@@ -14,11 +14,11 @@
 
 static int RESOLUTION = std::atoi(std::getenv("RESOLUTION"));
 
-class DashMainWindow : public QMainWindow {
+class MainWindow : public QMainWindow {
     Q_OBJECT
 
    public:
-    explicit DashMainWindow(QMainWindow *parent = 0);
+    explicit MainWindow(QMainWindow *parent = 0);
 
     inline QObject &get_open_auto_active_area() { return *this->open_auto_active_area; };
 
@@ -32,7 +32,7 @@ class DashMainWindow : public QMainWindow {
 
    signals:
     void data_tab_toggle(bool);
-    void open_auto_tab_toggle(unsigned int);
+    void toggle_open_auto(unsigned int);
 
    private:
     const int TAB_SIZE = 56 * RESOLUTION;

@@ -10,6 +10,10 @@
 
 #include "app/theme.hpp"
 
+const QFont Theme::h1_font = QFont("Montserrat", 36);
+const QFont Theme::h2_font = QFont("Montserrat", 18);
+const QFont Theme::h3_font = QFont("Montserrat", 14);
+
 Theme::Theme(QObject *parent) : QObject(parent), palette()
 {
     this->stylesheets["light"] = this->parse_stylesheet(":/light.qss");

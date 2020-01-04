@@ -13,19 +13,17 @@ class OBD {
     OBD();
     ~OBD();
 
-    bool is_connected() { return this->connected; }
-
     bool query(Command &cmd, double &val);
 
     static OBD *get_instance();
+
+    inline bool is_connected() { return this->connected; }
 
    private:
     int fd;
     std::mutex obd_mutex;
 
     bool connected = false;
-
-    std::string raw_query(std::string cmd) { return (this->_write(cmd) > 0) ? this->_read() : ""; }
 
     void connect(std::string, speed_t);
     void initialize();
@@ -34,6 +32,8 @@ class OBD {
     bool is_failed_response(std::string);
     Response receive();
     std::string _read();
+
+    inline std::string raw_query(std::string cmd) { return (this->_write(cmd) > 0) ? this->_read() : ""; }
 };
 
 #endif

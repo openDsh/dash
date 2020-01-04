@@ -16,11 +16,13 @@
 #include "app/theme.hpp"
 #include "app/window.hpp"
 
+#include <app/tabs/open_auto.hpp>
+
 namespace aasdk = f1x::aasdk;
 namespace autoapp = f1x::openauto::autoapp;
 using ThreadPool = std::vector<std::thread>;
 
-DashMainWindow::DashMainWindow(QMainWindow *parent) : QMainWindow(parent)
+MainWindow::MainWindow(QMainWindow *parent) : QMainWindow(parent)
 {
     QFontDatabase::addApplicationFont(":/Titillium_Web/TitilliumWeb-Regular.ttf");
     QFontDatabase::addApplicationFont(":/Montserrat/Montserrat-LightItalic.ttf");
@@ -68,7 +70,7 @@ DashMainWindow::DashMainWindow(QMainWindow *parent) : QMainWindow(parent)
             SLOT(update_icons(QList<QPair<int, QIcon>> &, QList<QPair<QPushButton *, QIcon>> &)));
 
     connect(this->tabs, &QTabWidget::currentChanged, [this](int index) {
-        emit this->open_auto_tab_toggle((index == 0) ? this->brightness : 0);
+        emit this->toggle_open_auto((index == 0) ? this->brightness : 0);
 
         emit this->data_tab_toggle(index == 2);
     });
@@ -113,7 +115,7 @@ DashMainWindow::DashMainWindow(QMainWindow *parent) : QMainWindow(parent)
     mainLayout->addLayout(bottom);
 }
 
-void DashMainWindow::update_icons(QList<QPair<int, QIcon>> &tab_icons, QList<QPair<QPushButton *, QIcon>> &button_icons)
+void MainWindow::update_icons(QList<QPair<int, QIcon>> &tab_icons, QList<QPair<QPushButton *, QIcon>> &button_icons)
 {
     auto tab_bar = this->tabs->tabBar();
     for (auto &icon : tab_icons) tab_bar->setTabIcon(icon.first, icon.second);
@@ -121,20 +123,20 @@ void DashMainWindow::update_icons(QList<QPair<int, QIcon>> &tab_icons, QList<QPa
     for (auto &icon : button_icons) icon.first->setIcon(icon.second);
 }
 
-void DashMainWindow::start_open_auto()
+void MainWindow::start_open_auto()
 {
     static OpenAutoTab *open_auto_tab = qobject_cast<OpenAutoTab *>(this->tabs->widget(0));
     open_auto_tab->start_worker();
 }
 
-void DashMainWindow::update_brightness(int position)
+void MainWindow::update_brightness(int position)
 {
     this->brightness = position;
     setWindowOpacity(this->brightness / 255.0);
-    if (this->tabs->currentIndex() == 0) emit open_auto_tab_toggle(this->brightness);
+    if (this->tabs->currentIndex() == 0) emit toggle_open_auto(this->brightness);
 }
 
-void DashMainWindow::update_system_volume(int position)
+void MainWindow::update_system_volume(int position)
 {
     QProcess *lProc = new QProcess();
     std::string command = "amixer set Master " + std::to_string(position) + "% --quiet";
@@ -142,7 +144,7 @@ void DashMainWindow::update_system_volume(int position)
     lProc->waitForFinished();
 }
 
-void DashMainWindow::update_slider_volume()
+void MainWindow::update_slider_volume()
 {
     QProcess *lProc = new QProcess();
     lProc->start("amixer sget Master");

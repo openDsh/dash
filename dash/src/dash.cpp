@@ -6,7 +6,7 @@ int main(int argc, char *argv[])
 {
     QApplication qApplication(argc, argv);
 
-    DashMainWindow w;
+    MainWindow w;
     w.setWindowFlags(Qt::FramelessWindowHint);
     if (std::atoi(std::getenv("DEBUG")))
         w.setFixedSize(1024 * RESOLUTION, 600 * RESOLUTION);

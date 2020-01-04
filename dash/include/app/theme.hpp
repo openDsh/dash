@@ -14,7 +14,11 @@ class Theme : public QObject {
     Q_OBJECT
 
    public:
-    explicit Theme(QObject *parent = 0);
+    static const QFont h1_font;
+    static const QFont h2_font;
+    static const QFont h3_font;
+
+    Theme(QObject *parent = 0);
 
     inline void set_mode(bool mode)
     {

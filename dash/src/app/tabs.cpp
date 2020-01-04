@@ -2,22 +2,17 @@
 #include <QRadioTuner>
 #include <QThread>
 #include <QtWidgets>
-#include <f1x/aasdk/TCP/TCPWrapper.hpp>
-#include <f1x/aasdk/USB/AccessoryModeQueryChain.hpp>
-#include <f1x/aasdk/USB/AccessoryModeQueryChainFactory.hpp>
-#include <f1x/aasdk/USB/AccessoryModeQueryFactory.hpp>
-#include <f1x/aasdk/USB/ConnectedAccessoriesEnumerator.hpp>
-#include <f1x/aasdk/USB/USBHub.hpp>
-#include <f1x/openauto/autoapp/App.hpp>
-#include <f1x/openauto/autoapp/Configuration/Configuration.hpp>
-#include <f1x/openauto/autoapp/Configuration/IConfiguration.hpp>
-#include <f1x/openauto/autoapp/Configuration/RecentAddressesList.hpp>
-#include <f1x/openauto/autoapp/Service/AndroidAutoEntityFactory.hpp>
-#include <f1x/openauto/autoapp/Service/ServiceFactory.hpp>
 
 #include <iostream>
 #include <regex>
 #include <thread>
+
+#include <aasdk_proto/VideoFPSEnum.pb.h>
+#include <aasdk_proto/VideoResolutionEnum.pb.h>
+#include <aasdk_proto/ButtonCodeEnum.pb.h>
+#include <f1x/openauto/autoapp/Configuration/BluetootAdapterType.hpp>
+#include <f1x/openauto/autoapp/Configuration/HandednessOfTrafficType.hpp>
+#include <f1x/openauto/autoapp/Configuration/AudioOutputBackendType.hpp>
 
 #include <BluezQt/Device>
 #include <BluezQt/PendingCall>
@@ -37,122 +32,10 @@
 
 namespace aasdk = f1x::aasdk;
 namespace autoapp = f1x::openauto::autoapp;
-using ThreadPool = std::vector<std::thread>;
 
 QFont f("Montserrat", 18);
 QFont ff("Montserrat", 14);
 QFont fff("Montserrat", 36);
-
-OpenAutoWorker::OpenAutoWorker(QWidget *parent, std::function<void(bool)> callback)
-    : active_area(parent),
-      active_callback(callback),
-      io_service(),
-      work(io_service),
-      configuration(Config::get_instance()->open_auto_config),
-      //   recent_addresses(7),
-      tcp_wrapper(),
-      usb_wrapper((init_usb_context(), usb_context)),
-      query_factory(usb_wrapper, io_service),
-      query_chain_factory(usb_wrapper, io_service, query_factory),
-      service_factory(io_service, configuration, active_area, active_callback),
-      android_auto_entity_factory(io_service, configuration, service_factory),
-      usb_hub(std::make_shared<aasdk::usb::USBHub>(this->usb_wrapper, this->io_service, this->query_chain_factory)),
-      connected_accessories_enumerator(std::make_shared<aasdk::usb::ConnectedAccessoriesEnumerator>(
-          this->usb_wrapper, this->io_service, this->query_chain_factory)),
-      app(std::make_shared<autoapp::App>(this->io_service, this->usb_wrapper, this->tcp_wrapper,
-                                         this->android_auto_entity_factory, usb_hub, connected_accessories_enumerator))
-{
-    this->create_usb_workers();
-    this->create_io_service_workers();
-}
-
-void OpenAutoWorker::start()
-{
-    // this->recent_addresses.read();
-
-    // QObject::connect(&this->connect_dialog, &autoapp::ui::ConnectDialog::connectionSucceed, [this](auto socket) {
-    //     this->app->start(std::move(socket));
-    // });
-
-    this->app->waitForUSBDevice();
-}
-
-void OpenAutoWorker::init_usb_context() { libusb_init(&this->usb_context); }
-
-OpenAutoWorker::~OpenAutoWorker()
-{
-    std::for_each(this->thread_pool.begin(), this->thread_pool.end(),
-                  std::bind(&std::thread::join, std::placeholders::_1));
-    libusb_exit(this->usb_context);
-}
-
-void OpenAutoWorker::create_usb_workers()
-{
-    auto worker = [this]() {
-        timeval event_timeout = {180, 0};
-        while (!this->io_service.stopped())
-            libusb_handle_events_timeout_completed(this->usb_context, &event_timeout, nullptr);
-    };
-
-    this->thread_pool.emplace_back(worker);
-    this->thread_pool.emplace_back(worker);
-    this->thread_pool.emplace_back(worker);
-    this->thread_pool.emplace_back(worker);
-}
-
-void OpenAutoWorker::create_io_service_workers()
-{
-    auto worker = [this]() { this->io_service.run(); };
-
-    this->thread_pool.emplace_back(worker);
-    this->thread_pool.emplace_back(worker);
-    this->thread_pool.emplace_back(worker);
-    this->thread_pool.emplace_back(worker);
-}
-
-OpenAutoTab::OpenAutoTab(QWidget *parent) : QWidget(parent)
-{
-    this->app = qobject_cast<DashMainWindow *>(parent);
-
-    connect(this->app, SIGNAL(open_auto_tab_toggle(unsigned int)), this, SLOT(toggle_open_auto(unsigned int)));
-
-    this->mainLayout = new QStackedLayout;
-    this->mainLayout->setContentsMargins(0, 0, 0, 0);
-    QWidget *waiting_widget = new QWidget;
-    QVBoxLayout *waiting_layout = new QVBoxLayout;
-    waiting_layout->setContentsMargins(24, 24, 24, 24);
-    QLabel *waiting = new QLabel("waiting for device...");
-    waiting->setFont(f);
-    waiting->setAlignment(Qt::AlignHCenter);
-    QLabel *plugin = new QLabel("plug in your device to start OpenAuto");
-    plugin->setFont(f);
-    plugin->setAlignment(Qt::AlignHCenter);
-    waiting_layout->addSpacerItem(new QSpacerItem(1, 1, QSizePolicy::Minimum, QSizePolicy::Expanding));
-    waiting_layout->addWidget(waiting);
-    waiting_layout->addWidget(plugin);
-    waiting_layout->addSpacerItem(new QSpacerItem(1, 1, QSizePolicy::Minimum, QSizePolicy::Expanding));
-    waiting_widget->setLayout(waiting_layout);
-    this->mainLayout->addWidget(waiting_widget);
-#ifdef USE_OMX
-    QWidget *black = new QWidget;
-    black->setStyleSheet("background-color: black;");
-    this->mainLayout->addWidget(black);
-#endif
-    setLayout(this->mainLayout);
-}
-
-void OpenAutoTab::start_worker()
-{
-    auto callback = [this](bool is_active) { this->toggle((is_active) ? 1 : 0); };
-    if (this->worker == nullptr) this->worker = new OpenAutoWorker(this, callback);
-    this->worker->start();
-}
-
-void OpenAutoTab::toggle_open_auto(unsigned int alpha)
-{
-    if (this->worker != nullptr) this->worker->setOpacity(alpha);
-    if (alpha > 0) this->setFocus();
-}
 
 MediaTab::MediaTab(QWidget *parent) : QWidget(parent)
 {
@@ -373,7 +256,7 @@ void MediaTab::forward()
 
 DataTab::DataTab(QWidget *parent) : QWidget(parent)
 {
-    this->app = qobject_cast<DashMainWindow *>(parent);
+    this->app = qobject_cast<MainWindow *>(parent);
 
     this->obd = OBD::get_instance();
 
@@ -504,7 +387,7 @@ void DataTab::convert_gauges(bool si)
 
 SettingsTab::SettingsTab(QWidget *parent) : QWidget(parent)
 {
-    this->app = qobject_cast<DashMainWindow *>(parent);
+    this->app = qobject_cast<MainWindow *>(parent);
     this->config = Config::get_instance();
 
     this->theme = Theme::get_instance();
