@@ -392,11 +392,11 @@ DataTab::DataTab(QWidget *parent) : QWidget(parent)
     Config *config = Config::get_instance();
     bool si = config->get_si_units();
 
-    this->gauges.push_back(new Gauge("°F", 0, 48, 16, 5000, {commands.COOLANT_TEMP}, 1,
+    this->gauges.push_back(new Gauge("°F", 0, 48, 16, 5000, {cmds.COOLANT_TEMP}, 1,
                                      [](std::vector<double> x, bool si) { return (si) ? x[0] : c_to_f(x[0]); }, si,
                                      "°C"));
     this->gauges.push_back(
-        new Gauge("%", 0, 48, 16, 500, {commands.LOAD}, 1, [](std::vector<double> x, bool _) { return x[0]; }, si));
+        new Gauge("%", 0, 48, 16, 500, {cmds.LOAD}, 1, [](std::vector<double> x, bool _) { return x[0]; }, si));
 
     QFont description_font("Montserrat", 16, QFont::Light);
 
@@ -425,17 +425,17 @@ DataTab::DataTab(QWidget *parent) : QWidget(parent)
     QWidget *drive_w = new QWidget;
     QHBoxLayout *drive = new QHBoxLayout(drive_w);
 
-    this->gauges.push_back(new Gauge("mph", 1, 92, 24, 100, {commands.SPEED}, 0,
+    this->gauges.push_back(new Gauge("mph", 1, 92, 24, 100, {cmds.SPEED}, 0,
                                      [](std::vector<double> x, bool si) { return (si) ? kph_to_mph(x[0]) : x[0]; }, si,
                                      "km/h"));
-    this->gauges.push_back(new Gauge("x1000rpm", 1, 92, 24, 100, {commands.RPM}, 1,
+    this->gauges.push_back(new Gauge("x1000rpm", 1, 92, 24, 100, {cmds.RPM}, 1,
                                      [](std::vector<double> x, bool _) { return x[0] / 1000.0; }, si));
     drive->addWidget(this->gauges[2]);
     drive->addWidget(this->gauges[3]);
 
     QWidget *left_w = new QWidget;
     QVBoxLayout *left = new QVBoxLayout(left_w);
-    this->gauges.push_back(new Gauge("mpg", 1, 48, 16, 100, {commands.SPEED, commands.MAF}, 1,
+    this->gauges.push_back(new Gauge("mpg", 1, 48, 16, 100, {cmds.SPEED, cmds.MAF}, 1,
                                      [](std::vector<double> x, bool si) {
                                          return ((si) ? x[0] : kph_to_mph(x[0])) /
                                                 ((si) ? gps_to_lph(x[1]) : gps_to_gph(x[1]));
@@ -917,7 +917,7 @@ void SettingsTab::media_player_changed(QString name, BluezQt::MediaPlayerPtr)
     this->media_player->setText((name.isEmpty()) ? "not connected" : name);
 }
 
-Gauge::Gauge(QString unit, int pos, int font_v, int font_u, int refresh_rate, std::vector<Command<double>> commands,
+Gauge::Gauge(QString unit, int pos, int font_v, int font_u, int refresh_rate, std::vector<Command> commands,
              int precision, std::function<double(std::vector<double>, bool)> result, bool si, QString alt_unit,
              QWidget *parent)
     : QWidget(parent)
@@ -987,7 +987,7 @@ void Gauge::update_gauge()
     for (auto &x : this->commands) {
         if (std::atoi(std::getenv("DEBUG")))
             val = rand() % 256;
-        else if (!OBD::get_instance()->query<double>(x, val))
+        else if (!OBD::get_instance()->query(x, val))
             return;
         results.push_back(val);
     }

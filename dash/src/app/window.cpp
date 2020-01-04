@@ -15,7 +15,6 @@
 #include "app/tabs.hpp"
 #include "app/theme.hpp"
 #include "app/window.hpp"
-#include "obd/conversions.hpp"
 
 namespace aasdk = f1x::aasdk;
 namespace autoapp = f1x::openauto::autoapp;

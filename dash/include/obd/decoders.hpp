@@ -3,14 +3,14 @@
 
 #include "obd/message.hpp"
 
-double percentage(Response response) { return (100.0 / 255.0) * response.A; }
+double percentage(Response resp) { return (100.0 / 255.0) * resp.A; }
 
-double temp(Response response) { return response.A - 40; }
+double temp(Response resp) { return resp.A - 40; }
 
-double rpm(Response response) { return ((256.0 * response.A) + response.B) / 4.0; }
+double rpm(Response resp) { return ((256.0 * resp.A) + resp.B) / 4.0; }
 
-double speed(Response response) { return response.A; }
+double speed(Response resp) { return resp.A; }
 
-double flow(Response response) { return ((256.0 * response.A) + response.B) / 100.0; }
+double flow(Response resp) { return ((256.0 * resp.A) + resp.B) / 100.0; }
 
 #endif

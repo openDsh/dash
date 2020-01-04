@@ -6,22 +6,21 @@
 
 #include "obd/message.hpp"
 
-template <typename T>
 struct Command {
     std::string description;
     Request request;
-    std::function<T(Response)> decoder;
+    std::function<double(Response)> decoder;
 };
 
 struct Commands {
-    Command<double> LOAD;
-    Command<double> COOLANT_TEMP;
-    Command<double> RPM;
-    Command<double> SPEED;
-    Command<double> INTAKE_TEMP;
-    Command<double> MAF;
+    Command LOAD;
+    Command COOLANT_TEMP;
+    Command RPM;
+    Command SPEED;
+    Command INTAKE_TEMP;
+    Command MAF;
 };
 
-extern Commands commands;
+extern Commands cmds;
 
 #endif

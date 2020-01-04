@@ -132,7 +132,7 @@ class Gauge : public QWidget {
 
    public:
     explicit Gauge(QString unit, int pos, int font_v, int font_u, int refresh_rate,
-                   std::vector<Command<double>> commands, int precision,
+                   std::vector<Command> commands, int precision,
                    std::function<double(std::vector<double>, bool)> result, bool si, QString alt_unit = QString(),
                    QWidget *parent = 0);
 
@@ -158,7 +158,7 @@ class Gauge : public QWidget {
     QTimer *timer;
     int refresh_rate;
 
-    std::vector<Command<double>> commands;
+    std::vector<Command> commands;
     std::function<double(std::vector<double>, bool)> result;
     int precision;
 };
