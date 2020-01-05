@@ -21,37 +21,7 @@
 
 class QTabWidget;
 class MainWindow;
-class OpenAutoTab;
 class DataTab;
-
-class MediaTab : public QWidget {
-    Q_OBJECT
-
-   public:
-    explicit MediaTab(QWidget *parent = 0);
-
-   private slots:
-    void toggle_play(bool checked = false);
-    void back();
-    void forward();
-    void update_media_player(QString, BluezQt::MediaPlayerPtr);
-    void update_media_player_status(BluezQt::MediaPlayer::Status);
-    void update_media_player_track(BluezQt::MediaPlayerTrack);
-
-   private:
-    Theme *theme;
-    Bluetooth *bluetooth;
-    QTabWidget *tabWidget;
-    QPushButton *play_button;
-    QString media_player_path;
-    QDBusInterface *media_player_interface = nullptr;
-
-    QLabel *artist;
-    QLabel *album;
-    QLabel *title;
-
-    void set_media_stats();
-};
 
 class Gauge : public QWidget {
     Q_OBJECT
