@@ -52,7 +52,7 @@ MainWindow::MainWindow(QMainWindow *parent) : QMainWindow(parent)
     OpenAutoTab *open_auto_tab = new OpenAutoTab(this);
     open_auto_tab->setFocus();
     this->tabs->addTab(open_auto_tab, "");
-    this->tabs->addTab(new MediaTab(this), "");
+    this->tabs->addTab(new BluetoothPlayerTab(this), "");
     DataTab *data_tab = new DataTab(this);
     this->tabs->addTab(data_tab, "");
     this->tabs->addTab(new QWidget(this), "");

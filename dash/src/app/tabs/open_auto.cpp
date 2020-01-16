@@ -68,18 +68,16 @@ OpenAutoTab::OpenAutoTab(QWidget *parent) : QWidget(parent)
 
     layout->addWidget(this->msg_widget());
 #ifdef USE_OMX
-    QWidget *open_auto_widget = new QWidget(this);
-    open_auto_widget->setStyleSheet("background-color: black;");
-    layout->addWidget(open_auto_widget);
+    QWidget *omx_backdrop = new QWidget(this);
+    omx_backdrop->setStyleSheet("background-color: black;");
+    layout->addWidget(omx_backdrop);
 #endif
-
-    this->setLayout(layout);
 }
 
 void OpenAutoTab::start_worker()
 {
-    QStackedLayout *main_layout = qobject_cast<QStackedLayout *>(this->layout());
-    auto callback = [main_layout](bool is_active) { main_layout->setCurrentIndex((is_active) ? 1 : 0); };
+    QStackedLayout *layout = qobject_cast<QStackedLayout *>(this->layout());
+    auto callback = [layout](bool is_active) { layout->setCurrentIndex((is_active) ? 1 : 0); };
     if (this->worker == nullptr) this->worker = new OpenAutoWorker(callback, this);
 
     this->worker->start();
@@ -92,13 +90,13 @@ QWidget *OpenAutoTab::msg_widget()
     layout->setContentsMargins(24, 24, 24, 24);
 
     QLabel *top_msg = new QLabel("waiting for device...", widget);
-    top_msg->setFont(Theme::h2_font);
+    top_msg->setFont(Theme::font_18);
     top_msg->setAlignment(Qt::AlignHCenter);
     layout->addStretch(1);
     layout->addWidget(top_msg);
 
     QLabel *bottom_msg = new QLabel("plug in your device to start OpenAuto", widget);
-    bottom_msg->setFont(Theme::h2_font);
+    bottom_msg->setFont(Theme::font_18);
     bottom_msg->setAlignment(Qt::AlignHCenter);
     layout->addWidget(bottom_msg);
     layout->addStretch(1);

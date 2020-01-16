@@ -14,9 +14,14 @@ class Theme : public QObject {
     Q_OBJECT
 
    public:
-    static const QFont h1_font;
-    static const QFont h2_font;
-    static const QFont h3_font;
+    static const QFont font_14;
+    static const QFont font_18;
+    static const QFont font_36;
+
+    static const QSize icon_36;
+    static const QSize icon_48;
+    static const QSize icon_56;
+    static const QSize icon_96;
 
     Theme(QObject *parent = 0);
 

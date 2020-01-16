@@ -10,9 +10,14 @@
 
 #include "app/theme.hpp"
 
-const QFont Theme::h1_font = QFont("Montserrat", 36);
-const QFont Theme::h2_font = QFont("Montserrat", 18);
-const QFont Theme::h3_font = QFont("Montserrat", 14);
+const QFont Theme::font_14 = QFont("Montserrat", 14);
+const QFont Theme::font_18 = QFont("Montserrat", 18);
+const QFont Theme::font_36 = QFont("Montserrat", 36);
+
+const QSize Theme::icon_36 = QSize(36, 36);
+const QSize Theme::icon_48 = QSize(48, 48);
+const QSize Theme::icon_56 = QSize(56, 56);
+const QSize Theme::icon_96 = QSize(96, 96);
 
 Theme::Theme(QObject *parent) : QObject(parent), palette()
 {
