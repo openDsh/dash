@@ -1,17 +1,13 @@
 #include <BluezQt/PendingCall>
 
-#include <app/bluetooth.hpp>
-#include <app/config.hpp>
 #include <app/tabs/media.hpp>
-#include <app/theme.hpp>
-#include <app/tuner.hpp>
 #include <app/window.hpp>
 
 MediaTab::MediaTab(QWidget *parent) : QWidget(parent)
 {
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
-    
+
     QTabWidget *widget = new QTabWidget(this);
     widget->tabBar()->setFont(Theme::font_18);
     widget->addTab(new RadioPlayerTab(widget), "Radio");
@@ -22,6 +18,8 @@ MediaTab::MediaTab(QWidget *parent) : QWidget(parent)
 
 BluetoothPlayerTab::BluetoothPlayerTab(QWidget *parent) : QWidget(parent)
 {
+    this->bluetooth = Bluetooth::get_instance();
+
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->setContentsMargins(24, 24, 24, 24);
 
@@ -34,49 +32,48 @@ BluetoothPlayerTab::BluetoothPlayerTab(QWidget *parent) : QWidget(parent)
 
 QWidget *BluetoothPlayerTab::track_widget()
 {
-    Bluetooth *bluetooth = Bluetooth::get_instance();
-    BluezQt::MediaPlayerPtr media_player = bluetooth->get_media_player().second;
+    BluezQt::MediaPlayerPtr media_player = this->bluetooth->get_media_player().second;
 
     QWidget *widget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
 
-    QLabel *artist_label = new QLabel("Artist", widget);
-    artist_label->setFont(Theme::font_18);
+    QLabel *artist_hdr = new QLabel("Artist", widget);
+    artist_hdr->setFont(Theme::font_18);
     QLabel *artist = new QLabel((media_player != nullptr) ? media_player->track().artist() : QString(), widget);
     artist->setFont(Theme::font_14);
     artist->setStyleSheet("padding-left: 16px;");
-    layout->addWidget(artist_label);
+    layout->addWidget(artist_hdr);
     layout->addWidget(artist);
 
-    QLabel *album_label = new QLabel("Album", widget);
-    album_label->setFont(Theme::font_18);
+    QLabel *album_hdr = new QLabel("Album", widget);
+    album_hdr->setFont(Theme::font_18);
     QLabel *album = new QLabel((media_player != nullptr) ? media_player->track().album() : QString(), widget);
     album->setFont(Theme::font_14);
     album->setStyleSheet("padding-left: 16px;");
-    layout->addWidget(album_label);
+    layout->addWidget(album_hdr);
     layout->addWidget(album);
 
-    QLabel *title_label = new QLabel("Title", widget);
-    title_label->setFont(Theme::font_18);
+    QLabel *title_hdr = new QLabel("Title", widget);
+    title_hdr->setFont(Theme::font_18);
     QLabel *title = new QLabel((media_player != nullptr) ? media_player->track().title() : QString(), widget);
     title->setFont(Theme::font_14);
     title->setStyleSheet("padding-left: 16px;");
-    layout->addWidget(title_label);
+    layout->addWidget(title_hdr);
     layout->addWidget(title);
 
-    connect(bluetooth, &Bluetooth::media_player_track_changed, [artist, album, title](BluezQt::MediaPlayerTrack track) {
-        artist->setText(track.artist());
-        album->setText(track.album());
-        title->setText(track.title());
-    });
+    connect(this->bluetooth, &Bluetooth::media_player_track_changed,
+            [artist, album, title](BluezQt::MediaPlayerTrack track) {
+                artist->setText(track.artist());
+                album->setText(track.album());
+                title->setText(track.title());
+            });
 
     return widget;
 }
 
 QWidget *BluetoothPlayerTab::controls_widget()
 {
-    Bluetooth *bluetooth = Bluetooth::get_instance();
-    BluezQt::MediaPlayerPtr media_player = bluetooth->get_media_player().second;
+    BluezQt::MediaPlayerPtr media_player = this->bluetooth->get_media_player().second;
     Theme *theme = Theme::get_instance();
 
     QWidget *widget = new QWidget(this);
@@ -85,7 +82,7 @@ QWidget *BluetoothPlayerTab::controls_widget()
     QPushButton *previous_button = new QPushButton(widget);
     previous_button->setFlat(true);
     previous_button->setIconSize(Theme::icon_96);
-    connect(previous_button, &QPushButton::clicked, [bluetooth]() {
+    connect(previous_button, &QPushButton::clicked, [bluetooth = this->bluetooth]() {
         BluezQt::MediaPlayerPtr media_player = bluetooth->get_media_player().second;
         if (media_player != nullptr) media_player->previous()->waitForFinished();
     });
@@ -99,7 +96,7 @@ QWidget *BluetoothPlayerTab::controls_widget()
     bool status = (media_player != nullptr) ? media_player->status() == BluezQt::MediaPlayer::Status::Playing : false;
     play_button->setChecked(status);
     play_button->setIconSize(Theme::icon_96);
-    connect(play_button, &QPushButton::clicked, [play_button, bluetooth](bool checked = false) {
+    connect(play_button, &QPushButton::clicked, [bluetooth = this->bluetooth, play_button](bool checked = false) {
         play_button->setChecked(!checked);
 
         BluezQt::MediaPlayerPtr media_player = bluetooth->get_media_player().second;
@@ -110,9 +107,10 @@ QWidget *BluetoothPlayerTab::controls_widget()
                 media_player->pause()->waitForFinished();
         }
     });
-    connect(bluetooth, &Bluetooth::media_player_status_changed, [play_button](BluezQt::MediaPlayer::Status status) {
-        play_button->setChecked(status == BluezQt::MediaPlayer::Status::Playing);
-    });
+    connect(this->bluetooth, &Bluetooth::media_player_status_changed,
+            [play_button](BluezQt::MediaPlayer::Status status) {
+                play_button->setChecked(status == BluezQt::MediaPlayer::Status::Playing);
+            });
     theme->add_button_icon("pause", play_button, "play");
     layout->addStretch(1);
     layout->addWidget(play_button);
@@ -120,7 +118,7 @@ QWidget *BluetoothPlayerTab::controls_widget()
     QPushButton *forward_button = new QPushButton(widget);
     forward_button->setFlat(true);
     forward_button->setIconSize(Theme::icon_96);
-    connect(forward_button, &QPushButton::clicked, [bluetooth]() {
+    connect(forward_button, &QPushButton::clicked, [bluetooth = this->bluetooth]() {
         BluezQt::MediaPlayerPtr media_player = bluetooth->get_media_player().second;
         if (media_player != nullptr) media_player->next()->waitForFinished();
     });
@@ -134,77 +132,99 @@ QWidget *BluetoothPlayerTab::controls_widget()
 
 RadioPlayerTab::RadioPlayerTab(QWidget *parent) : QWidget(parent)
 {
-    Theme *theme = Theme::get_instance();
-    Config *config = Config::get_instance();
+    this->theme = Theme::get_instance();
+    this->config = Config::get_instance();
+    this->tuner = new Tuner();
 
-    QVBoxLayout *layout = new QVBoxLayout;
+    QVBoxLayout *layout = new QVBoxLayout(this);
     layout->setContentsMargins(24, 24, 24, 24);
-    Tuner *tuner = new Tuner(config->get_radio_station());
-    tuner->setFont(Theme::font_14);
-
-    QLabel *tuner_value = new QLabel(QString::number(tuner->sliderPosition() / 10.0, 'f', 1));
-    tuner_value->setAlignment(Qt::AlignCenter);
-    tuner_value->setFont(Theme::font_36);
-
-    connect(tuner, &Tuner::station_updated, [tuner_value, config](int station) {
-        tuner_value->setText(QString::number(station / 10.0, 'f', 1));
-        config->set_radio_station(station);
-    });
 
     layout->addStretch(1);
-    layout->addWidget(tuner_value);
+    layout->addWidget(this->tuner_widget());
     layout->addStretch(1);
-    layout->addWidget(tuner);
+    layout->addWidget(this->controls_widget());
+    layout->addStretch(1);
+}
+
+QWidget *RadioPlayerTab::tuner_widget()
+{
+    QWidget *widget = new QWidget(this);
+    QVBoxLayout *layout = new QVBoxLayout(widget);
+
+    this->tuner->setParent(widget);
+    this->tuner->setFont(Theme::font_14);
+
+    QLabel *station = new QLabel(QString::number(this->tuner->sliderPosition() / 10.0, 'f', 1), widget);
+    station->setAlignment(Qt::AlignCenter);
+    station->setFont(Theme::font_36);
+    connect(this->tuner, &Tuner::station_updated,
+            [station](int freq) { station->setText(QString::number(freq / 10.0, 'f', 1)); });
+    layout->addWidget(station);
+    layout->addStretch(1);
+    layout->addWidget(this->tuner);
+
+    return widget;
+}
+
+QWidget *RadioPlayerTab::controls_widget()
+{
+    QWidget *widget = new QWidget(this);
+    QHBoxLayout *layout = new QHBoxLayout(widget);
+
+    QPushButton *scan_reverse_button = new QPushButton(widget);
+    scan_reverse_button->setFlat(true);
+    scan_reverse_button->setIconSize(Theme::icon_96);
+    this->theme->add_button_icon("fast_rewind", scan_reverse_button);
+    connect(scan_reverse_button, &QPushButton::clicked,
+            [tuner = this->tuner]() { tuner->setSliderPosition(tuner->sliderPosition() - 5); });
+    layout->addStretch(1);
+    layout->addWidget(scan_reverse_button);
+
+    QPushButton *prev_station_button = new QPushButton(widget);
+    prev_station_button->setFlat(true);
+    prev_station_button->setIconSize(Theme::icon_96);
+    this->theme->add_button_icon("skip_previous", prev_station_button);
+    connect(prev_station_button, &QPushButton::clicked,
+            [tuner = this->tuner]() { tuner->setSliderPosition(tuner->sliderPosition() - 1); });
+    layout->addStretch(1);
+    layout->addWidget(prev_station_button);
+
+    QPushButton *next_station_button = new QPushButton(widget);
+    next_station_button->setFlat(true);
+    next_station_button->setIconSize(Theme::icon_96);
+    this->theme->add_button_icon("skip_next", next_station_button);
+    connect(next_station_button, &QPushButton::clicked,
+            [tuner = this->tuner]() { tuner->setSliderPosition(tuner->sliderPosition() + 1); });
+    layout->addStretch(1);
+    layout->addWidget(next_station_button);
+
+    QPushButton *scan_forward_button = new QPushButton(widget);
+    scan_forward_button->setFlat(true);
+    scan_forward_button->setIconSize(Theme::icon_96);
+    this->theme->add_button_icon("fast_forward", scan_forward_button);
+    connect(scan_forward_button, &QPushButton::clicked,
+            [tuner = this->tuner]() { tuner->setSliderPosition(tuner->sliderPosition() + 5); });
+    layout->addStretch(1);
+    layout->addWidget(scan_forward_button);
+
+    QFrame *vert_break = new QFrame(widget);
+    vert_break->setLineWidth(1);
+    vert_break->setFrameShape(QFrame::VLine);
+    vert_break->setFrameShadow(QFrame::Plain);
+    layout->addStretch(1);
+    layout->addWidget(vert_break);
+
+    QPushButton *mute_button = new QPushButton(widget);
+    mute_button->setFlat(true);
+    mute_button->setCheckable(true);
+    mute_button->setChecked(this->config->get_radio_muted());
+    mute_button->setIconSize(Theme::icon_56);
+    connect(mute_button, &QPushButton::clicked,
+            [config = this->config](bool checked = false) { config->set_radio_muted(checked); });
+    this->theme->add_button_icon("volume_off", mute_button);
+    layout->addStretch(1);
+    layout->addWidget(mute_button);
     layout->addStretch(1);
 
-    QHBoxLayout *controls = new QHBoxLayout;
-    QPushButton *scan_reverse = new QPushButton;
-    scan_reverse->setFlat(true);
-    scan_reverse->setIconSize(Theme::icon_96);
-    theme->add_button_icon("fast_rewind", scan_reverse);
-    connect(scan_reverse, &QPushButton::clicked, [tuner]() { tuner->setSliderPosition(tuner->sliderPosition() - 5); });
-    controls->addSpacerItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Minimum));
-    controls->addWidget(scan_reverse);
-    QPushButton *prev_station = new QPushButton;
-    prev_station->setFlat(true);
-    prev_station->setIconSize(Theme::icon_96);
-    theme->add_button_icon("skip_previous", prev_station);
-    connect(prev_station, &QPushButton::clicked, [tuner]() { tuner->setSliderPosition(tuner->sliderPosition() - 1); });
-    controls->addSpacerItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Minimum));
-    controls->addWidget(prev_station);
-    QPushButton *next_station = new QPushButton;
-    next_station->setFlat(true);
-    next_station->setIconSize(Theme::icon_96);
-    theme->add_button_icon("skip_next", next_station);
-    connect(next_station, &QPushButton::clicked, [tuner]() { tuner->setSliderPosition(tuner->sliderPosition() + 1); });
-    controls->addSpacerItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Minimum));
-    controls->addWidget(next_station);
-    QPushButton *scan_forward = new QPushButton;
-    scan_forward->setFlat(true);
-    scan_forward->setIconSize(Theme::icon_96);
-    theme->add_button_icon("fast_forward", scan_forward);
-    connect(scan_forward, &QPushButton::clicked, [tuner]() { tuner->setSliderPosition(tuner->sliderPosition() + 5); });
-    controls->addSpacerItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Minimum));
-    controls->addWidget(scan_forward);
-    controls->addSpacerItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Minimum));
-    QFrame *line = new QFrame;
-    line->setLineWidth(1);
-    line->setFrameShape(QFrame::VLine);
-    line->setFrameShadow(QFrame::Plain);
-    controls->addWidget(line);
-    QPushButton *mute = new QPushButton;
-    mute->setFlat(true);
-    mute->setCheckable(true);
-    mute->setChecked(config->get_radio_muted());
-    mute->setIconSize(Theme::icon_56);
-    connect(mute, &QPushButton::clicked, [config](bool checked = false) { config->set_radio_muted(checked); });
-    theme->add_button_icon("volume_off", mute);
-    controls->addSpacerItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Minimum));
-    controls->addWidget(mute);
-    controls->addSpacerItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Minimum));
-
-    layout->addLayout(controls);
-    layout->addSpacerItem(new QSpacerItem(1, 1, QSizePolicy::Minimum, QSizePolicy::Expanding));
-
-    this->setLayout(layout);
+    return widget;
 }

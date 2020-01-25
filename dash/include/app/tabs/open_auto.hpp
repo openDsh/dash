@@ -25,6 +25,9 @@ class OpenAutoWorker {
     inline void set_opacity(unsigned int alpha) { this->service_factory.setOpacity(alpha); }
 
    private:
+    void create_usb_workers();
+    void create_io_service_workers();
+
     libusb_context *usb_context;
     boost::asio::io_service io_service;
     boost::asio::io_service::work work;
@@ -39,9 +42,6 @@ class OpenAutoWorker {
     std::shared_ptr<aasdk::usb::ConnectedAccessoriesEnumerator> connected_accessories_enumerator;
     std::shared_ptr<autoapp::App> app;
     std::vector<std::thread> thread_pool;
-
-    void create_usb_workers();
-    void create_io_service_workers();
 };
 
 class OpenAutoTab : public QWidget {
@@ -49,10 +49,11 @@ class OpenAutoTab : public QWidget {
 
    public:
     OpenAutoTab(QWidget *parent = 0);
+
     void start_worker();
 
    private:
-    OpenAutoWorker *worker = nullptr;
-
     QWidget *msg_widget();
+
+    OpenAutoWorker *worker = nullptr;
 };

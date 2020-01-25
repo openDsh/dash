@@ -4,13 +4,18 @@
 
 #include <app/tuner.hpp>
 
-Tuner::Tuner(int default_position, QWidget *parent) : QSlider(Qt::Orientation::Horizontal, parent)
+Tuner::Tuner(QWidget *parent) : QSlider(Qt::Orientation::Horizontal, parent)
 {
+    this->config = Config::get_instance();
+
     setRange(880, 1080);
     setTickInterval(1);
-    setSliderPosition(default_position);
+    setSliderPosition(this->config->get_radio_station());
 
-    connect(this, &QSlider::valueChanged, [this](int value) { emit station_updated(this->sliderPosition()); });
+    connect(this, &QSlider::valueChanged, [this](int value) {
+        emit station_updated(value);
+        this->config->set_radio_station(value);
+    });
 }
 
 QSize Tuner::sizeHint() const

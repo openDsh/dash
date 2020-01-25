@@ -3,12 +3,14 @@
 
 #include <QSlider>
 
+#include <app/config.hpp>
+
 class Tuner : public QSlider {
     Q_OBJECT
     Q_PROPERTY(QColor color READ get_color WRITE set_color)
 
    public:
-    Tuner(int default_position = 980, QWidget *parent = nullptr);
+    Tuner(QWidget *parent = nullptr);
     QSize sizeHint() const override;
 
     QColor get_color() { return this->color; }
@@ -21,6 +23,7 @@ class Tuner : public QSlider {
     void station_updated(int);
 
    private:
+    Config *config;
     QColor color;
 };
 
