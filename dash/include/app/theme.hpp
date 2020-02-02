@@ -23,6 +23,9 @@ class Theme : public QObject {
     static const QSize icon_56;
     static const QSize icon_96;
 
+    static const QColor danger_color;
+    static const QColor success_color;
+
     Theme(QObject *parent = 0);
 
     inline void set_mode(bool mode)

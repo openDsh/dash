@@ -23,6 +23,8 @@ OBD::~OBD()
 
 bool OBD::query(Command &cmd, double &val)
 {
+    if (!this->connected) return false;
+
     std::lock_guard<std::mutex> guard(this->obd_mutex);
     if (this->send(cmd.request)) {
         Response resp = this->receive();

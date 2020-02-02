@@ -21,68 +21,6 @@
 
 class QTabWidget;
 class MainWindow;
-class DataTab;
-
-class Gauge : public QWidget {
-    Q_OBJECT
-
-   public:
-    explicit Gauge(QString unit, int pos, int font_v, int font_u, int refresh_rate,
-                   std::vector<Command> commands, int precision,
-                   std::function<double(std::vector<double>, bool)> result, bool si, QString alt_unit = QString(),
-                   QWidget *parent = 0);
-
-    void convert(bool);
-    void update_value();
-    inline void start() { this->timer->start(this->refresh_rate); }
-    inline void stop() { this->timer->stop(); }
-
-   private slots:
-    void update_gauge();
-
-   private:
-    DataTab *tab;
-
-    QString unit;
-    QString alt_unit;
-
-    bool si;
-
-    QLabel *value_label;
-    QLabel *unit_label;
-
-    QTimer *timer;
-    int refresh_rate;
-
-    std::vector<Command> commands;
-    std::function<double(std::vector<double>, bool)> result;
-    int precision;
-};
-
-class DataTab : public QWidget {
-    Q_OBJECT
-
-   public:
-    explicit DataTab(QWidget *parent = 0);
-
-    void enable_updates();
-
-    void disable_updates();
-
-    void convert_gauges(bool);
-
-   private slots:
-    void toggle_updates(bool);
-
-   private:
-    OBD *obd;
-
-    MainWindow *app;
-
-    QFrame *obd_status;
-
-    std::vector<Gauge *> gauges;
-};
 
 class SettingsTab : public QWidget {
     Q_OBJECT

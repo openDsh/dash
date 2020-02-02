@@ -18,6 +18,7 @@
 
 #include <app/tabs/open_auto.hpp>
 #include <app/tabs/media.hpp>
+#include <app/tabs/data.hpp>
 
 namespace aasdk = f1x::aasdk;
 namespace autoapp = f1x::openauto::autoapp;

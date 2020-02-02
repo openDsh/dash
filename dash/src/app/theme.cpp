@@ -19,6 +19,9 @@ const QSize Theme::icon_48 = QSize(48, 48);
 const QSize Theme::icon_56 = QSize(56, 56);
 const QSize Theme::icon_96 = QSize(96, 96);
 
+const QColor Theme::danger_color = QColor(211, 47, 47);
+const QColor Theme::success_color = QColor(56, 142, 60);
+
 Theme::Theme(QObject *parent) : QObject(parent), palette()
 {
     this->stylesheets["light"] = this->parse_stylesheet(":/light.qss");
@@ -110,8 +113,8 @@ void Theme::add_button_icon(QString name, QPushButton *button, QString normal_na
     QPixmap dark_normal;
     QPixmap light_normal;
     if (normal_name.isNull()) {
-        dark_normal = (checkable) ? this->create_pixmap_variant(dark_base, .54) : dark_active;
-        light_normal = (checkable) ? this->create_pixmap_variant(light_base, .7) : light_active;
+        dark_normal = checkable ? this->create_pixmap_variant(dark_base, .54) : dark_active;
+        light_normal = checkable ? this->create_pixmap_variant(light_base, .7) : light_active;
     }
     else {
         QPixmap dark_normal_base = QIcon(this->ICON_PATH + "dark/" + normal_name + "-24px.svg").pixmap(512, 512);

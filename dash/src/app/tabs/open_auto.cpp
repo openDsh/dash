@@ -77,7 +77,7 @@ OpenAutoTab::OpenAutoTab(QWidget *parent) : QWidget(parent)
 void OpenAutoTab::start_worker()
 {
     QStackedLayout *layout = qobject_cast<QStackedLayout *>(this->layout());
-    auto callback = [layout](bool is_active) { layout->setCurrentIndex((is_active) ? 1 : 0); };
+    auto callback = [layout](bool is_active) { layout->setCurrentIndex(is_active ? 1 : 0); };
     if (this->worker == nullptr) this->worker = new OpenAutoWorker(callback, this);
 
     this->worker->start();

@@ -7,12 +7,12 @@
 #include <regex>
 #include <thread>
 
+#include <aasdk_proto/ButtonCodeEnum.pb.h>
 #include <aasdk_proto/VideoFPSEnum.pb.h>
 #include <aasdk_proto/VideoResolutionEnum.pb.h>
-#include <aasdk_proto/ButtonCodeEnum.pb.h>
+#include <f1x/openauto/autoapp/Configuration/AudioOutputBackendType.hpp>
 #include <f1x/openauto/autoapp/Configuration/BluetootAdapterType.hpp>
 #include <f1x/openauto/autoapp/Configuration/HandednessOfTrafficType.hpp>
-#include <f1x/openauto/autoapp/Configuration/AudioOutputBackendType.hpp>
 
 #include <BluezQt/Device>
 #include <BluezQt/PendingCall>
@@ -25,7 +25,6 @@
 #include "app/theme.hpp"
 #include "app/tuner.hpp"
 #include "app/window.hpp"
-#include "obd/conversions.hpp"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -36,137 +35,6 @@ namespace autoapp = f1x::openauto::autoapp;
 QFont f("Montserrat", 18);
 QFont ff("Montserrat", 14);
 QFont fff("Montserrat", 36);
-
-DataTab::DataTab(QWidget *parent) : QWidget(parent)
-{
-    this->app = qobject_cast<MainWindow *>(parent);
-
-    this->obd = OBD::get_instance();
-
-    connect(this->app, SIGNAL(data_tab_toggle(bool)), this, SLOT(toggle_updates(bool)));
-
-    QVBoxLayout *main_layout = new QVBoxLayout;
-    main_layout->setContentsMargins(0, 0, 0, 0);
-    this->obd_status = new QFrame();
-    this->obd_status->setFixedHeight(4 * RESOLUTION);
-    this->obd_status->setAutoFillBackground(true);
-    main_layout->addWidget(this->obd_status);
-
-    QWidget *right_w = new QWidget;
-    QVBoxLayout *right = new QVBoxLayout(right_w);
-
-    Config *config = Config::get_instance();
-    bool si = config->get_si_units();
-
-    this->gauges.push_back(new Gauge("°F", 0, 48, 16, 5000, {cmds.COOLANT_TEMP}, 1,
-                                     [](std::vector<double> x, bool si) { return (si) ? x[0] : c_to_f(x[0]); }, si,
-                                     "°C"));
-    this->gauges.push_back(
-        new Gauge("%", 0, 48, 16, 500, {cmds.LOAD}, 1, [](std::vector<double> x, bool _) { return x[0]; }, si));
-
-    QFont description_font("Montserrat", 16, QFont::Light);
-
-    right->addSpacerItem(new QSpacerItem(1, 1, QSizePolicy::Minimum, QSizePolicy::Expanding));
-    right->addWidget(this->gauges[0]);
-    QLabel *coolant_temp_description = new QLabel("coolant");
-    coolant_temp_description->setFont(description_font);
-    coolant_temp_description->setAlignment(Qt::AlignHCenter);
-    coolant_temp_description->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-    right->addWidget(coolant_temp_description);
-    QFrame *line2 = new QFrame;
-    line2->setLineWidth(1);
-    line2->setFrameShape(QFrame::HLine);
-    line2->setFrameShadow(QFrame::Plain);
-    right->addSpacerItem(new QSpacerItem(1, 1, QSizePolicy::Minimum, QSizePolicy::Expanding));
-    right->addWidget(line2);
-    right->addSpacerItem(new QSpacerItem(1, 1, QSizePolicy::Minimum, QSizePolicy::Expanding));
-    right->addWidget(this->gauges[1]);
-    QLabel *load_description = new QLabel("load");
-    load_description->setFont(description_font);
-    load_description->setAlignment(Qt::AlignHCenter);
-    load_description->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-    right->addWidget(load_description);
-    right->addSpacerItem(new QSpacerItem(1, 1, QSizePolicy::Minimum, QSizePolicy::Expanding));
-
-    QWidget *drive_w = new QWidget;
-    QHBoxLayout *drive = new QHBoxLayout(drive_w);
-
-    this->gauges.push_back(new Gauge("mph", 1, 92, 24, 100, {cmds.SPEED}, 0,
-                                     [](std::vector<double> x, bool si) { return (si) ? kph_to_mph(x[0]) : x[0]; }, si,
-                                     "km/h"));
-    this->gauges.push_back(new Gauge("x1000rpm", 1, 92, 24, 100, {cmds.RPM}, 1,
-                                     [](std::vector<double> x, bool _) { return x[0] / 1000.0; }, si));
-    drive->addWidget(this->gauges[2]);
-    drive->addWidget(this->gauges[3]);
-
-    QWidget *left_w = new QWidget;
-    QVBoxLayout *left = new QVBoxLayout(left_w);
-    this->gauges.push_back(new Gauge("mpg", 1, 48, 16, 100, {cmds.SPEED, cmds.MAF}, 1,
-                                     [](std::vector<double> x, bool si) {
-                                         return ((si) ? x[0] : kph_to_mph(x[0])) /
-                                                ((si) ? gps_to_lph(x[1]) : gps_to_gph(x[1]));
-                                     },
-                                     si, "km/L"));
-
-    left->addWidget(drive_w);
-    QFrame *line3 = new QFrame;
-    line3->setLineWidth(1);
-    line3->setFrameShape(QFrame::HLine);
-    line3->setFrameShadow(QFrame::Plain);
-    left->addWidget(line3);
-    left->addWidget(this->gauges[4]);
-
-    QWidget *tab = new QWidget;
-    QHBoxLayout *data_stuff = new QHBoxLayout(tab);
-    data_stuff->setContentsMargins(24, 24, 24, 24);
-    data_stuff->addWidget(left_w);
-    QFrame *line = new QFrame;
-    line->setLineWidth(1);
-    line->setFrameShape(QFrame::VLine);
-    line->setFrameShadow(QFrame::Plain);
-    data_stuff->addWidget(line);
-    data_stuff->addWidget(right_w);
-
-    QSizePolicy sp_left(QSizePolicy::Preferred, QSizePolicy::Preferred);
-    sp_left.setHorizontalStretch(5);
-    left_w->setSizePolicy(sp_left);
-    QSizePolicy sp_right(QSizePolicy::Preferred, QSizePolicy::Preferred);
-    sp_right.setHorizontalStretch(2);
-    right_w->setSizePolicy(sp_right);
-
-    main_layout->addWidget(tab);
-
-    setLayout(main_layout);
-}
-
-void DataTab::toggle_updates(bool toggle)
-{
-    if (toggle)
-        enable_updates();
-    else
-        disable_updates();
-}
-
-void DataTab::enable_updates()
-{
-    QString status_color = "rgb(211, 47, 47)";
-    if (this->obd->is_connected() || std::atoi(std::getenv("DEBUG"))) {
-        status_color = "rgb(56, 142, 60)";
-        for (auto &x : this->gauges) x->start();
-    }
-
-    this->obd_status->setStyleSheet("background-color: " + status_color);
-}
-
-void DataTab::disable_updates()
-{
-    for (auto &x : this->gauges) x->stop();
-}
-
-void DataTab::convert_gauges(bool si)
-{
-    for (auto &x : this->gauges) x->convert(si);
-}
 
 SettingsTab::SettingsTab(QWidget *parent) : QWidget(parent)
 {
@@ -329,7 +197,7 @@ SettingsTab::SettingsTab(QWidget *parent) : QWidget(parent)
     QLabel *mp = new QLabel("Media Player");
     mp->setFont(f);
     auto media_player_name = this->bluetooth->get_media_player().first;
-    this->media_player = new QLabel((media_player_name.isEmpty()) ? "not connected" : media_player_name);
+    this->media_player = new QLabel(media_player_name.isEmpty() ? "not connected" : media_player_name);
     this->media_player->setStyleSheet("padding-left: 16px;");
     this->media_player->setFont(ff);
     left_layout->addSpacerItem(new QSpacerItem(1, 1, QSizePolicy::Minimum, QSizePolicy::Expanding));
@@ -580,90 +448,5 @@ void SettingsTab::bluetooth_device_removed(BluezQt::DevicePtr device)
 
 void SettingsTab::media_player_changed(QString name, BluezQt::MediaPlayerPtr)
 {
-    this->media_player->setText((name.isEmpty()) ? "not connected" : name);
-}
-
-Gauge::Gauge(QString unit, int pos, int font_v, int font_u, int refresh_rate, std::vector<Command> commands,
-             int precision, std::function<double(std::vector<double>, bool)> result, bool si, QString alt_unit,
-             QWidget *parent)
-    : QWidget(parent)
-{
-    this->tab = qobject_cast<DataTab *>(parent);
-
-    this->unit = unit;
-    this->alt_unit = alt_unit;
-    this->si = si;
-
-    this->commands = commands;
-    this->result = result;
-    this->precision = precision;
-
-    this->refresh_rate = refresh_rate;
-
-    this->timer = new QTimer;
-    connect(this->timer, SIGNAL(timeout()), this, SLOT(update_gauge()));
-
-    QBoxLayout *layout;
-
-    QSpacerItem *spacer;
-    Qt::Alignment alignment;
-    if (pos) {
-        layout = new QVBoxLayout(this);
-        spacer = new QSpacerItem(1, 1, QSizePolicy::Minimum, QSizePolicy::Expanding);
-        alignment = Qt::AlignHCenter;
-    }
-    else {
-        layout = new QHBoxLayout(this);
-        spacer = new QSpacerItem(1, 1, QSizePolicy::Expanding);
-        alignment = Qt::AlignVCenter;
-    }
-
-    this->value_label = new QLabel(QString::number(0, 'f', this->precision));
-    QFont value_font("Titillium Web", font_v);
-    this->value_label->setFont(value_font);
-    this->value_label->setAlignment(alignment);
-
-    this->unit_label = new QLabel((this->si) ? this->alt_unit : this->unit);
-    QFont unit_font("Montserrat", font_u, QFont::Light, true);
-    this->unit_label->setFont(unit_font);
-    this->unit_label->setAlignment(alignment);
-
-    layout->addSpacerItem(spacer);
-    layout->addWidget(this->value_label);
-    layout->addWidget(this->unit_label);
-    if (pos) layout->addSpacerItem(spacer);
-
-    setLayout(layout);
-}
-
-void Gauge::convert(bool si)
-{
-    this->si = si;
-    if (!this->alt_unit.isNull()) {
-        this->unit_label->setText((this->si) ? this->alt_unit : this->unit);
-        this->update_gauge();
-    }
-}
-
-void Gauge::update_gauge()
-{
-    double val;
-
-    std::vector<double> results;
-    for (auto &x : this->commands) {
-        if (std::atoi(std::getenv("DEBUG")))
-            val = rand() % 256;
-        else if (!OBD::get_instance()->query(x, val))
-            return;
-        results.push_back(val);
-    }
-
-    val = this->result(results, this->si);
-
-    QString label;
-    if (this->precision == 0)
-        label = QString::number((int)val);
-    else
-        label = QString::number(val, 'f', this->precision);
-    this->value_label->setText(label);
+    this->media_player->setText(name.isEmpty() ? "not connected" : name);
 }

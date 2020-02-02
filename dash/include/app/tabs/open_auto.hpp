@@ -1,3 +1,6 @@
+#ifndef OPEN_AUTO_HPP_
+#define OPEN_AUTO_HPP_
+
 #include <QtWidgets>
 
 #include <f1x/aasdk/TCP/TCPWrapper.hpp>
@@ -48,7 +51,7 @@ class OpenAutoTab : public QWidget {
     Q_OBJECT
 
    public:
-    OpenAutoTab(QWidget *parent = 0);
+    OpenAutoTab(QWidget *parent = nullptr);
 
     void start_worker();
 
@@ -57,3 +60,5 @@ class OpenAutoTab : public QWidget {
 
     OpenAutoWorker *worker = nullptr;
 };
+
+#endif
