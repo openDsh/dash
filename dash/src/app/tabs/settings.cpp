@@ -36,9 +36,7 @@ GeneralSettingsTab::GeneralSettingsTab(QWidget *parent) : QWidget(parent)
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->setContentsMargins(24, 24, 24, 24);
 
-    layout->addStretch();
     layout->addWidget(this->settings_widget());
-    layout->addStretch();
     layout->addWidget(this->controls_widget());
 }
 
@@ -48,9 +46,11 @@ QWidget *GeneralSettingsTab::settings_widget()
     QVBoxLayout *layout = new QVBoxLayout(widget);
 
     layout->addWidget(this->dark_mode_row_widget(), 1);
-    layout->addWidget(this->brightness_row_widget(), 1);
-    layout->addWidget(this->si_units_row_widget(), 1);
     layout->addWidget(this->color_row_widget(), 1);
+    layout->addWidget(Theme::br(widget), 1);
+    layout->addWidget(this->si_units_row_widget(), 1);
+    layout->addWidget(Theme::br(widget), 1);
+    layout->addWidget(this->brightness_row_widget(), 1);
 
     return widget;
 }

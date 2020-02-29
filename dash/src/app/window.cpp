@@ -12,7 +12,6 @@
 #include <regex>
 
 #include "app/config.hpp"
-#include "app/tabs.hpp"
 #include "app/theme.hpp"
 #include "app/window.hpp"
 

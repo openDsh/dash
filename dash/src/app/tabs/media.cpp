@@ -215,7 +215,7 @@ QWidget *RadioPlayerTab::controls_widget()
     mute_button->setFlat(true);
     mute_button->setCheckable(true);
     mute_button->setChecked(this->config->get_radio_muted());
-    mute_button->setIconSize(Theme::icon_56);
+    mute_button->setIconSize(Theme::icon_48);
     connect(mute_button, &QPushButton::clicked,
             [config = this->config](bool checked = false) { config->set_radio_muted(checked); });
     this->theme->add_button_icon("volume_off", mute_button);
