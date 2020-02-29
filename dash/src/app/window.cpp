@@ -19,6 +19,7 @@
 #include <app/tabs/open_auto.hpp>
 #include <app/tabs/media.hpp>
 #include <app/tabs/data.hpp>
+#include <app/tabs/settings.hpp>
 
 namespace aasdk = f1x::aasdk;
 namespace autoapp = f1x::openauto::autoapp;
@@ -89,23 +90,24 @@ MainWindow::MainWindow(QMainWindow *parent) : QMainWindow(parent)
     connect(this->volume_control, &QSlider::sliderMoved, [this](int position) { update_system_volume(position); });
 
     QLabel *connectivity = new QLabel();
-    connectivity->setFixedSize(640 * RESOLUTION, 48 * RESOLUTION);
+    // connectivity->setFixedWidth(640 * RESOLUTION);
+    bottom->addStretch(4);
     bottom->addWidget(connectivity);
     QPushButton *volume_down = new QPushButton();
     volume_down->setFlat(true);
     this->theme->add_button_icon("volume_mute", volume_down);
-    volume_down->setIconSize(QSize(36 * RESOLUTION, 36 * RESOLUTION));
+    volume_down->setIconSize(QSize(32 * RESOLUTION, 32 * RESOLUTION));
     connect(volume_down, &QPushButton::clicked, [this]() {
         int position = this->volume_control->sliderPosition() - 10;
         this->volume_control->setSliderPosition(position);
         update_system_volume(position);
     });
     bottom->addWidget(volume_down);
-    bottom->addWidget(this->volume_control);
+    bottom->addWidget(this->volume_control, 2);
     QPushButton *volume_up = new QPushButton;
     volume_up->setFlat(true);
     this->theme->add_button_icon("volume_up", volume_up);
-    volume_up->setIconSize(QSize(36 * RESOLUTION, 36 * RESOLUTION));
+    volume_up->setIconSize(QSize(32 * RESOLUTION, 32 * RESOLUTION));
     connect(volume_up, &QPushButton::clicked, [this]() {
         int position = this->volume_control->sliderPosition() + 10;
         this->volume_control->setSliderPosition(position);

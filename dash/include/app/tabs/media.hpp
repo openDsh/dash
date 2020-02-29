@@ -8,13 +8,11 @@
 #include <app/theme.hpp>
 #include <app/tuner.hpp>
 
-class MediaTab : public QWidget {
+class MediaTab : public QTabWidget {
     Q_OBJECT
 
    public:
     MediaTab(QWidget *parent = nullptr);
-
-   private:
 };
 
 class BluetoothPlayerTab : public QWidget {

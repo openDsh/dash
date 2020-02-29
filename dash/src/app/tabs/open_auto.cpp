@@ -90,16 +90,16 @@ QWidget *OpenAutoTab::msg_widget()
     layout->setContentsMargins(24, 24, 24, 24);
 
     QLabel *top_msg = new QLabel("waiting for device...", widget);
-    top_msg->setFont(Theme::font_18);
+    top_msg->setFont(Theme::font_16);
     top_msg->setAlignment(Qt::AlignHCenter);
-    layout->addStretch(1);
+    layout->addStretch();
     layout->addWidget(top_msg);
 
     QLabel *bottom_msg = new QLabel("plug in your device to start OpenAuto", widget);
-    bottom_msg->setFont(Theme::font_18);
+    bottom_msg->setFont(Theme::font_16);
     bottom_msg->setAlignment(Qt::AlignHCenter);
     layout->addWidget(bottom_msg);
-    layout->addStretch(1);
+    layout->addStretch();
 
     return widget;
 }

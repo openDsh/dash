@@ -3,17 +3,14 @@
 #include <app/tabs/media.hpp>
 #include <app/window.hpp>
 
-MediaTab::MediaTab(QWidget *parent) : QWidget(parent)
+MediaTab::MediaTab(QWidget *parent) : QTabWidget(parent)
 {
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
 
-    QTabWidget *widget = new QTabWidget(this);
-    widget->tabBar()->setFont(Theme::font_18);
-    widget->addTab(new RadioPlayerTab(widget), "Radio");
-    widget->addTab(new BluetoothPlayerTab(widget), "Bluetooth");
-
-    layout->addWidget(widget);
+    this->tabBar()->setFont(Theme::font_16);
+    this->addTab(new RadioPlayerTab(this), "Radio");
+    this->addTab(new BluetoothPlayerTab(this), "Bluetooth");
 }
 
 BluetoothPlayerTab::BluetoothPlayerTab(QWidget *parent) : QWidget(parent)
@@ -23,11 +20,11 @@ BluetoothPlayerTab::BluetoothPlayerTab(QWidget *parent) : QWidget(parent)
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->setContentsMargins(24, 24, 24, 24);
 
-    layout->addStretch(1);
+    layout->addStretch();
     layout->addWidget(this->track_widget());
-    layout->addStretch(1);
+    layout->addStretch();
     layout->addWidget(this->controls_widget());
-    layout->addStretch(1);
+    layout->addStretch();
 }
 
 QWidget *BluetoothPlayerTab::track_widget()
@@ -38,7 +35,7 @@ QWidget *BluetoothPlayerTab::track_widget()
     QVBoxLayout *layout = new QVBoxLayout(widget);
 
     QLabel *artist_hdr = new QLabel("Artist", widget);
-    artist_hdr->setFont(Theme::font_18);
+    artist_hdr->setFont(Theme::font_16);
     QLabel *artist = new QLabel((media_player != nullptr) ? media_player->track().artist() : QString(), widget);
     artist->setFont(Theme::font_14);
     artist->setStyleSheet("padding-left: 16px;");
@@ -46,7 +43,7 @@ QWidget *BluetoothPlayerTab::track_widget()
     layout->addWidget(artist);
 
     QLabel *album_hdr = new QLabel("Album", widget);
-    album_hdr->setFont(Theme::font_18);
+    album_hdr->setFont(Theme::font_16);
     QLabel *album = new QLabel((media_player != nullptr) ? media_player->track().album() : QString(), widget);
     album->setFont(Theme::font_14);
     album->setStyleSheet("padding-left: 16px;");
@@ -54,7 +51,7 @@ QWidget *BluetoothPlayerTab::track_widget()
     layout->addWidget(album);
 
     QLabel *title_hdr = new QLabel("Title", widget);
-    title_hdr->setFont(Theme::font_18);
+    title_hdr->setFont(Theme::font_16);
     QLabel *title = new QLabel((media_player != nullptr) ? media_player->track().title() : QString(), widget);
     title->setFont(Theme::font_14);
     title->setStyleSheet("padding-left: 16px;");
@@ -81,13 +78,13 @@ QWidget *BluetoothPlayerTab::controls_widget()
 
     QPushButton *previous_button = new QPushButton(widget);
     previous_button->setFlat(true);
-    previous_button->setIconSize(Theme::icon_96);
+    previous_button->setIconSize(Theme::icon_84);
     connect(previous_button, &QPushButton::clicked, [bluetooth = this->bluetooth]() {
         BluezQt::MediaPlayerPtr media_player = bluetooth->get_media_player().second;
         if (media_player != nullptr) media_player->previous()->waitForFinished();
     });
     theme->add_button_icon("skip_previous", previous_button);
-    layout->addStretch(1);
+    layout->addStretch();
     layout->addWidget(previous_button);
 
     QPushButton *play_button = new QPushButton(widget);
@@ -95,7 +92,7 @@ QWidget *BluetoothPlayerTab::controls_widget()
     play_button->setCheckable(true);
     bool status = (media_player != nullptr) ? media_player->status() == BluezQt::MediaPlayer::Status::Playing : false;
     play_button->setChecked(status);
-    play_button->setIconSize(Theme::icon_96);
+    play_button->setIconSize(Theme::icon_84);
     connect(play_button, &QPushButton::clicked, [bluetooth = this->bluetooth, play_button](bool checked = false) {
         play_button->setChecked(!checked);
 
@@ -112,20 +109,20 @@ QWidget *BluetoothPlayerTab::controls_widget()
                 play_button->setChecked(status == BluezQt::MediaPlayer::Status::Playing);
             });
     theme->add_button_icon("pause", play_button, "play");
-    layout->addStretch(1);
+    layout->addStretch();
     layout->addWidget(play_button);
 
     QPushButton *forward_button = new QPushButton(widget);
     forward_button->setFlat(true);
-    forward_button->setIconSize(Theme::icon_96);
+    forward_button->setIconSize(Theme::icon_84);
     connect(forward_button, &QPushButton::clicked, [bluetooth = this->bluetooth]() {
         BluezQt::MediaPlayerPtr media_player = bluetooth->get_media_player().second;
         if (media_player != nullptr) media_player->next()->waitForFinished();
     });
     theme->add_button_icon("skip_next", forward_button);
-    layout->addStretch(1);
+    layout->addStretch();
     layout->addWidget(forward_button);
-    layout->addStretch(1);
+    layout->addStretch();
 
     return widget;
 }
@@ -139,11 +136,11 @@ RadioPlayerTab::RadioPlayerTab(QWidget *parent) : QWidget(parent)
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->setContentsMargins(24, 24, 24, 24);
 
-    layout->addStretch(1);
+    layout->addStretch();
     layout->addWidget(this->tuner_widget());
-    layout->addStretch(1);
+    layout->addStretch();
     layout->addWidget(this->controls_widget());
-    layout->addStretch(1);
+    layout->addStretch();
 }
 
 QWidget *RadioPlayerTab::tuner_widget()
@@ -160,7 +157,7 @@ QWidget *RadioPlayerTab::tuner_widget()
     connect(this->tuner, &Tuner::station_updated,
             [station](int freq) { station->setText(QString::number(freq / 10.0, 'f', 1)); });
     layout->addWidget(station);
-    layout->addStretch(1);
+    layout->addStretch();
     layout->addWidget(this->tuner);
 
     return widget;
@@ -173,45 +170,45 @@ QWidget *RadioPlayerTab::controls_widget()
 
     QPushButton *scan_reverse_button = new QPushButton(widget);
     scan_reverse_button->setFlat(true);
-    scan_reverse_button->setIconSize(Theme::icon_96);
+    scan_reverse_button->setIconSize(Theme::icon_84);
     this->theme->add_button_icon("fast_rewind", scan_reverse_button);
     connect(scan_reverse_button, &QPushButton::clicked,
             [tuner = this->tuner]() { tuner->setSliderPosition(tuner->sliderPosition() - 5); });
-    layout->addStretch(1);
+    layout->addStretch();
     layout->addWidget(scan_reverse_button);
 
     QPushButton *prev_station_button = new QPushButton(widget);
     prev_station_button->setFlat(true);
-    prev_station_button->setIconSize(Theme::icon_96);
+    prev_station_button->setIconSize(Theme::icon_84);
     this->theme->add_button_icon("skip_previous", prev_station_button);
     connect(prev_station_button, &QPushButton::clicked,
             [tuner = this->tuner]() { tuner->setSliderPosition(tuner->sliderPosition() - 1); });
-    layout->addStretch(1);
+    layout->addStretch();
     layout->addWidget(prev_station_button);
 
     QPushButton *next_station_button = new QPushButton(widget);
     next_station_button->setFlat(true);
-    next_station_button->setIconSize(Theme::icon_96);
+    next_station_button->setIconSize(Theme::icon_84);
     this->theme->add_button_icon("skip_next", next_station_button);
     connect(next_station_button, &QPushButton::clicked,
             [tuner = this->tuner]() { tuner->setSliderPosition(tuner->sliderPosition() + 1); });
-    layout->addStretch(1);
+    layout->addStretch();
     layout->addWidget(next_station_button);
 
     QPushButton *scan_forward_button = new QPushButton(widget);
     scan_forward_button->setFlat(true);
-    scan_forward_button->setIconSize(Theme::icon_96);
+    scan_forward_button->setIconSize(Theme::icon_84);
     this->theme->add_button_icon("fast_forward", scan_forward_button);
     connect(scan_forward_button, &QPushButton::clicked,
             [tuner = this->tuner]() { tuner->setSliderPosition(tuner->sliderPosition() + 5); });
-    layout->addStretch(1);
+    layout->addStretch();
     layout->addWidget(scan_forward_button);
 
     QFrame *vert_break = new QFrame(widget);
     vert_break->setLineWidth(1);
     vert_break->setFrameShape(QFrame::VLine);
     vert_break->setFrameShadow(QFrame::Plain);
-    layout->addStretch(1);
+    layout->addStretch();
     layout->addWidget(vert_break);
 
     QPushButton *mute_button = new QPushButton(widget);
@@ -222,9 +219,9 @@ QWidget *RadioPlayerTab::controls_widget()
     connect(mute_button, &QPushButton::clicked,
             [config = this->config](bool checked = false) { config->set_radio_muted(checked); });
     this->theme->add_button_icon("volume_off", mute_button);
-    layout->addStretch(1);
+    layout->addStretch();
     layout->addWidget(mute_button);
-    layout->addStretch(1);
+    layout->addStretch();
 
     return widget;
 }

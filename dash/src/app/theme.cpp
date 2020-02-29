@@ -11,12 +11,18 @@
 #include "app/theme.hpp"
 
 const QFont Theme::font_14 = QFont("Montserrat", 14);
+const QFont Theme::font_16 = QFont("Montserrat", 16);
 const QFont Theme::font_18 = QFont("Montserrat", 18);
 const QFont Theme::font_36 = QFont("Montserrat", 36);
 
+const QSize Theme::icon_16 = QSize(16, 16);
+const QSize Theme::icon_24 = QSize(24, 24);
+const QSize Theme::icon_32 = QSize(32, 32);
 const QSize Theme::icon_36 = QSize(36, 36);
+const QSize Theme::icon_42 = QSize(42, 42);
 const QSize Theme::icon_48 = QSize(48, 48);
 const QSize Theme::icon_56 = QSize(56, 56);
+const QSize Theme::icon_84 = QSize(84, 84);
 const QSize Theme::icon_96 = QSize(96, 96);
 
 const QColor Theme::danger_color = QColor(211, 47, 47);

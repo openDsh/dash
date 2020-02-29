@@ -3,6 +3,7 @@
 
 #include <QApplication>
 #include <QDebug>
+#include <QFrame>
 #include <QMainWindow>
 #include <QMap>
 #include <QObject>
@@ -15,12 +16,18 @@ class Theme : public QObject {
 
    public:
     static const QFont font_14;
+    static const QFont font_16;
     static const QFont font_18;
     static const QFont font_36;
 
+    static const QSize icon_16;
+    static const QSize icon_24;
+    static const QSize icon_32;
     static const QSize icon_36;
+    static const QSize icon_42;
     static const QSize icon_48;
     static const QSize icon_56;
+    static const QSize icon_84;
     static const QSize icon_96;
 
     static const QColor danger_color;
@@ -45,6 +52,16 @@ class Theme : public QObject {
     void add_tab_icon(QString name, int index, int orientation = 0);
     void add_button_icon(QString name, QPushButton *button, QString active_name = QString());
     void update();
+
+    inline static QFrame *br(QWidget *parent = nullptr, bool vert = false)
+    {
+        QFrame *br = new QFrame(parent);
+        br->setLineWidth(1);
+        br->setFrameShape((vert) ? QFrame::VLine : QFrame::HLine);
+        br->setFrameShadow(QFrame::Plain);
+
+        return br;
+    }
 
     static Theme *get_instance();
 

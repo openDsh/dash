@@ -35,7 +35,7 @@ class MainWindow : public QMainWindow {
     void toggle_open_auto(unsigned int);
 
    private:
-    const int TAB_SIZE = 56 * RESOLUTION;
+    const int TAB_SIZE = 48 * RESOLUTION;
 
     Theme *theme;
     QTabWidget *tabs;
