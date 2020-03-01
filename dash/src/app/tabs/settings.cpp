@@ -18,9 +18,6 @@ namespace autoapp = f1x::openauto::autoapp;
 
 SettingsTab::SettingsTab(QWidget *parent) : QTabWidget(parent)
 {
-    QVBoxLayout *layout = new QVBoxLayout(this);
-    layout->setContentsMargins(0, 0, 0, 0);
-
     this->tabBar()->setFont(Theme::font_18);
 
     this->addTab(new GeneralSettingsSubTab(this), "General");
