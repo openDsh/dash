@@ -9,15 +9,13 @@ int main(int argc, char *argv[])
     MainWindow w;
     w.setWindowFlags(Qt::FramelessWindowHint);
     if (std::atoi(std::getenv("DEBUG")))
-        w.setFixedSize(1024 * RESOLUTION, 600 * RESOLUTION);
+        w.setFixedSize(1024, 600);
     else {
         qApplication.setOverrideCursor(Qt::BlankCursor);
         w.setFixedSize(qApplication.desktop()->screenGeometry().size());
     }
     w.move(0, 0);
     w.show();
-
-    w.start_open_auto();
 
     return qApplication.exec();
 }

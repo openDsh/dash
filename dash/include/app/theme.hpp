@@ -11,6 +11,9 @@
 #include <QPushButton>
 #include <QString>
 
+typedef QPair<int, QIcon> tab_icon_t;
+typedef QPair<QPushButton *, QIcon> button_icon_t;
+
 class Theme : public QObject {
     Q_OBJECT
 
@@ -33,7 +36,7 @@ class Theme : public QObject {
     static const QColor danger_color;
     static const QColor success_color;
 
-    Theme(QObject *parent = 0);
+    Theme();
 
     inline void set_mode(bool mode)
     {
@@ -84,8 +87,8 @@ class Theme : public QObject {
     QPalette palette;
     QString color = "blue";
 
-    QMap<QString, QList<QPair<int, QIcon>>> tab_icons;
-    QMap<QString, QList<QPair<QPushButton *, QIcon>>> button_icons;
+    QMap<QString, QList<tab_icon_t>> tab_icons;
+    QMap<QString, QList<button_icon_t>> button_icons;
 
     QMap<QString, QString> stylesheets;
 
@@ -98,7 +101,7 @@ class Theme : public QObject {
     QPixmap create_pixmap_variant(QPixmap &base, qreal opacity);
 
    signals:
-    void icons_updated(QList<QPair<int, QIcon>> &, QList<QPair<QPushButton *, QIcon>> &);
+    void icons_updated(QList<tab_icon_t> &, QList<button_icon_t> &);
     void color_updated(QMap<QString, QColor> &);
 };
 

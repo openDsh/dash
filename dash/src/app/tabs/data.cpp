@@ -9,7 +9,8 @@ Gauge::Gauge(units_t units, QFont value_font, QFont unit_font, Gauge::Orientatio
              std::vector<Command> cmds, int precision, obd_decoder_t decoder, QWidget *parent)
     : QWidget(parent)
 {
-    this->si = Config::get_instance()->get_si_units();
+    Config *config = Config::get_instance();
+    this->si = config->get_si_units();
 
     this->rate = rate;
     this->precision = precision;
@@ -40,7 +41,7 @@ Gauge::Gauge(units_t units, QFont value_font, QFont unit_font, Gauge::Orientatio
         value_label->setText(this->format_value(decoder(results, this->si)));
     });
 
-    connect(this, &Gauge::toggle_unit, [this, units, unit_label, value_label](bool si) {
+    connect(config, &Config::si_units_changed, [this, units, unit_label, value_label](bool si) {
         this->si = si;
         unit_label->setText(this->si ? units.second : units.first);
         value_label->setText(this->null_value());
@@ -78,10 +79,10 @@ DataTab::DataTab(QWidget *parent) : QWidget(parent)
     layout->setContentsMargins(0, 0, 0, 0);
 
     QFrame *status_indicator = new QFrame(this);
-    status_indicator->setFixedHeight(6 * RESOLUTION);
+    status_indicator->setFixedHeight(6);
     status_indicator->setAutoFillBackground(true);
-    connect(app, &MainWindow::data_tab_toggle, [this, status_indicator](bool toggled) {
-        if (toggled) {
+    connect(app, &MainWindow::set_data_state, [this, status_indicator](bool enabled) {
+        if (enabled) {
             QPalette p(palette());
             if (OBD::get_instance()->is_connected()) {
                 p.setColor(QPalette::Window, Theme::success_color);
@@ -223,9 +224,4 @@ QWidget *DataTab::engine_load_widget()
     engine_load_label->setAlignment(Qt::AlignHCenter);
     layout->addWidget(engine_load_label);
     return widget;
-}
-
-void DataTab::convert_gauges(bool si)
-{
-    for (auto &x : this->gauges) x->toggle_unit(si);
 }

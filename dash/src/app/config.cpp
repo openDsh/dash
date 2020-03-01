@@ -1,9 +1,10 @@
-#include <QDebug>
+#include <QApplication>
+#include <QTimer>
 
 #include <app/config.hpp>
 
-Config::Config(QObject *parent)
-    : QObject(parent),
+Config::Config()
+    : QObject(qApp),
       open_auto_config(std::make_shared<f1x::openauto::autoapp::configuration::Configuration>()),
       ia_config(QSettings::IniFormat, QSettings::UserScope, "ia")
 {
@@ -15,6 +16,10 @@ Config::Config(QObject *parent)
     this->bluetooth_device = this->ia_config.value("Bluetooth/device", QString()).toString();
     this->radio_station = this->ia_config.value("Radio/station", 98.0).toDouble();
     this->radio_muted = this->ia_config.value("Radio/muted", true).toBool();
+
+    QTimer *timer = new QTimer(this);
+    connect(timer, &QTimer::timeout, [this]() { this->save(); });
+    timer->start(10000);
 }
 
 void Config::save()

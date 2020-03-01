@@ -1,19 +1,23 @@
 QMainWindow {
-    background-color: rgb(18, 18, 18);
+    background-color: rgb(238, 238, 238);
 }
 
 QLabel {
-    color: rgb(255, 255, 255);
+    color: rgba(0, 0, 0, 222);
 }
 
 QTabWidget::pane {
-    background-color: rgba(255, 255, 255, 5);
+    background-color: rgba(255, 255, 255, 80);
     border-top: 0px;
+}
+
+QTabWidget::tab-bar[tabPosition="2"] {
+    alignment: center;
 }
 
 QTabBar::tab {
     background-color: transparent;
-    color: rgba(255, 255, 255, 179);
+    color: rgba(0, 0, 0, 138);
     padding: 4px;
 }
 
@@ -23,7 +27,7 @@ QTabBar::tab:selected:top {
 }
 
 QTabBar::tab:disabled:top {
-    color: rgba(255, 255, 255, 128);
+    color: rgba(0, 0, 0, 97);
 }
 
 QSlider::groove {
@@ -45,42 +49,42 @@ QSlider::sub-page {
 }
 
 QPushButton {
-    color: rgb(255, 255, 255);
+    color: rgba(0, 0, 0, 222);
     border: none;
     padding: 8px;
 }
 
 QPushButton:pressed {
-    background-color: rgba(255, 255, 255, 25);
+    background-color: rgba(0, 0, 0, 25);
 }
 
 QPushButton:disabled {
-    color: rgba(255, 255, 255, 128);
+    color: rgba(0, 0, 0, 97);
 }
 
 QPushButton:!flat {
-    background-color: rgba(255, 255, 255, 31);
+    background-color: rgba(0, 0, 0, 31);
 }
 
 QPushButton:!flat:checked {
-    color: rgb(0, 0, 0);
+    color: rgba(255, 255, 255, 222);
     background-color: palette(base);
 }
 
 QPushButton:!flat:disabled {
-    background-color: rgba(255, 255, 255, 13);
+    background-color: rgba(0, 0, 0, 13);
 }
 
 QFrame[frameShape="4"][frameShadow="16"],
 QFrame[frameShape="5"][frameShadow="16"] {
-    color: rgba(255, 255, 255, 31);
+    color: rgba(0, 0, 0, 31);
 }
 
 QComboBox {
-    color: rgb(255, 255, 255);
+    color: rgba(0, 0, 0, 222);
     background: transparent;
     border: none;
-    border-bottom: 2px solid rgba(255, 255, 255, 31);
+    border-bottom: 2px solid rgba(0, 0, 0, 31);
 }
 
 QComboBox::drop-down {
@@ -89,13 +93,13 @@ QComboBox::drop-down {
 }
 
 QComboBox::down-arrow {
-    image: url(:/icons/dark/arrow_drop_down-24px.svg);
+    image: url(:/icons/light/arrow_drop_down-24px.svg);
 }
 
 QComboBox QAbstractItemView::item {
     border: none;
-    color: rgb(255, 255, 255);
-    background-color: rgb(33, 33, 33);
+    color: rgba(0, 0, 0, 222);
+    background-color: rgb(245, 245, 245);
 }
 
 QGroupBox {
@@ -103,30 +107,30 @@ QGroupBox {
 }
 
 QCheckBox {
-    color: rgb(255, 255, 255);
+    color: rgba(0, 0, 0, 222);
     background-color: transparent;
 }
 
 QRadioButton {
-    color: rgb(255, 255, 255);
+    color: rgba(0, 0, 0, 222);
     background-color: transparent;
 }
 
 QCheckBox::indicator {
     width: 22px;
     height: 22px;
-    border: 2px solid rgb(255, 255, 255);
+    border: 2px solid rgb(97, 97, 97);
 }
 
 QRadioButton::indicator {
     width: 18px;
     height: 18px;
-    border: 2px solid rgb(255, 255, 255);
+    border: 2px solid rgb(97, 97, 97);
     border-radius: 11px;
 }
 
 QCheckBox::indicator::checked {
-    image: url(:/icons/dark/check-24px.svg);
+    image: url(:/icons/light/check-24px.svg);
     background-color: palette(base);
     border: 2px solid palette(base);
 }
@@ -137,18 +141,18 @@ QRadioButton::indicator::checked {
 }
 
 Switch {
-    qproperty-track_color: rgba(255, 255, 255, 31);
-    qproperty-thumb_color: rgb(158, 158, 158);
+    qproperty-track_color: rgba(0, 0, 0, 64);
+    qproperty-thumb_color: rgb(224, 224, 224);
 }
 
 Tuner {
-    qproperty-color: rgb(224, 224, 224);
+    qproperty-color: rgb(0, 0, 0);
     padding-left: 16px;
     padding-right: 16px;
 }
 
 Tuner::groove {
-    background-color: rgb(224, 224, 224);
+    background-color: rgb(0, 0, 0);
 }
 
 Tuner::handle {
@@ -158,5 +162,5 @@ Tuner::handle {
 }
 
 Tuner::sub-page {
-    background-color: rgb(224, 224, 224);
+    background-color: rgb(0, 0, 0);
 }

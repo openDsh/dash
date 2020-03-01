@@ -13,10 +13,6 @@ class SettingsTab : public QTabWidget {
 
    public:
     SettingsTab(QWidget *parent = nullptr);
-
-   signals:
-    void si_units_changed(bool);
-    void brightness_updated(int);
 };
 
 class GeneralSettingsTab : public QWidget {
@@ -34,7 +30,6 @@ class GeneralSettingsTab : public QWidget {
     QWidget *color_row_widget();
     QWidget *controls_widget();
 
-    SettingsTab *settings_tab;
     Config *config;
     Theme *theme;
 };
@@ -50,7 +45,6 @@ class BluetoothSettingsTab : public QWidget {
     QWidget *scanner_widget();
     QWidget *devices_widget();
 
-    SettingsTab *settings_tab;
     Bluetooth *bluetooth;
     Config *config;
     Theme *theme;
@@ -74,7 +68,6 @@ class OpenAutoSettingsTab : public QWidget {
     QWidget *audio_channels_row_widget();
     QWidget *bluetooth_row_widget();
 
-    SettingsTab *settings_tab;
     Bluetooth *bluetooth;
     Config *config;
     Theme *theme;

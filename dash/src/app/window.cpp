@@ -1,142 +1,104 @@
-#include <QBluetoothAddress>
-#include <QBluetoothDeviceDiscoveryAgent>
-#include <QBluetoothDeviceInfo>
-#include <QBluetoothLocalDevice>
-#include <QBluetoothServiceDiscoveryAgent>
-#include <QBluetoothServiceInfo>
-#include <QDebug>
-#include <QStringList>
-#include <QtDBus/QtDBus>
 #include <QtWidgets>
-#include <iostream>
-#include <regex>
 
-#include "app/config.hpp"
-#include "app/theme.hpp"
-#include "app/window.hpp"
-
-#include <app/tabs/open_auto.hpp>
-#include <app/tabs/media.hpp>
 #include <app/tabs/data.hpp>
+#include <app/tabs/media.hpp>
 #include <app/tabs/settings.hpp>
+#include <app/window.hpp>
 
-namespace aasdk = f1x::aasdk;
-namespace autoapp = f1x::openauto::autoapp;
-using ThreadPool = std::vector<std::thread>;
-
-MainWindow::MainWindow(QMainWindow *parent) : QMainWindow(parent)
+MainWindow::MainWindow()
 {
-    QFontDatabase::addApplicationFont(":/Titillium_Web/TitilliumWeb-Regular.ttf");
-    QFontDatabase::addApplicationFont(":/Montserrat/Montserrat-LightItalic.ttf");
-    QFontDatabase::addApplicationFont(":/Montserrat/Montserrat-Regular.ttf");
-
-    Config *config = Config::get_instance();
-
-    QTimer *config_timer = new QTimer;
-    connect(config_timer, &QTimer::timeout, [config]() { config->save(); });
-    config_timer->start(10000);
-
-    this->brightness = config->get_brightness();
-    setWindowOpacity(this->brightness / 255.0);
+    this->config = Config::get_instance();
+    this->setWindowOpacity(this->config->get_brightness() / 255.0);
 
     this->theme = Theme::get_instance();
-    this->theme->set_mode(config->get_dark_mode());
-    this->theme->set_color(config->get_color());
+    this->theme->set_mode(this->config->get_dark_mode());
+    this->theme->set_color(this->config->get_color());
 
-    QWidget *widget = new QWidget;
+    this->open_auto_tab = new OpenAutoTab(this);
+
+    QWidget *widget = new QWidget(this);
+    QVBoxLayout *layout = new QVBoxLayout(widget);
+
+    QTabWidget *tabs = new QTabWidget(widget);
+    tabs->setTabPosition(QTabWidget::TabPosition::West);
+    tabs->tabBar()->setIconSize(Theme::icon_48);
+    tabs->addTab(this->open_auto_tab, QString());
+    this->theme->add_tab_icon("directions_car", 0, 90);
+    tabs->addTab(new BluetoothPlayerTab(this), QString());
+    this->theme->add_tab_icon("play_circle_outline", 1, 90);
+    tabs->addTab(new DataTab(this), QString());
+    this->theme->add_tab_icon("speed", 2, 90);
+    tabs->addTab(new SettingsTab(this), "");
+    this->theme->add_tab_icon("tune", 3, 90);
+    connect(this->config, &Config::brightness_changed, [this, tabs](int position) {
+        this->setWindowOpacity(position / 255.0);
+        if (tabs->currentIndex() == 0) emit set_open_auto_state(position);
+    });
+    connect(this->theme, &Theme::icons_updated, [tabs](QList<tab_icon_t> &tab_icons, QList<button_icon_t> &button_icons) {
+        for (auto &icon : tab_icons) tabs->tabBar()->setTabIcon(icon.first, icon.second);
+        for (auto &icon : button_icons) icon.first->setIcon(icon.second);
+    });
+    connect(tabs, &QTabWidget::currentChanged, [this](int index) {
+        emit this->set_open_auto_state((index == 0) ? (windowOpacity() * 255) : 0);
+        emit this->set_data_state(index == 2);
+    });
+    layout->addWidget(tabs);
+
+    layout->addWidget(this->controls_widget());
+
     setCentralWidget(widget);
-
-    QVBoxLayout *mainLayout = new QVBoxLayout(widget);
-    this->tabs = new QTabWidget();
-    this->tabs->setTabPosition(QTabWidget::TabPosition::West);
-
-    OpenAutoTab *open_auto_tab = new OpenAutoTab(this);
-    open_auto_tab->setFocus();
-    this->tabs->addTab(open_auto_tab, "");
-    this->tabs->addTab(new BluetoothPlayerTab(this), "");
-    DataTab *data_tab = new DataTab(this);
-    this->tabs->addTab(data_tab, "");
-    this->tabs->addTab(new QWidget(this), "");
-    this->tabs->setTabEnabled(3, false);
-    SettingsTab *settings_tab = new SettingsTab(this);
-    // should the signal really be from the settings tab
-    connect(settings_tab, SIGNAL(brightness_updated(int)), this, SLOT(update_brightness(int)));
-    connect(settings_tab, &SettingsTab::si_units_changed, [data_tab](bool si) { data_tab->convert_gauges(si); });
-    this->tabs->addTab(settings_tab, "");
-    this->tabs->tabBar()->setIconSize(QSize(this->TAB_SIZE, this->TAB_SIZE));
-
-    std::vector<QString> icons = {"directions_car", "play_circle_outline", "speed", "report_problem", "tune"};
-    for (unsigned long i = 0; i < icons.size(); i++) this->theme->add_tab_icon(icons[i], i, 90);
-
-    connect(this->theme, SIGNAL(icons_updated(QList<QPair<int, QIcon>> &, QList<QPair<QPushButton *, QIcon>> &)), this,
-            SLOT(update_icons(QList<QPair<int, QIcon>> &, QList<QPair<QPushButton *, QIcon>> &)));
-
-    connect(this->tabs, &QTabWidget::currentChanged, [this](int index) {
-        emit this->toggle_open_auto((index == 0) ? this->brightness : 0);
-
-        emit this->data_tab_toggle(index == 2);
-    });
-
-    QHBoxLayout *bottom = new QHBoxLayout;
-    this->volume_control = new QSlider(Qt::Orientation::Horizontal);
-    this->volume_control->setRange(0, 100);
-    this->volume_control->setSliderPosition(config->get_volume());
-    this->update_system_volume(this->volume_control->sliderPosition());
-
-    connect(this->volume_control, &QSlider::valueChanged,
-            [this, config](int position) { config->set_volume(position); });
-
-    connect(this->volume_control, &QSlider::sliderMoved, [this](int position) { update_system_volume(position); });
-
-    QLabel *connectivity = new QLabel();
-    // connectivity->setFixedWidth(640 * RESOLUTION);
-    bottom->addStretch(4);
-    bottom->addWidget(connectivity);
-    QPushButton *volume_down = new QPushButton();
-    volume_down->setFlat(true);
-    this->theme->add_button_icon("volume_mute", volume_down);
-    volume_down->setIconSize(QSize(32 * RESOLUTION, 32 * RESOLUTION));
-    connect(volume_down, &QPushButton::clicked, [this]() {
-        int position = this->volume_control->sliderPosition() - 10;
-        this->volume_control->setSliderPosition(position);
-        update_system_volume(position);
-    });
-    bottom->addWidget(volume_down);
-    bottom->addWidget(this->volume_control, 2);
-    QPushButton *volume_up = new QPushButton;
-    volume_up->setFlat(true);
-    this->theme->add_button_icon("volume_up", volume_up);
-    volume_up->setIconSize(QSize(32 * RESOLUTION, 32 * RESOLUTION));
-    connect(volume_up, &QPushButton::clicked, [this]() {
-        int position = this->volume_control->sliderPosition() + 10;
-        this->volume_control->setSliderPosition(position);
-        update_system_volume(position);
-    });
-    bottom->addWidget(volume_up);
-
-    mainLayout->addWidget(tabs);
-    mainLayout->addLayout(bottom);
 }
 
-void MainWindow::update_icons(QList<QPair<int, QIcon>> &tab_icons, QList<QPair<QPushButton *, QIcon>> &button_icons)
+QWidget *MainWindow::controls_widget()
 {
-    auto tab_bar = this->tabs->tabBar();
-    for (auto &icon : tab_icons) tab_bar->setTabIcon(icon.first, icon.second);
+    QWidget *widget = new QWidget(this);
+    QHBoxLayout *layout = new QHBoxLayout(widget);
+    layout->setContentsMargins(0, 0, 0, 0);
 
-    for (auto &icon : button_icons) icon.first->setIcon(icon.second);
+    layout->addStretch(5);
+    layout->addWidget(this->volume_widget(), 3);
+
+    return widget;
 }
 
-void MainWindow::start_open_auto()
+QWidget *MainWindow::volume_widget()
 {
-    static OpenAutoTab *open_auto_tab = qobject_cast<OpenAutoTab *>(this->tabs->widget(0));
-    open_auto_tab->start_worker();
-}
+    QWidget *widget = new QWidget(this);
+    QHBoxLayout *layout = new QHBoxLayout(widget);
+    layout->setContentsMargins(0, 0, 0, 0);
 
-void MainWindow::update_brightness(int position)
-{
-    this->brightness = position;
-    setWindowOpacity(this->brightness / 255.0);
-    if (this->tabs->currentIndex() == 0) emit toggle_open_auto(this->brightness);
+    QSlider *slider = new QSlider(Qt::Orientation::Horizontal, widget);
+    slider->setRange(0, 100);
+    slider->setSliderPosition(this->config->get_volume());
+    update_system_volume(slider->sliderPosition());
+    connect(slider, &QSlider::valueChanged, [config = this->config](int position) {
+        config->set_volume(position);
+        MainWindow::update_system_volume(position);
+    });
+
+    QPushButton *lower_button = new QPushButton(widget);
+    lower_button->setFlat(true);
+    lower_button->setIconSize(Theme::icon_32);
+    this->theme->add_button_icon("volume_mute", lower_button);
+    connect(lower_button, &QPushButton::clicked, [slider]() {
+        int position = slider->sliderPosition() - 10;
+        slider->setSliderPosition(position);
+    });
+
+    QPushButton *raise_button = new QPushButton(widget);
+    raise_button->setFlat(true);
+    raise_button->setIconSize(Theme::icon_32);
+    this->theme->add_button_icon("volume_up", raise_button);
+    connect(raise_button, &QPushButton::clicked, [slider]() {
+        int position = slider->sliderPosition() + 10;
+        slider->setSliderPosition(position);
+    });
+
+    layout->addWidget(lower_button);
+    layout->addWidget(slider, 4);
+    layout->addWidget(raise_button);
+
+    return widget;
 }
 
 void MainWindow::update_system_volume(int position)
@@ -147,13 +109,10 @@ void MainWindow::update_system_volume(int position)
     lProc->waitForFinished();
 }
 
-void MainWindow::update_slider_volume()
+void MainWindow::showEvent(QShowEvent *event)
 {
-    QProcess *lProc = new QProcess();
-    lProc->start("amixer sget Master");
-    lProc->waitForFinished();
-    std::string lResult = lProc->readAllStandardOutput().toStdString();
-    std::regex rgx("\\[(\\d+)%\\]");
-    std::smatch match;
-    if (std::regex_search(lResult, match, rgx)) this->volume_control->setSliderPosition(std::stoi(match[1]));
+    QWidget::showEvent(event);
+
+    this->open_auto_tab->start_worker();
+    this->open_auto_tab->setFocus();
 }

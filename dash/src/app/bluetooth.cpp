@@ -5,6 +5,7 @@
 #include <BluezQt/Manager>
 #include <BluezQt/MediaPlayer>
 #include <BluezQt/MediaPlayerTrack>
+#include <QApplication>
 #include <QAbstractSlider>
 #include <QBluetoothAddress>
 #include <QBluetoothDeviceDiscoveryAgent>
@@ -19,7 +20,7 @@
 #include "app/bluetooth.hpp"
 #include "app/progress.hpp"
 
-Bluetooth::Bluetooth(QObject *parent) : QObject(parent)
+Bluetooth::Bluetooth() : QObject(qApp)
 {
     BluezQt::Manager *manager = new BluezQt::Manager();
     BluezQt::InitManagerJob *job = manager->init();

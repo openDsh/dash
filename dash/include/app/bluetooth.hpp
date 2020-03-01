@@ -19,7 +19,7 @@ class Bluetooth : public QObject {
     Q_OBJECT
 
    public:
-    explicit Bluetooth(QObject *parent = 0);
+    explicit Bluetooth();
 
     inline QList<BluezQt::DevicePtr> get_devices() { return this->adapter->devices(); }
 

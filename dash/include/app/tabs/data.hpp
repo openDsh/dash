@@ -21,9 +21,6 @@ class Gauge : public QWidget {
     inline void start() { this->timer->start(this->rate); }
     inline void stop() { this->timer->stop(); }
 
-   signals:
-    void toggle_unit(bool si);
-
    private:
     QString format_value(double value);
     QString null_value();
@@ -31,8 +28,10 @@ class Gauge : public QWidget {
     bool si;
     int rate;
     int precision;
-
     QTimer *timer;
+
+   signals:
+    void toggle_unit(bool si);
 };
 
 class DataTab : public QWidget {
@@ -40,8 +39,6 @@ class DataTab : public QWidget {
 
    public:
     DataTab(QWidget *parent = nullptr);
-
-    void convert_gauges(bool);
 
    private:
     QWidget *cluster_widget();

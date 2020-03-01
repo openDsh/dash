@@ -1,5 +1,6 @@
 #include <QApplication>
 #include <QFile>
+#include <QFontDatabase>
 #include <QIcon>
 #include <QObject>
 #include <QPainter>
@@ -28,10 +29,14 @@ const QSize Theme::icon_96 = QSize(96, 96);
 const QColor Theme::danger_color = QColor(211, 47, 47);
 const QColor Theme::success_color = QColor(56, 142, 60);
 
-Theme::Theme(QObject *parent) : QObject(parent), palette()
+Theme::Theme() : QObject(qApp), palette()
 {
-    this->stylesheets["light"] = this->parse_stylesheet(":/light.qss");
-    this->stylesheets["dark"] = this->parse_stylesheet(":/dark.qss");
+    QFontDatabase::addApplicationFont(":/fonts/Titillium_Web/TitilliumWeb-Regular.ttf");
+    QFontDatabase::addApplicationFont(":/fonts/Montserrat/Montserrat-LightItalic.ttf");
+    QFontDatabase::addApplicationFont(":/fonts/Montserrat/Montserrat-Regular.ttf");
+
+    this->stylesheets["light"] = this->parse_stylesheet(":/stylesheets/light.qss");
+    this->stylesheets["dark"] = this->parse_stylesheet(":/stylesheets/dark.qss");
 
     qApp->setStyleSheet(this->stylesheets[this->mode ? "dark" : "light"]);
 

@@ -40,10 +40,10 @@
         <file>icons/light/volume_off-24px.svg</file>
         <file>icons/light/save-24px.svg</file>
         <file>icons/light/bluetooth_searching-24px.svg</file>
-        <file>light.qss</file>
-        <file>dark.qss</file>
-        <file>Titillium_Web/TitilliumWeb-Regular.ttf</file>
-        <file>Montserrat/Montserrat-LightItalic.ttf</file>
-        <file>Montserrat/Montserrat-Regular.ttf</file>
+        <file>stylesheets/light.qss</file>
+        <file>stylesheets/dark.qss</file>
+        <file>fonts/Titillium_Web/TitilliumWeb-Regular.ttf</file>
+        <file>fonts/Montserrat/Montserrat-LightItalic.ttf</file>
+        <file>fonts/Montserrat/Montserrat-Regular.ttf</file>
     </qresource>
 </RCC>

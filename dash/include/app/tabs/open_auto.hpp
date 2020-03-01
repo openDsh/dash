@@ -2,7 +2,6 @@
 #define OPEN_AUTO_HPP_
 
 #include <QtWidgets>
-
 #include <f1x/aasdk/TCP/TCPWrapper.hpp>
 #include <f1x/aasdk/USB/AccessoryModeQueryChain.hpp>
 #include <f1x/aasdk/USB/AccessoryModeQueryChainFactory.hpp>

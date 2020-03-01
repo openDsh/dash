@@ -10,38 +10,31 @@
 #include <QtDBus/QtDBus>
 #include <QtWidgets>
 
-#include "app/theme.hpp"
-
-static int RESOLUTION = std::atoi(std::getenv("RESOLUTION"));
+#include <app/config.hpp>
+#include <app/theme.hpp>
+#include <app/tabs/open_auto.hpp>
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
 
    public:
-    explicit MainWindow(QMainWindow *parent = 0);
+    MainWindow();
 
-    inline QObject &get_open_auto_active_area() { return *this->open_auto_active_area; };
-
-    void start_open_auto();
-
-   private slots:
-    void update_brightness(int);
-    void update_system_volume(int);
-    void update_slider_volume();
-    void update_icons(QList<QPair<int, QIcon>> &tab_icons, QList<QPair<QPushButton *, QIcon>> &button_icons);
-
-   signals:
-    void data_tab_toggle(bool);
-    void toggle_open_auto(unsigned int);
+   protected:
+    void showEvent(QShowEvent *event);
 
    private:
-    const int TAB_SIZE = 48 * RESOLUTION;
+    static void update_system_volume(int position);
+    QWidget *controls_widget();
+    QWidget *volume_widget();
 
+    Config *config;
     Theme *theme;
-    QTabWidget *tabs;
-    QObject *open_auto_active_area;
-    QSlider *volume_control;
-    int brightness = 255;
+    OpenAutoTab *open_auto_tab;
+
+   signals:
+    void set_data_state(bool enabled);
+    void set_open_auto_state(unsigned int alpha);
 };
 
 #endif

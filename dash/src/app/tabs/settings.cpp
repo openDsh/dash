@@ -29,7 +29,6 @@ SettingsTab::SettingsTab(QWidget *parent) : QTabWidget(parent)
 
 GeneralSettingsTab::GeneralSettingsTab(QWidget *parent) : QWidget(parent)
 {
-    this->settings_tab = qobject_cast<SettingsTab *>(parent);
     this->theme = Theme::get_instance();
     this->config = Config::get_instance();
 
@@ -97,35 +96,32 @@ QWidget *GeneralSettingsTab::brightness_widget()
     QSlider *slider = new QSlider(Qt::Orientation::Horizontal, widget);
     slider->setRange(76, 255);
     slider->setSliderPosition(this->config->get_brightness());
-    connect(slider, &QSlider::sliderMoved, [this](int position) { this->settings_tab->brightness_updated(position); });
     connect(slider, &QSlider::valueChanged,
             [config = this->config](int position) { config->set_brightness(position); });
 
-    QPushButton *dim = new QPushButton(widget);
-    dim->setFlat(true);
-    dim->setIconSize(Theme::icon_32);
-    this->theme->add_button_icon("brightness_low", dim);
-    connect(dim, &QPushButton::clicked, this, [this, slider] {
+    QPushButton *dim_button = new QPushButton(widget);
+    dim_button->setFlat(true);
+    dim_button->setIconSize(Theme::icon_32);
+    this->theme->add_button_icon("brightness_low", dim_button);
+    connect(dim_button, &QPushButton::clicked, this, [slider] {
         int position = std::max(76, slider->sliderPosition() - 18);
         printf("new position: %d\n", position);
         slider->setSliderPosition(position);
-        this->settings_tab->brightness_updated(position);
     });
 
-    QPushButton *brighten = new QPushButton(widget);
-    brighten->setFlat(true);
-    brighten->setIconSize(Theme::icon_32);
-    this->theme->add_button_icon("brightness_high", brighten);
-    connect(brighten, &QPushButton::clicked, this, [this, slider] {
+    QPushButton *brighten_button = new QPushButton(widget);
+    brighten_button->setFlat(true);
+    brighten_button->setIconSize(Theme::icon_32);
+    this->theme->add_button_icon("brightness_high", brighten_button);
+    connect(brighten_button, &QPushButton::clicked, this, [slider] {
         int position = std::min(255, slider->sliderPosition() + 18);
         slider->setSliderPosition(position);
-        this->settings_tab->brightness_updated(position);
     });
 
     layout->addStretch(1);
-    layout->addWidget(dim);
+    layout->addWidget(dim_button);
     layout->addWidget(slider, 4);
-    layout->addWidget(brighten);
+    layout->addWidget(brighten_button);
     layout->addStretch(1);
 
     return widget;
@@ -142,10 +138,7 @@ QWidget *GeneralSettingsTab::si_units_row_widget()
 
     Switch *toggle = new Switch(widget);
     toggle->setChecked(this->config->get_si_units());
-    connect(toggle, &Switch::stateChanged, [this, config = this->config](bool state) {
-        this->settings_tab->si_units_changed(state);
-        config->set_si_units(state);
-    });
+    connect(toggle, &Switch::stateChanged, [config = this->config](bool state) { config->set_si_units(state); });
     layout->addWidget(toggle, 1, Qt::AlignHCenter);
 
     return widget;
@@ -208,7 +201,6 @@ QWidget *GeneralSettingsTab::controls_widget()
 
 BluetoothSettingsTab::BluetoothSettingsTab(QWidget *parent) : QWidget(parent)
 {
-    this->settings_tab = qobject_cast<SettingsTab *>(parent);
     this->bluetooth = Bluetooth::get_instance();
     this->theme = Theme::get_instance();
     this->config = Config::get_instance();
@@ -325,7 +317,6 @@ QWidget *BluetoothSettingsTab::devices_widget()
 
 OpenAutoSettingsTab::OpenAutoSettingsTab(QWidget *parent) : QWidget(parent)
 {
-    this->settings_tab = qobject_cast<SettingsTab *>(parent);
     this->bluetooth = Bluetooth::get_instance();
     this->theme = Theme::get_instance();
     this->config = Config::get_instance();
@@ -486,7 +477,7 @@ QWidget *OpenAutoSettingsTab::dpi_widget()
         config->open_auto_config->setScreenDPI(position);
     });
 
-    layout->addStretch(1);
+    layout->addStretch(2);
     layout->addWidget(slider, 4);
     layout->addWidget(value, 1);
     layout->addStretch(1);
