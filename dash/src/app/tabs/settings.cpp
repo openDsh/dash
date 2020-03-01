@@ -463,9 +463,11 @@ QWidget *OpenAutoSettingsTab::dpi_widget()
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
     QSlider *slider = new QSlider(Qt::Orientation::Horizontal, widget);
+    slider->setFixedHeight(slider->height());
     slider->setRange(0, 512);
     slider->setSliderPosition(this->config->open_auto_config->getScreenDPI());
     QLabel *value = new QLabel(QString::number(slider->sliderPosition()), widget);
+    value->setFixedHeight(value->height());
     value->setFont(Theme::font_14);
     connect(slider, &QSlider::valueChanged, [config = this->config, value](int position) {
         value->setText(QString::number(position));

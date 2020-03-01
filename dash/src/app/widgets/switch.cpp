@@ -7,8 +7,8 @@ Switch::Switch(QWidget* parent) : QAbstractButton(parent)
     QAbstractButton::setCheckable(true);
     QAbstractButton::setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
-    this->track_radius = 7;
-    this->thumb_radius = 10;
+    this->track_radius = 8;
+    this->thumb_radius = 12;
     this->margin = std::max(0, this->thumb_radius - this->track_radius);
     this->base_offset = std::max(this->thumb_radius, this->track_radius);
     this->end_offset = [this](bool checked) { return checked ? this->width() - this->base_offset : this->base_offset; };

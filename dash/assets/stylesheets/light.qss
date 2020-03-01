@@ -30,22 +30,28 @@ QTabBar::tab:disabled:top {
     color: rgba(0, 0, 0, 97);
 }
 
+QSlider {
+    height: 30px;
+}
+
 QSlider::groove {
     background-color: palette(alternate-base);
-    height: 3px;
+    height: 4px;
 }
 
 QSlider::handle {
     background-color: palette(base);
-    width: 15px;
-    margin-top: -6px;
-    margin-bottom: -6px;
-    border-radius: 7px;
+    width: 24px;
+    height: 4px;
+    line-height: 25px;
+    margin-top: -10px;
+    margin-bottom: -10px;
+    border-radius: 12px;
 }
 
 QSlider::sub-page {
-    height: 3px;
     background-color: palette(base);
+    height: 4px;
 }
 
 QPushButton {
