@@ -9,7 +9,7 @@
 #include <QTextStream>
 #include <QTransform>
 
-#include "app/theme.hpp"
+#include <app/theme.hpp>
 
 const QFont Theme::font_14 = QFont("Montserrat", 14);
 const QFont Theme::font_16 = QFont("Montserrat", 16);
@@ -29,7 +29,7 @@ const QSize Theme::icon_96 = QSize(96, 96);
 const QColor Theme::danger_color = QColor(211, 47, 47);
 const QColor Theme::success_color = QColor(56, 142, 60);
 
-Theme::Theme() : QObject(qApp), palette()
+Theme::Theme() : QObject(qApp), palette(), color("blue")
 {
     QFontDatabase::addApplicationFont(":/fonts/Titillium_Web/TitilliumWeb-Regular.ttf");
     QFontDatabase::addApplicationFont(":/fonts/Montserrat/Montserrat-LightItalic.ttf");
@@ -80,12 +80,12 @@ QPixmap Theme::create_pixmap_variant(QPixmap &base, qreal opacity)
     return image;
 }
 
-void Theme::add_tab_icon(QString name, int index, int orientation)
+void Theme::add_tab_icon(QString name, int index, Qt::Orientation orientation)
 {
     QTransform t;
-    t.rotate(orientation);
+    t.rotate((orientation == Qt::Orientation::Horizontal) ? 0 : 90);
 
-    QPixmap dark_base = QIcon(this->ICON_PATH + "dark/" + name + "-24px.svg").pixmap(512, 512).transformed(t);
+    QPixmap dark_base = QIcon(QString(":/icons/dark/%1-24px.svg").arg(name)).pixmap(512, 512).transformed(t);
     QPixmap dark_active = this->create_pixmap_variant(dark_base, .87);
     QPixmap dark_normal = this->create_pixmap_variant(dark_base, .54);
     QPixmap dark_disabled = this->create_pixmap_variant(dark_base, .38);
@@ -95,7 +95,7 @@ void Theme::add_tab_icon(QString name, int index, int orientation)
     dark_icon.addPixmap(dark_disabled, QIcon::Disabled);
     this->tab_icons["dark"].append({index, dark_icon});
 
-    QPixmap light_base = QIcon(this->ICON_PATH + "light/" + name + "-24px.svg").pixmap(512, 512).transformed(t);
+    QPixmap light_base = QIcon(QString(":/icons/light/%1-24px.svg").arg(name)).pixmap(512, 512).transformed(t);
     QPixmap light_active = this->create_pixmap_variant(light_base, 1);
     QPixmap light_normal = this->create_pixmap_variant(light_base, .7);
     QPixmap light_disabled = this->create_pixmap_variant(light_base, .5);
@@ -112,8 +112,8 @@ void Theme::add_button_icon(QString name, QPushButton *button, QString normal_na
 {
     bool checkable = button->isCheckable();
 
-    QPixmap dark_base = QIcon(this->ICON_PATH + "dark/" + name + "-24px.svg").pixmap(512, 512);
-    QPixmap light_base = QIcon(this->ICON_PATH + "light/" + name + "-24px.svg").pixmap(512, 512);
+    QPixmap dark_base = QIcon(QString(":/icons/dark/%1-24px.svg").arg(name)).pixmap(512, 512);
+    QPixmap light_base = QIcon(QString(":/icons/light/%1-24px.svg").arg(name)).pixmap(512, 512);
 
     QPixmap dark_active = this->create_pixmap_variant(dark_base, .87);
     QPixmap dark_disabled = this->create_pixmap_variant(dark_base, .38);
@@ -128,8 +128,8 @@ void Theme::add_button_icon(QString name, QPushButton *button, QString normal_na
         light_normal = checkable ? this->create_pixmap_variant(light_base, .7) : light_active;
     }
     else {
-        QPixmap dark_normal_base = QIcon(this->ICON_PATH + "dark/" + normal_name + "-24px.svg").pixmap(512, 512);
-        QPixmap light_normal_base = QIcon(this->ICON_PATH + "light/" + normal_name + "-24px.svg").pixmap(512, 512);
+        QPixmap dark_normal_base = QIcon(QString(":/icons/dark/%1-24px.svg").arg(normal_name)).pixmap(512, 512);
+        QPixmap light_normal_base = QIcon(QString(":/icons/light/%1-24px.svg").arg(normal_name)).pixmap(512, 512);
 
         dark_normal = this->create_pixmap_variant(dark_normal_base, .87);
         light_normal = this->create_pixmap_variant(light_normal_base, 1);
@@ -155,7 +155,6 @@ void Theme::update()
 
     emit icons_updated(this->tab_icons[this->mode ? "dark" : "light"],
                        this->button_icons[this->mode ? "dark" : "light"]);
-
     emit color_updated(this->colors[this->mode ? "dark" : "light"]);
 }
 

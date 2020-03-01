@@ -23,13 +23,13 @@ MainWindow::MainWindow()
     tabs->setTabPosition(QTabWidget::TabPosition::West);
     tabs->tabBar()->setIconSize(Theme::icon_48);
     tabs->addTab(this->open_auto_tab, QString());
-    this->theme->add_tab_icon("directions_car", 0, 90);
+    this->theme->add_tab_icon("directions_car", 0, Qt::Orientation::Vertical);
     tabs->addTab(new BluetoothPlayerTab(this), QString());
-    this->theme->add_tab_icon("play_circle_outline", 1, 90);
+    this->theme->add_tab_icon("play_circle_outline", 1, Qt::Orientation::Vertical);
     tabs->addTab(new DataTab(this), QString());
-    this->theme->add_tab_icon("speed", 2, 90);
+    this->theme->add_tab_icon("speed", 2, Qt::Orientation::Vertical);
     tabs->addTab(new SettingsTab(this), "");
-    this->theme->add_tab_icon("tune", 3, 90);
+    this->theme->add_tab_icon("tune", 3, Qt::Orientation::Vertical);
     connect(this->config, &Config::brightness_changed, [this, tabs](int position) {
         this->setWindowOpacity(position / 255.0);
         if (tabs->currentIndex() == 0) emit set_open_auto_state(position);

@@ -5,20 +5,18 @@
 #include <BluezQt/Manager>
 #include <BluezQt/MediaPlayer>
 #include <BluezQt/MediaPlayerTrack>
-#include <QApplication>
 #include <QAbstractSlider>
+#include <QApplication>
 #include <QBluetoothAddress>
 #include <QBluetoothDeviceDiscoveryAgent>
 #include <QBluetoothDeviceInfo>
 #include <QBluetoothLocalDevice>
 #include <QBluetoothServiceDiscoveryAgent>
 #include <QBluetoothServiceInfo>
-#include <QThread>
 #include <QTimer>
-#include <iostream>
 
-#include "app/bluetooth.hpp"
-#include "app/progress.hpp"
+#include <app/widgets/progress.hpp>
+#include <app/bluetooth.hpp>
 
 Bluetooth::Bluetooth() : QObject(qApp)
 {

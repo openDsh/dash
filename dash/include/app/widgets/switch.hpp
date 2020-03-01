@@ -3,8 +3,6 @@
 
 #include <QtWidgets>
 
-#include "app/theme.hpp"
-
 class Switch : public QAbstractButton {
     Q_OBJECT
     Q_PROPERTY(QColor track_color READ get_track_color WRITE set_track_color)
@@ -12,7 +10,7 @@ class Switch : public QAbstractButton {
     Q_PROPERTY(int offset READ get_offset WRITE set_offset)
 
    public:
-    Switch(QWidget* parent = 0);
+    Switch(QWidget* parent = nullptr);
 
     QSize sizeHint() const override;
 
@@ -30,12 +28,7 @@ class Switch : public QAbstractButton {
     void mouseReleaseEvent(QMouseEvent*) override;
     void nextCheckState() override;
 
-   signals:
-    void stateChanged(bool);
-
    private:
-    Theme *theme;
-
     int track_radius;
     int thumb_radius;
 
@@ -45,6 +38,9 @@ class Switch : public QAbstractButton {
     int margin;
     int base_offset;
     std::function<int(bool)> end_offset;
+
+   signals:
+    void stateChanged(bool);
 };
 
 #endif

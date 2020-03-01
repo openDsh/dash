@@ -11,13 +11,14 @@ class Tuner : public QSlider {
 
    public:
     Tuner(QWidget *parent = nullptr);
+
     QSize sizeHint() const override;
 
     QColor get_color() { return this->color; }
     void set_color(QColor color) { this->color = color; }
 
    protected:
-    void paintEvent(QPaintEvent *) override;
+    void paintEvent(QPaintEvent *event) override;
 
    signals:
     void station_updated(int);

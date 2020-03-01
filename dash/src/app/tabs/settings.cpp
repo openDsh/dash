@@ -8,9 +8,9 @@
 #include <f1x/openauto/autoapp/Configuration/HandednessOfTrafficType.hpp>
 
 #include <app/config.hpp>
-#include <app/switch.hpp>
 #include <app/tabs/settings.hpp>
 #include <app/theme.hpp>
+#include <app/widgets/switch.hpp>
 #include <app/window.hpp>
 
 namespace aasdk = f1x::aasdk;
@@ -103,20 +103,15 @@ QWidget *GeneralSettingsTab::brightness_widget()
     dim_button->setFlat(true);
     dim_button->setIconSize(Theme::icon_32);
     this->theme->add_button_icon("brightness_low", dim_button);
-    connect(dim_button, &QPushButton::clicked, this, [slider] {
-        int position = std::max(76, slider->sliderPosition() - 18);
-        printf("new position: %d\n", position);
-        slider->setSliderPosition(position);
-    });
+    connect(dim_button, &QPushButton::clicked,
+            [slider]() { slider->setSliderPosition(std::max(76, slider->sliderPosition() - 18)); });
 
     QPushButton *brighten_button = new QPushButton(widget);
     brighten_button->setFlat(true);
     brighten_button->setIconSize(Theme::icon_32);
     this->theme->add_button_icon("brightness_high", brighten_button);
-    connect(brighten_button, &QPushButton::clicked, this, [slider] {
-        int position = std::min(255, slider->sliderPosition() + 18);
-        slider->setSliderPosition(position);
-    });
+    connect(brighten_button, &QPushButton::clicked,
+            [slider]() { slider->setSliderPosition(std::min(255, slider->sliderPosition() + 18)); });
 
     layout->addStretch(1);
     layout->addWidget(dim_button);

@@ -6,7 +6,7 @@
 #include <app/bluetooth.hpp>
 #include <app/config.hpp>
 #include <app/theme.hpp>
-#include <app/tuner.hpp>
+#include <app/widgets/tuner.hpp>
 
 class MediaTab : public QTabWidget {
     Q_OBJECT
