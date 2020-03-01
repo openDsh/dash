@@ -10,7 +10,7 @@ class Switch : public QAbstractButton {
     Q_PROPERTY(int offset READ get_offset WRITE set_offset)
 
    public:
-    Switch(QWidget* parent = nullptr);
+    Switch(QWidget *parent = nullptr);
 
     QSize sizeHint() const override;
 
@@ -23,17 +23,17 @@ class Switch : public QAbstractButton {
     void set_offset(int offset) { this->offset = offset; }
 
    protected:
-    void paintEvent(QPaintEvent*) override;
-    void resizeEvent(QResizeEvent*) override;
-    void mouseReleaseEvent(QMouseEvent*) override;
+    void paintEvent(QPaintEvent *event) override;
+    void resizeEvent(QResizeEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
     void nextCheckState() override;
 
    private:
     int track_radius;
     int thumb_radius;
 
-    QColor track_color=Qt::transparent;
-    QColor thumb_color=Qt::transparent;
+    QColor track_color = Qt::transparent;
+    QColor thumb_color = Qt::transparent;
     int offset;
     int margin;
     int base_offset;

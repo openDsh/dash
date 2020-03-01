@@ -15,11 +15,11 @@ class SettingsTab : public QTabWidget {
     SettingsTab(QWidget *parent = nullptr);
 };
 
-class GeneralSettingsTab : public QWidget {
+class GeneralSettingsSubTab : public QWidget {
     Q_OBJECT
 
    public:
-    GeneralSettingsTab(QWidget *parent = nullptr);
+    GeneralSettingsSubTab(QWidget *parent = nullptr);
 
    private:
     QWidget *settings_widget();
@@ -34,11 +34,11 @@ class GeneralSettingsTab : public QWidget {
     Theme *theme;
 };
 
-class BluetoothSettingsTab : public QWidget {
+class BluetoothSettingsSubTab : public QWidget {
     Q_OBJECT
 
    public:
-    BluetoothSettingsTab(QWidget *parent = nullptr);
+    BluetoothSettingsSubTab(QWidget *parent = nullptr);
 
    private:
     QWidget *controls_widget();
@@ -51,11 +51,11 @@ class BluetoothSettingsTab : public QWidget {
     QMap<BluezQt::DevicePtr, QPushButton *> devices;
 };
 
-class OpenAutoSettingsTab : public QWidget {
+class OpenAutoSettingsSubTab : public QWidget {
     Q_OBJECT
 
    public:
-    OpenAutoSettingsTab(QWidget *parent = nullptr);
+    OpenAutoSettingsSubTab(QWidget *parent = nullptr);
 
    private:
     QWidget *settings_widget();

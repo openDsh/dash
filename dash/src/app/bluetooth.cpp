@@ -15,8 +15,8 @@
 #include <QBluetoothServiceInfo>
 #include <QTimer>
 
-#include <app/widgets/progress.hpp>
 #include <app/bluetooth.hpp>
+#include <app/widgets/progress.hpp>
 
 Bluetooth::Bluetooth() : QObject(qApp)
 {

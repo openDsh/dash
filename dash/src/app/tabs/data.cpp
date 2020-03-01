@@ -88,12 +88,14 @@ DataTab::DataTab(QWidget *parent) : QWidget(parent)
                 p.setColor(QPalette::Window, Theme::success_color);
                 for (auto &gauge : this->gauges) gauge->start();
             }
-            else
+            else {
                 p.setColor(QPalette::Window, Theme::danger_color);
+            }
             status_indicator->setPalette(p);
         }
-        else
+        else {
             for (auto &gauge : this->gauges) gauge->stop();
+        }
     });
     layout->addWidget(status_indicator);
     layout->addWidget(this->cluster_widget());

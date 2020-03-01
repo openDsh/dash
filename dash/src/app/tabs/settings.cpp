@@ -21,13 +21,14 @@ SettingsTab::SettingsTab(QWidget *parent) : QTabWidget(parent)
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
 
-    this->tabBar()->setFont(Theme::font_16);
-    this->addTab(new GeneralSettingsTab(this), "General");
-    this->addTab(new BluetoothSettingsTab(this), "Bluetooth");
-    this->addTab(new OpenAutoSettingsTab(this), "OpenAuto");
+    this->tabBar()->setFont(Theme::font_18);
+
+    this->addTab(new GeneralSettingsSubTab(this), "General");
+    this->addTab(new BluetoothSettingsSubTab(this), "Bluetooth");
+    this->addTab(new OpenAutoSettingsSubTab(this), "OpenAuto");
 }
 
-GeneralSettingsTab::GeneralSettingsTab(QWidget *parent) : QWidget(parent)
+GeneralSettingsSubTab::GeneralSettingsSubTab(QWidget *parent) : QWidget(parent)
 {
     this->theme = Theme::get_instance();
     this->config = Config::get_instance();
@@ -39,7 +40,7 @@ GeneralSettingsTab::GeneralSettingsTab(QWidget *parent) : QWidget(parent)
     layout->addWidget(this->controls_widget());
 }
 
-QWidget *GeneralSettingsTab::settings_widget()
+QWidget *GeneralSettingsSubTab::settings_widget()
 {
     QWidget *widget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
@@ -54,7 +55,7 @@ QWidget *GeneralSettingsTab::settings_widget()
     return widget;
 }
 
-QWidget *GeneralSettingsTab::dark_mode_row_widget()
+QWidget *GeneralSettingsSubTab::dark_mode_row_widget()
 {
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
@@ -74,7 +75,7 @@ QWidget *GeneralSettingsTab::dark_mode_row_widget()
     return widget;
 }
 
-QWidget *GeneralSettingsTab::brightness_row_widget()
+QWidget *GeneralSettingsSubTab::brightness_row_widget()
 {
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
@@ -88,7 +89,7 @@ QWidget *GeneralSettingsTab::brightness_row_widget()
     return widget;
 }
 
-QWidget *GeneralSettingsTab::brightness_widget()
+QWidget *GeneralSettingsSubTab::brightness_widget()
 {
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
@@ -122,7 +123,7 @@ QWidget *GeneralSettingsTab::brightness_widget()
     return widget;
 }
 
-QWidget *GeneralSettingsTab::si_units_row_widget()
+QWidget *GeneralSettingsSubTab::si_units_row_widget()
 {
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
@@ -139,7 +140,7 @@ QWidget *GeneralSettingsTab::si_units_row_widget()
     return widget;
 }
 
-QWidget *GeneralSettingsTab::color_row_widget()
+QWidget *GeneralSettingsSubTab::color_row_widget()
 {
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
@@ -178,7 +179,7 @@ QWidget *GeneralSettingsTab::color_row_widget()
     return widget;
 }
 
-QWidget *GeneralSettingsTab::controls_widget()
+QWidget *GeneralSettingsSubTab::controls_widget()
 {
     QWidget *widget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
@@ -194,7 +195,7 @@ QWidget *GeneralSettingsTab::controls_widget()
     return widget;
 }
 
-BluetoothSettingsTab::BluetoothSettingsTab(QWidget *parent) : QWidget(parent)
+BluetoothSettingsSubTab::BluetoothSettingsSubTab(QWidget *parent) : QWidget(parent)
 {
     this->bluetooth = Bluetooth::get_instance();
     this->theme = Theme::get_instance();
@@ -207,7 +208,7 @@ BluetoothSettingsTab::BluetoothSettingsTab(QWidget *parent) : QWidget(parent)
     layout->addWidget(this->devices_widget());
 }
 
-QWidget *BluetoothSettingsTab::controls_widget()
+QWidget *BluetoothSettingsSubTab::controls_widget()
 {
     QWidget *widget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
@@ -230,7 +231,7 @@ QWidget *BluetoothSettingsTab::controls_widget()
     return widget;
 }
 
-QWidget *BluetoothSettingsTab::scanner_widget()
+QWidget *BluetoothSettingsSubTab::scanner_widget()
 {
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
@@ -256,7 +257,7 @@ QWidget *BluetoothSettingsTab::scanner_widget()
     return widget;
 }
 
-QWidget *BluetoothSettingsTab::devices_widget()
+QWidget *BluetoothSettingsSubTab::devices_widget()
 {
     QWidget *widget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
@@ -310,7 +311,7 @@ QWidget *BluetoothSettingsTab::devices_widget()
     return widget;
 }
 
-OpenAutoSettingsTab::OpenAutoSettingsTab(QWidget *parent) : QWidget(parent)
+OpenAutoSettingsSubTab::OpenAutoSettingsSubTab(QWidget *parent) : QWidget(parent)
 {
     this->bluetooth = Bluetooth::get_instance();
     this->theme = Theme::get_instance();
@@ -322,7 +323,7 @@ OpenAutoSettingsTab::OpenAutoSettingsTab(QWidget *parent) : QWidget(parent)
     layout->addWidget(this->settings_widget());
 }
 
-QWidget *OpenAutoSettingsTab::settings_widget()
+QWidget *OpenAutoSettingsSubTab::settings_widget()
 {
     QWidget *widget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
@@ -341,7 +342,7 @@ QWidget *OpenAutoSettingsTab::settings_widget()
     return widget;
 }
 
-QWidget *OpenAutoSettingsTab::rhd_row_widget()
+QWidget *OpenAutoSettingsSubTab::rhd_row_widget()
 {
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
@@ -363,7 +364,7 @@ QWidget *OpenAutoSettingsTab::rhd_row_widget()
     return widget;
 }
 
-QWidget *OpenAutoSettingsTab::frame_rate_row_widget()
+QWidget *OpenAutoSettingsSubTab::frame_rate_row_widget()
 {
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
@@ -396,7 +397,7 @@ QWidget *OpenAutoSettingsTab::frame_rate_row_widget()
     return widget;
 }
 
-QWidget *OpenAutoSettingsTab::resolution_row_widget()
+QWidget *OpenAutoSettingsSubTab::resolution_row_widget()
 {
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
@@ -443,7 +444,7 @@ QWidget *OpenAutoSettingsTab::resolution_row_widget()
     return widget;
 }
 
-QWidget *OpenAutoSettingsTab::dpi_row_widget()
+QWidget *OpenAutoSettingsSubTab::dpi_row_widget()
 {
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
@@ -457,7 +458,7 @@ QWidget *OpenAutoSettingsTab::dpi_row_widget()
     return widget;
 }
 
-QWidget *OpenAutoSettingsTab::dpi_widget()
+QWidget *OpenAutoSettingsSubTab::dpi_widget()
 {
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
@@ -482,7 +483,7 @@ QWidget *OpenAutoSettingsTab::dpi_widget()
     return widget;
 }
 
-QWidget *OpenAutoSettingsTab::rt_audio_row_widget()
+QWidget *OpenAutoSettingsSubTab::rt_audio_row_widget()
 {
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
@@ -504,7 +505,7 @@ QWidget *OpenAutoSettingsTab::rt_audio_row_widget()
     return widget;
 }
 
-QWidget *OpenAutoSettingsTab::audio_channels_row_widget()
+QWidget *OpenAutoSettingsSubTab::audio_channels_row_widget()
 {
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
@@ -538,7 +539,7 @@ QWidget *OpenAutoSettingsTab::audio_channels_row_widget()
     return widget;
 }
 
-QWidget *OpenAutoSettingsTab::bluetooth_row_widget()
+QWidget *OpenAutoSettingsSubTab::bluetooth_row_widget()
 {
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);

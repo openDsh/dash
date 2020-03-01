@@ -4,7 +4,7 @@
 #include <functional>
 #include <string>
 
-#include "obd/message.hpp"
+#include <obd/message.hpp>
 
 struct Command {
     std::string description;

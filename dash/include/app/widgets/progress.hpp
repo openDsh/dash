@@ -31,11 +31,11 @@ class ProgressIndicator : public QWidget {
     virtual void paintEvent(QPaintEvent* event);
 
    private:
-    int timer_id=-1;
-    bool enabled=false;
-    int angle=0;
-    qreal dash_length=24;
-    qreal dash_offset=0;
+    int timer_id = -1;
+    bool enabled = false;
+    int angle = 0;
+    qreal dash_length = 24;
+    qreal dash_offset = 0;
 };
 
 #endif

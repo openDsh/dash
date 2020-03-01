@@ -1,7 +1,7 @@
 #ifndef DECODERS_HPP_
 #define DECODERS_HPP_
 
-#include "obd/message.hpp"
+#include <obd/message.hpp>
 
 double percentage(Response resp) { return (100.0 / 255.0) * resp.A; }
 

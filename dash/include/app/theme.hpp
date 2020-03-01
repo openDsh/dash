@@ -53,11 +53,11 @@ class Theme : public QObject {
     void add_button_icon(QString name, QPushButton *button, QString active_name = QString());
     void update();
 
-    inline static QFrame *br(QWidget *parent = nullptr, bool vert = false)
+    inline static QFrame *br(QWidget *parent = nullptr, bool vertical = false)
     {
         QFrame *br = new QFrame(parent);
         br->setLineWidth(1);
-        br->setFrameShape((vert) ? QFrame::VLine : QFrame::HLine);
+        br->setFrameShape(vertical ? QFrame::VLine : QFrame::HLine);
         br->setFrameShadow(QFrame::Plain);
 
         return br;
@@ -90,8 +90,8 @@ class Theme : public QObject {
     QPixmap create_pixmap_variant(QPixmap &base, qreal opacity);
 
    signals:
-    void icons_updated(QList<tab_icon_t> &tab_icons, QList<button_icon_t> &button_icons);
-    void color_updated(QMap<QString, QColor> &colors);
+    void icons_updated(QList<tab_icon_t> &, QList<button_icon_t> &);
+    void color_updated(QMap<QString, QColor> &);
 };
 
 #endif

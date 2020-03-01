@@ -31,8 +31,9 @@ bool OBD::query(Command &cmd, double &val)
         val = cmd.decoder(resp);
         return resp.success;
     }
-    else
+    else {
         std::cout << "unable to send command" << std::endl;
+    }
 
     return false;
 }

@@ -15,11 +15,11 @@ class MediaTab : public QTabWidget {
     MediaTab(QWidget *parent = nullptr);
 };
 
-class BluetoothPlayerTab : public QWidget {
+class BluetoothPlayerSubTab : public QWidget {
     Q_OBJECT
 
    public:
-    BluetoothPlayerTab(QWidget *parent = nullptr);
+    BluetoothPlayerSubTab(QWidget *parent = nullptr);
 
    private:
     QWidget *track_widget();
@@ -29,11 +29,11 @@ class BluetoothPlayerTab : public QWidget {
     Theme *theme;
 };
 
-class RadioPlayerTab : public QWidget {
+class RadioPlayerSubTab : public QWidget {
     Q_OBJECT
 
    public:
-    RadioPlayerTab(QWidget *parent = nullptr);
+    RadioPlayerSubTab(QWidget *parent = nullptr);
 
    private:
     QWidget *tuner_widget();

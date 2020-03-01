@@ -19,34 +19,45 @@ MainWindow::MainWindow()
     QWidget *widget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
 
-    QTabWidget *tabs = new QTabWidget(widget);
-    tabs->setTabPosition(QTabWidget::TabPosition::West);
-    tabs->tabBar()->setIconSize(Theme::icon_48);
-    tabs->addTab(this->open_auto_tab, QString());
-    this->theme->add_tab_icon("directions_car", 0, Qt::Orientation::Vertical);
-    tabs->addTab(new BluetoothPlayerTab(this), QString());
-    this->theme->add_tab_icon("play_circle_outline", 1, Qt::Orientation::Vertical);
-    tabs->addTab(new DataTab(this), QString());
-    this->theme->add_tab_icon("speed", 2, Qt::Orientation::Vertical);
-    tabs->addTab(new SettingsTab(this), "");
-    this->theme->add_tab_icon("tune", 3, Qt::Orientation::Vertical);
-    connect(this->config, &Config::brightness_changed, [this, tabs](int position) {
-        this->setWindowOpacity(position / 255.0);
-        if (tabs->currentIndex() == 0) emit set_open_auto_state(position);
-    });
-    connect(this->theme, &Theme::icons_updated, [tabs](QList<tab_icon_t> &tab_icons, QList<button_icon_t> &button_icons) {
-        for (auto &icon : tab_icons) tabs->tabBar()->setTabIcon(icon.first, icon.second);
-        for (auto &icon : button_icons) icon.first->setIcon(icon.second);
-    });
-    connect(tabs, &QTabWidget::currentChanged, [this](int index) {
-        emit this->set_open_auto_state((index == 0) ? (windowOpacity() * 255) : 0);
-        emit this->set_data_state(index == 2);
-    });
-    layout->addWidget(tabs);
-
+    layout->addWidget(this->tabs_widget());
     layout->addWidget(this->controls_widget());
 
     setCentralWidget(widget);
+}
+
+QTabWidget *MainWindow::tabs_widget()
+{
+    QTabWidget *widget = new QTabWidget(this);
+    widget->setTabPosition(QTabWidget::TabPosition::West);
+    widget->tabBar()->setIconSize(Theme::icon_48);
+
+    widget->addTab(this->open_auto_tab, QString());
+    this->theme->add_tab_icon("directions_car", 0, Qt::Orientation::Vertical);
+
+    widget->addTab(new BluetoothPlayerSubTab(this), QString());
+    this->theme->add_tab_icon("play_circle_outline", 1, Qt::Orientation::Vertical);
+
+    widget->addTab(new DataTab(this), QString());
+    this->theme->add_tab_icon("speed", 2, Qt::Orientation::Vertical);
+
+    widget->addTab(new SettingsTab(this), "");
+    this->theme->add_tab_icon("tune", 3, Qt::Orientation::Vertical);
+
+    connect(this->config, &Config::brightness_changed, [this, widget](int position) {
+        this->setWindowOpacity(position / 255.0);
+        if (widget->currentIndex() == 0) emit set_open_auto_state(position);
+    });
+    connect(this->theme, &Theme::icons_updated,
+            [widget](QList<tab_icon_t> &tab_icons, QList<button_icon_t> &button_icons) {
+                for (auto &icon : tab_icons) widget->tabBar()->setTabIcon(icon.first, icon.second);
+                for (auto &icon : button_icons) icon.first->setIcon(icon.second);
+            });
+    connect(widget, &QTabWidget::currentChanged, [this](int index) {
+        emit set_open_auto_state((index == 0) ? (windowOpacity() * 255) : 0);
+        emit set_data_state(index == 2);
+    });
+
+    return widget;
 }
 
 QWidget *MainWindow::controls_widget()

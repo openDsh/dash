@@ -5,15 +5,13 @@
 
 MediaTab::MediaTab(QWidget *parent) : QTabWidget(parent)
 {
-    QVBoxLayout *layout = new QVBoxLayout(this);
-    layout->setContentsMargins(0, 0, 0, 0);
+    this->tabBar()->setFont(Theme::font_18);
 
-    this->tabBar()->setFont(Theme::font_16);
-    this->addTab(new RadioPlayerTab(this), "Radio");
-    this->addTab(new BluetoothPlayerTab(this), "Bluetooth");
+    this->addTab(new RadioPlayerSubTab(this), "Radio");
+    this->addTab(new BluetoothPlayerSubTab(this), "Bluetooth");
 }
 
-BluetoothPlayerTab::BluetoothPlayerTab(QWidget *parent) : QWidget(parent)
+BluetoothPlayerSubTab::BluetoothPlayerSubTab(QWidget *parent) : QWidget(parent)
 {
     this->bluetooth = Bluetooth::get_instance();
 
@@ -27,7 +25,7 @@ BluetoothPlayerTab::BluetoothPlayerTab(QWidget *parent) : QWidget(parent)
     layout->addStretch();
 }
 
-QWidget *BluetoothPlayerTab::track_widget()
+QWidget *BluetoothPlayerSubTab::track_widget()
 {
     BluezQt::MediaPlayerPtr media_player = this->bluetooth->get_media_player().second;
 
@@ -68,7 +66,7 @@ QWidget *BluetoothPlayerTab::track_widget()
     return widget;
 }
 
-QWidget *BluetoothPlayerTab::controls_widget()
+QWidget *BluetoothPlayerSubTab::controls_widget()
 {
     BluezQt::MediaPlayerPtr media_player = this->bluetooth->get_media_player().second;
     Theme *theme = Theme::get_instance();
@@ -127,7 +125,7 @@ QWidget *BluetoothPlayerTab::controls_widget()
     return widget;
 }
 
-RadioPlayerTab::RadioPlayerTab(QWidget *parent) : QWidget(parent)
+RadioPlayerSubTab::RadioPlayerSubTab(QWidget *parent) : QWidget(parent)
 {
     this->theme = Theme::get_instance();
     this->config = Config::get_instance();
@@ -143,7 +141,7 @@ RadioPlayerTab::RadioPlayerTab(QWidget *parent) : QWidget(parent)
     layout->addStretch();
 }
 
-QWidget *RadioPlayerTab::tuner_widget()
+QWidget *RadioPlayerSubTab::tuner_widget()
 {
     QWidget *widget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
@@ -163,7 +161,7 @@ QWidget *RadioPlayerTab::tuner_widget()
     return widget;
 }
 
-QWidget *RadioPlayerTab::controls_widget()
+QWidget *RadioPlayerSubTab::controls_widget()
 {
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);

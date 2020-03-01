@@ -20,11 +20,11 @@ class OBD {
     static OBD *get_instance();
 
    private:
-    void connect(std::string, speed_t);
+    void connect(std::string dev_path, speed_t baudrate);
     void initialize();
-    bool send(Request);
-    int _write(std::string);
-    bool is_failed_response(std::string);
+    bool send(Request req);
+    int _write(std::string str);
+    bool is_failed_response(std::string str);
     Response receive();
     std::string _read();
 

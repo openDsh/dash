@@ -11,8 +11,8 @@
 #include <QtWidgets>
 
 #include <app/config.hpp>
-#include <app/theme.hpp>
 #include <app/tabs/open_auto.hpp>
+#include <app/theme.hpp>
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
@@ -25,6 +25,7 @@ class MainWindow : public QMainWindow {
 
    private:
     static void update_system_volume(int position);
+    QTabWidget *tabs_widget();
     QWidget *controls_widget();
     QWidget *volume_widget();
 
