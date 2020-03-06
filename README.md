@@ -5,7 +5,7 @@ IntelligentAuto is a Qt-based infotainment center for your current Linux OpenAut
 Main features include:
 
 * volume control
-* responsive UI
+* responsive UI (adjusts to any screen size)
 * embedded OpenAuto
 * bluetooth media control
 * read vehicle OBD-II data
