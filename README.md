@@ -51,7 +51,7 @@ The following packages are required:
 * qtconnectivity5-dev
 * pulseaudio
 * librtaudio-dev
-* librtaudio6
+* librtaudio6 (or librtaudio5a for Raspberry Pi3B+)
 * libkf5bluezqt-dev
 * libgstreamer1.0-0
 * gstreamer1.0-plugins-base
