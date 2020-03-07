@@ -74,6 +74,12 @@ For example, you can install all the packages like this:
 sudo apt-get install -y alsa-utils cmake libboost-all-dev libusb-1.0.0-dev libssl-dev libprotobuf-dev protobuf-c-compiler protobuf-compiler libqt5multimedia5 libqt5multimedia5-plugins libqt5multimediawidgets5 qtmultimedia5-dev libqt5bluetooth5 libqt5bluetooth5-bin qtconnectivity5-dev pulseaudio librtaudio-dev librtaudio6 libkf5bluezqt-dev libgstreamer1.0-0 gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly gstreamer1.0-libav gstreamer1.0-doc gstreamer1.0-tools gstreamer1.0-x gstreamer1.0-alsa gstreamer1.0-gl gstreamer1.0-gtk3 gstreamer1.0-qt5 gstreamer1.0-pulseaudio
 ```
 
+For a Raspberry Pi, you will also need to run the following commands:
+```
+cd /opt/vc/src/hello_pi/libs/ilclient
+make
+```
+
 ### Building
 
 It is assumed you have cloned this repo with all submodules and are in its root directory at the beginning of each build.
