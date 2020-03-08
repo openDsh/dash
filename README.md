@@ -123,3 +123,5 @@ If using GStreamer for your video backend (i.e. not a Raspberry Pi), you may get
 - [ ] ignore apsect ratio of OpenAuto for GStreamer backend
 - [ ] debug issue for OpenAuto randomly disconnecting
 - [ ] automatic light/dark mode
+- [ ] local media player
+- [ ] audio equalizer
