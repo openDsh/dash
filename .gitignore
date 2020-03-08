@@ -1,5 +1,5 @@
 .vscode/
+bin/
+build/
 
-aasdk_build
-openauto_build
-dash_build
+CMakeLists.txt.user

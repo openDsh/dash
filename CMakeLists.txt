@@ -1,5 +1,14 @@
 cmake_minimum_required(VERSION 3.5.1)
-project(dash CXX)
+project(ia CXX)
+
+add_subdirectory(aasdk)
+set(AASDK_INCLUDE_DIRS ${aasdk_SOURCE_DIR}/include)
+set(AASDK_LIBRARIES ${aasdk_SOURCE_DIR}/lib/libaasdk.so)
+set(AASDK_PROTO_INCLUDE_DIRS ${aasdk_BINARY_DIR})
+set(AASDK_PROTO_LIBRARIES ${aasdk_SOURCE_DIR}/lib/libaasdk_proto.so)
+
+add_subdirectory(openauto)
+set(OPENAUTO_INCLUDE_DIRS ${openauto_SOURCE_DIR}/include)
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
@@ -32,10 +41,6 @@ find_package(Protobuf REQUIRED)
 find_package(OpenSSL REQUIRED)
 find_package(rtaudio REQUIRED)
 
-if(WIN32)
-    set(WINSOCK2_LIBRARIES "ws2_32")
-endif(WIN32)
-
 if(RPI_BUILD)
     add_definitions(-DUSE_OMX -DOMX_SKIP64BIT)
     set(BCM_HOST_LIBRARIES "/opt/vc/lib/libbcm_host.so")
@@ -60,25 +65,27 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR}
                     ${BCM_HOST_INCLUDE_DIRS}
                     ${ILCLIENT_INCLUDE_DIRS}
                     ${include_directory})
-								
+
 link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
 
 file(GLOB_RECURSE source_files ${sources_directory}/*.cpp ${include_directory}/*.hpp ${resources_directory}/*.qrc)
 
-add_executable(dash ${source_files})
+add_executable(ia ${source_files})
 
-target_link_libraries(dash
-                        ${AASDK_PROTO_LIBRARIES}
-                        ${AASDK_LIBRARIES}
-                        ${OPENAUTO_LIBRARIES}
-                        ${Boost_LIBRARIES}
-                        ${Qt5Multimedia_LIBRARIES}
-                        ${Qt5MultimediaWidgets_LIBRARIES}
-                        ${Qt5Bluetooth_LIBRARIES}
-                        KF5::BluezQt
-                        ${LIBUSB_1_LIBRARIES}
-                        ${PROTOBUF_LIBRARIES}
-                        ${BCM_HOST_LIBRARIES}
-                        ${ILCLIENT_LIBRARIES}
-                        ${WINSOCK2_LIBRARIES}
-                        ${RTAUDIO_LIBRARIES})
+add_dependencies(auto aasdk)
+target_link_libraries(ia
+                      aasdk_proto
+                      aasdk
+                      auto
+                      ${Boost_LIBRARIES}
+                      ${Qt5Multimedia_LIBRARIES}
+                      ${Qt5MultimediaWidgets_LIBRARIES}
+                      ${Qt5Bluetooth_LIBRARIES}
+                      KF5::BluezQt
+                      ${LIBUSB_1_LIBRARIES}
+                      ${PROTOBUF_LIBRARIES}
+                      ${BCM_HOST_LIBRARIES}
+                      ${ILCLIENT_LIBRARIES}
+                      ${WINSOCK2_LIBRARIES}
+                      ${RTAUDIO_LIBRARIES})
+

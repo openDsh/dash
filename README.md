@@ -26,13 +26,9 @@ Main features include:
 
 ## Getting Started
 
-The build procedure is currently a bit tediuos because it requires multiple libraries to be be built. In future versions, I plan on consolidating everything into a single build procedure.
-
 ### Prerequisites
 
-To make things easier, I'm going to include the instrutions for building everything (aasdk, OpenAuto, dash) here.
-
-The following packages are required:
+The following packages have been used while developing this application (NOTE some things may be missing and others are not actually needed):
 
 * alsa-utils
 * cmake
@@ -51,8 +47,11 @@ The following packages are required:
 * qtconnectivity5-dev
 * pulseaudio
 * librtaudio-dev
-* librtaudio6 (or librtaudio5a for Raspberry Pi3B+)
+* librtaudio6
 * libkf5bluezqt-dev
+
+If you plan on using the Qt video library instead of the OMX library (i.e. not using a Raspberry Pi) you'll also most likely want the following packages:
+
 * libgstreamer1.0-0
 * gstreamer1.0-plugins-base
 * gstreamer1.0-plugins-good
@@ -68,12 +67,6 @@ The following packages are required:
 * gstreamer1.0-qt5
 * gstreamer1.0-pulseaudio
 
-For example, you can install all the packages like this:
-
-```
-sudo apt-get install -y alsa-utils cmake libboost-all-dev libusb-1.0.0-dev libssl-dev libprotobuf-dev protobuf-c-compiler protobuf-compiler libqt5multimedia5 libqt5multimedia5-plugins libqt5multimediawidgets5 qtmultimedia5-dev libqt5bluetooth5 libqt5bluetooth5-bin qtconnectivity5-dev pulseaudio librtaudio-dev librtaudio6 libkf5bluezqt-dev libgstreamer1.0-0 gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly gstreamer1.0-libav gstreamer1.0-doc gstreamer1.0-tools gstreamer1.0-x gstreamer1.0-alsa gstreamer1.0-gl gstreamer1.0-gtk3 gstreamer1.0-qt5 gstreamer1.0-pulseaudio
-```
-
 For a Raspberry Pi, you will also need to run the following commands:
 ```
 cd /opt/vc/src/hello_pi/libs/ilclient
@@ -84,32 +77,10 @@ make
 
 It is assumed you have cloned this repo with all submodules and are in its root directory at the beginning of each build.
 
-#### aasdk
-
 ```
-mkdir aasdk_build
-cd aasdk_build
-cmake -DCMAKE_BUILD_TYPE=Release ../aasdk
-make
-```
-
-#### OpenAuto
-
-```
-mkdir openauto_build
-cd openauto_build
-cmake -DCMAKE_BUILD_TYPE=Release -DAASDK_INCLUDE_DIRS="`pwd`/../aasdk/include" -DAASDK_LIBRARIES="`pwd`/../aasdk/lib/libaasdk.so" -DAASDK_PROTO_INCLUDE_DIRS="`pwd`/../aasdk_build" -DAASDK_PROTO_LIBRARIES="`pwd`/../aasdk/lib/libaasdk_proto.so" ../openauto
-make
-```
-
-If building this for a Raspberry Pi, add `-DRPI_BUILD=TRUE` to the `cmake` command.
-
-#### dash
-
-```
-mkdir dash_build
-cd dash_build
-cmake -DCMAKE_BUILD_TYPE=Release -DAASDK_INCLUDE_DIRS="`pwd`/../aasdk/include" -DAASDK_LIBRARIES="`pwd`/../aasdk/lib/libaasdk.so" -DAASDK_PROTO_INCLUDE_DIRS="`pwd`/../aasdk_build" -DAASDK_PROTO_LIBRARIES="`pwd`/../aasdk/lib/libaasdk_proto.so" -DOPENAUTO_INCLUDE_DIRS="`pwd`/../openauto/include" -DOPENAUTO_LIBRARIES="`pwd`/../openauto/lib/libauto.so" ../dash
+mkdir build
+cd build
+cmake -DCMAKE_BUILD_TYPE=Release ../
 make
 ```
 
@@ -117,7 +88,7 @@ If building this for a Raspberry Pi, add `-DRPI_BUILD=TRUE` to the `cmake` comma
 
 ### Running
 
-Building dash will create the `dash` binary in `dash/bin`. Depending on what you're running it on, you may need to make some adjustments to your system.
+Building dash will create the `ia` binary in `bin/`. Depending on what you're running it on, you may need to make some adjustments to your system.
 
 Some things to consider when configuring your system:
 
@@ -137,7 +108,9 @@ Settings are saved periodically every 10 seconds (or anytime the `save` button i
 
 Not all OpenAuto settings are acessible.
 
-### Future Features
+If using GStreamer for your video backend (i.e. not a Raspberry Pi), you may get some black bars around the margins of OpenAuto. I'm still trying to figure out a way for it to ignore the aspect ratio.
+
+### Future Features/Fixes
 
 - [ ] add radio player (UI elements exist, just haven't had anything to interface with yet)
 - [ ] support bluetooth OBD-II adapter
@@ -147,3 +120,5 @@ Not all OpenAuto settings are acessible.
 - [ ] add modular OBD-II data tabs
 - [ ] add OBD-II error codes tab
 - [ ] add dashcam video tab
+- [ ] ignore apsect ratio of OpenAuto for GStreamer backend
+- [ ] debug issue for OpenAuto randomly disconnecting
