@@ -75,7 +75,7 @@ make
 
 ### Building
 
-It is assumed you have cloned this repo with all submodules and are in its root directory at the beginning of each build.
+It is assumed you have cloned this repo with all submodules and are in the root directory.
 
 ```
 mkdir build
@@ -122,3 +122,4 @@ If using GStreamer for your video backend (i.e. not a Raspberry Pi), you may get
 - [ ] add dashcam video tab
 - [ ] ignore apsect ratio of OpenAuto for GStreamer backend
 - [ ] debug issue for OpenAuto randomly disconnecting
+- [ ] automatic light/dark mode
