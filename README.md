@@ -116,12 +116,12 @@ If using GStreamer for your video backend (i.e. not a Raspberry Pi), you may get
 - [ ] support bluetooth OBD-II adapter
 - [ ] control screen brightness
 - [ ] incorporate wireless OpenAuto
-- [ ] wireless hotspot controls
+- [ ] add wireless hotspot controls
 - [ ] add modular OBD-II data tabs
 - [ ] add OBD-II error codes tab
 - [ ] add dashcam video tab
 - [ ] ignore apsect ratio of OpenAuto for GStreamer backend
 - [ ] debug issue for OpenAuto randomly disconnecting
-- [ ] automatic light/dark mode
-- [ ] local media player
-- [ ] audio equalizer
+- [ ] add automatic light/dark mode
+- [ ] add local media player
+- [ ] add audio equalizer
