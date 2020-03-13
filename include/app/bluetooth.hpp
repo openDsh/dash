@@ -23,7 +23,10 @@ class Bluetooth : public QObject {
 
     void scan();
 
-    inline QList<BluezQt::DevicePtr> get_devices() { return this->adapter->devices(); }
+    inline QList<BluezQt::DevicePtr> get_devices()
+    {
+        return this->has_adapter() ? this->adapter->devices() : QList<BluezQt::DevicePtr>();
+    }
     inline QPair<QString, BluezQt::MediaPlayerPtr> get_media_player()
     {
         if (this->media_player_device != nullptr)
@@ -31,13 +34,14 @@ class Bluetooth : public QObject {
 
         return {QString(), nullptr};
     }
+    inline bool has_adapter() { return this->adapter != nullptr; }
 
     static Bluetooth *get_instance();
 
    private:
     void update_media_player(BluezQt::DevicePtr device);
 
-    BluezQt::Adapter *adapter;
+    BluezQt::AdapterPtr adapter;
     BluezQt::DevicePtr media_player_device;
 
    signals:

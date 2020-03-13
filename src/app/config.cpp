@@ -1,4 +1,5 @@
 #include <QApplication>
+#include <QDir>
 #include <QTimer>
 
 #include <app/config.hpp>
@@ -16,6 +17,7 @@ Config::Config()
     this->bluetooth_device = this->ia_config.value("Bluetooth/device", QString()).toString();
     this->radio_station = this->ia_config.value("Radio/station", 98.0).toDouble();
     this->radio_muted = this->ia_config.value("Radio/muted", true).toBool();
+    this->media_home = this->ia_config.value("media_home", QDir().absolutePath()).toString();
 
     QTimer *timer = new QTimer(this);
     connect(timer, &QTimer::timeout, [this]() { this->save(); });
@@ -40,6 +42,8 @@ void Config::save()
         this->ia_config.setValue("Radio/station", this->radio_station);
     if (this->radio_muted != this->ia_config.value("Radio/muted", true).toBool())
         this->ia_config.setValue("Radio/muted", this->radio_muted);
+    if (this->media_home != this->ia_config.value("media_home", QDir().absolutePath()).toString())
+        this->ia_config.setValue("media_home", this->media_home);
 
     this->open_auto_config->save();
 }

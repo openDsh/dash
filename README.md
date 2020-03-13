@@ -49,6 +49,7 @@ The following packages have been used while developing this application (NOTE so
 * librtaudio-dev
 * librtaudio6
 * libkf5bluezqt-dev
+* libtag1-dev
 
 If you plan on using the Qt video library instead of the OMX library (i.e. not using a Raspberry Pi) you'll also most likely want the following packages:
 

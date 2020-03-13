@@ -24,33 +24,37 @@ Bluetooth::Bluetooth() : QObject(qApp)
     BluezQt::InitManagerJob *job = manager->init();
     job->exec();
 
-    this->adapter = manager->usableAdapter().get();
+    this->adapter = manager->usableAdapter();
 
-    for (auto device : this->adapter->devices()) {
-        if (device->mediaPlayer() != nullptr) {
-            this->media_player_device = device;
-            break;
+    if (this->has_adapter()) {
+        for (auto device : this->get_devices()) {
+            if (device->mediaPlayer() != nullptr) {
+                this->media_player_device = device;
+                break;
+            }
         }
-    }
 
-    connect(this->adapter, &BluezQt::Adapter::deviceAdded,
-            [this](BluezQt::DevicePtr device) { emit device_added(device); });
-    connect(this->adapter, &BluezQt::Adapter::deviceChanged, [this](BluezQt::DevicePtr device) {
-        emit device_changed(device);
-        this->update_media_player(device);
-    });
-    connect(this->adapter, &BluezQt::Adapter::deviceRemoved,
-            [this](BluezQt::DevicePtr device) { emit device_removed(device); });
+        connect(this->adapter.get(), &BluezQt::Adapter::deviceAdded,
+                [this](BluezQt::DevicePtr device) { emit device_added(device); });
+        connect(this->adapter.get(), &BluezQt::Adapter::deviceChanged, [this](BluezQt::DevicePtr device) {
+            emit device_changed(device);
+            this->update_media_player(device);
+        });
+        connect(this->adapter.get(), &BluezQt::Adapter::deviceRemoved,
+                [this](BluezQt::DevicePtr device) { emit device_removed(device); });
+    }
 }
 
 void Bluetooth::scan()
 {
-    emit scan_status(true);
-    this->adapter->startDiscovery();
-    QTimer::singleShot(10000, [this]() {
-        this->adapter->stopDiscovery();
-        emit scan_status(false);
-    });
+    if (this->has_adapter()) {
+        emit scan_status(true);
+        this->adapter->startDiscovery();
+        QTimer::singleShot(10000, [this]() {
+            this->adapter->stopDiscovery();
+            emit scan_status(false);
+        });
+    }
 }
 
 void Bluetooth::update_media_player(BluezQt::DevicePtr device)

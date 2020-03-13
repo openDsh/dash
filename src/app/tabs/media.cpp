@@ -1,4 +1,12 @@
+#include <fileref.h>
+#include <math.h>
+#include <tag.h>
+#include <tpropertymap.h>
 #include <BluezQt/PendingCall>
+#include <QDirIterator>
+#include <QListWidget>
+#include <QListWidgetItem>
+#include <QMediaPlaylist>
 
 #include <app/tabs/media.hpp>
 #include <app/window.hpp>
@@ -7,8 +15,9 @@ MediaTab::MediaTab(QWidget *parent) : QTabWidget(parent)
 {
     this->tabBar()->setFont(Theme::font_18);
 
-    this->addTab(new RadioPlayerSubTab(this), "Radio");
+    // this->addTab(new RadioPlayerSubTab(this), "Radio");
     this->addTab(new BluetoothPlayerSubTab(this), "Bluetooth");
+    this->addTab(new LocalPlayerSubTab(this), "Local");
 }
 
 BluetoothPlayerSubTab::BluetoothPlayerSubTab(QWidget *parent) : QWidget(parent)
@@ -222,4 +231,207 @@ QWidget *RadioPlayerSubTab::controls_widget()
     layout->addStretch();
 
     return widget;
+}
+
+LocalPlayerSubTab::LocalPlayerSubTab(QWidget *parent) : QWidget(parent)
+{
+    this->config = Config::get_instance();
+
+    QMediaPlaylist *playlist = new QMediaPlaylist(this);
+    playlist->setPlaybackMode(QMediaPlaylist::Loop);
+
+    this->player = new QMediaPlayer(this);
+    this->player->setPlaylist(playlist);
+
+    this->path_label = new QLabel(this->config->get_media_home(), this);
+    this->path_label->setFont(Theme::font_14);
+
+    QVBoxLayout *layout = new QVBoxLayout(this);
+    layout->setContentsMargins(24, 24, 24, 24);
+
+    layout->addWidget(this->path_label);
+    layout->addWidget(this->playlist_widget());
+    layout->addWidget(this->seek_widget());
+    layout->addWidget(this->controls_widget());
+}
+
+QWidget *LocalPlayerSubTab::playlist_widget()
+{
+    Theme *theme = Theme::get_instance();
+
+    QWidget *widget = new QWidget(this);
+    QHBoxLayout *layout = new QHBoxLayout(widget);
+
+    QString root_path(config->get_media_home());
+
+    QPushButton *home_button = new QPushButton(widget);
+    home_button->setFlat(true);
+    home_button->setCheckable(true);
+    home_button->setChecked(this->config->get_media_home() == root_path);
+    home_button->setIconSize(Theme::icon_32);
+    connect(home_button, &QPushButton::clicked, [this](bool checked = false) {
+        this->config->set_media_home(checked ? this->path_label->text() : QDir().absolutePath());
+    });
+    theme->add_button_icon("playlist_add_check", home_button, "playlist_add");
+    layout->addWidget(home_button, 0, Qt::AlignTop);
+
+    QListWidget *folders = new QListWidget(widget);
+    this->populate_dirs(root_path, folders);
+    layout->addWidget(folders, 1);
+
+    QListWidget *tracks = new QListWidget(widget);
+    this->populate_tracks(root_path, tracks);
+    connect(tracks, &QListWidget::itemClicked, [tracks, player = this->player](QListWidgetItem *item) {
+        player->playlist()->setCurrentIndex(tracks->row(item));
+        player->play();
+    });
+    connect(this->player->playlist(), &QMediaPlaylist::currentIndexChanged, [tracks](int idx) {
+        if (idx < 0) return;
+        tracks->setCurrentRow(idx);
+    });
+    connect(folders, &QListWidget::itemClicked, [this, folders, tracks, home_button](QListWidgetItem *item) {
+        if (!item->isSelected()) return;
+
+        tracks->clear();
+        this->player->playlist()->clear();
+        QString current_path(item->data(Qt::UserRole).toString());
+        this->path_label->setText(current_path);
+        this->populate_tracks(current_path, tracks);
+        this->populate_dirs(current_path, folders);
+
+        home_button->setChecked(this->config->get_media_home() == current_path);
+    });
+    layout->addWidget(tracks, 2);
+
+    return widget;
+}
+
+QWidget *LocalPlayerSubTab::seek_widget()
+{
+    QWidget *widget = new QWidget(this);
+    QHBoxLayout *layout = new QHBoxLayout(widget);
+
+    QSlider *slider = new QSlider(Qt::Orientation::Horizontal, widget);
+    slider->setFixedHeight(slider->height());
+    slider->setRange(0, 0);
+    QLabel *value = new QLabel(LocalPlayerSubTab::durationFmt(slider->sliderPosition()), widget);
+    value->setFixedHeight(value->height());
+    value->setFont(Theme::font_14);
+    connect(slider, &QSlider::valueChanged,
+            [value](int position) { value->setText(LocalPlayerSubTab::durationFmt(position)); });
+    connect(slider, &QSlider::sliderReleased,
+            [player = this->player, slider]() { player->setPosition(slider->value()); });
+    connect(this->player, &QMediaPlayer::durationChanged, [slider](qint64 duration) {
+        slider->setSliderPosition(0);
+        slider->setRange(0, duration);
+    });
+    connect(this->player, &QMediaPlayer::positionChanged,
+            [slider](qint64 position) { slider->setSliderPosition(position); });
+
+    layout->addStretch(4);
+    layout->addWidget(slider, 28);
+    layout->addWidget(value, 3);
+    layout->addStretch(1);
+
+    return widget;
+}
+
+QWidget *LocalPlayerSubTab::controls_widget()
+{
+    Theme *theme = Theme::get_instance();
+
+    QWidget *widget = new QWidget(this);
+    QHBoxLayout *layout = new QHBoxLayout(widget);
+
+    QPushButton *previous_button = new QPushButton(widget);
+    previous_button->setFlat(true);
+    previous_button->setIconSize(Theme::icon_84);
+    connect(previous_button, &QPushButton::clicked, [player = this->player]() {
+        if (player->playlist()->currentIndex() < 0) player->playlist()->setCurrentIndex(0);
+        player->playlist()->previous();
+        player->play();
+    });
+    theme->add_button_icon("skip_previous", previous_button);
+    layout->addStretch();
+    layout->addWidget(previous_button);
+
+    QPushButton *play_button = new QPushButton(widget);
+    play_button->setFlat(true);
+    play_button->setCheckable(true);
+    play_button->setChecked(false);
+    play_button->setIconSize(Theme::icon_84);
+    connect(play_button, &QPushButton::clicked, [player = this->player, play_button](bool checked = false) {
+        play_button->setChecked(!checked);
+        if (checked)
+            player->play();
+        else
+            player->pause();
+    });
+    connect(this->player, &QMediaPlayer::stateChanged,
+            [play_button](QMediaPlayer::State state) { play_button->setChecked(state == QMediaPlayer::PlayingState); });
+    theme->add_button_icon("pause", play_button, "play");
+    layout->addStretch();
+    layout->addWidget(play_button);
+
+    QPushButton *forward_button = new QPushButton(widget);
+    forward_button->setFlat(true);
+    forward_button->setIconSize(Theme::icon_84);
+    connect(forward_button, &QPushButton::clicked, [player = this->player]() {
+        player->playlist()->next();
+        player->play();
+    });
+    theme->add_button_icon("skip_next", forward_button);
+    layout->addStretch();
+    layout->addWidget(forward_button);
+    layout->addStretch();
+
+    return widget;
+}
+
+QString LocalPlayerSubTab::durationFmt(int total_ms)
+{
+    int mins = (total_ms / (1000 * 60)) % 60;
+    int secs = (total_ms / 1000) % 60;
+
+    return QString("%1:%2").arg(mins, 2, 10, QChar('0')).arg(secs, 2, 10, QChar('0'));
+}
+
+void LocalPlayerSubTab::populate_dirs(QString path, QListWidget *dirs_widget)
+{
+    dirs_widget->clear();
+    QDir current_dir(path);
+    QFileInfoList dirs = current_dir.entryInfoList(QDir::AllDirs | QDir::Readable);
+    for (QFileInfo dir : dirs) {
+        if (dir.fileName() == ".") continue;
+
+        QListWidgetItem *item = new QListWidgetItem(dir.fileName(), dirs_widget);
+        if (dir.fileName() == "..") {
+            item->setText("↲");
+
+            if (current_dir.isRoot()) item->setFlags(Qt::NoItemFlags);
+        }
+        else {
+            item->setText(dir.fileName());
+        }
+        item->setFont(Theme::font_16);
+        item->setData(Qt::UserRole, QVariant(dir.absoluteFilePath()));
+    }
+}
+
+void LocalPlayerSubTab::populate_tracks(QString path, QListWidget *tracks_widget)
+{
+    QStringList tracks = QDir(path).entryList(QStringList() << "*.mp3", QDir::Files | QDir::Readable);
+    for (QString track : tracks) {
+        if (this->player->playlist()->addMedia(QMediaContent(QUrl::fromLocalFile(path + '/' + track)))) {
+            TagLib::FileRef f(std::string(path.toStdString() + "/" + track.toStdString()).c_str());
+            if (!f.isNull() && f.tag()) {
+                TagLib::Tag *tag = f.tag();
+                tag->title();
+            }
+            int lastPoint = track.lastIndexOf(".");
+            QString fileNameNoExt = track.left(lastPoint);
+            QListWidgetItem *item = new QListWidgetItem(fileNameNoExt, tracks_widget);
+            item->setFont(Theme::font_16);
+        }
+    }
 }

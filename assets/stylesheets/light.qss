@@ -2,6 +2,10 @@ QMainWindow {
     background-color: rgb(238, 238, 238);
 }
 
+QWidget {
+    outline: 0;
+}
+
 QLabel {
     color: rgba(0, 0, 0, 222);
 }
@@ -86,6 +90,25 @@ QFrame[frameShape="5"][frameShadow="16"] {
     color: rgba(0, 0, 0, 31);
 }
 
+QListWidget {
+    background-color: rgba(255, 255, 255, 80);
+    color: rgba(0, 0, 0, 222);
+    border: none;
+}
+
+QListView::indicator {
+    border: none;
+}
+
+QListView::item:selected {
+    color: rgba(255, 255, 255, 222);
+    background-color: palette(base);
+}
+
+QListView::item:disabled {
+    color: rgba(0, 0, 0, 97);
+}
+
 QComboBox {
     color: rgba(0, 0, 0, 222);
     background: transparent;
@@ -102,10 +125,15 @@ QComboBox::down-arrow {
     image: url(:/icons/light/arrow_drop_down-24px.svg);
 }
 
-QComboBox QAbstractItemView::item {
+QComboBox QAbstractItemView::item,
+QComboBox QWidget:item:selected {
     border: none;
     color: rgba(0, 0, 0, 222);
-    background-color: rgb(245, 245, 245);
+    background-color: rgb(255, 255, 255);
+}
+
+QComboBox QFrame {
+   border: none;
 }
 
 QGroupBox {
@@ -144,6 +172,30 @@ QCheckBox::indicator::checked {
 QRadioButton::indicator::checked {
     background-color: qradialgradient(cx:0.5, cy:0.5, fx:0.5, fy:0.5, radius:.4, stop:.65 palette(base), stop:.75 transparent);
     border: 2px solid palette(base);
+}
+
+QScrollBar {
+    background-color: transparent;
+}
+
+QScrollBar::horizontal {
+    height: 12px;
+}
+
+QScrollBar::vertical {
+    width: 12px;
+}
+
+QScrollBar::handle {
+    background-color: rgba(0, 0, 0, 64);
+}
+
+QScrollBar::add-line {
+    border: none;
+}
+
+QScrollBar::sub-line {
+    border: none;
 }
 
 Switch {

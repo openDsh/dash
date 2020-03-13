@@ -47,6 +47,9 @@ class Config : public QObject {
     inline bool get_radio_muted() { return this->radio_muted; }
     inline void set_radio_muted(bool radio_muted) { this->radio_muted = radio_muted; }
 
+    inline QString get_media_home() { return this->media_home; }
+    inline void set_media_home(QString media_home) { this->media_home = media_home; }
+
     std::shared_ptr<f1x::openauto::autoapp::configuration::Configuration> open_auto_config;
 
     static Config *get_instance();
@@ -61,6 +64,7 @@ class Config : public QObject {
     QString bluetooth_device;
     double radio_station;
     bool radio_muted;
+    QString media_home;
 
    signals:
     void brightness_changed(unsigned int);

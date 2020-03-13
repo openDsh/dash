@@ -236,6 +236,7 @@ QWidget *BluetoothSettingsSubTab::scanner_widget()
     QPushButton *button = new QPushButton("scan", widget);
     button->setFont(Theme::font_14);
     button->setFlat(true);
+    button->setEnabled(this->bluetooth->has_adapter());
     button->setIconSize(Theme::icon_36);
     this->theme->add_button_icon("bluetooth_searching", button);
     connect(button, &QPushButton::clicked, [bluetooth = this->bluetooth]() { bluetooth->scan(); });

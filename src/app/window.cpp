@@ -34,7 +34,7 @@ QTabWidget *MainWindow::tabs_widget()
     widget->addTab(this->open_auto_tab, QString());
     this->theme->add_tab_icon("directions_car", 0, Qt::Orientation::Vertical);
 
-    widget->addTab(new BluetoothPlayerSubTab(this), QString());
+    widget->addTab(new MediaTab(this), QString());
     this->theme->add_tab_icon("play_circle_outline", 1, Qt::Orientation::Vertical);
 
     widget->addTab(new DataTab(this), QString());
