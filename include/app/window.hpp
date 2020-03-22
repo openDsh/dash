@@ -11,7 +11,7 @@
 #include <QtWidgets>
 
 #include <app/config.hpp>
-#include <app/tabs/open_auto.hpp>
+#include <app/tabs/openauto.hpp>
 #include <app/theme.hpp>
 
 class MainWindow : public QMainWindow {
@@ -20,24 +20,31 @@ class MainWindow : public QMainWindow {
    public:
     MainWindow();
 
+    inline void add_widget(QWidget *widget) { this->layout->addWidget(widget); }
+    inline void remove_widget(QWidget *widget) { this->layout->removeWidget(widget); }
+    inline void set_widget() { layout->setCurrentIndex(1); }
+    inline void unset_widget() { layout->setCurrentIndex(0); }
+
    protected:
     void showEvent(QShowEvent *event);
 
    private:
     static void update_system_volume(int position);
+    QWidget *window_widget();
     QTabWidget *tabs_widget();
     QWidget *controls_widget();
     QWidget *volume_widget();
 
     Config *config;
     Theme *theme;
-    OpenAutoTab *open_auto_tab;
-    
+    QStackedLayout *layout;
+
     const QSize TAB_SIZE = Theme::icon_48;
 
    signals:
+    void is_ready();
     void set_data_state(bool enabled);
-    void set_open_auto_state(unsigned int alpha);
+    void set_openauto_state(unsigned int alpha);
 };
 
 #endif

@@ -273,10 +273,12 @@ QWidget *LocalPlayerSubTab::playlist_widget()
     layout->addWidget(home_button, 0, Qt::AlignTop);
 
     QListWidget *folders = new QListWidget(widget);
+    Theme::to_touch_scroller(folders);
     this->populate_dirs(root_path, folders);
     layout->addWidget(folders, 1);
 
     QListWidget *tracks = new QListWidget(widget);
+    Theme::to_touch_scroller(tracks);
     this->populate_tracks(root_path, tracks);
     connect(tracks, &QListWidget::itemClicked, [tracks, player = this->player](QListWidgetItem *item) {
         player->playlist()->setCurrentIndex(tracks->row(item));

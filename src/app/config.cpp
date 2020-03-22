@@ -6,7 +6,7 @@
 
 Config::Config()
     : QObject(qApp),
-      open_auto_config(std::make_shared<f1x::openauto::autoapp::configuration::Configuration>()),
+      openauto_config(std::make_shared<f1x::openauto::autoapp::configuration::Configuration>()),
       ia_config(QSettings::IniFormat, QSettings::UserScope, "ia")
 {
     this->volume = this->ia_config.value("volume", 50).toInt();
@@ -45,7 +45,7 @@ void Config::save()
     if (this->media_home != this->ia_config.value("media_home", QDir().absolutePath()).toString())
         this->ia_config.setValue("media_home", this->media_home);
 
-    this->open_auto_config->save();
+    this->openauto_config->save();
 }
 
 Config *Config::get_instance()

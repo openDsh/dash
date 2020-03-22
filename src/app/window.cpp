@@ -17,15 +17,24 @@ MainWindow::MainWindow()
     this->theme->set_mode(this->config->get_dark_mode());
     this->theme->set_color(this->config->get_color());
 
-    this->open_auto_tab = new OpenAutoTab(this);
+    QWidget *widget = new QWidget(this);
+    this->layout = new QStackedLayout(widget);
 
+    this->layout->addWidget(this->window_widget());
+
+    setCentralWidget(widget);
+}
+
+QWidget *MainWindow::window_widget()
+{
     QWidget *widget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
+    layout->setContentsMargins(0, 0, 0, 0);
 
     layout->addWidget(this->tabs_widget());
     layout->addWidget(this->controls_widget());
 
-    setCentralWidget(widget);
+    return widget;
 }
 
 QTabWidget *MainWindow::tabs_widget()
@@ -34,7 +43,7 @@ QTabWidget *MainWindow::tabs_widget()
     widget->setTabPosition(QTabWidget::TabPosition::West);
     widget->tabBar()->setIconSize(this->TAB_SIZE);
 
-    widget->addTab(this->open_auto_tab, QString());
+    widget->addTab(new OpenAutoTab(this), QString());
     this->theme->add_tab_icon("directions_car", 0, Qt::Orientation::Vertical);
 
     widget->addTab(new MediaTab(this), QString());
@@ -48,7 +57,7 @@ QTabWidget *MainWindow::tabs_widget()
 
     connect(this->config, &Config::brightness_changed, [this, widget](int position) {
         this->setWindowOpacity(position / 255.0);
-        if (widget->currentIndex() == 0) emit set_open_auto_state(position);
+        if (widget->currentIndex() == 0) emit set_openauto_state(position);
     });
     connect(this->theme, &Theme::icons_updated,
             [widget](QList<tab_icon_t> &tab_icons, QList<button_icon_t> &button_icons) {
@@ -56,7 +65,7 @@ QTabWidget *MainWindow::tabs_widget()
                 for (auto &icon : button_icons) icon.first->setIcon(icon.second);
             });
     connect(widget, &QTabWidget::currentChanged, [this](int index) {
-        emit set_open_auto_state((index == 0) ? (windowOpacity() * 255) : 0);
+        emit set_openauto_state((index == 0) ? (this->windowOpacity() * 255) : 0);
         emit set_data_state(index == 2);
     });
 
@@ -160,7 +169,5 @@ void MainWindow::update_system_volume(int position)
 void MainWindow::showEvent(QShowEvent *event)
 {
     QWidget::showEvent(event);
-
-    this->open_auto_tab->start_worker();
-    this->open_auto_tab->setFocus();
+    emit is_ready();
 }

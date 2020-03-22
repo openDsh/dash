@@ -187,10 +187,6 @@ QScrollBar {
     background-color: transparent;
 }
 
-QScrollBar::horizontal {
-    height: 12px;
-}
-
 QScrollBar::vertical {
     width: 12px;
 }

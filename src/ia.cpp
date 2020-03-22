@@ -5,7 +5,7 @@
 
 int main(int argc, char *argv[])
 {
-    QApplication dash(argc, argv);
+    QApplication ia(argc, argv);
     QStringList args = QCoreApplication::arguments();
 
     MainWindow window;
@@ -16,11 +16,11 @@ int main(int argc, char *argv[])
         window.setFixedSize(w, h);
     }
     else {
-        dash.setOverrideCursor(Qt::BlankCursor);
-        window.setFixedSize(dash.desktop()->screenGeometry().size());
+        ia.setOverrideCursor(Qt::BlankCursor);
+        window.setFixedSize(ia.desktop()->screenGeometry().size());
     }
     window.move(0, 0);
     window.show();
 
-    return dash.exec();
+    return ia.exec();
 }

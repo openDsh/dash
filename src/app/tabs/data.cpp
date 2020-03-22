@@ -73,7 +73,7 @@ QString Gauge::null_value()
 
 DataTab::DataTab(QWidget *parent) : QWidget(parent)
 {
-    MainWindow *app = qobject_cast<MainWindow *>(parent);
+    MainWindow *window = qobject_cast<MainWindow *>(parent);
 
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
@@ -81,7 +81,7 @@ DataTab::DataTab(QWidget *parent) : QWidget(parent)
     QFrame *status_indicator = new QFrame(this);
     status_indicator->setFixedHeight(6);
     status_indicator->setAutoFillBackground(true);
-    connect(app, &MainWindow::set_data_state, [this, status_indicator](bool enabled) {
+    connect(window, &MainWindow::set_data_state, [this, status_indicator](bool enabled) {
         if (enabled) {
             QPalette p(palette());
             if (OBD::get_instance()->is_connected()) {

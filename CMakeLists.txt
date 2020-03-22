@@ -40,7 +40,7 @@ find_package(KF5BluezQt REQUIRED)
 find_package(Protobuf REQUIRED)
 find_package(OpenSSL REQUIRED)
 find_package(rtaudio REQUIRED)
-find_package(Taglib REQUIRED)
+find_package(taglib REQUIRED)
 
 if(RPI_BUILD)
     add_definitions(-DUSE_OMX -DOMX_SKIP64BIT)
@@ -65,7 +65,7 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR}
                     ${OPENAUTO_INCLUDE_DIRS}
                     ${BCM_HOST_INCLUDE_DIRS}
                     ${ILCLIENT_INCLUDE_DIRS}
-                    ${TAGLIB_INCLUDES}
+                    ${TAGLIB_INCLUDE_DIRS}
                     ${include_directory})
 
 link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
@@ -91,4 +91,3 @@ target_link_libraries(ia
                       ${WINSOCK2_LIBRARIES}
                       ${RTAUDIO_LIBRARIES}
                       ${TAGLIB_LIBRARIES})
-

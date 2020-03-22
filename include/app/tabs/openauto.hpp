@@ -1,5 +1,5 @@
-#ifndef OPEN_AUTO_HPP_
-#define OPEN_AUTO_HPP_
+#ifndef OPENAUTO_HPP_
+#define OPENAUTO_HPP_
 
 #include <QtWidgets>
 #include <f1x/aasdk/TCP/TCPWrapper.hpp>
@@ -25,6 +25,7 @@ class OpenAutoWorker {
 
     inline void start() { this->app->waitForUSBDevice(); }
     inline void set_opacity(unsigned int alpha) { this->service_factory.setOpacity(alpha); }
+    inline void resize() { this->service_factory.resize(); }
 
    private:
     void create_usb_workers();
@@ -46,13 +47,31 @@ class OpenAutoWorker {
     std::vector<std::thread> thread_pool;
 };
 
+class OpenAutoFrame : public QWidget {
+    Q_OBJECT
+
+   public:
+    OpenAutoFrame(QWidget *parent);
+
+    inline bool is_fullscreen() { return this->fullscreen; }
+    inline void toggle_fullscreen() { this->fullscreen = !this->fullscreen; }
+
+   protected:
+    void mouseDoubleClickEvent(QMouseEvent *);
+
+   private:
+    bool fullscreen = false;
+
+   signals:
+    void double_clicked(bool fullscreen);
+    void toggle(bool enable);
+};
+
 class OpenAutoTab : public QWidget {
     Q_OBJECT
 
    public:
     OpenAutoTab(QWidget *parent = nullptr);
-
-    void start_worker();
 
    private:
     QWidget *msg_widget();

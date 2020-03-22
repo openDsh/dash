@@ -50,7 +50,7 @@ class Config : public QObject {
     inline QString get_media_home() { return this->media_home; }
     inline void set_media_home(QString media_home) { this->media_home = media_home; }
 
-    std::shared_ptr<f1x::openauto::autoapp::configuration::Configuration> open_auto_config;
+    std::shared_ptr<f1x::openauto::autoapp::configuration::Configuration> openauto_config;
 
     static Config *get_instance();
 

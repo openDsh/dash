@@ -1,5 +1,4 @@
 #include <math.h>
-#include <QDebug>
 #include <QPainter>
 
 #include <app/widgets/tuner.hpp>
