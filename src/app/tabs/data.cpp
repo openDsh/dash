@@ -105,7 +105,6 @@ QWidget *DataTab::cluster_widget()
 {
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
-    layout->setContentsMargins(24, 24, 24, 24);
 
     QWidget *driving_data = this->driving_data_widget();
     layout->addWidget(driving_data);

@@ -87,7 +87,6 @@ QWidget *OpenAutoTab::msg_widget()
 {
     QWidget *widget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
-    layout->setContentsMargins(24, 24, 24, 24);
 
     QLabel *top_msg = new QLabel("waiting for device...", widget);
     top_msg->setFont(Theme::font_16);

@@ -25,7 +25,6 @@ BluetoothPlayerSubTab::BluetoothPlayerSubTab(QWidget *parent) : QWidget(parent)
     this->bluetooth = Bluetooth::get_instance();
 
     QVBoxLayout *layout = new QVBoxLayout(this);
-    layout->setContentsMargins(24, 24, 24, 24);
 
     layout->addStretch();
     layout->addWidget(this->track_widget());
@@ -141,7 +140,6 @@ RadioPlayerSubTab::RadioPlayerSubTab(QWidget *parent) : QWidget(parent)
     this->tuner = new Tuner();
 
     QVBoxLayout *layout = new QVBoxLayout(this);
-    layout->setContentsMargins(24, 24, 24, 24);
 
     layout->addStretch();
     layout->addWidget(this->tuner_widget());
@@ -247,7 +245,6 @@ LocalPlayerSubTab::LocalPlayerSubTab(QWidget *parent) : QWidget(parent)
     this->path_label->setFont(Theme::font_14);
 
     QVBoxLayout *layout = new QVBoxLayout(this);
-    layout->setContentsMargins(24, 24, 24, 24);
 
     layout->addWidget(this->path_label);
     layout->addWidget(this->playlist_widget());

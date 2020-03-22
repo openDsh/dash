@@ -3,6 +3,7 @@
 #include <aasdk_proto/VideoResolutionEnum.pb.h>
 #include <BluezQt/Device>
 #include <BluezQt/PendingCall>
+#include <QScrollArea>
 #include <f1x/openauto/autoapp/Configuration/AudioOutputBackendType.hpp>
 #include <f1x/openauto/autoapp/Configuration/BluetootAdapterType.hpp>
 #include <f1x/openauto/autoapp/Configuration/HandednessOfTrafficType.hpp>
@@ -31,10 +32,8 @@ GeneralSettingsSubTab::GeneralSettingsSubTab(QWidget *parent) : QWidget(parent)
     this->config = Config::get_instance();
 
     QVBoxLayout *layout = new QVBoxLayout(this);
-    layout->setContentsMargins(24, 24, 24, 24);
 
     layout->addWidget(this->settings_widget());
-    layout->addWidget(this->controls_widget());
 }
 
 QWidget *GeneralSettingsSubTab::settings_widget()
@@ -49,7 +48,12 @@ QWidget *GeneralSettingsSubTab::settings_widget()
     layout->addWidget(Theme::br(widget), 1);
     layout->addWidget(this->brightness_row_widget(), 1);
 
-    return widget;
+    QScrollArea *scroll_area = new QScrollArea(this);
+    scroll_area->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+    scroll_area->setWidgetResizable(true);
+    scroll_area->setWidget(widget);
+
+    return scroll_area;
 }
 
 QWidget *GeneralSettingsSubTab::dark_mode_row_widget()
@@ -176,22 +180,6 @@ QWidget *GeneralSettingsSubTab::color_row_widget()
     return widget;
 }
 
-QWidget *GeneralSettingsSubTab::controls_widget()
-{
-    QWidget *widget = new QWidget(this);
-    QVBoxLayout *layout = new QVBoxLayout(widget);
-
-    QPushButton *save_button = new QPushButton("save", widget);
-    save_button->setFont(Theme::font_14);
-    save_button->setFlat(true);
-    save_button->setIconSize(Theme::icon_36);
-    this->theme->add_button_icon("save", save_button);
-    connect(save_button, &QPushButton::clicked, [config = this->config]() { config->save(); });
-    layout->addWidget(save_button, 0, Qt::AlignRight);
-
-    return widget;
-}
-
 BluetoothSettingsSubTab::BluetoothSettingsSubTab(QWidget *parent) : QWidget(parent)
 {
     this->bluetooth = Bluetooth::get_instance();
@@ -199,10 +187,9 @@ BluetoothSettingsSubTab::BluetoothSettingsSubTab(QWidget *parent) : QWidget(pare
     this->config = Config::get_instance();
 
     QHBoxLayout *layout = new QHBoxLayout(this);
-    layout->setContentsMargins(24, 24, 24, 24);
 
-    layout->addWidget(this->controls_widget());
-    layout->addWidget(this->devices_widget());
+    layout->addWidget(this->controls_widget(), 1);
+    layout->addWidget(this->devices_widget(), 1);
 }
 
 QWidget *BluetoothSettingsSubTab::controls_widget()
@@ -306,7 +293,11 @@ QWidget *BluetoothSettingsSubTab::devices_widget()
         this->devices.remove(device);
     });
 
-    return widget;
+    QScrollArea *scroll_area = new QScrollArea(this);
+    scroll_area->setWidgetResizable(true);
+    scroll_area->setWidget(widget);
+
+    return scroll_area;
 }
 
 OpenAutoSettingsSubTab::OpenAutoSettingsSubTab(QWidget *parent) : QWidget(parent)
@@ -316,7 +307,6 @@ OpenAutoSettingsSubTab::OpenAutoSettingsSubTab(QWidget *parent) : QWidget(parent
     this->config = Config::get_instance();
 
     QVBoxLayout *layout = new QVBoxLayout(this);
-    layout->setContentsMargins(24, 24, 24, 24);
 
     layout->addWidget(this->settings_widget());
 }
@@ -337,7 +327,12 @@ QWidget *OpenAutoSettingsSubTab::settings_widget()
     layout->addWidget(Theme::br(widget), 1);
     layout->addWidget(this->bluetooth_row_widget(), 1);
 
-    return widget;
+    QScrollArea *scroll_area = new QScrollArea(this);
+    scroll_area->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+    scroll_area->setWidgetResizable(true);
+    scroll_area->setWidget(widget);
+
+    return scroll_area;
 }
 
 QWidget *OpenAutoSettingsSubTab::rhd_row_widget()

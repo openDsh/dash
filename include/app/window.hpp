@@ -32,6 +32,8 @@ class MainWindow : public QMainWindow {
     Config *config;
     Theme *theme;
     OpenAutoTab *open_auto_tab;
+    
+    const QSize TAB_SIZE = Theme::icon_48;
 
    signals:
     void set_data_state(bool enabled);

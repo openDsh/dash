@@ -1,4 +1,7 @@
+#include <QElapsedTimer>
 #include <QtWidgets>
+#include <cstdlib>
+#include <sstream>
 
 #include <app/tabs/data.hpp>
 #include <app/tabs/media.hpp>
@@ -29,7 +32,7 @@ QTabWidget *MainWindow::tabs_widget()
 {
     QTabWidget *widget = new QTabWidget(this);
     widget->setTabPosition(QTabWidget::TabPosition::West);
-    widget->tabBar()->setIconSize(Theme::icon_48);
+    widget->tabBar()->setIconSize(this->TAB_SIZE);
 
     widget->addTab(this->open_auto_tab, QString());
     this->theme->add_tab_icon("directions_car", 0, Qt::Orientation::Vertical);
@@ -66,8 +69,42 @@ QWidget *MainWindow::controls_widget()
     QHBoxLayout *layout = new QHBoxLayout(widget);
     layout->setContentsMargins(0, 0, 0, 0);
 
-    layout->addStretch(5);
-    layout->addWidget(this->volume_widget(), 3);
+    QWidget *tab_spacer = new QWidget(this);
+    tab_spacer->setFixedWidth(this->TAB_SIZE.width());
+
+    QPushButton *save_button = new QPushButton(widget);
+    save_button->setFlat(true);
+    save_button->setIconSize(Theme::icon_32);
+    this->theme->add_button_icon("save", save_button);
+    connect(save_button, &QPushButton::clicked, [config = this->config]() { config->save(); });
+
+    QPushButton *shutdown_button = new QPushButton(widget);
+    shutdown_button->setFlat(true);
+    shutdown_button->setIconSize(Theme::icon_32);
+    this->theme->add_button_icon("power_settings_new", shutdown_button);
+
+    QPushButton *exit_button = new QPushButton(widget);
+    exit_button->setFlat(true);
+    exit_button->setIconSize(Theme::icon_32);
+    this->theme->add_button_icon("close", exit_button);
+    connect(exit_button, &QPushButton::clicked, []() { qApp->exit(); });
+
+    QElapsedTimer timer;
+    connect(shutdown_button, &QPushButton::pressed, [&timer]() { timer.start(); });
+    connect(shutdown_button, &QPushButton::released, [&timer]() {
+        sync();
+
+        std::stringstream cmd;
+        cmd << "shutdown -" << (timer.hasExpired(2000) ? 'r' : 'h') << " now";
+        if (system(cmd.str().c_str()) < 0) qApp->exit();
+    });
+
+    layout->addWidget(tab_spacer);
+    layout->addWidget(this->volume_widget());
+    layout->addStretch();
+    layout->addWidget(save_button);
+    layout->addWidget(shutdown_button);
+    layout->addWidget(exit_button);
 
     return widget;
 }
