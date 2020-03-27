@@ -29,7 +29,7 @@ const QSize Theme::icon_96 = QSize(96, 96);
 const QColor Theme::danger_color = QColor(211, 47, 47);
 const QColor Theme::success_color = QColor(56, 142, 60);
 
-Theme::Theme() : QObject(qApp), palette(), color("blue")
+Theme::Theme() : QObject(qApp), palette(), color("azure")
 {
     QFontDatabase::addApplicationFont(":/fonts/Titillium_Web/TitilliumWeb-Regular.ttf");
     QFontDatabase::addApplicationFont(":/fonts/Montserrat/Montserrat-LightItalic.ttf");
@@ -155,7 +155,7 @@ void Theme::update()
 
     emit icons_updated(this->tab_icons[this->mode ? "dark" : "light"],
                        this->button_icons[this->mode ? "dark" : "light"]);
-    emit color_updated(this->colors[this->mode ? "dark" : "light"]);
+    emit color_updated();
 }
 
 Theme *Theme::get_instance()

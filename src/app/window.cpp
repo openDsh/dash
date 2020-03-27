@@ -10,6 +10,8 @@
 
 MainWindow::MainWindow()
 {
+    this->setAttribute(Qt::WA_TranslucentBackground, true);
+
     this->config = Config::get_instance();
     this->setWindowOpacity(this->config->get_brightness() / 255.0);
 
@@ -17,7 +19,7 @@ MainWindow::MainWindow()
     this->theme->set_mode(this->config->get_dark_mode());
     this->theme->set_color(this->config->get_color());
 
-    QWidget *widget = new QWidget(this);
+    QFrame *widget = new QFrame(this);
     this->layout = new QStackedLayout(widget);
 
     this->layout->addWidget(this->window_widget());
@@ -30,6 +32,7 @@ QWidget *MainWindow::window_widget()
     QWidget *widget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
     layout->setContentsMargins(0, 0, 0, 0);
+    layout->setSpacing(0);
 
     layout->addWidget(this->tabs_widget());
     layout->addWidget(this->controls_widget());
@@ -64,10 +67,8 @@ QTabWidget *MainWindow::tabs_widget()
                 for (auto &icon : tab_icons) widget->tabBar()->setTabIcon(icon.first, icon.second);
                 for (auto &icon : button_icons) icon.first->setIcon(icon.second);
             });
-    connect(widget, &QTabWidget::currentChanged, [this](int index) {
-        emit set_openauto_state((index == 0) ? (this->windowOpacity() * 255) : 0);
-        emit set_data_state(index == 2);
-    });
+    connect(widget, &QTabWidget::currentChanged,
+            [this](int index) { emit set_openauto_state((index == 0) ? (this->windowOpacity() * 255) : 0); });
 
     return widget;
 }
@@ -136,7 +137,7 @@ QWidget *MainWindow::volume_widget()
     QPushButton *lower_button = new QPushButton(widget);
     lower_button->setFlat(true);
     lower_button->setIconSize(Theme::icon_32);
-    this->theme->add_button_icon("volume_mute", lower_button);
+    this->theme->add_button_icon("volume_down", lower_button);
     connect(lower_button, &QPushButton::clicked, [slider]() {
         int position = slider->sliderPosition() - 10;
         slider->setSliderPosition(position);

@@ -28,6 +28,7 @@ class GeneralSettingsSubTab : public QWidget {
     QWidget *brightness_widget();
     QWidget *si_units_row_widget();
     QWidget *color_row_widget();
+    QWidget *color_select_widget();
 
     Config *config;
     Theme *theme;

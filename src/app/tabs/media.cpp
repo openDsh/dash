@@ -44,7 +44,7 @@ QWidget *BluetoothPlayerSubTab::track_widget()
     artist_hdr->setFont(Theme::font_16);
     QLabel *artist = new QLabel((media_player != nullptr) ? media_player->track().artist() : QString(), widget);
     artist->setFont(Theme::font_14);
-    artist->setStyleSheet("padding-left: 16px;");
+    artist->setIndent(16);
     layout->addWidget(artist_hdr);
     layout->addWidget(artist);
 
@@ -52,7 +52,7 @@ QWidget *BluetoothPlayerSubTab::track_widget()
     album_hdr->setFont(Theme::font_16);
     QLabel *album = new QLabel((media_player != nullptr) ? media_player->track().album() : QString(), widget);
     album->setFont(Theme::font_14);
-    album->setStyleSheet("padding-left: 16px;");
+    album->setIndent(16);
     layout->addWidget(album_hdr);
     layout->addWidget(album);
 
@@ -60,7 +60,7 @@ QWidget *BluetoothPlayerSubTab::track_widget()
     title_hdr->setFont(Theme::font_16);
     QLabel *title = new QLabel((media_player != nullptr) ? media_player->track().title() : QString(), widget);
     title->setFont(Theme::font_14);
-    title->setStyleSheet("padding-left: 16px;");
+    title->setIndent(16);
     layout->addWidget(title_hdr);
     layout->addWidget(title);
 

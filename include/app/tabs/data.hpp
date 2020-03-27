@@ -41,7 +41,6 @@ class DataTab : public QWidget {
     DataTab(QWidget *parent = nullptr);
 
    private:
-    QWidget *cluster_widget();
     QWidget *driving_data_widget();
     QWidget *speedo_tach_widget();
     QWidget *mileage_data_widget();

@@ -73,42 +73,11 @@ QString Gauge::null_value()
 
 DataTab::DataTab(QWidget *parent) : QWidget(parent)
 {
-    MainWindow *window = qobject_cast<MainWindow *>(parent);
-
-    QVBoxLayout *layout = new QVBoxLayout(this);
-    layout->setContentsMargins(0, 0, 0, 0);
-
-    QFrame *status_indicator = new QFrame(this);
-    status_indicator->setFixedHeight(6);
-    status_indicator->setAutoFillBackground(true);
-    connect(window, &MainWindow::set_data_state, [this, status_indicator](bool enabled) {
-        if (enabled) {
-            QPalette p(palette());
-            if (OBD::get_instance()->is_connected()) {
-                p.setColor(QPalette::Window, Theme::success_color);
-                for (auto &gauge : this->gauges) gauge->start();
-            }
-            else {
-                p.setColor(QPalette::Window, Theme::danger_color);
-            }
-            status_indicator->setPalette(p);
-        }
-        else {
-            for (auto &gauge : this->gauges) gauge->stop();
-        }
-    });
-    layout->addWidget(status_indicator);
-    layout->addWidget(this->cluster_widget());
-}
-
-QWidget *DataTab::cluster_widget()
-{
-    QWidget *widget = new QWidget(this);
-    QHBoxLayout *layout = new QHBoxLayout(widget);
+    QHBoxLayout *layout = new QHBoxLayout(this);
 
     QWidget *driving_data = this->driving_data_widget();
     layout->addWidget(driving_data);
-    layout->addWidget(Theme::br(widget, true));
+    layout->addWidget(Theme::br(this, true));
 
     QWidget *engine_data = this->engine_data_widget();
     layout->addWidget(engine_data);
@@ -119,8 +88,6 @@ QWidget *DataTab::cluster_widget()
     QSizePolicy sp_right(QSizePolicy::Preferred, QSizePolicy::Preferred);
     sp_right.setHorizontalStretch(2);
     engine_data->setSizePolicy(sp_right);
-
-    return widget;
 }
 
 QWidget *DataTab::driving_data_widget()

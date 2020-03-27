@@ -43,7 +43,6 @@ class MainWindow : public QMainWindow {
 
    signals:
     void is_ready();
-    void set_data_state(bool enabled);
     void set_openauto_state(unsigned int alpha);
 };
 

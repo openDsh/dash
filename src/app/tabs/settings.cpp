@@ -3,6 +3,7 @@
 #include <aasdk_proto/VideoResolutionEnum.pb.h>
 #include <BluezQt/Device>
 #include <BluezQt/PendingCall>
+#include <QLabel>
 #include <QScrollArea>
 #include <f1x/openauto/autoapp/Configuration/AudioOutputBackendType.hpp>
 #include <f1x/openauto/autoapp/Configuration/BluetootAdapterType.hpp>
@@ -11,6 +12,7 @@
 #include <app/config.hpp>
 #include <app/tabs/settings.hpp>
 #include <app/theme.hpp>
+#include <app/widgets/color_label.hpp>
 #include <app/widgets/switch.hpp>
 #include <app/window.hpp>
 
@@ -150,34 +152,49 @@ QWidget *GeneralSettingsSubTab::color_row_widget()
     label->setFont(Theme::font_16);
     layout->addWidget(label, 1);
 
-    QComboBox *box = new QComboBox(widget);
-    box->setItemDelegate(new QStyledItemDelegate());
-    box->setFont(Theme::font_14);
-    QMap<QString, QColor> colors = this->theme->get_colors();
-    QMap<QString, QColor>::iterator it;
-    QPixmap pixmap(Theme::icon_16);
-    int min_length = 0;
-    for (it = colors.begin(); it != colors.end(); it++) {
-        pixmap.fill(it.value());
-        box->addItem(QIcon(pixmap), it.key());
-        min_length = std::max(min_length, it.key().length());
-    }
-    box->setMinimumContentsLength(min_length + 2);
-    box->setCurrentText(this->config->get_color());
-    connect(box, QOverload<const QString &>::of(&QComboBox::activated),
-            [theme = this->theme, config = this->config](const QString &color) {
-                theme->set_color(color);
-                config->set_color(color);
-            });
-    connect(this->theme, &Theme::color_updated, [box](QMap<QString, QColor> &colors) {
-        QMap<QString, QColor>::iterator it;
-        QPixmap pixmap(Theme::icon_16);
-        for (it = colors.begin(); it != colors.end(); it++) {
-            pixmap.fill(it.value());
-            box->setItemIcon(box->findText(it.key()), QIcon(pixmap));
-        }
+    layout->addWidget(this->color_select_widget(), 1);
+
+    return widget;
+}
+
+QWidget *GeneralSettingsSubTab::color_select_widget()
+{
+    QWidget *widget = new QWidget(this);
+    QHBoxLayout *layout = new QHBoxLayout(widget);
+
+    const QList<QString> colors = this->theme->get_colors().keys();
+
+    ColorLabel *label = new ColorLabel(Theme::icon_16, widget);
+    label->setFont(Theme::font_16);
+
+    QPushButton *left_button = new QPushButton(widget);
+    left_button->setFlat(true);
+    left_button->setIconSize(Theme::icon_32);
+    this->theme->add_button_icon("arrow_left", left_button);
+    connect(left_button, &QPushButton::clicked, [this, colors, label]() {
+        int total_colors = colors.size();
+        QString color = colors[((colors.indexOf(label->text()) - 1) % total_colors + total_colors) % total_colors];
+        label->update(color);
+        this->theme->set_color(color);
+        this->config->set_color(color);
     });
-    layout->addWidget(box, 1, Qt::AlignHCenter);
+
+    QPushButton *right_button = new QPushButton(widget);
+    right_button->setFlat(true);
+    right_button->setIconSize(Theme::icon_32);
+    this->theme->add_button_icon("arrow_right", right_button);
+    connect(right_button, &QPushButton::clicked, [this, colors, label]() {
+        QString color = colors[(colors.indexOf(label->text()) + 1) % colors.size()];
+        label->update(color);
+        this->theme->set_color(color);
+        this->config->set_color(color);
+    });
+
+    layout->addStretch(1);
+    layout->addWidget(left_button);
+    layout->addWidget(label, 2);
+    layout->addWidget(right_button);
+    layout->addStretch(1);
 
     return widget;
 }
@@ -205,7 +222,7 @@ QWidget *BluetoothSettingsSubTab::controls_widget()
     layout->addWidget(label);
 
     QLabel *connected_device = new QLabel(this->bluetooth->get_media_player().first, widget);
-    connected_device->setStyleSheet("padding-left: 16px;");
+    connected_device->setIndent(16);
     connected_device->setFont(Theme::font_14);
     connect(this->bluetooth, &Bluetooth::media_player_changed,
             [connected_device](QString name, BluezQt::MediaPlayerPtr) { connected_device->setText(name); });

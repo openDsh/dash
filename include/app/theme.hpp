@@ -52,6 +52,7 @@ class Theme : public QObject {
         this->update();
     }
     inline const QMap<QString, QColor> get_colors() { return this->colors[this->mode ? "dark" : "light"]; }
+    inline const QColor get_color(QString color) { return this->colors[this->mode ? "dark" : "light"][color]; }
 
     void add_tab_icon(QString name, int index, Qt::Orientation orientation = Qt::Orientation::Horizontal);
     void add_button_icon(QString name, QPushButton *button, QString active_name = QString());
@@ -60,7 +61,7 @@ class Theme : public QObject {
     inline static QFrame *br(QWidget *parent = nullptr, bool vertical = false)
     {
         QFrame *br = new QFrame(parent);
-        br->setLineWidth(1);
+        br->setLineWidth(2);
         br->setFrameShape(vertical ? QFrame::VLine : QFrame::HLine);
         br->setFrameShadow(QFrame::Plain);
 
@@ -74,7 +75,6 @@ class Theme : public QObject {
         properties.setScrollMetric(QScrollerProperties::VerticalOvershootPolicy, policy);
         properties.setScrollMetric(QScrollerProperties::HorizontalOvershootPolicy, policy);
 
-        area->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
         area->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         QScroller::grabGesture(area->viewport(), QScroller::LeftMouseButtonGesture);
         QScroller::scroller(area->viewport())->setScrollerProperties(properties);
@@ -83,17 +83,19 @@ class Theme : public QObject {
 
    private:
     QMap<QString, QMap<QString, QColor>> colors = {{"light",
-                                                    {{"blue", QColor(33, 150, 243)},
-                                                     {"red", QColor(244, 67, 54)},
-                                                     {"green", QColor(76, 175, 80)},
-                                                     {"orange", QColor(255, 152, 0)},
-                                                     {"steel", QColor(96, 125, 139)}}},
+                                                    {{"azure", QColor(33, 150, 243)},
+                                                     {"rose", QColor(244, 67, 54)},
+                                                     {"jade", QColor(76, 175, 80)},
+                                                     {"fire", QColor(255, 152, 0)},
+                                                     {"steel", QColor(96, 125, 139)},
+                                                     {"lilac", QColor(103, 58, 183)}}},
                                                    {"dark",
-                                                    {{"blue", QColor(144, 202, 249)},
-                                                     {"red", QColor(239, 154, 154)},
-                                                     {"green", QColor(165, 214, 167)},
-                                                     {"orange", QColor(255, 204, 128)},
-                                                     {"steel", QColor(176, 190, 197)}}}};
+                                                    {{"azure", QColor(144, 202, 249)},
+                                                     {"rose", QColor(239, 154, 154)},
+                                                     {"jade", QColor(165, 214, 167)},
+                                                     {"fire", QColor(255, 204, 128)},
+                                                     {"steel", QColor(176, 190, 197)},
+                                                     {"lilac", QColor(179, 157, 219)}}}};
 
     QPalette palette;
     QString color;
@@ -108,7 +110,7 @@ class Theme : public QObject {
 
    signals:
     void icons_updated(QList<tab_icon_t> &, QList<button_icon_t> &);
-    void color_updated(QMap<QString, QColor> &);
+    void color_updated();
 };
 
 #endif
