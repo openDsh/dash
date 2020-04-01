@@ -3,8 +3,9 @@
 
 #include <QColor>
 #include <QWidget>
+#include <QFrame>
 
-class ProgressIndicator : public QWidget {
+class ProgressIndicator : public QFrame {
     Q_OBJECT
     Q_PROPERTY(qreal dash_offset READ get_dash_offset WRITE set_dash_offset)
     Q_PROPERTY(qreal dash_length READ get_dash_length WRITE set_dash_length)
@@ -23,8 +24,8 @@ class ProgressIndicator : public QWidget {
     inline void set_dash_offset(qreal offset) { this->dash_offset = offset; }
 
    public slots:
-    void startAnimation();
-    void stopAnimation();
+    void start_animation();
+    void stop_animation();
 
    protected:
     virtual inline void timerEvent(QTimerEvent* event) { update(); }

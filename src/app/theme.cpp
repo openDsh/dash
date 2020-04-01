@@ -110,7 +110,7 @@ void Theme::add_tab_icon(QString name, int index, Qt::Orientation orientation)
 
 void Theme::add_button_icon(QString name, QPushButton *button, QString normal_name)
 {
-    bool checkable = button->isCheckable();
+    bool set_down_state = button->isCheckable() && button->text().isNull();
 
     QPixmap dark_base = QIcon(QString(":/icons/dark/%1-24px.svg").arg(name)).pixmap(512, 512);
     QPixmap light_base = QIcon(QString(":/icons/light/%1-24px.svg").arg(name)).pixmap(512, 512);
@@ -124,8 +124,8 @@ void Theme::add_button_icon(QString name, QPushButton *button, QString normal_na
     QPixmap dark_normal;
     QPixmap light_normal;
     if (normal_name.isNull()) {
-        dark_normal = checkable ? this->create_pixmap_variant(dark_base, .54) : dark_active;
-        light_normal = checkable ? this->create_pixmap_variant(light_base, .7) : light_active;
+        dark_normal = set_down_state ? this->create_pixmap_variant(dark_base, .54) : dark_active;
+        light_normal = set_down_state ? this->create_pixmap_variant(light_base, .7) : light_active;
     }
     else {
         QPixmap dark_normal_base = QIcon(QString(":/icons/dark/%1-24px.svg").arg(normal_name)).pixmap(512, 512);

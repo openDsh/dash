@@ -18,16 +18,22 @@
 namespace aasdk = f1x::aasdk;
 namespace autoapp = f1x::openauto::autoapp;
 
-class OpenAutoWorker {
+class OpenAutoWorker : public QObject {
+    Q_OBJECT
+
    public:
     OpenAutoWorker(std::function<void(bool)> callback = nullptr, QWidget *parent = nullptr);
     ~OpenAutoWorker();
+    const QStringList get_recent_addresses();
+    void connect_wireless(QString address);
 
     inline void start() { this->app->waitForUSBDevice(); }
     inline void set_opacity(unsigned int alpha) { this->service_factory.setOpacity(alpha); }
     inline void resize() { this->service_factory.resize(); }
 
    private:
+    const int OPENAUTO_PORT = 5277;
+
     void create_usb_workers();
     void create_io_service_workers();
 
@@ -35,6 +41,7 @@ class OpenAutoWorker {
     boost::asio::io_service io_service;
     boost::asio::io_service::work work;
     std::shared_ptr<autoapp::configuration::Configuration> configuration;
+    autoapp::configuration::RecentAddressesList recent_addresses_list;
     aasdk::tcp::TCPWrapper tcp_wrapper;
     aasdk::usb::USBWrapper usb_wrapper;
     aasdk::usb::AccessoryModeQueryFactory query_factory;
@@ -44,7 +51,12 @@ class OpenAutoWorker {
     std::shared_ptr<aasdk::usb::USBHub> usb_hub;
     std::shared_ptr<aasdk::usb::ConnectedAccessoriesEnumerator> connected_accessories_enumerator;
     std::shared_ptr<autoapp::App> app;
+    std::shared_ptr<boost::asio::ip::tcp::socket> socket;
     std::vector<std::thread> thread_pool;
+
+   signals:
+    void wireless_connection_success(QString address);
+    void wireless_connection_failure();
 };
 
 class OpenAutoFrame : public QWidget {
@@ -75,8 +87,13 @@ class OpenAutoTab : public QWidget {
 
    private:
     QWidget *msg_widget();
+    QWidget *wireless_widget();
 
+    Config *config;
     OpenAutoWorker *worker = nullptr;
+
+   signals:
+    void connect_wireless();
 };
 
 #endif

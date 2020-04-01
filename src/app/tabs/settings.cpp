@@ -162,7 +162,7 @@ QWidget *GeneralSettingsSubTab::color_select_widget()
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
-    const QList<QString> colors = this->theme->get_colors().keys();
+    const QStringList colors = this->theme->get_colors().keys();
 
     ColorLabel *label = new ColorLabel(Theme::icon_16, widget);
     label->setFont(Theme::font_16);
@@ -242,19 +242,25 @@ QWidget *BluetoothSettingsSubTab::scanner_widget()
     QPushButton *button = new QPushButton("scan", widget);
     button->setFont(Theme::font_14);
     button->setFlat(true);
+    button->setCheckable(true);
     button->setEnabled(this->bluetooth->has_adapter());
     button->setIconSize(Theme::icon_36);
     this->theme->add_button_icon("bluetooth_searching", button);
-    connect(button, &QPushButton::clicked, [bluetooth = this->bluetooth]() { bluetooth->scan(); });
+    connect(button, &QPushButton::clicked, [bluetooth = this->bluetooth](bool checked) {
+        if (checked)
+            bluetooth->start_scan();
+        else
+            bluetooth->stop_scan();
+    });
     layout->addWidget(button);
 
     ProgressIndicator *loader = new ProgressIndicator(widget);
     connect(this->bluetooth, &Bluetooth::scan_status, [button, loader](bool status) {
-        button->setEnabled(!status);
         if (status)
-            loader->startAnimation();
+            loader->start_animation();
         else
-            loader->stopAnimation();
+            loader->stop_animation();
+        button->setChecked(status);
     });
     layout->addWidget(loader);
 
@@ -267,7 +273,7 @@ QWidget *BluetoothSettingsSubTab::devices_widget()
     QVBoxLayout *layout = new QVBoxLayout(widget);
 
     for (BluezQt::DevicePtr device : this->bluetooth->get_devices()) {
-        if (device->address() == this->config->get_bluetooth_device()) device->connectToDevice()->waitForFinished();
+        if (device->address() == this->config->get_bluetooth_device()) device->connectToDevice();
         QPushButton *button = new QPushButton(device->name(), widget);
         button->setFont(Theme::font_16);
         button->setCheckable(true);
@@ -275,11 +281,11 @@ QWidget *BluetoothSettingsSubTab::devices_widget()
         connect(button, &QPushButton::clicked, [config = this->config, button, device](bool checked = false) {
             button->setChecked(!checked);
             if (checked) {
-                device->connectToDevice()->waitForFinished();
+                device->connectToDevice();
                 config->set_bluetooth_device(device->address());
             }
             else {
-                device->disconnectFromDevice()->waitForFinished();
+                device->disconnectFromDevice();
                 config->set_bluetooth_device(QString());
             }
         });
@@ -390,7 +396,6 @@ QWidget *OpenAutoSettingsSubTab::frame_rate_row_widget()
     QHBoxLayout *group_layout = new QHBoxLayout(group);
 
     QRadioButton *fps_30_button = new QRadioButton("30fps", group);
-    fps_30_button->setFixedHeight(fps_30_button->height());
     fps_30_button->setFont(Theme::font_14);
     fps_30_button->setChecked(this->config->openauto_config->getVideoFPS() == aasdk::proto::enums::VideoFPS::_30);
     connect(fps_30_button, &QRadioButton::clicked,
@@ -398,7 +403,6 @@ QWidget *OpenAutoSettingsSubTab::frame_rate_row_widget()
     group_layout->addWidget(fps_30_button);
 
     QRadioButton *fps_60_button = new QRadioButton("60fps", group);
-    fps_60_button->setFixedHeight(fps_60_button->height());
     fps_60_button->setFont(Theme::font_14);
     fps_60_button->setChecked(this->config->openauto_config->getVideoFPS() == aasdk::proto::enums::VideoFPS::_60);
     connect(fps_60_button, &QRadioButton::clicked,
@@ -423,7 +427,6 @@ QWidget *OpenAutoSettingsSubTab::resolution_row_widget()
     QHBoxLayout *group_layout = new QHBoxLayout(group);
 
     QRadioButton *res_480_button = new QRadioButton("480p", group);
-    res_480_button->setFixedHeight(res_480_button->height());
     res_480_button->setFont(Theme::font_14);
     res_480_button->setChecked(this->config->openauto_config->getVideoResolution() ==
                                aasdk::proto::enums::VideoResolution::_480p);
@@ -433,7 +436,6 @@ QWidget *OpenAutoSettingsSubTab::resolution_row_widget()
     group_layout->addWidget(res_480_button);
 
     QRadioButton *res_720_button = new QRadioButton("720p", group);
-    res_720_button->setFixedHeight(res_720_button->height());
     res_720_button->setFont(Theme::font_14);
     res_720_button->setChecked(this->config->openauto_config->getVideoResolution() ==
                                aasdk::proto::enums::VideoResolution::_720p);
@@ -443,7 +445,6 @@ QWidget *OpenAutoSettingsSubTab::resolution_row_widget()
     group_layout->addWidget(res_720_button);
 
     QRadioButton *res_1080_button = new QRadioButton("1080p", group);
-    res_1080_button->setFixedHeight(res_1080_button->height());
     res_1080_button->setFont(Theme::font_14);
     res_1080_button->setChecked(this->config->openauto_config->getVideoResolution() ==
                                 aasdk::proto::enums::VideoResolution::_1080p);
@@ -477,11 +478,9 @@ QWidget *OpenAutoSettingsSubTab::dpi_widget()
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
     QSlider *slider = new QSlider(Qt::Orientation::Horizontal, widget);
-    slider->setFixedHeight(slider->height());
     slider->setRange(0, 512);
     slider->setSliderPosition(this->config->openauto_config->getScreenDPI());
     QLabel *value = new QLabel(QString::number(slider->sliderPosition()), widget);
-    value->setFixedHeight(value->height());
     value->setFont(Theme::font_14);
     connect(slider, &QSlider::valueChanged, [config = this->config, value](int position) {
         value->setText(QString::number(position));
@@ -531,7 +530,6 @@ QWidget *OpenAutoSettingsSubTab::audio_channels_row_widget()
     QHBoxLayout *group_layout = new QHBoxLayout(group);
 
     QCheckBox *music_button = new QCheckBox("Music", group);
-    music_button->setFixedHeight(music_button->height());
     music_button->setFont(Theme::font_14);
     music_button->setChecked(this->config->openauto_config->musicAudioChannelEnabled());
     connect(music_button, &QCheckBox::toggled,
@@ -540,7 +538,6 @@ QWidget *OpenAutoSettingsSubTab::audio_channels_row_widget()
     group_layout->addStretch(2);
 
     QCheckBox *speech_button = new QCheckBox("Speech", group);
-    speech_button->setFixedHeight(speech_button->height());
     speech_button->setFont(Theme::font_14);
     speech_button->setChecked(this->config->openauto_config->speechAudioChannelEnabled());
     connect(speech_button, &QCheckBox::toggled,

@@ -25,6 +25,9 @@
         <file>icons/dark/power_settings_new-24px.svg</file>
         <file>icons/dark/arrow_left-24px.svg</file>
         <file>icons/dark/arrow_right-24px.svg</file>
+        <file>icons/dark/arrow_drop_up-24px.svg</file>
+        <file>icons/dark/arrow_drop_down-24px.svg</file>
+        <file>icons/dark/wifi-24px.svg</file>
         <file>icons/light/play-24px.svg</file>
         <file>icons/light/pause-24px.svg</file>
         <file>icons/light/brightness_low-24px.svg</file>
@@ -50,6 +53,9 @@
         <file>icons/light/power_settings_new-24px.svg</file>
         <file>icons/light/arrow_left-24px.svg</file>
         <file>icons/light/arrow_right-24px.svg</file>
+        <file>icons/light/arrow_drop_up-24px.svg</file>
+        <file>icons/light/arrow_drop_down-24px.svg</file>
+        <file>icons/light/wifi-24px.svg</file>
         <file>stylesheets/light.qss</file>
         <file>stylesheets/dark.qss</file>
         <file>fonts/Titillium_Web/TitilliumWeb-Regular.ttf</file>

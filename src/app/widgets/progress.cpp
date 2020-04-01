@@ -6,7 +6,7 @@
 
 #include <app/widgets/progress.hpp>
 
-ProgressIndicator::ProgressIndicator(QWidget* parent) : QWidget(parent)
+ProgressIndicator::ProgressIndicator(QWidget* parent) : QFrame(parent)
 {
     setFocusPolicy(Qt::NoFocus);
 
@@ -43,13 +43,13 @@ ProgressIndicator::ProgressIndicator(QWidget* parent) : QWidget(parent)
     group->start();
 }
 
-void ProgressIndicator::startAnimation()
+void ProgressIndicator::start_animation()
 {
     if (this->timer_id == -1) this->timer_id = startTimer(0);
     this->enabled = true;
 }
 
-void ProgressIndicator::stopAnimation()
+void ProgressIndicator::stop_animation()
 {
     if (this->timer_id != -1) killTimer(this->timer_id);
     this->enabled = false;

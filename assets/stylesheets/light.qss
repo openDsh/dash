@@ -11,6 +11,10 @@ QLabel {
     color: rgba(0, 0, 0, 222);
 }
 
+QLabel:disabled {
+    color: rgba(0, 0, 0, 97);
+}
+
 QTabWidget::pane {
     background-color: rgba(255, 255, 255, 100);
     border-top: 0px;
@@ -208,6 +212,7 @@ Tuner::handle {
     width: 6px;
     margin-top: -32px;
     margin-bottom: -32px;
+    border-radius: 3px;
 }
 
 Tuner::sub-page {

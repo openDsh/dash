@@ -209,12 +209,8 @@ QWidget *RadioPlayerSubTab::controls_widget()
     layout->addStretch();
     layout->addWidget(scan_forward_button);
 
-    QFrame *vert_break = new QFrame(widget);
-    vert_break->setLineWidth(1);
-    vert_break->setFrameShape(QFrame::VLine);
-    vert_break->setFrameShadow(QFrame::Plain);
     layout->addStretch();
-    layout->addWidget(vert_break);
+    layout->addWidget(Theme::br(widget, true));
 
     QPushButton *mute_button = new QPushButton(widget);
     mute_button->setFlat(true);
@@ -311,10 +307,8 @@ QWidget *LocalPlayerSubTab::seek_widget()
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
     QSlider *slider = new QSlider(Qt::Orientation::Horizontal, widget);
-    slider->setFixedHeight(slider->height());
     slider->setRange(0, 0);
     QLabel *value = new QLabel(LocalPlayerSubTab::durationFmt(slider->sliderPosition()), widget);
-    value->setFixedHeight(value->height());
     value->setFont(Theme::font_14);
     connect(slider, &QSlider::valueChanged,
             [value](int position) { value->setText(LocalPlayerSubTab::durationFmt(position)); });

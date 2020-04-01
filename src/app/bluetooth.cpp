@@ -26,6 +26,10 @@ Bluetooth::Bluetooth() : QObject(qApp)
 
     this->adapter = manager->usableAdapter();
 
+    this->scan_timer = new QTimer(this);
+    this->scan_timer->setSingleShot(true);
+    connect(this->scan_timer, &QTimer::timeout, [this]() { this->stop_scan(); });
+
     if (this->has_adapter()) {
         for (auto device : this->get_devices()) {
             if (device->mediaPlayer() != nullptr) {
@@ -45,15 +49,24 @@ Bluetooth::Bluetooth() : QObject(qApp)
     }
 }
 
-void Bluetooth::scan()
+void Bluetooth::start_scan()
 {
     if (this->has_adapter()) {
-        emit scan_status(true);
-        this->adapter->startDiscovery();
-        QTimer::singleShot(10000, [this]() {
-            this->adapter->stopDiscovery();
+        if (!this->adapter->isDiscovering()) {
+            emit scan_status(true);
+            this->adapter->startDiscovery();
+            this->scan_timer->start(15000);
+        }
+    }
+}
+
+void Bluetooth::stop_scan()
+{
+    if (this->has_adapter()) {
+        if (this->adapter->isDiscovering()) {
             emit scan_status(false);
-        });
+            this->adapter->stopDiscovery();
+        }
     }
 }
 

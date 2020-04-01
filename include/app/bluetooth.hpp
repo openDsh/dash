@@ -21,7 +21,8 @@ class Bluetooth : public QObject {
    public:
     Bluetooth();
 
-    void scan();
+    void start_scan();
+    void stop_scan();
 
     inline QList<BluezQt::DevicePtr> get_devices()
     {
@@ -43,6 +44,7 @@ class Bluetooth : public QObject {
 
     BluezQt::AdapterPtr adapter;
     BluezQt::DevicePtr media_player_device;
+    QTimer *scan_timer;
 
    signals:
     void device_added(BluezQt::DevicePtr);
