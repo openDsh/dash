@@ -15,6 +15,9 @@
 #include <f1x/openauto/autoapp/Service/AndroidAutoEntityFactory.hpp>
 #include <f1x/openauto/autoapp/Service/ServiceFactory.hpp>
 
+#include <app/config.hpp>
+#include <app/theme.hpp>
+
 namespace aasdk = f1x::aasdk;
 namespace autoapp = f1x::openauto::autoapp;
 
@@ -22,7 +25,7 @@ class OpenAutoWorker : public QObject {
     Q_OBJECT
 
    public:
-    OpenAutoWorker(std::function<void(bool)> callback = nullptr, QWidget *parent = nullptr);
+    OpenAutoWorker(std::function<void(bool)> callback = nullptr, QWidget *parent = nullptr, bool night_mode = false);
     ~OpenAutoWorker();
     const QStringList get_recent_addresses();
     void connect_wireless(QString address);
@@ -30,6 +33,7 @@ class OpenAutoWorker : public QObject {
     inline void start() { this->app->waitForUSBDevice(); }
     inline void set_opacity(unsigned int alpha) { this->service_factory.setOpacity(alpha); }
     inline void resize() { this->service_factory.resize(); }
+    inline void set_night_mode(bool mode) { this->service_factory.setNightMode(mode); }
 
    private:
     const int OPENAUTO_PORT = 5277;
@@ -90,6 +94,7 @@ class OpenAutoTab : public QWidget {
     QWidget *wireless_widget();
 
     Config *config;
+    Theme *theme;
     OpenAutoWorker *worker = nullptr;
 
    signals:

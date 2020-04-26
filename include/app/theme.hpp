@@ -41,6 +41,7 @@ class Theme : public QObject {
 
     Theme();
 
+    inline bool get_mode() { return this->mode; }
     inline void set_mode(bool mode)
     {
         this->mode = mode;
@@ -109,6 +110,7 @@ class Theme : public QObject {
     QPixmap create_pixmap_variant(QPixmap &base, qreal opacity);
 
    signals:
+    void mode_updated(bool mode);
     void icons_updated(QList<tab_icon_t> &, QList<button_icon_t> &);
     void color_updated();
 };

@@ -153,6 +153,7 @@ void Theme::update()
     this->set_palette();
     qApp->setStyleSheet(this->stylesheets[this->mode ? "dark" : "light"]);
 
+    emit mode_updated(this->mode);
     emit icons_updated(this->tab_icons[this->mode ? "dark" : "light"],
                        this->button_icons[this->mode ? "dark" : "light"]);
     emit color_updated();

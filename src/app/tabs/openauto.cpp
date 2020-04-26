@@ -5,7 +5,7 @@
 #include <app/widgets/progress.hpp>
 #include <app/window.hpp>
 
-OpenAutoWorker::OpenAutoWorker(std::function<void(bool)> callback, QWidget *parent)
+OpenAutoWorker::OpenAutoWorker(std::function<void(bool)> callback, QWidget *parent, bool night_mode)
     : QObject(qApp),
       io_service(),
       work(io_service),
@@ -15,7 +15,7 @@ OpenAutoWorker::OpenAutoWorker(std::function<void(bool)> callback, QWidget *pare
       usb_wrapper((libusb_init(&usb_context), usb_context)),
       query_factory(usb_wrapper, io_service),
       query_chain_factory(usb_wrapper, io_service, query_factory),
-      service_factory(io_service, configuration, parent, callback),
+      service_factory(io_service, configuration, parent, callback, night_mode),
       android_auto_entity_factory(io_service, configuration, service_factory),
       usb_hub(std::make_shared<aasdk::usb::USBHub>(usb_wrapper, io_service, query_chain_factory)),
       connected_accessories_enumerator(
@@ -109,6 +109,11 @@ OpenAutoTab::OpenAutoTab(QWidget *parent) : QWidget(parent)
 {
     this->config = Config::get_instance();
 
+    this->theme = Theme::get_instance();
+    connect(this->theme, &Theme::mode_updated, [this](bool mode) {
+        if (this->worker != nullptr) this->worker->set_night_mode(mode);
+    });
+
     MainWindow *window = qobject_cast<MainWindow *>(parent);
     connect(window, &MainWindow::set_openauto_state, [this](unsigned int alpha) {
         if (this->worker != nullptr) this->worker->set_opacity(alpha);
@@ -153,7 +158,7 @@ OpenAutoTab::OpenAutoTab(QWidget *parent) : QWidget(parent)
             frame->toggle(is_active);
             frame->setFocus();
         };
-        if (this->worker == nullptr) this->worker = new OpenAutoWorker(callback, frame);
+        if (this->worker == nullptr) this->worker = new OpenAutoWorker(callback, frame, this->theme->get_mode());
         this->worker->set_opacity(opacity * 255);
 
         layout->addWidget(this->msg_widget());
