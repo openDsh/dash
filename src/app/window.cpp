@@ -8,17 +8,27 @@
 #include <app/tabs/launcher.hpp>
 #include <app/tabs/settings.hpp>
 #include <app/window.hpp>
+#include <app/modules/brightness.hpp>
 
 MainWindow::MainWindow()
 {
     this->setAttribute(Qt::WA_TranslucentBackground, true);
 
     this->config = Config::get_instance();
-    this->setWindowOpacity(this->config->get_brightness() / 255.0);
 
     this->theme = Theme::get_instance();
     this->theme->set_mode(this->config->get_dark_mode());
     this->theme->set_color(this->config->get_color());
+
+    this->config->add_quick_view("volume", this->volume_widget());
+    this->config->add_quick_view("none", new QFrame(this));
+
+    this->config->add_brightness_module("mocked", new MockedBrightnessModule(this));
+    this->config->add_brightness_module("x", new XBrightnessModule());
+    this->config->add_brightness_module("rpi 7\"", new RpiBrightnessModule());
+
+    BrightnessModule *module = this->config->get_brightness_module(this->config->get_brightness_module());
+    module->set_brightness(this->config->get_brightness());
 
     QFrame *widget = new QFrame(this);
     this->layout = new QStackedLayout(widget);
@@ -63,16 +73,20 @@ QTabWidget *MainWindow::tabs_widget()
     this->theme->add_tab_icon("tune", 4, Qt::Orientation::Vertical);
 
     connect(this->config, &Config::brightness_changed, [this, widget](int position) {
-        this->setWindowOpacity(position / 255.0);
-        if (widget->currentIndex() == 0) emit set_openauto_state(position);
+        BrightnessModule *module = this->config->get_brightness_module(this->config->get_brightness_module());
+        module->set_brightness(position);
+        if (widget->currentIndex() == 0 && module->update_androidauto()) emit set_openauto_state(position);
     });
     connect(this->theme, &Theme::icons_updated,
             [widget](QList<tab_icon_t> &tab_icons, QList<button_icon_t> &button_icons) {
                 for (auto &icon : tab_icons) widget->tabBar()->setTabIcon(icon.first, icon.second);
                 for (auto &icon : button_icons) icon.first->setIcon(icon.second);
             });
-    connect(widget, &QTabWidget::currentChanged,
-            [this](int index) { emit set_openauto_state((index == 0) ? (this->windowOpacity() * 255) : 0); });
+    connect(widget, &QTabWidget::currentChanged, [this](int index) {
+        BrightnessModule *module = this->config->get_brightness_module(this->config->get_brightness_module());
+        int alpha = module->update_androidauto() ? this->config->get_brightness() : 255;
+        emit set_openauto_state((index == 0) ? alpha : 0);
+    });
 
     return widget;
 }
@@ -113,12 +127,30 @@ QWidget *MainWindow::controls_widget()
         if (system(cmd.str().c_str()) < 0) qApp->exit();
     });
 
+    QWidget *quick_view = this->quick_view_widget();
+    quick_view->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+
     layout->addWidget(tab_spacer);
-    layout->addWidget(this->volume_widget());
+    layout->addWidget(quick_view);
     layout->addStretch();
     layout->addWidget(save_button);
     layout->addWidget(shutdown_button);
     layout->addWidget(exit_button);
+
+    return widget;
+}
+
+QWidget *MainWindow::quick_view_widget()
+{
+    QWidget *widget = new QWidget(this);
+    QStackedLayout *layout = new QStackedLayout(widget);
+    layout->setContentsMargins(0, 0, 0, 0);
+
+    for (auto quick_view : this->config->get_quick_views().values()) layout->addWidget(quick_view);
+    layout->setCurrentWidget(this->config->get_quick_view(this->config->get_quick_view()));
+    connect(this->config, &Config::quick_view_changed, [this, layout](QString quick_view) {
+        layout->setCurrentWidget(this->config->get_quick_view(quick_view));
+    });
 
     return widget;
 }

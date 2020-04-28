@@ -4,8 +4,12 @@
 #include <f1x/openauto/autoapp/Configuration/Configuration.hpp>
 
 #include <QObject>
+#include <QWidget>
+#include <QFrame>
 #include <QSettings>
 #include <QString>
+
+#include <app/modules/brightness.hpp>
 
 class Config : public QObject {
     Q_OBJECT
@@ -65,11 +69,33 @@ class Config : public QObject {
     inline QString get_launcher_app() { return this->launcher_app; }
     inline void set_launcher_app(QString launcher_app) { this->launcher_app = launcher_app; }
 
+    inline QString get_quick_view() { return this->quick_view; }
+    inline void set_quick_view(QString quick_view)
+    {
+        this->quick_view = quick_view;
+        emit quick_view_changed(this->quick_view);
+    }
+    inline QMap<QString, QWidget *> get_quick_views() { return this->quick_views; }
+    inline QWidget *get_quick_view(QString name) { return this->quick_views[name]; }
+    inline void add_quick_view(QString name, QWidget *view) { this->quick_views[name] = view; }
+
+    inline QString get_brightness_module() { return this->brightness_module; }
+    inline void set_brightness_module(QString brightness_module) { this->brightness_module = brightness_module; }
+    inline QMap<QString, BrightnessModule *> get_brightness_modules() { return this->brightness_modules; }
+    inline BrightnessModule *get_brightness_module(QString name) { return this->brightness_modules[name]; }
+    inline void add_brightness_module(QString name, BrightnessModule *module)
+    {
+        this->brightness_modules[name] = module;
+    }
+
     std::shared_ptr<f1x::openauto::autoapp::configuration::Configuration> openauto_config;
 
     static Config *get_instance();
 
    private:
+    QMap<QString, QWidget *> quick_views;
+    QMap<QString, BrightnessModule *> brightness_modules;
+
     QSettings ia_config;
     int volume;
     bool dark_mode;
@@ -85,10 +111,13 @@ class Config : public QObject {
     QString launcher_home;
     bool launcher_auto_launch;
     QString launcher_app;
+    QString quick_view;
+    QString brightness_module;
 
    signals:
     void brightness_changed(unsigned int brightness);
     void si_units_changed(bool si_units);
+    void quick_view_changed(QString quick_view);
 };
 
 #endif

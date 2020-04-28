@@ -33,6 +33,7 @@ class MainWindow : public QMainWindow {
     QWidget *window_widget();
     QTabWidget *tabs_widget();
     QWidget *controls_widget();
+    QWidget *quick_view_widget();
     QWidget *volume_widget();
 
     Config *config;

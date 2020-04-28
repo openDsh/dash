@@ -10,17 +10,17 @@ ColorLabel::ColorLabel(QSize block_size, QWidget *parent) : QWidget(parent)
 {
     this->theme = Theme::get_instance();
 
-    QString default_color = Config::get_instance()->get_color();
+    QString color = Config::get_instance()->get_color();
 
     QHBoxLayout *layout = new QHBoxLayout(this);
 
     this->icon = new QLabel(this);
     QPixmap block(block_size);
-    block.fill(this->theme->get_color(default_color));
+    block.fill(this->theme->get_color(color));
     this->icon->setPixmap(block);
 
     this->name = new QLabel(this);
-    this->name->setText(default_color);
+    this->name->setText(color);
 
     connect(this->theme, &Theme::color_updated, [this]() { this->update(this->text()); });
 
