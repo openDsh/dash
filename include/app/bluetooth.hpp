@@ -33,7 +33,7 @@ class Bluetooth : public QObject {
         if (this->media_player_device != nullptr)
             return {this->media_player_device->name(), this->media_player_device->mediaPlayer()};
 
-        return {QString(), nullptr};
+        return {QString(), QSharedPointer<BluezQt::MediaPlayer>(nullptr)};
     }
     inline bool has_adapter() { return this->adapter != nullptr; }
 

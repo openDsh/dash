@@ -9,6 +9,7 @@
 ColorLabel::ColorLabel(QSize block_size, QWidget *parent) : QWidget(parent)
 {
     this->theme = Theme::get_instance();
+    this->block_size = block_size;
 
     QString color = Config::get_instance()->get_color();
 
@@ -28,6 +29,14 @@ ColorLabel::ColorLabel(QSize block_size, QWidget *parent) : QWidget(parent)
     layout->addWidget(this->icon);
     layout->addWidget(this->name);
     layout->addStretch();
+}
+
+void ColorLabel::scale(double scale)
+{
+    QSize size(this->block_size);
+    size.rwidth() *= scale;
+    size.rheight() *= scale;
+    this->icon->setPixmap(this->icon->pixmap()->scaled(size));
 }
 
 void ColorLabel::update(QString color)

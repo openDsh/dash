@@ -1,3 +1,5 @@
+#include <math.h>
+
 #include <QApplication>
 #include <QFile>
 #include <QFontDatabase>
@@ -6,6 +8,7 @@
 #include <QPainter>
 #include <QPair>
 #include <QPixmap>
+#include <QRegularExpression>
 #include <QTextStream>
 #include <QTransform>
 
@@ -45,15 +48,26 @@ Theme::Theme() : QObject(qApp), palette(), color("azure")
 
 QString Theme::parse_stylesheet(QString file)
 {
-    QString stylesheet;
+    QFile f(file);
+    f.open(QFile::ReadOnly | QFile::Text);
+    QTextStream s(&f);
+    QString stylesheet(s.readAll());
+    f.close();
 
-    QFile *f = new QFile(file);
-    f->open(QFile::ReadOnly | QFile::Text);
-    QTextStream s(f);
-    stylesheet = s.readAll();
-    f->close();
+    return stylesheet;
+}
 
-    delete f;
+QString Theme::scale_stylesheet(QString stylesheet)
+{
+    QRegularExpression px_regex(" (-?\\d+)px");
+    QRegularExpressionMatchIterator i = px_regex.globalMatch(stylesheet);
+    while (i.hasNext()) {
+        QRegularExpressionMatch match = i.next();
+        if (match.hasMatch()) {
+            int scaled_px = ceil(match.captured(1).toInt() * this->scale);
+            stylesheet.replace(match.captured(), QString("%1px").arg(scaled_px));
+        }
+    }
 
     return stylesheet;
 }
@@ -80,12 +94,12 @@ QPixmap Theme::create_pixmap_variant(QPixmap &base, qreal opacity)
     return image;
 }
 
-void Theme::add_tab_icon(QString name, int index, Qt::Orientation orientation)
+void Theme::add_tab_icon(QString name, QWidget *widget, Qt::Orientation orientation)
 {
     QTransform t;
     t.rotate((orientation == Qt::Orientation::Horizontal) ? 0 : 90);
 
-    QPixmap dark_base = QIcon(QString(":/icons/dark/%1-24px.svg").arg(name)).pixmap(512, 512).transformed(t);
+    QPixmap dark_base = QIcon(QString(":/icons/dark/%1.svg").arg(name)).pixmap(512, 512).transformed(t);
     QPixmap dark_active = this->create_pixmap_variant(dark_base, .87);
     QPixmap dark_normal = this->create_pixmap_variant(dark_base, .54);
     QPixmap dark_disabled = this->create_pixmap_variant(dark_base, .38);
@@ -93,9 +107,9 @@ void Theme::add_tab_icon(QString name, int index, Qt::Orientation orientation)
     QIcon dark_icon = QIcon(dark_normal);
     dark_icon.addPixmap(dark_active, QIcon::Active, QIcon::On);
     dark_icon.addPixmap(dark_disabled, QIcon::Disabled);
-    this->tab_icons["dark"].append({index, dark_icon});
+    this->tab_icons["dark"].append({widget, dark_icon});
 
-    QPixmap light_base = QIcon(QString(":/icons/light/%1-24px.svg").arg(name)).pixmap(512, 512).transformed(t);
+    QPixmap light_base = QIcon(QString(":/icons/light/%1.svg").arg(name)).pixmap(512, 512).transformed(t);
     QPixmap light_active = this->create_pixmap_variant(light_base, 1);
     QPixmap light_normal = this->create_pixmap_variant(light_base, .7);
     QPixmap light_disabled = this->create_pixmap_variant(light_base, .5);
@@ -103,7 +117,7 @@ void Theme::add_tab_icon(QString name, int index, Qt::Orientation orientation)
     QIcon light_icon = QIcon(light_normal);
     light_icon.addPixmap(light_active, QIcon::Active, QIcon::On);
     light_icon.addPixmap(light_disabled, QIcon::Disabled);
-    this->tab_icons["light"].append({index, light_icon});
+    this->tab_icons["light"].append({widget, light_icon});
 
     this->update();
 }
@@ -112,8 +126,8 @@ void Theme::add_button_icon(QString name, QPushButton *button, QString normal_na
 {
     bool set_down_state = button->isCheckable() && button->text().isNull();
 
-    QPixmap dark_base = QIcon(QString(":/icons/dark/%1-24px.svg").arg(name)).pixmap(512, 512);
-    QPixmap light_base = QIcon(QString(":/icons/light/%1-24px.svg").arg(name)).pixmap(512, 512);
+    QPixmap dark_base = QIcon(QString(":/icons/dark/%1.svg").arg(name)).pixmap(512, 512);
+    QPixmap light_base = QIcon(QString(":/icons/light/%1.svg").arg(name)).pixmap(512, 512);
 
     QPixmap dark_active = this->create_pixmap_variant(dark_base, .87);
     QPixmap dark_disabled = this->create_pixmap_variant(dark_base, .38);
@@ -128,8 +142,8 @@ void Theme::add_button_icon(QString name, QPushButton *button, QString normal_na
         light_normal = set_down_state ? this->create_pixmap_variant(light_base, .7) : light_active;
     }
     else {
-        QPixmap dark_normal_base = QIcon(QString(":/icons/dark/%1-24px.svg").arg(normal_name)).pixmap(512, 512);
-        QPixmap light_normal_base = QIcon(QString(":/icons/light/%1-24px.svg").arg(normal_name)).pixmap(512, 512);
+        QPixmap dark_normal_base = QIcon(QString(":/icons/dark/%1.svg").arg(normal_name)).pixmap(512, 512);
+        QPixmap light_normal_base = QIcon(QString(":/icons/light/%1.svg").arg(normal_name)).pixmap(512, 512);
 
         dark_normal = this->create_pixmap_variant(dark_normal_base, .87);
         light_normal = this->create_pixmap_variant(light_normal_base, 1);
@@ -138,24 +152,32 @@ void Theme::add_button_icon(QString name, QPushButton *button, QString normal_na
     QIcon dark_icon = QIcon(dark_normal);
     dark_icon.addPixmap(dark_active, QIcon::Active, QIcon::On);
     dark_icon.addPixmap(dark_disabled, QIcon::Disabled);
-    this->button_icons["dark"].append({button, dark_icon});
+    this->button_icons["dark"].append({button, dark_icon, button->iconSize()});
 
     QIcon light_icon = QIcon(light_normal);
     light_icon.addPixmap(light_active, QIcon::Active, QIcon::On);
     light_icon.addPixmap(light_disabled, QIcon::Disabled);
-    this->button_icons["light"].append({button, light_icon});
+    this->button_icons["light"].append({button, light_icon, button->iconSize()});
 
     this->update();
 }
 
-void Theme::update()
+void Theme::update(bool scaled)
 {
     this->set_palette();
-    qApp->setStyleSheet(this->stylesheets[this->mode ? "dark" : "light"]);
+    qApp->setStyleSheet(this->scale_stylesheet(this->stylesheets[this->mode ? "dark" : "light"]));
+
+    for (QWidget *widget : qApp->allWidgets()) {
+        QFont font = widget->font();
+        font.setPointSize(std::ceil(font.pointSize() * this->scale));
+        widget->setFont(font);
+    }
+
+    if (!scaled) qApp->processEvents();
 
     emit mode_updated(this->mode);
     emit icons_updated(this->tab_icons[this->mode ? "dark" : "light"],
-                       this->button_icons[this->mode ? "dark" : "light"]);
+                       this->button_icons[this->mode ? "dark" : "light"], this->scale);
     emit color_updated();
 }
 

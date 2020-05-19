@@ -28,51 +28,25 @@ QStringList IpInput::IpAddress::to_str_list(bool pad)
     return numbers;
 }
 
-IpInput::IpInput(QStringList addresses, QFont font, QWidget *parent) : QWidget(parent), last_saved_address(DEFAULT_IP)
+IpInput::IpInput(QString address, QFont font, QWidget *parent) : QWidget(parent)
 {
     this->theme = Theme::get_instance();
     this->reset_timer = new QElapsedTimer();
     this->font = font;
-    this->update_addresses(addresses);
 
     QVBoxLayout *layout = new QVBoxLayout(this);
 
-    QPushButton *up_button = new QPushButton(this);
-    up_button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
-    up_button->setFlat(true);
-    up_button->setIconSize(Theme::icon_32);
-    this->theme->add_button_icon("arrow_drop_up", up_button);
-    connect(up_button, &QPushButton::clicked, [this]() {
-        int count = this->addresses.size();
-        if (count > 0) this->update(this->addresses[(this->addresses.indexOf(this->last_saved_address) + 1) % count]);
-    });
-
-    QPushButton *down_button = new QPushButton(this);
-    down_button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
-    down_button->setFlat(true);
-    down_button->setIconSize(Theme::icon_32);
-    this->theme->add_button_icon("arrow_drop_down", down_button);
-    connect(down_button, &QPushButton::clicked, [this]() {
-        int count = this->addresses.size();
-        if (count > 0) {
-            int idx = ((this->addresses.indexOf(this->last_saved_address) - 1) % count + count) % count;
-            this->update(this->addresses[idx]);
-        }
-    });
-
-    layout->addWidget(up_button, 0, Qt::AlignCenter);
-    layout->addWidget(this->input_widget());
-    layout->addWidget(down_button, 0, Qt::AlignCenter);
+    layout->addWidget(this->input_widget(IpAddress(address)));
 }
 
-QWidget *IpInput::input_widget()
+QWidget *IpInput::input_widget(IpAddress address)
 {
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
     layout->addStretch();
 
     QList<QPushButton *> numbers;
-    for (auto numbers : this->last_saved_address.to_str_list(true)) {
+    for (auto numbers : address.to_str_list(true)) {
         for (auto number : numbers) {
             QPushButton *button = new QPushButton(QString(number), widget);
             button->setFont(this->font);
@@ -109,13 +83,4 @@ QString IpInput::active_address()
     }
 
     return address;
-}
-
-void IpInput::update(IpAddress address)
-{
-    int idx = 0;
-    for (auto numbers : address.to_str_list(true))
-        for (auto number : numbers) this->inputs[idx++]->setText(QString(number));
-
-    this->last_saved_address = address;
 }

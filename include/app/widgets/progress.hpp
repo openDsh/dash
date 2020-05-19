@@ -5,6 +5,8 @@
 #include <QWidget>
 #include <QFrame>
 
+#include <math.h>
+
 class ProgressIndicator : public QFrame {
     Q_OBJECT
     Q_PROPERTY(qreal dash_offset READ get_dash_offset WRITE set_dash_offset)
@@ -23,6 +25,12 @@ class ProgressIndicator : public QFrame {
     inline qreal get_dash_offset() { return this->dash_offset; }
     inline void set_dash_offset(qreal offset) { this->dash_offset = offset; }
 
+    inline void scale(double scale)
+    {
+        this->pen_width = std::ceil(BASE_PEN_WIDTH * scale);
+        this->ellipse_point = std::ceil(BASE_ELLIPSE_POINT * scale);
+    }
+
    public slots:
     void start_animation();
     void stop_animation();
@@ -32,11 +40,16 @@ class ProgressIndicator : public QFrame {
     virtual void paintEvent(QPaintEvent* event);
 
    private:
+    const int BASE_PEN_WIDTH = 3;
+    const int BASE_ELLIPSE_POINT = 16;
+
     int timer_id = -1;
     bool enabled = false;
     int angle = 0;
     qreal dash_length = 24;
     qreal dash_offset = 0;
+    int pen_width;
+    int ellipse_point;
 };
 
 #endif

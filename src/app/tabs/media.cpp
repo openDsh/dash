@@ -14,7 +14,10 @@
 MediaTab::MediaTab(QWidget *parent) : QTabWidget(parent)
 {
     this->tabBar()->setFont(Theme::font_18);
+}
 
+void MediaTab::fill_tabs()
+{
     // this->addTab(new RadioPlayerSubTab(this), "Radio");
     this->addTab(new BluetoothPlayerSubTab(this), "Bluetooth");
     this->addTab(new LocalPlayerSubTab(this), "Local");
@@ -269,11 +272,13 @@ QWidget *LocalPlayerSubTab::playlist_widget()
     layout->addWidget(home_button, 0, Qt::AlignTop);
 
     QListWidget *folders = new QListWidget(widget);
+    folders->setFont(Theme::font_16);
     Theme::to_touch_scroller(folders);
     this->populate_dirs(root_path, folders);
     layout->addWidget(folders, 1);
 
     QListWidget *tracks = new QListWidget(widget);
+    tracks->setFont(Theme::font_16);
     Theme::to_touch_scroller(tracks);
     this->populate_tracks(root_path, tracks);
     connect(tracks, &QListWidget::itemClicked, [tracks, player = this->player](QListWidgetItem *item) {
@@ -406,7 +411,6 @@ void LocalPlayerSubTab::populate_dirs(QString path, QListWidget *dirs_widget)
         else {
             item->setText(dir.fileName());
         }
-        item->setFont(Theme::font_16);
         item->setData(Qt::UserRole, QVariant(dir.absoluteFilePath()));
     }
 }
@@ -423,8 +427,7 @@ void LocalPlayerSubTab::populate_tracks(QString path, QListWidget *tracks_widget
             }
             int lastPoint = track.lastIndexOf(".");
             QString fileNameNoExt = track.left(lastPoint);
-            QListWidgetItem *item = new QListWidgetItem(fileNameNoExt, tracks_widget);
-            item->setFont(Theme::font_16);
+            new QListWidgetItem(fileNameNoExt, tracks_widget);
         }
     }
 }

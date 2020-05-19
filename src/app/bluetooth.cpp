@@ -38,13 +38,13 @@ Bluetooth::Bluetooth() : QObject(qApp)
             }
         }
 
-        connect(this->adapter.get(), &BluezQt::Adapter::deviceAdded,
+        connect(this->adapter.data(), &BluezQt::Adapter::deviceAdded,
                 [this](BluezQt::DevicePtr device) { emit device_added(device); });
-        connect(this->adapter.get(), &BluezQt::Adapter::deviceChanged, [this](BluezQt::DevicePtr device) {
+        connect(this->adapter.data(), &BluezQt::Adapter::deviceChanged, [this](BluezQt::DevicePtr device) {
             emit device_changed(device);
             this->update_media_player(device);
         });
-        connect(this->adapter.get(), &BluezQt::Adapter::deviceRemoved,
+        connect(this->adapter.data(), &BluezQt::Adapter::deviceRemoved,
                 [this](BluezQt::DevicePtr device) { emit device_removed(device); });
     }
 }
@@ -81,7 +81,7 @@ void Bluetooth::update_media_player(BluezQt::DevicePtr device)
     else if (this->media_player_device == device) {
         emit media_player_status_changed(BluezQt::MediaPlayer::Status::Paused);
         emit media_player_track_changed(BluezQt::MediaPlayerTrack());
-        emit media_player_changed(QString(), nullptr);
+        emit media_player_changed(QString(), QSharedPointer<BluezQt::MediaPlayer>(nullptr));
     }
 }
 

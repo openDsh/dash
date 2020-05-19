@@ -36,8 +36,11 @@ QTabBar::tab:selected:top {
     border-bottom: 2px solid palette(base);
 }
 
-QTabBar::tab:disabled:top {
-    color: rgba(0, 0, 0, 97);
+QTabBar::tab:disabled {
+    height: 0px;
+    width: 0px;
+    padding: 0px;
+    margin: 0px;
 }
 
 QSlider {
@@ -146,14 +149,14 @@ QCheckBox::indicator {
 }
 
 QRadioButton::indicator {
-    width: 18px;
-    height: 18px;
+    width: 19px;
+    height: 19px;
     border: 2px solid rgb(97, 97, 97);
     border-radius: 11px;
 }
 
 QCheckBox::indicator::checked {
-    image: url(:/icons/light/check-24px.svg);
+    image: url(:/icons/light/check.svg);
     background-color: palette(base);
     border: 2px solid palette(base);
 }

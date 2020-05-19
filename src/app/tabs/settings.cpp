@@ -22,8 +22,12 @@ namespace autoapp = f1x::openauto::autoapp;
 SettingsTab::SettingsTab(QWidget *parent) : QTabWidget(parent)
 {
     this->tabBar()->setFont(Theme::font_18);
+}
 
+void SettingsTab::fill_tabs()
+{
     this->addTab(new GeneralSettingsSubTab(this), "General");
+    this->addTab(new LayoutSettingsSubTab(this), "Layout");
     this->addTab(new BluetoothSettingsSubTab(this), "Bluetooth");
     this->addTab(new OpenAutoSettingsSubTab(this), "OpenAuto");
 }
@@ -50,8 +54,6 @@ QWidget *GeneralSettingsSubTab::settings_widget()
     layout->addWidget(Theme::br(widget), 1);
     layout->addWidget(this->brightness_module_row_widget(), 1);
     layout->addWidget(this->brightness_row_widget(), 1);
-    layout->addWidget(Theme::br(widget), 1);
-    layout->addWidget(this->quick_view_row_widget(), 1);
 
     QScrollArea *scroll_area = new QScrollArea(this);
     Theme::to_touch_scroller(scroll_area);
@@ -71,7 +73,9 @@ QWidget *GeneralSettingsSubTab::dark_mode_row_widget()
     layout->addWidget(label, 1);
 
     Switch *toggle = new Switch(widget);
+    toggle->scale(this->config->get_scale());
     toggle->setChecked(this->config->get_dark_mode());
+    connect(this->config, &Config::scale_changed, [toggle](double scale) { toggle->scale(scale); });
     connect(toggle, &Switch::stateChanged, [theme = this->theme, config = this->config](bool state) {
         theme->set_mode(state);
         config->set_dark_mode(state);
@@ -195,7 +199,9 @@ QWidget *GeneralSettingsSubTab::si_units_row_widget()
     layout->addWidget(label, 1);
 
     Switch *toggle = new Switch(widget);
+    toggle->scale(this->config->get_scale());
     toggle->setChecked(this->config->get_si_units());
+    connect(this->config, &Config::scale_changed, [toggle](double scale) { toggle->scale(scale); });
     connect(toggle, &Switch::stateChanged, [config = this->config](bool state) { config->set_si_units(state); });
     layout->addWidget(toggle, 1, Qt::AlignHCenter);
 
@@ -225,6 +231,7 @@ QWidget *GeneralSettingsSubTab::color_select_widget()
 
     ColorLabel *label = new ColorLabel(Theme::icon_16, widget);
     label->setFont(Theme::font_16);
+    connect(this->config, &Config::scale_changed, [label](double scale) { label->scale(scale); });
 
     QPushButton *left_button = new QPushButton(widget);
     left_button->setFlat(true);
@@ -258,7 +265,84 @@ QWidget *GeneralSettingsSubTab::color_select_widget()
     return widget;
 }
 
-QWidget *GeneralSettingsSubTab::quick_view_row_widget()
+LayoutSettingsSubTab::LayoutSettingsSubTab(QWidget *parent) : QWidget(parent)
+{
+    this->theme = Theme::get_instance();
+    this->config = Config::get_instance();
+
+    QVBoxLayout *layout = new QVBoxLayout(this);
+    layout->addWidget(this->settings_widget());
+}
+
+QWidget *LayoutSettingsSubTab::settings_widget()
+{
+    QWidget *widget = new QWidget(this);
+    QVBoxLayout *layout = new QVBoxLayout(widget);
+
+    layout->addWidget(this->pages_widget());
+    layout->addWidget(Theme::br(widget), 1);
+    layout->addWidget(this->controls_bar_widget(), 1);
+    layout->addWidget(this->quick_view_row_widget(), 1);
+    layout->addWidget(Theme::br(widget), 1);
+    layout->addWidget(this->scale_row_widget(), 1);
+
+    QScrollArea *scroll_area = new QScrollArea(this);
+    Theme::to_touch_scroller(scroll_area);
+    scroll_area->setWidgetResizable(true);
+    scroll_area->setWidget(widget);
+
+    return scroll_area;
+}
+
+QWidget *LayoutSettingsSubTab::pages_widget()
+{
+    QWidget *widget = new QWidget(this);
+    QHBoxLayout *layout = new QHBoxLayout(widget);
+
+    QLabel *label = new QLabel("Pages", widget);
+    label->setFont(Theme::font_16);
+    layout->addWidget(label, 1);
+
+    QGroupBox *group = new QGroupBox(widget);
+    QVBoxLayout *group_layout = new QVBoxLayout(group);
+
+    for (tab_icon_t page : this->theme->get_tab_icons()) {
+        if (!page.first->property("prevent_disable").toBool()) {
+            QCheckBox *button = new QCheckBox(page.first->objectName(), group);
+            button->setFont(Theme::font_14);
+            button->setChecked(page.first->isEnabled());
+            connect(button, &QCheckBox::toggled, [page, config = this->config](bool checked) {
+                config->set_page(page.first, checked);
+            });
+            group_layout->addWidget(button);
+        }
+    }
+
+    layout->addWidget(group, 1, Qt::AlignHCenter);
+
+    return widget;
+}
+
+QWidget *LayoutSettingsSubTab::controls_bar_widget()
+{
+    QWidget *widget = new QWidget(this);
+    QHBoxLayout *layout = new QHBoxLayout(widget);
+
+    QLabel *label = new QLabel("Controls Bar", widget);
+    label->setFont(Theme::font_16);
+    layout->addWidget(label, 1);
+
+    Switch *toggle = new Switch(widget);
+    toggle->scale(this->config->get_scale());
+    toggle->setChecked(this->config->get_controls_bar());
+    connect(this->config, &Config::scale_changed, [toggle](double scale) { toggle->scale(scale); });
+    connect(toggle, &Switch::stateChanged, [config = this->config](bool state) { config->set_controls_bar(state); });
+    layout->addWidget(toggle, 1, Qt::AlignHCenter);
+
+    return widget;
+}
+
+QWidget *LayoutSettingsSubTab::quick_view_row_widget()
 {
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
@@ -272,7 +356,7 @@ QWidget *GeneralSettingsSubTab::quick_view_row_widget()
     return widget;
 }
 
-QWidget *GeneralSettingsSubTab::quick_view_select_widget()
+QWidget *LayoutSettingsSubTab::quick_view_select_widget()
 {
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
@@ -309,6 +393,43 @@ QWidget *GeneralSettingsSubTab::quick_view_select_widget()
     layout->addWidget(label, 2);
     layout->addWidget(right_button);
     layout->addStretch(1);
+
+    return widget;
+}
+
+QWidget *LayoutSettingsSubTab::scale_row_widget()
+{
+    QWidget *widget = new QWidget(this);
+    QHBoxLayout *layout = new QHBoxLayout(widget);
+
+    QLabel *label = new QLabel("Scale", widget);
+    label->setFont(Theme::font_16);
+    layout->addWidget(label, 1);
+
+    layout->addWidget(this->scale_widget(), 1);
+
+    return widget;
+}
+
+QWidget *LayoutSettingsSubTab::scale_widget()
+{
+    QWidget *widget = new QWidget(this);
+    QHBoxLayout *layout = new QHBoxLayout(widget);
+
+    QSlider *slider = new QSlider(Qt::Orientation::Horizontal, widget);
+    slider->setRange(1, 4);
+    slider->setSliderPosition(this->config->get_scale() * 4);
+    QLabel *value = new QLabel(QString("x%1").arg(slider->sliderPosition() / 4.0), widget);
+    value->setFont(Theme::font_14);
+    connect(slider, &QSlider::valueChanged, [config = this->config, value](int position) {
+        double scale = position / 4.0;
+        value->setText(QString("x%1").arg(scale));
+        config->set_scale(scale);
+    });
+
+    layout->addStretch(2);
+    layout->addWidget(slider, 4);
+    layout->addWidget(value, 2);
 
     return widget;
 }
@@ -369,6 +490,8 @@ QWidget *BluetoothSettingsSubTab::scanner_widget()
     layout->addWidget(button);
 
     ProgressIndicator *loader = new ProgressIndicator(widget);
+    loader->scale(this->config->get_scale());
+    connect(this->config, &Config::scale_changed, [loader](double scale) { loader->scale(scale); });
     connect(this->bluetooth, &Bluetooth::scan_status, [button, loader](bool status) {
         if (status)
             loader->start_animation();
@@ -421,6 +544,8 @@ QWidget *BluetoothSettingsSubTab::devices_widget()
         });
         this->devices[device] = button;
         layout->addWidget(button);
+        qApp->processEvents();
+        this->theme->update();
     });
     connect(this->bluetooth, &Bluetooth::device_changed, [this](BluezQt::DevicePtr device) {
         this->devices[device]->setText(device->name());
@@ -485,8 +610,10 @@ QWidget *OpenAutoSettingsSubTab::rhd_row_widget()
     layout->addWidget(label, 1);
 
     Switch *toggle = new Switch(widget);
+    toggle->scale(this->config->get_scale());
     toggle->setChecked(this->config->openauto_config->getHandednessOfTrafficType() ==
                        autoapp::configuration::HandednessOfTrafficType::RIGHT_HAND_DRIVE);
+    connect(this->config, &Config::scale_changed, [toggle](double scale) { toggle->scale(scale); });
     connect(toggle, &Switch::stateChanged, [config = this->config](bool state) {
         config->openauto_config->setHandednessOfTrafficType(
             state ? autoapp::configuration::HandednessOfTrafficType::RIGHT_HAND_DRIVE
@@ -603,8 +730,7 @@ QWidget *OpenAutoSettingsSubTab::dpi_widget()
 
     layout->addStretch(2);
     layout->addWidget(slider, 4);
-    layout->addWidget(value, 1);
-    layout->addStretch(1);
+    layout->addWidget(value, 2);
 
     return widget;
 }
@@ -619,8 +745,10 @@ QWidget *OpenAutoSettingsSubTab::rt_audio_row_widget()
     layout->addWidget(label, 1);
 
     Switch *toggle = new Switch(widget);
+    toggle->scale(this->config->get_scale());
     toggle->setChecked(this->config->openauto_config->getAudioOutputBackendType() ==
                        autoapp::configuration::AudioOutputBackendType::RTAUDIO);
+    connect(this->config, &Config::scale_changed, [toggle](double scale) { toggle->scale(scale); });
     connect(toggle, &Switch::stateChanged, [config = this->config](bool state) {
         config->openauto_config->setAudioOutputBackendType(state
                                                                ? autoapp::configuration::AudioOutputBackendType::RTAUDIO
@@ -673,8 +801,10 @@ QWidget *OpenAutoSettingsSubTab::bluetooth_row_widget()
     layout->addWidget(label, 1);
 
     Switch *toggle = new Switch(widget);
+    toggle->scale(this->config->get_scale());
     toggle->setChecked(this->config->openauto_config->getBluetoothAdapterType() ==
                        autoapp::configuration::BluetoothAdapterType::LOCAL);
+    connect(this->config, &Config::scale_changed, [toggle](double scale) { toggle->scale(scale); });
     connect(toggle, &Switch::stateChanged, [config = this->config](bool state) {
         config->openauto_config->setBluetoothAdapterType(state ? autoapp::configuration::BluetoothAdapterType::LOCAL
                                                                : autoapp::configuration::BluetoothAdapterType::NONE);

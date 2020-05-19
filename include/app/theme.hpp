@@ -2,6 +2,7 @@
 #define THEME_HPP_
 
 #include <QAbstractScrollArea>
+#include <QApplication>
 #include <QFrame>
 #include <QMap>
 #include <QObject>
@@ -11,9 +12,10 @@
 #include <QScrollerProperties>
 #include <QString>
 #include <QVariant>
+#include <tuple>
 
-typedef QPair<int, QIcon> tab_icon_t;
-typedef QPair<QPushButton *, QIcon> button_icon_t;
+typedef QPair<QWidget *, QIcon> tab_icon_t;
+typedef std::tuple<QPushButton *, QIcon, QSize> button_icon_t;
 
 class Theme : public QObject {
     Q_OBJECT
@@ -47,17 +49,26 @@ class Theme : public QObject {
         this->mode = mode;
         this->update();
     }
+    inline const QMap<QString, QColor> get_colors() { return this->colors[this->mode ? "dark" : "light"]; }
+    inline const QColor get_color(QString color) { return this->colors[this->mode ? "dark" : "light"][color]; }
     inline void set_color(QString color)
     {
         this->color = color;
         this->update();
     }
-    inline const QMap<QString, QColor> get_colors() { return this->colors[this->mode ? "dark" : "light"]; }
-    inline const QColor get_color(QString color) { return this->colors[this->mode ? "dark" : "light"][color]; }
 
-    void add_tab_icon(QString name, int index, Qt::Orientation orientation = Qt::Orientation::Horizontal);
+    inline void set_scale(double scale)
+    {
+        this->scale = scale;
+        qApp->processEvents();
+        this->update(true);
+    }
+
+    void add_tab_icon(QString name, QWidget *widget, Qt::Orientation orientation = Qt::Orientation::Horizontal);
+    inline QIcon get_tab_icon(int idx) { return this->tab_icons[this->mode ? "dark" : "light"][idx].second; }
+    inline QList<tab_icon_t> get_tab_icons() { return this->tab_icons[this->mode ? "dark" : "light"]; }
     void add_button_icon(QString name, QPushButton *button, QString active_name = QString());
-    void update();
+    void update(bool scaled = false);
 
     inline static QFrame *br(QWidget *parent = nullptr, bool vertical = false)
     {
@@ -104,14 +115,16 @@ class Theme : public QObject {
     QMap<QString, QList<button_icon_t>> button_icons;
     QMap<QString, QString> stylesheets;
     bool mode = false;
+    double scale = 1.0;
 
     void set_palette();
     QString parse_stylesheet(QString file);
+    QString scale_stylesheet(QString stylesheet);
     QPixmap create_pixmap_variant(QPixmap &base, qreal opacity);
 
    signals:
     void mode_updated(bool mode);
-    void icons_updated(QList<tab_icon_t> &, QList<button_icon_t> &);
+    void icons_updated(QList<tab_icon_t> &tab_icons, QList<button_icon_t> &button_icons, double scale);
     void color_updated();
 };
 

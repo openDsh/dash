@@ -15,8 +15,10 @@ class ColorLabel : public QWidget {
 
     inline QString text() { return this->name->text(); }
     inline void setFont(QFont font) { this->name->setFont(font); }
+    void scale(double scale);
 
    private:
+    QSize block_size;
     QLabel *icon;
     QLabel *name;
     Theme *theme;

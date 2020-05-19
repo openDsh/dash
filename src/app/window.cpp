@@ -19,6 +19,9 @@ MainWindow::MainWindow()
     this->theme = Theme::get_instance();
     this->theme->set_mode(this->config->get_dark_mode());
     this->theme->set_color(this->config->get_color());
+    this->theme->set_scale(this->config->get_scale());
+
+    connect(this->config, &Config::scale_changed, [theme = this->theme](double scale) { theme->set_scale(scale); });
 
     this->config->add_quick_view("volume", this->volume_widget());
     this->config->add_quick_view("none", new QFrame(this));
@@ -46,7 +49,11 @@ QWidget *MainWindow::window_widget()
     layout->setSpacing(0);
 
     layout->addWidget(this->tabs_widget());
-    layout->addWidget(this->controls_widget());
+    QWidget *controls_widget = this->controls_widget();
+    if (!this->config->get_controls_bar()) controls_widget->hide();
+    connect(this->config, &Config::controls_bar_changed,
+            [controls_widget](bool controls_bar) { controls_bar ? controls_widget->show() : controls_widget->hide(); });
+    layout->addWidget(controls_widget);
 
     return widget;
 }
@@ -55,32 +62,65 @@ QTabWidget *MainWindow::tabs_widget()
 {
     QTabWidget *widget = new QTabWidget(this);
     widget->setTabPosition(QTabWidget::TabPosition::West);
-    widget->tabBar()->setIconSize(this->TAB_SIZE);
+    widget->setIconSize(this->TAB_SIZE);
 
-    widget->addTab(new OpenAutoTab(this), QString());
-    this->theme->add_tab_icon("directions_car", 0, Qt::Orientation::Vertical);
+    OpenAutoTab *openauto = new OpenAutoTab(this);
+    openauto->setObjectName("OpenAuto");
+    MediaTab *media = new MediaTab(this);
+    media->setObjectName("Media");
+    DataTab *data = new DataTab(this);
+    data->setObjectName("Data");
+    LauncherTab *launcher = new LauncherTab(this);
+    launcher->setObjectName("Launcher");
+    SettingsTab *settings = new SettingsTab(this);
+    settings->setProperty("prevent_disable", true);
 
-    widget->addTab(new MediaTab(this), QString());
-    this->theme->add_tab_icon("play_circle_outline", 1, Qt::Orientation::Vertical);
+    int idx;
+    idx = widget->addTab(openauto, QString());
+    this->theme->add_tab_icon("directions_car", openauto, Qt::Orientation::Vertical);
+    widget->setTabEnabled(idx, this->config->get_page(openauto));
+    idx = widget->addTab(media, QString());
+    this->theme->add_tab_icon("play_circle_outline", media, Qt::Orientation::Vertical);
+    widget->setTabEnabled(idx, this->config->get_page(media));
+    idx = widget->addTab(data, QString());
+    this->theme->add_tab_icon("speed", data, Qt::Orientation::Vertical);
+    widget->setTabEnabled(idx, this->config->get_page(data));
+    idx = widget->addTab(launcher, QString());
+    this->theme->add_tab_icon("widgets", launcher, Qt::Orientation::Vertical);
+    widget->setTabEnabled(idx, this->config->get_page(launcher));
+    idx = widget->addTab(settings, QString());
+    this->theme->add_tab_icon("tune", settings, Qt::Orientation::Vertical);
 
-    widget->addTab(new DataTab(this), QString());
-    this->theme->add_tab_icon("speed", 2, Qt::Orientation::Vertical);
-
-    widget->addTab(new LauncherTab(this), "");
-    this->theme->add_tab_icon("widgets", 3, Qt::Orientation::Vertical);
-
-    widget->addTab(new SettingsTab(this), "");
-    this->theme->add_tab_icon("tune", 4, Qt::Orientation::Vertical);
+    media->fill_tabs();
+    settings->fill_tabs();
 
     connect(this->config, &Config::brightness_changed, [this, widget](int position) {
         BrightnessModule *module = this->config->get_brightness_module(this->config->get_brightness_module());
         module->set_brightness(position);
         if (widget->currentIndex() == 0 && module->update_androidauto()) emit set_openauto_state(position);
     });
+    connect(this->config, &Config::page_changed, [this, widget](QWidget *page, bool enabled) {
+        int idx = widget->indexOf(page);
+        widget->setTabEnabled(idx, enabled);
+        widget->setTabIcon(idx, (enabled) ? this->theme->get_tab_icon(idx) : QIcon());
+        widget->ensurePolished();
+    });
     connect(this->theme, &Theme::icons_updated,
-            [widget](QList<tab_icon_t> &tab_icons, QList<button_icon_t> &button_icons) {
-                for (auto &icon : tab_icons) widget->tabBar()->setTabIcon(icon.first, icon.second);
-                for (auto &icon : button_icons) icon.first->setIcon(icon.second);
+            [widget, tab_size = this->TAB_SIZE](QList<tab_icon_t> &tab_icons, QList<button_icon_t> &button_icons,
+                                                double scale) {
+                widget->setIconSize(tab_size * scale);
+                for (auto &icon : tab_icons) {
+                    int idx = widget->indexOf(icon.first);
+                    if (widget->isTabEnabled(idx)) widget->tabBar()->setTabIcon(idx, icon.second);
+                }
+                for (auto &icon : button_icons) {
+                    QPushButton *button = std::get<0>(icon);
+                    QSize size = std::get<2>(icon);
+                    size.rwidth() *= scale;
+                    size.rheight() *= scale;
+                    button->setIconSize(size);
+                    button->setIcon(std::get<1>(icon));
+                }
             });
     connect(widget, &QTabWidget::currentChanged, [this](int index) {
         BrightnessModule *module = this->config->get_brightness_module(this->config->get_brightness_module());
@@ -98,7 +138,9 @@ QWidget *MainWindow::controls_widget()
     layout->setContentsMargins(0, 0, 0, 0);
 
     QWidget *tab_spacer = new QWidget(this);
-    tab_spacer->setFixedWidth(this->TAB_SIZE.width());
+    tab_spacer->setFixedWidth(this->TAB_SIZE.width() * this->config->get_scale());
+    connect(this->config, &Config::scale_changed,
+            [tab_spacer, width = this->TAB_SIZE.width()](double scale) { tab_spacer->setFixedWidth(width * scale); });
 
     QPushButton *save_button = new QPushButton(widget);
     save_button->setFlat(true);

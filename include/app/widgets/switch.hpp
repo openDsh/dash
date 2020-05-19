@@ -21,6 +21,12 @@ class Switch : public QAbstractButton {
     void set_track_color(QColor track_color) { this->track_color = track_color; }
     void set_thumb_color(QColor thumb_color) { this->thumb_color = thumb_color; }
     void set_offset(int offset) { this->offset = offset; }
+    void scale(double scale)
+    {
+        this->track_radius = std::ceil(BASE_TRACK_RADIUS * scale);
+        this->thumb_radius = std::ceil(BASE_THUMB_RADIUS * scale);
+        this->update_properties();
+    }
 
    protected:
     void paintEvent(QPaintEvent *event) override;
@@ -29,6 +35,9 @@ class Switch : public QAbstractButton {
     void nextCheckState() override;
 
    private:
+    const int BASE_TRACK_RADIUS = 8;
+    const int BASE_THUMB_RADIUS = 12;
+
     int track_radius;
     int thumb_radius;
 
@@ -39,8 +48,10 @@ class Switch : public QAbstractButton {
     int base_offset;
     std::function<int(bool)> end_offset;
 
+    void update_properties();
+
    signals:
-    void stateChanged(bool);
+    void stateChanged(bool state);
 };
 
 #endif

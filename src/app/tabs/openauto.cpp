@@ -10,7 +10,6 @@ OpenAutoWorker::OpenAutoWorker(std::function<void(bool)> callback, QWidget *pare
       io_service(),
       work(io_service),
       configuration(Config::get_instance()->openauto_config),
-      recent_addresses_list(7),
       tcp_wrapper(),
       usb_wrapper((libusb_init(&usb_context), usb_context)),
       query_factory(usb_wrapper, io_service),
@@ -35,23 +34,12 @@ OpenAutoWorker::~OpenAutoWorker()
     libusb_exit(this->usb_context);
 }
 
-const QStringList OpenAutoWorker::get_recent_addresses()
-{
-    this->recent_addresses_list.read();
-
-    QStringList addresses;
-    for (auto &address : this->recent_addresses_list.getList()) addresses.append(QString::fromStdString(address));
-
-    return addresses;
-}
-
 void OpenAutoWorker::connect_wireless(QString address)
 {
     try {
         this->tcp_wrapper.asyncConnect(*this->socket, address.toStdString(), this->OPENAUTO_PORT,
                                        [this, address](const boost::system::error_code &ec) {
                                            if (!ec) {
-                                               this->recent_addresses_list.insertAddress(address.toStdString());
                                                this->app->start(this->socket);
                                                emit wireless_connection_success(address);
                                            }
@@ -116,7 +104,10 @@ OpenAutoTab::OpenAutoTab(QWidget *parent) : QWidget(parent)
 
     MainWindow *window = qobject_cast<MainWindow *>(parent);
     connect(window, &MainWindow::set_openauto_state, [this](unsigned int alpha) {
-        if (this->worker != nullptr) this->worker->set_opacity(alpha);
+        if (this->worker != nullptr) {
+            this->worker->set_opacity(alpha);
+            this->worker->resize();
+        }
         if (alpha > 0) this->setFocus();
     });
 
@@ -184,11 +175,6 @@ QWidget *OpenAutoTab::msg_widget()
 
     QCheckBox *wireless_button = new QCheckBox("Wireless", widget);
     wireless_button->setFont(Theme::font_14);
-    wireless_button->setStyleSheet(QString("QCheckBox::indicator {"
-                                           "    width: %1px;"
-                                           "    height: %1px;"
-                                           "}")
-                                       .arg(Theme::font_14.pointSize()));
     wireless_button->setChecked(this->config->get_wireless_active());
     connect(wireless_button, &QCheckBox::toggled, [config = this->config, connection](bool checked) {
         checked ? connection->show() : connection->hide();
@@ -209,8 +195,7 @@ QWidget *OpenAutoTab::wireless_widget()
     QWidget *widget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
 
-    IpInput *ip_input = new IpInput(this->worker->get_recent_addresses(), QFont("Titillium Web", 24), widget);
-    ip_input->set_last_saved_address(this->config->get_wireless_address());
+    IpInput *ip_input = new IpInput(this->config->get_wireless_address(), QFont("Titillium Web", 24), widget);
     layout->addWidget(ip_input);
 
     QPushButton *button = new QPushButton("connect", widget);
@@ -228,7 +213,6 @@ QWidget *OpenAutoTab::wireless_widget()
     connect(this->worker, &OpenAutoWorker::wireless_connection_success, [this, widget, ip_input](QString address) {
         widget->setEnabled(true);
         this->config->set_wireless_address(address);
-        ip_input->update_addresses(this->worker->get_recent_addresses());
     });
     connect(this->worker, &OpenAutoWorker::wireless_connection_failure, [widget]() { widget->setEnabled(true); });
 
