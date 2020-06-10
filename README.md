@@ -26,6 +26,21 @@ Main features include:
 
 ## Getting Started
 
+### Install.sh automated install (Raspberry Pi only)
+First you need to run the executable with the following command:
+
+`./install.sh`
+
+Once installed it will start up, to run afterwards, navigate to bin folder and run:
+
+`./ia`
+
+Video walk through: 
+
+https://youtu.be/ElS7Vx9JuL0 
+
+## Manual Install
+
 ### Prerequisites
 
 The following packages have been used while developing this application (NOTE some things may be missing and others are not actually needed):
