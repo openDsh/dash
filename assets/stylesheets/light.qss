@@ -196,6 +196,18 @@ QScrollBar::sub-line {
     border: none;
 }
 
+QLineEdit {
+    color: rgba(0, 0, 0, 222);
+    background-color: transparent;
+    border-width: 1px;
+    border-style: solid;
+    border-color: transparent transparent rgb(0,0,0) transparent;
+}
+
+QLineEdit:focus {
+    border: 2px solid palette(base);
+}
+
 Switch {
     qproperty-track_color: rgba(0, 0, 0, 64);
     qproperty-thumb_color: rgb(224, 224, 224);
