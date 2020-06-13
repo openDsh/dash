@@ -77,30 +77,15 @@ EmbeddedApp::EmbeddedApp(QWidget *parent) : QWidget(parent)
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
 
-    this->container = new QVBoxLayout();
-
-    layout->addWidget(this->controls_widget(), 0, Qt::AlignTop | Qt::AlignRight);
-    layout->addLayout(this->container, 1);
-}
-
-QWidget *EmbeddedApp::controls_widget()
-{
-    QWidget *widget = new QWidget(this);
-
-    QHBoxLayout *layout = new QHBoxLayout(widget);
-    layout->setContentsMargins(0, 0, 0, 0);
-
     QPushButton *button = new QPushButton(this);
     button->setFlat(true);
     button->setIconSize(Theme::icon_16);
     connect(button, &QPushButton::clicked, [this]() { this->end(); });
     Theme::get_instance()->add_button_icon("close", button);
-    layout->addWidget(button);
+    layout->addWidget(button, 0, Qt::AlignRight);
 
-    layout->addStretch();
-    layout->addWidget(button);
-
-    return widget;
+    this->container = new QVBoxLayout();
+    layout->addLayout(this->container, 1);
 }
 
 void EmbeddedApp::start(QString app)

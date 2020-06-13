@@ -255,4 +255,5 @@ void MainWindow::showEvent(QShowEvent *event)
 {
     QWidget::showEvent(event);
     emit is_ready();
+    this->theme->update();
 }

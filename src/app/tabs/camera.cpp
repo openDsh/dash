@@ -1,44 +1,47 @@
-#include <app/config.hpp>
+#include <QLineEdit>
+
 #include <app/tabs/camera.hpp>
 #include <app/window.hpp>
-#include <app/theme.hpp>
 
 CameraTab::CameraTab(QWidget *parent) : QWidget(parent)
 {
-    QStackedLayout *stack = new QStackedLayout(this);
-    stack->addWidget(this->connect_widget());
-    stack->addWidget(this->cam_widget());
+    this->theme = Theme::get_instance();
+    this->player = new QMediaPlayer(this);
 
-    connect(this, &CameraTab::stream_connected, this, [stack]() {stack->setCurrentIndex(1);});
-    connect(this, &CameraTab::stream_disconnected, this, [stack]() {stack->setCurrentIndex(0);});
+    this->config = Config::get_instance();
+    this->url = this->config->get_cam_stream_url();
 
-    this->player = nullptr;
-    // connect_stream(); TODO: offer auto-connect option
+    QStackedLayout *layout = new QStackedLayout(this);
+    layout->setContentsMargins(0, 0, 0, 0);
+
+    layout->addWidget(this->connect_widget());
+    layout->addWidget(this->camera_widget());
+
+    connect(this, &CameraTab::connected, [layout]() { layout->setCurrentIndex(1); });
+    connect(this, &CameraTab::disconnected, [layout]() { layout->setCurrentIndex(0); });
 }
 
-QWidget *CameraTab::cam_widget()
+QWidget *CameraTab::camera_widget()
 {
     QWidget *widget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setSpacing(0);
 
-    QHBoxLayout *connection = new QHBoxLayout;
-    this->status_cam_view = new QLabel("Disconnected", widget);
-    this->status_cam_view->setFont(Theme::font_16);
-    QPushButton *disconnect = new QPushButton("disconnect");
-    disconnect->setFont(Theme::font_14);
-    disconnect->setFlat(true);
-    disconnect->setIconSize(Theme::icon_36);
-    Theme::get_instance()->add_button_icon("wifi", disconnect);
-    connection->addWidget(this->status_cam_view);
-    connection->addStretch();
-    connection->addWidget(disconnect);
+    QPushButton *button = new QPushButton(widget);
+    button->setFlat(true);
+    button->setIconSize(Theme::icon_16);
+    connect(button, &QPushButton::clicked, [this]() {
+        this->player->setMedia(QUrl());
+        this->status->setText(QString());
+        this->player->stop();
+    });
+    this->theme->add_button_icon("close", button);
+    layout->addWidget(button, 0, Qt::AlignRight);
 
-    connect(disconnect, &QPushButton::clicked, this, &CameraTab::disconnect_stream);
-
-    this->video_widget = new QVideoWidget;
-
-    layout->addWidget(this->video_widget);
-    layout->addLayout(connection);
+    QVideoWidget *video = new QVideoWidget(widget);
+    this->player->setVideoOutput(video);
+    layout->addWidget(video);
 
     return widget;
 }
@@ -48,102 +51,85 @@ QWidget *CameraTab::connect_widget()
     QWidget *widget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
 
-    QLabel *label = new QLabel("connect camera stream for camera view", widget);
+    QLabel *label = new QLabel("connect camera stream", widget);
     label->setFont(Theme::font_16);
-    label->setAlignment(Qt::AlignCenter);
 
-    Config *config = Config::get_instance();
-    QLineEdit *stream_url_input = new QLineEdit(config->get_cam_stream_url(), widget);
-    stream_url_input->setFixedWidth(18 * 30);
-    stream_url_input->setFont(Theme::font_18);
-    stream_url_input->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    connect(stream_url_input, &QLineEdit::editingFinished, this, [config,stream_url_input]() {
-        config->set_cam_stream_url(stream_url_input->text());
-    });
-
-    this->status_connection_overlay = new QLabel("", widget);
-    this->status_connection_overlay->setFont(Theme::font_16);
-    this->status_connection_overlay->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    this->status = new QLabel(widget);
+    this->status->setFont(Theme::font_16);
 
     QPushButton *button = new QPushButton("connect", widget);
     button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
     button->setFont(Theme::font_14);
     button->setFlat(true);
     button->setIconSize(Theme::icon_36);
-    Theme::get_instance()->add_button_icon("wifi", button);
-    connect(button, &QPushButton::clicked, this, [this, stream_url_input]() {
-        this->connect_stream(stream_url_input->text());
-    });
-
-    connect(this, &CameraTab::stream_connecting, this, [button, stream_url_input]() {
-        button->setEnabled(false); stream_url_input->setEnabled(false);
-    });
-    connect(this, &CameraTab::stream_disconnected, this, [button, stream_url_input]() {
-        button->setEnabled(true); stream_url_input->setEnabled(true);
+    this->theme->add_button_icon("wifi", button);
+    connect(button, &QPushButton::clicked, [this]() {
+        this->connect_stream();
+        this->config->set_cam_stream_url(this->url);
     });
 
     layout->addStretch();
-    layout->addWidget(label, 1);
+    layout->addWidget(label, 0, Qt::AlignCenter);
     layout->addStretch();
-    layout->addWidget(stream_url_input, 0, Qt::AlignCenter);
-    layout->addWidget(this->status_connection_overlay, 0, Qt::AlignCenter);
+    layout->addWidget(this->input_widget());
+    layout->addWidget(this->status, 0, Qt::AlignCenter);
+    layout->addWidget(button, 0, Qt::AlignCenter);
     layout->addStretch();
-    layout->addWidget(button, 1, Qt::AlignCenter);
 
     return widget;
 }
 
-void CameraTab::changed_status(QMediaPlayer::MediaStatus media_status)
+QWidget *CameraTab::input_widget()
 {
-    qInfo() << "Camera status changed to: " << media_status;
+    QWidget *widget = new QWidget(this);
+    QHBoxLayout *layout = new QHBoxLayout(widget);
 
-    switch(media_status) {
-        case QMediaPlayer::InvalidMedia:
-            this->status_connection_overlay->setText("unable to connect");
-            emit stream_disconnected();
+    QLineEdit *input = new QLineEdit(this->url, widget);
+    input->setContextMenuPolicy(Qt::NoContextMenu);
+    input->setFont(Theme::font_18);
+    input->setAlignment(Qt::AlignCenter);
+    connect(input, &QLineEdit::textEdited, [this](QString text) { this->url = text; });
+    connect(input, &QLineEdit::returnPressed, [this]() {
+        this->connect_stream();
+        this->config->set_cam_stream_url(this->url);
+    });
+
+    layout->addStretch(1);
+    layout->addWidget(input, 4);
+    layout->addStretch(1);
+
+    return widget;
+}
+
+void CameraTab::update_status(QMediaPlayer::MediaStatus media_status)
+{
+    qInfo() << "camera status changed to: " << media_status;
+
+    switch (media_status) {
+        case QMediaPlayer::LoadingMedia:
+        case QMediaPlayer::LoadedMedia:
+        case QMediaPlayer::BufferedMedia:
+            this->status->setText("connecting...");
             break;
-         case QMediaPlayer::LoadingMedia:
-         case QMediaPlayer::LoadedMedia:
-         case QMediaPlayer::BufferedMedia:
-            this->status_connection_overlay->setText("connecting...");
-            emit stream_connecting();
-            break;
-         case QMediaPlayer::EndOfMedia:
-         case QMediaPlayer::StalledMedia:
-         case QMediaPlayer::NoMedia:
         default:
-            this->status_connection_overlay->setText("disconnected");
-            emit stream_disconnected();
+            this->status->setText("connection failed");
+            emit disconnected();
             break;
     }
 }
 
-void CameraTab::new_metadata(const QString &key, const QVariant &value)
+void CameraTab::connect_stream()
 {
-    this->status_cam_view->setText("connected");
-    emit stream_connected();
-}
+    connect(this->player, &QMediaPlayer::mediaStatusChanged,
+            [this](QMediaPlayer::MediaStatus media_status) { this->update_status(media_status); });
+    connect(this->player, QOverload<>::of(&QMediaPlayer::metaDataChanged), [this]() { emit connected(); });
 
-void CameraTab::disconnect_stream()
-{
-    this->player->setMedia(QUrl());
-    this->player->stop();
-}
+    QString pipeline = QString(
+                           "gst-pipeline: rtspsrc location=%1 ! decodebin ! video/x-raw ! videoconvert ! videoscale ! "
+                           "xvimagesink sync=false force-aspect-ratio=false name=\"qtvideosink\"")
+                           .arg(this->url);
 
-void CameraTab::connect_stream(QString stream_url)
-{
-    if (this->player != nullptr)
-        delete this->player;
-
-    this->player = new QMediaPlayer;
-    this->player->setVideoOutput(this->video_widget);
-
-    connect(this->player, &QMediaPlayer::mediaStatusChanged, this, &CameraTab::changed_status);
-    connect(this->player, qOverload<const QString&,const QVariant&>(&QMediaPlayer::metaDataChanged), this, &CameraTab::new_metadata);
-
-    // e.g. "rtsp://10.0.0.185:8554/unicast"
-    QString stream_pipeline = QString("gst-pipeline: rtspsrc location=%1 ! decodebin ! video/x-raw ! videoconvert ! videoscale ! xvimagesink sync=false force-aspect-ratio=false name=\"qtvideosink\"").arg(stream_url);
-    qInfo() << "Playing stream pipeline: " << stream_pipeline;
-    this->player->setMedia(QUrl(stream_pipeline));
+    qInfo() << "playing stream pipeline: " << pipeline;
+    this->player->setMedia(QUrl(pipeline));
     this->player->play();
 }
