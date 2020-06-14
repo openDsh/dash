@@ -37,7 +37,7 @@ Once installed it will start up, to run afterwards, navigate to bin folder and r
 
 Video walk through: 
 
-https://youtu.be/ElS7Vx9JuL0 
+https://youtu.be/CIdEN2JNAzw
 
 ## Manual Install
 
