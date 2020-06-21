@@ -16,7 +16,7 @@ void MockedBrightnessModule::set_brightness(int brightness) { this->window->setW
 
 RpiBrightnessModule::RpiBrightnessModule() : BrightnessModule(false), brightness_attribute(this->PATH)
 {
-    this->brightness_attribute.open(QIODevice::WriteOnly | QIODevice::ExistingOnly);
+    this->brightness_attribute.open(QIODevice::WriteOnly);
 }
 
 RpiBrightnessModule::~RpiBrightnessModule()
