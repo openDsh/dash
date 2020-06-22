@@ -2,6 +2,7 @@
 #define WINDOW_HPP_
 
 #include <stdlib.h>
+
 #include <QBluetoothDeviceInfo>
 #include <QBluetoothServiceDiscoveryAgent>
 #include <QBluetoothServiceInfo>
@@ -11,6 +12,7 @@
 #include <QtWidgets>
 
 #include <app/config.hpp>
+#include <app/shortcuts.hpp>
 #include <app/tabs/openauto.hpp>
 #include <app/theme.hpp>
 
@@ -27,6 +29,8 @@ class MainWindow : public QMainWindow {
 
    protected:
     void showEvent(QShowEvent *event);
+    void keyPressEvent(QKeyEvent *event);
+    void keyReleaseEvent(QKeyEvent *event);
 
    private:
     static void update_system_volume(int position);
@@ -38,7 +42,9 @@ class MainWindow : public QMainWindow {
 
     Config *config;
     Theme *theme;
+    Shortcuts *shortcuts;
     QStackedLayout *layout;
+    OpenAutoTab *openauto;
 
     const QSize TAB_SIZE = Theme::icon_48;
 

@@ -4,8 +4,9 @@
 #include <sstream>
 
 #include <app/tabs/data.hpp>
-#include <app/tabs/media.hpp>
 #include <app/tabs/launcher.hpp>
+#include <app/tabs/media.hpp>
+#include <app/tabs/openauto.hpp>
 #include <app/tabs/settings.hpp>
 #include <app/window.hpp>
 #include <app/tabs/camera.hpp>
@@ -16,6 +17,7 @@ MainWindow::MainWindow()
     this->setAttribute(Qt::WA_TranslucentBackground, true);
 
     this->config = Config::get_instance();
+    qApp->setOverrideCursor(this->config->get_mouse_active() ? Qt::ArrowCursor : Qt::BlankCursor);
 
     this->theme = Theme::get_instance();
     this->theme->set_mode(this->config->get_dark_mode());
@@ -23,6 +25,8 @@ MainWindow::MainWindow()
     this->theme->set_scale(this->config->get_scale());
 
     connect(this->config, &Config::scale_changed, [theme = this->theme](double scale) { theme->set_scale(scale); });
+
+    this->shortcuts = Shortcuts::get_instance();
 
     this->config->add_quick_view("volume", this->volume_widget());
     this->config->add_quick_view("none", new QFrame(this));
@@ -65,18 +69,68 @@ QTabWidget *MainWindow::tabs_widget()
     widget->setTabPosition(QTabWidget::TabPosition::West);
     widget->setIconSize(this->TAB_SIZE);
 
-    OpenAutoTab *openauto = new OpenAutoTab(this);
-    openauto->setObjectName("OpenAuto");
+    Shortcut *cycle_pages_shortcut = new Shortcut(this->config->get_shortcut("cycle_pages"), this);
+    this->shortcuts->add_shortcut("cycle_pages", "Cycle Pages", cycle_pages_shortcut);
+    connect(cycle_pages_shortcut, &Shortcut::activated, [widget]() {
+        int idx = widget->currentIndex();
+        do {
+            idx = (idx + 1) % widget->count();
+        } while (!widget->isTabEnabled(idx));
+        widget->setCurrentIndex(idx);
+    });
+
+    this->openauto = new OpenAutoTab(this);
+    this->openauto->setObjectName("OpenAuto");
+    Shortcut *openauto_shortcut = new Shortcut(this->config->get_shortcut("openauto_page"), this);
+    this->shortcuts->add_shortcut("openauto_page", "Open OpenAuto Page", openauto_shortcut);
+    connect(openauto_shortcut, &Shortcut::activated, [widget, openauto = this->openauto]() {
+        int idx = widget->indexOf(openauto);
+        if (widget->isTabEnabled(idx)) widget->setCurrentIndex(idx);
+    });
+
     MediaTab *media = new MediaTab(this);
     media->setObjectName("Media");
+    Shortcut *media_shortcut = new Shortcut(this->config->get_shortcut("media_page"), this);
+    this->shortcuts->add_shortcut("media_page", "Open Media Page", media_shortcut);
+    connect(media_shortcut, &Shortcut::activated, [widget, media]() {
+        int idx = widget->indexOf(media);
+        if (widget->isTabEnabled(idx)) widget->setCurrentIndex(idx);
+    });
+
     DataTab *data = new DataTab(this);
     data->setObjectName("Data");
-    LauncherTab *launcher = new LauncherTab(this);
-    launcher->setObjectName("Launcher");
-    SettingsTab *settings = new SettingsTab(this);
-    settings->setProperty("prevent_disable", true);
+    Shortcut *data_shortcut = new Shortcut(this->config->get_shortcut("data_page"), this);
+    this->shortcuts->add_shortcut("data_page", "Open Data Page", data_shortcut);
+    connect(data_shortcut, &Shortcut::activated, [widget, data]() {
+        int idx = widget->indexOf(data);
+        if (widget->isTabEnabled(idx)) widget->setCurrentIndex(idx);
+    });
+
     CameraTab *camera = new CameraTab(this);
     camera->setObjectName("Camera");
+    Shortcut *camera_shortcut = new Shortcut(this->config->get_shortcut("camera_page"), this);
+    this->shortcuts->add_shortcut("camera_page", "Open Camera Page", camera_shortcut);
+    connect(camera_shortcut, &Shortcut::activated, [widget, camera]() {
+        int idx = widget->indexOf(camera);
+        if (widget->isTabEnabled(idx)) widget->setCurrentIndex(idx);
+    });
+
+    LauncherTab *launcher = new LauncherTab(this);
+    launcher->setObjectName("Launcher");
+    Shortcut *launcher_shortcut = new Shortcut(this->config->get_shortcut("launcher_page"), this);
+    this->shortcuts->add_shortcut("launcher_page", "Open Launcher Page", launcher_shortcut);
+    connect(launcher_shortcut, &Shortcut::activated, [widget, launcher]() {
+        int idx = widget->indexOf(launcher);
+        if (widget->isTabEnabled(idx)) widget->setCurrentIndex(idx);
+    });
+
+    SettingsTab *settings = new SettingsTab(this);
+    settings->setProperty("prevent_disable", true);
+    Shortcut *settings_shortcut = new Shortcut(this->config->get_shortcut("settings_page"), this);
+    this->shortcuts->add_shortcut("settings_page", "Open Settings Page", settings_shortcut);
+    connect(settings_shortcut, &Shortcut::activated, [widget, settings]() {
+        widget->setCurrentIndex(widget->indexOf(settings));
+    });
 
     int idx;
     idx = widget->addTab(openauto, QString());
@@ -217,24 +271,28 @@ QWidget *MainWindow::volume_widget()
         config->set_volume(position);
         MainWindow::update_system_volume(position);
     });
+    Shortcut *lower_shortcut = new Shortcut(this->config->get_shortcut("volume_down"), this);
+    this->shortcuts->add_shortcut("volume_down", "Decrease Volume", lower_shortcut);
+    connect(lower_shortcut, &Shortcut::activated,
+            [slider]() { slider->setSliderPosition(slider->sliderPosition() - 2); });
+    Shortcut *upper_shortcut = new Shortcut(this->config->get_shortcut("volume_up"), this);
+    this->shortcuts->add_shortcut("volume_up", "Increase Volume", upper_shortcut);
+    connect(upper_shortcut, &Shortcut::activated,
+            [slider]() { slider->setSliderPosition(slider->sliderPosition() + 2); });
 
     QPushButton *lower_button = new QPushButton(widget);
     lower_button->setFlat(true);
     lower_button->setIconSize(Theme::icon_32);
     this->theme->add_button_icon("volume_down", lower_button);
-    connect(lower_button, &QPushButton::clicked, [slider]() {
-        int position = slider->sliderPosition() - 10;
-        slider->setSliderPosition(position);
-    });
+    connect(lower_button, &QPushButton::clicked,
+            [slider]() { slider->setSliderPosition(slider->sliderPosition() - 10); });
 
     QPushButton *raise_button = new QPushButton(widget);
     raise_button->setFlat(true);
     raise_button->setIconSize(Theme::icon_32);
     this->theme->add_button_icon("volume_up", raise_button);
-    connect(raise_button, &QPushButton::clicked, [slider]() {
-        int position = slider->sliderPosition() + 10;
-        slider->setSliderPosition(position);
-    });
+    connect(raise_button, &QPushButton::clicked,
+            [slider]() { slider->setSliderPosition(slider->sliderPosition() + 10); });
 
     layout->addWidget(lower_button);
     layout->addWidget(slider, 4);
@@ -256,4 +314,16 @@ void MainWindow::showEvent(QShowEvent *event)
     QWidget::showEvent(event);
     emit is_ready();
     this->theme->update();
+}
+
+void MainWindow::keyPressEvent(QKeyEvent *event)
+{
+    QMainWindow::keyPressEvent(event);
+    if (this->openauto != nullptr) this->openauto->send_key_event(event);
+}
+
+void MainWindow::keyReleaseEvent(QKeyEvent *event)
+{
+    QMainWindow::keyReleaseEvent(event);
+    if (this->openauto != nullptr) this->openauto->send_key_event(event);
 }

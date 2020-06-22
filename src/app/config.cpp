@@ -7,6 +7,7 @@
 Config::Config()
     : QObject(qApp),
       openauto_config(std::make_shared<f1x::openauto::autoapp::configuration::Configuration>()),
+      openauto_button_codes(openauto_config->getButtonCodes()),
       ia_config(QSettings::IniFormat, QSettings::UserScope, "ia")
 {
     this->volume = this->ia_config.value("volume", 50).toInt();
@@ -20,6 +21,7 @@ Config::Config()
     this->media_home = this->ia_config.value("media_home", QDir().absolutePath()).toString();
     this->wireless_active = this->ia_config.value("Wireless/active", false).toBool();
     this->wireless_address = this->ia_config.value("Wireless/address", "0.0.0.0").toString();
+    this->mouse_active = this->ia_config.value("mouse_active", true).toBool();
     this->launcher_home = this->ia_config.value("Launcher/home", QDir().absolutePath()).toString();
     this->launcher_auto_launch = this->ia_config.value("Launcher/auto_launch", false).toBool();
     this->launcher_app = this->ia_config.value("Launcher/app", QString()).toString();
@@ -32,6 +34,10 @@ Config::Config()
     this->ia_config.beginGroup("Pages");
     for (auto key : this->ia_config.childKeys())
         this->pages[key] = this->ia_config.value(key, true).toBool();
+    this->ia_config.endGroup();
+    this->ia_config.beginGroup("Shortcuts");
+    for (auto key : this->ia_config.childKeys())
+        this->shortcuts[key] = this->ia_config.value(key, QString()).toString();
     this->ia_config.endGroup();
 
     QTimer *timer = new QTimer(this);
@@ -69,6 +75,8 @@ void Config::save()
         this->ia_config.setValue("Launcher/auto_launch", this->launcher_auto_launch);
     if (this->launcher_app != this->ia_config.value("Launcher/app", QString()).toString())
         this->ia_config.setValue("Launcher/app", this->launcher_app);
+    if (this->mouse_active != this->ia_config.value("mouse_active", true).toBool())
+        this->ia_config.setValue("mouse_active", this->mouse_active);
     if (this->quick_view != this->ia_config.value("quick_view", "volume").toString())
         this->ia_config.setValue("quick_view", this->quick_view);
     if (this->brightness_module != this->ia_config.value("brightness_module", "mocked").toString())
@@ -87,7 +95,14 @@ void Config::save()
         if (page_enabled != this->ia_config.value(config_key, true).toBool())
             this->ia_config.setValue(config_key, page_enabled);
     }
+    for (auto id : this->shortcuts.keys()) {
+        QString config_key = QString("Shortcuts/%1").arg(id);
+        QString shortcut = this->shortcuts[id];
+        if (shortcut != this->ia_config.value(config_key, QString()).toString())
+            this->ia_config.setValue(config_key, shortcut);
+    }
 
+    this->openauto_config->setButtonCodes(this->openauto_button_codes);
     this->openauto_config->save();
 }
 

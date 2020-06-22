@@ -1,5 +1,4 @@
 #include <QColor>
-#include <QDebug>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QList>
@@ -49,6 +48,7 @@ QWidget *IpInput::input_widget(IpAddress address)
     for (auto numbers : address.to_str_list(true)) {
         for (auto number : numbers) {
             QPushButton *button = new QPushButton(QString(number), widget);
+            button->setProperty("add_hint", true);
             button->setFont(this->font);
             button->setFlat(true);
             this->inputs.append(button);

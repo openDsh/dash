@@ -1,6 +1,7 @@
 #include <aasdk_proto/ButtonCodeEnum.pb.h>
 #include <aasdk_proto/VideoFPSEnum.pb.h>
 #include <aasdk_proto/VideoResolutionEnum.pb.h>
+#include <algorithm>
 #include <BluezQt/Device>
 #include <BluezQt/PendingCall>
 #include <QLabel>
@@ -16,7 +17,6 @@
 #include <app/widgets/switch.hpp>
 #include <app/window.hpp>
 
-namespace aasdk = f1x::aasdk;
 namespace autoapp = f1x::openauto::autoapp;
 
 SettingsTab::SettingsTab(QWidget *parent) : QTabWidget(parent)
@@ -29,6 +29,7 @@ void SettingsTab::fill_tabs()
     this->addTab(new GeneralSettingsSubTab(this), "General");
     this->addTab(new LayoutSettingsSubTab(this), "Layout");
     this->addTab(new BluetoothSettingsSubTab(this), "Bluetooth");
+    this->addTab(new ShortcutsSettingsSubTab(this), "Shortcuts");
     this->addTab(new OpenAutoSettingsSubTab(this), "OpenAuto");
 }
 
@@ -36,6 +37,7 @@ GeneralSettingsSubTab::GeneralSettingsSubTab(QWidget *parent) : QWidget(parent)
 {
     this->theme = Theme::get_instance();
     this->config = Config::get_instance();
+    this->shortcuts = Shortcuts::get_instance();
 
     QVBoxLayout *layout = new QVBoxLayout(this);
 
@@ -49,6 +51,8 @@ QWidget *GeneralSettingsSubTab::settings_widget()
 
     layout->addWidget(this->dark_mode_row_widget(), 1);
     layout->addWidget(this->color_row_widget(), 1);
+    layout->addWidget(Theme::br(widget), 1);
+    layout->addWidget(this->mouse_row_widget(), 1);
     layout->addWidget(Theme::br(widget), 1);
     layout->addWidget(this->si_units_row_widget(), 1);
     layout->addWidget(Theme::br(widget), 1);
@@ -80,6 +84,21 @@ QWidget *GeneralSettingsSubTab::dark_mode_row_widget()
         theme->set_mode(state);
         config->set_dark_mode(state);
     });
+    Shortcut *shortcut = new Shortcut(this->config->get_shortcut("dark_mode_toggle"), this->window());
+    this->shortcuts->add_shortcut("dark_mode_toggle", "Toggle Dark Mode", shortcut);
+    connect(shortcut, &Shortcut::activated, [toggle]() { toggle->click(); });
+
+    Shortcut *temp_shortcut_on = new Shortcut(this->config->get_shortcut("dark_mode_on"), this->window());
+    this->shortcuts->add_shortcut("dark_mode_on", "[Enable Dark Mode]", temp_shortcut_on);
+    connect(temp_shortcut_on, &Shortcut::activated, [toggle]() {
+        if (!toggle->isChecked()) toggle->click();
+    });
+    Shortcut *temp_shortcut_off = new Shortcut(this->config->get_shortcut("dark_mode_off"), this->window());
+    this->shortcuts->add_shortcut("dark_mode_off", "[Disable Dark Mode]", temp_shortcut_off);
+    connect(temp_shortcut_off, &Shortcut::activated, [toggle]() {
+        if (toggle->isChecked()) toggle->click();
+    });
+
     layout->addWidget(toggle, 1, Qt::AlignHCenter);
 
     return widget;
@@ -165,6 +184,14 @@ QWidget *GeneralSettingsSubTab::brightness_widget()
     slider->setSliderPosition(this->config->get_brightness());
     connect(slider, &QSlider::valueChanged,
             [config = this->config](int position) { config->set_brightness(position); });
+    Shortcut *dim_shortcut = new Shortcut(this->config->get_shortcut("brightness_down"), this->window());
+    this->shortcuts->add_shortcut("brightness_down", "Decrease Brightness", dim_shortcut);
+    connect(dim_shortcut, &Shortcut::activated,
+            [slider]() { slider->setSliderPosition(std::max(76, slider->sliderPosition() - 4)); });
+    Shortcut *brighten_shortcut = new Shortcut(this->config->get_shortcut("brightness_up"), this->window());
+    this->shortcuts->add_shortcut("brightness_up", "Increase Brightness", brighten_shortcut);
+    connect(brighten_shortcut, &Shortcut::activated,
+            [slider]() { slider->setSliderPosition(std::min(255, slider->sliderPosition() + 4)); });
 
     QPushButton *dim_button = new QPushButton(widget);
     dim_button->setFlat(true);
@@ -261,6 +288,28 @@ QWidget *GeneralSettingsSubTab::color_select_widget()
     layout->addWidget(label, 2);
     layout->addWidget(right_button);
     layout->addStretch(1);
+
+    return widget;
+}
+
+QWidget *GeneralSettingsSubTab::mouse_row_widget()
+{
+    QWidget *widget = new QWidget(this);
+    QHBoxLayout *layout = new QHBoxLayout(widget);
+
+    QLabel *label = new QLabel("Mouse", widget);
+    label->setFont(Theme::font_16);
+    layout->addWidget(label, 1);
+
+    Switch *toggle = new Switch(widget);
+    toggle->scale(this->config->get_scale());
+    toggle->setChecked(this->config->get_mouse_active());
+    connect(this->config, &Config::scale_changed, [toggle](double scale) { toggle->scale(scale); });
+    connect(toggle, &Switch::stateChanged, [config = this->config](bool state) {
+        qApp->setOverrideCursor(state ? Qt::ArrowCursor : Qt::BlankCursor);
+        config->set_mouse_active(state);
+    });
+    layout->addWidget(toggle, 1, Qt::AlignHCenter);
 
     return widget;
 }
@@ -421,10 +470,13 @@ QWidget *LayoutSettingsSubTab::scale_widget()
     slider->setSliderPosition(this->config->get_scale() * 4);
     QLabel *value = new QLabel(QString("x%1").arg(slider->sliderPosition() / 4.0), widget);
     value->setFont(Theme::font_14);
-    connect(slider, &QSlider::valueChanged, [config = this->config, value](int position) {
+    connect(slider, &QSlider::valueChanged, [config = this->config, slider, value](int position) {
+        slider->setEnabled(false);
         double scale = position / 4.0;
         value->setText(QString("x%1").arg(scale));
         config->set_scale(scale);
+        slider->setEnabled(true);
+        slider->setFocus();
     });
 
     layout->addStretch(2);
@@ -565,6 +617,96 @@ QWidget *BluetoothSettingsSubTab::devices_widget()
     return scroll_area;
 }
 
+ShortcutsSettingsSubTab::ShortcutsSettingsSubTab(QWidget *parent) : QWidget(parent)
+{
+    this->theme = Theme::get_instance();
+    this->config = Config::get_instance();
+    this->shortcuts = Shortcuts::get_instance();
+    QVBoxLayout *layout = new QVBoxLayout(this);
+    layout->addWidget(this->settings_widget());
+}
+
+QWidget *ShortcutsSettingsSubTab::settings_widget()
+{
+    QWidget *widget = new QWidget(this);
+    QVBoxLayout *layout = new QVBoxLayout(widget);
+
+    QMap<QString, QPair<QString, Shortcut *>> shortcuts = this->shortcuts->get_shortcuts();
+    for (auto id : shortcuts.keys()) {
+        QPair<QString, Shortcut *> shortcut = shortcuts[id];
+        layout->addWidget(this->shortcut_row_widget(id, shortcut.first, shortcut.second));
+    }
+    connect(this->shortcuts, &Shortcuts::shortcut_added,
+            [this, layout](QString id, QString description, Shortcut *shortcut) {
+                layout->addWidget(this->shortcut_row_widget(id, description, shortcut));
+            });
+
+    QScrollArea *scroll_area = new QScrollArea(this);
+    Theme::to_touch_scroller(scroll_area);
+    scroll_area->setWidgetResizable(true);
+    scroll_area->setWidget(widget);
+
+    return scroll_area;
+}
+
+QWidget *ShortcutsSettingsSubTab::shortcut_row_widget(QString id, QString description, Shortcut *shortcut)
+{
+    QWidget *widget = new QWidget(this);
+    QHBoxLayout *layout = new QHBoxLayout(widget);
+
+    QLabel *label = new QLabel(description, widget);
+    label->setFont(Theme::font_16);
+
+    layout->addWidget(label, 1);
+    layout->addWidget(this->shortcut_input_widget(id, shortcut), 1);
+
+    return widget;
+}
+
+QWidget *ShortcutsSettingsSubTab::shortcut_input_widget(QString id, Shortcut *shortcut)
+{
+    QWidget *widget = new QWidget(this);
+    QHBoxLayout *layout = new QHBoxLayout(widget);
+
+    QPushButton *symbol = new QPushButton(widget);
+    QSizePolicy symbol_policy = symbol->sizePolicy();
+    symbol_policy.setRetainSizeWhenHidden(true);
+    symbol->setSizePolicy(symbol_policy);
+    symbol->setFocusPolicy(Qt::NoFocus);
+    symbol->setAttribute(Qt::WA_TransparentForMouseEvents, true);
+    symbol->setFlat(true);
+    symbol->setCheckable(true);
+    if (shortcut->to_str().isEmpty())
+        symbol->hide();
+    else
+        symbol->setChecked(shortcut->to_str().startsWith("gpio"));
+    symbol->setIconSize(Theme::icon_32);
+    this->theme->add_button_icon("developer_board", symbol, "keyboard");
+
+    ShortcutInput *input = new ShortcutInput(shortcut->to_str(), widget);
+    input->setProperty("add_hint", true);
+    input->setFlat(true);
+    input->setFont(QFont("Titillium Web", 18));
+    connect(input, &ShortcutInput::shortcut_updated, [this, id, symbol](QString shortcut) {
+        if (shortcut.isEmpty()) {
+            symbol->hide();
+        }
+        else {
+            symbol->setChecked(shortcut.startsWith("gpio"));
+            symbol->show();
+        }
+        this->shortcuts->update_shortcut(id, shortcut);
+        this->config->set_shortcut(id, shortcut);
+    });
+
+    layout->addStretch(1);
+    layout->addWidget(input, 3);
+    layout->addStretch(1);
+    layout->addWidget(symbol, 1, Qt::AlignRight);
+
+    return widget;
+}
+
 OpenAutoSettingsSubTab::OpenAutoSettingsSubTab(QWidget *parent) : QWidget(parent)
 {
     this->bluetooth = Bluetooth::get_instance();
@@ -591,6 +733,9 @@ QWidget *OpenAutoSettingsSubTab::settings_widget()
     layout->addWidget(this->audio_channels_row_widget(), 1);
     layout->addWidget(Theme::br(widget), 1);
     layout->addWidget(this->bluetooth_row_widget(), 1);
+    layout->addWidget(Theme::br(widget), 1);
+    layout->addWidget(this->touchscreen_row_widget(), 1);
+    layout->addWidget(this->buttons_row_widget(), 1);
 
     QScrollArea *scroll_area = new QScrollArea(this);
     Theme::to_touch_scroller(scroll_area);
@@ -634,7 +779,7 @@ QWidget *OpenAutoSettingsSubTab::frame_rate_row_widget()
     layout->addWidget(label, 1);
 
     QGroupBox *group = new QGroupBox(widget);
-    QHBoxLayout *group_layout = new QHBoxLayout(group);
+    QVBoxLayout *group_layout = new QVBoxLayout(group);
 
     QRadioButton *fps_30_button = new QRadioButton("30fps", group);
     fps_30_button->setFont(Theme::font_14);
@@ -665,7 +810,7 @@ QWidget *OpenAutoSettingsSubTab::resolution_row_widget()
     layout->addWidget(label, 1);
 
     QGroupBox *group = new QGroupBox(widget);
-    QHBoxLayout *group_layout = new QHBoxLayout(group);
+    QVBoxLayout *group_layout = new QVBoxLayout(group);
 
     QRadioButton *res_480_button = new QRadioButton("480p", group);
     res_480_button->setFont(Theme::font_14);
@@ -769,7 +914,7 @@ QWidget *OpenAutoSettingsSubTab::audio_channels_row_widget()
     layout->addWidget(label, 1);
 
     QGroupBox *group = new QGroupBox(widget);
-    QHBoxLayout *group_layout = new QHBoxLayout(group);
+    QVBoxLayout *group_layout = new QVBoxLayout(group);
 
     QCheckBox *music_button = new QCheckBox("Music", group);
     music_button->setFont(Theme::font_14);
@@ -810,6 +955,84 @@ QWidget *OpenAutoSettingsSubTab::bluetooth_row_widget()
                                                                : autoapp::configuration::BluetoothAdapterType::NONE);
     });
     layout->addWidget(toggle, 1, Qt::AlignHCenter);
+
+    return widget;
+}
+
+QWidget *OpenAutoSettingsSubTab::touchscreen_row_widget()
+{
+    QWidget *widget = new QWidget(this);
+    QHBoxLayout *layout = new QHBoxLayout(widget);
+
+    QLabel *label = new QLabel("Touchscreen", widget);
+    label->setFont(Theme::font_16);
+    layout->addWidget(label, 1);
+
+    Switch *toggle = new Switch(widget);
+    toggle->scale(this->config->get_scale());
+    toggle->setChecked(this->config->openauto_config->getTouchscreenEnabled());
+    connect(this->config, &Config::scale_changed, [toggle](double scale) { toggle->scale(scale); });
+    connect(toggle, &Switch::stateChanged,
+            [config = this->config](bool state) { config->openauto_config->setTouchscreenEnabled(state); });
+    layout->addWidget(toggle, 1, Qt::AlignHCenter);
+
+    return widget;
+}
+
+QCheckBox *OpenAutoSettingsSubTab::button_checkbox(QString name, QString key,
+                                                   aasdk::proto::enums::ButtonCode::Enum code, QWidget *parent)
+{
+    QCheckBox *checkbox = new QCheckBox(QString("%1 [%2]").arg(name).arg(key), parent);
+    checkbox->setFont(Theme::font_14);
+    checkbox->setChecked(std::find(this->config->openauto_button_codes.begin(),
+                                   this->config->openauto_button_codes.end(),
+                                   code) != this->config->openauto_button_codes.end());
+    connect(checkbox, &QCheckBox::toggled, [config = this->config, code](bool checked) {
+        if (checked) {
+            config->openauto_button_codes.push_back(code);
+        }
+        else {
+            config->openauto_button_codes.erase(
+                std::remove(config->openauto_button_codes.begin(), config->openauto_button_codes.end(), code),
+                config->openauto_button_codes.end());
+        }
+    });
+
+    return checkbox;
+}
+
+QWidget *OpenAutoSettingsSubTab::buttons_row_widget()
+{
+    QWidget *widget = new QWidget(this);
+    QHBoxLayout *layout = new QHBoxLayout(widget);
+
+    QLabel *label = new QLabel("Buttons", widget);
+    label->setFont(Theme::font_16);
+
+    QGroupBox *group = new QGroupBox(widget);
+    QVBoxLayout *group_layout = new QVBoxLayout(group);
+
+    group_layout->addWidget(this->button_checkbox("Enter", "Enter", aasdk::proto::enums::ButtonCode::ENTER, widget));
+    group_layout->addWidget(this->button_checkbox("Left", "Left", aasdk::proto::enums::ButtonCode::LEFT, widget));
+    group_layout->addWidget(this->button_checkbox("Right", "Right", aasdk::proto::enums::ButtonCode::RIGHT, widget));
+    group_layout->addWidget(this->button_checkbox("Up", "Up", aasdk::proto::enums::ButtonCode::UP, widget));
+    group_layout->addWidget(this->button_checkbox("Down", "Down", aasdk::proto::enums::ButtonCode::DOWN, widget));
+    group_layout->addWidget(this->button_checkbox("Back", "Esc", aasdk::proto::enums::ButtonCode::BACK, widget));
+    group_layout->addWidget(this->button_checkbox("Home", "H", aasdk::proto::enums::ButtonCode::HOME, widget));
+    group_layout->addWidget(this->button_checkbox("Phone", "P", aasdk::proto::enums::ButtonCode::PHONE, widget));
+    group_layout->addWidget(this->button_checkbox("Call End", "O", aasdk::proto::enums::ButtonCode::CALL_END, widget));
+    group_layout->addWidget(this->button_checkbox("Play", "X", aasdk::proto::enums::ButtonCode::PLAY, widget));
+    group_layout->addWidget(this->button_checkbox("Pause", "C", aasdk::proto::enums::ButtonCode::PAUSE, widget));
+    group_layout->addWidget(this->button_checkbox("Prev Track", "V", aasdk::proto::enums::ButtonCode::PREV, widget));
+    group_layout->addWidget(this->button_checkbox("Next Track", "N", aasdk::proto::enums::ButtonCode::NEXT, widget));
+    group_layout->addWidget(
+        this->button_checkbox("Toggle Play", "B", aasdk::proto::enums::ButtonCode::TOGGLE_PLAY, widget));
+    group_layout->addWidget(this->button_checkbox("Voice", "M", aasdk::proto::enums::ButtonCode::MICROPHONE_1, widget));
+    group_layout->addWidget(
+        this->button_checkbox("Scroll", "1/2", aasdk::proto::enums::ButtonCode::SCROLL_WHEEL, widget));
+
+    layout->addWidget(label, 1);
+    layout->addWidget(group, 1, Qt::AlignHCenter);
 
     return widget;
 }

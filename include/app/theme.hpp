@@ -60,15 +60,14 @@ class Theme : public QObject {
     inline void set_scale(double scale)
     {
         this->scale = scale;
-        qApp->processEvents();
-        this->update(true);
+        this->update();
     }
 
     void add_tab_icon(QString name, QWidget *widget, Qt::Orientation orientation = Qt::Orientation::Horizontal);
     inline QIcon get_tab_icon(int idx) { return this->tab_icons[this->mode ? "dark" : "light"][idx].second; }
     inline QList<tab_icon_t> get_tab_icons() { return this->tab_icons[this->mode ? "dark" : "light"]; }
     void add_button_icon(QString name, QPushButton *button, QString active_name = QString());
-    void update(bool scaled = false);
+    void update();
 
     inline static QFrame *br(QWidget *parent = nullptr, bool vertical = false)
     {

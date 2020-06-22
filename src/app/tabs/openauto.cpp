@@ -102,19 +102,19 @@ OpenAutoTab::OpenAutoTab(QWidget *parent) : QWidget(parent)
         if (this->worker != nullptr) this->worker->set_night_mode(mode);
     });
 
+    OpenAutoFrame *frame = new OpenAutoFrame(this);
     MainWindow *window = qobject_cast<MainWindow *>(parent);
-    connect(window, &MainWindow::set_openauto_state, [this](unsigned int alpha) {
+    connect(window, &MainWindow::set_openauto_state, [this, frame](unsigned int alpha) {
         if (this->worker != nullptr) {
             this->worker->set_opacity(alpha);
             this->worker->resize();
         }
-        if (alpha > 0) this->setFocus();
+        if (alpha > 0) frame->setFocus();
     });
 
     QStackedLayout *layout = new QStackedLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
 
-    OpenAutoFrame *frame = new OpenAutoFrame(this);
     connect(frame, &OpenAutoFrame::toggle, [=](bool enable) {
         if (!enable && frame->is_fullscreen()) {
             window->unset_widget();

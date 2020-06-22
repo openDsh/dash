@@ -238,3 +238,7 @@ Tuner::handle {
 Tuner::sub-page {
     background-color: rgb(0, 0, 0);
 }
+
+*[add_hint="true"] {
+    background-color: rgba(0, 0, 0, 8);
+}

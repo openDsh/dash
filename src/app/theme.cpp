@@ -162,7 +162,7 @@ void Theme::add_button_icon(QString name, QPushButton *button, QString normal_na
     this->update();
 }
 
-void Theme::update(bool scaled)
+void Theme::update()
 {
     this->set_palette();
     qApp->setStyleSheet(this->scale_stylesheet(this->stylesheets[this->mode ? "dark" : "light"]));
@@ -172,8 +172,6 @@ void Theme::update(bool scaled)
         font.setPointSize(std::ceil(font.pointSize() * this->scale));
         widget->setFont(font);
     }
-
-    if (!scaled) qApp->processEvents();
 
     emit mode_updated(this->mode);
     emit icons_updated(this->tab_icons[this->mode ? "dark" : "light"],

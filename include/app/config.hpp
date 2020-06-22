@@ -4,6 +4,7 @@
 #include <f1x/openauto/autoapp/Configuration/Configuration.hpp>
 
 #include <QFrame>
+#include <QKeySequence>
 #include <QObject>
 #include <QSettings>
 #include <QString>
@@ -69,6 +70,12 @@ class Config : public QObject {
     inline QString get_launcher_app() { return this->launcher_app; }
     inline void set_launcher_app(QString launcher_app) { this->launcher_app = launcher_app; }
 
+    inline bool get_mouse_active() { return this->mouse_active; }
+    inline void set_mouse_active(bool mouse_active) { this->mouse_active = mouse_active; }
+
+    inline void set_shortcut(QString id, QString shortcut) { this->shortcuts[id] = shortcut; }
+    inline QString get_shortcut(QString id) { return this->shortcuts[id]; }
+
     inline QString get_quick_view() { return this->quick_view; }
     inline void set_quick_view(QString quick_view)
     {
@@ -113,6 +120,7 @@ class Config : public QObject {
     inline void set_cam_stream_url(QString stream_url) { this->cam_stream_url = stream_url; }
 
     std::shared_ptr<f1x::openauto::autoapp::configuration::Configuration> openauto_config;
+    f1x::openauto::autoapp::configuration::Configuration::ButtonCodes openauto_button_codes;
 
     static Config *get_instance();
 
@@ -135,6 +143,8 @@ class Config : public QObject {
     QString launcher_home;
     bool launcher_auto_launch;
     QString launcher_app;
+    bool mouse_active;
+    QMap<QString, QString> shortcuts;
     QString quick_view;
     QString brightness_module;
     bool controls_bar;

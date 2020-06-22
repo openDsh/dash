@@ -3,10 +3,14 @@
 
 #include <QMap>
 #include <QtWidgets>
+#include <f1x/openauto/autoapp/Configuration/Configuration.hpp>
 
 #include <app/bluetooth.hpp>
 #include <app/config.hpp>
+#include <app/shortcuts.hpp>
 #include <app/theme.hpp>
+
+namespace aasdk = f1x::aasdk;
 
 class SettingsTab : public QTabWidget {
     Q_OBJECT
@@ -32,9 +36,11 @@ class GeneralSettingsSubTab : public QWidget {
     QWidget *si_units_row_widget();
     QWidget *color_row_widget();
     QWidget *color_select_widget();
+    QWidget *mouse_row_widget();
 
     Config *config;
     Theme *theme;
+    Shortcuts *shortcuts;
 };
 
 class LayoutSettingsSubTab : public QWidget {
@@ -73,6 +79,22 @@ class BluetoothSettingsSubTab : public QWidget {
     QMap<BluezQt::DevicePtr, QPushButton *> devices;
 };
 
+class ShortcutsSettingsSubTab : public QWidget {
+    Q_OBJECT
+
+   public:
+    ShortcutsSettingsSubTab(QWidget *parent = nullptr);
+
+   private:
+    QWidget *settings_widget();
+    QWidget *shortcut_row_widget(QString key, QString name, Shortcut *shortcut);
+    QWidget *shortcut_input_widget(QString id, Shortcut *shortcut);
+
+    Theme *theme;
+    Config *config;
+    Shortcuts *shortcuts;
+};
+
 class OpenAutoSettingsSubTab : public QWidget {
     Q_OBJECT
 
@@ -89,6 +111,9 @@ class OpenAutoSettingsSubTab : public QWidget {
     QWidget *rt_audio_row_widget();
     QWidget *audio_channels_row_widget();
     QWidget *bluetooth_row_widget();
+    QWidget *touchscreen_row_widget();
+    QCheckBox *button_checkbox(QString name, QString key, aasdk::proto::enums::ButtonCode::Enum code, QWidget *parent);
+    QWidget *buttons_row_widget();
 
     Bluetooth *bluetooth;
     Config *config;

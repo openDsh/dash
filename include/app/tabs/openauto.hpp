@@ -15,7 +15,6 @@
 #include <f1x/openauto/autoapp/Configuration/RecentAddressesList.hpp>
 #include <f1x/openauto/autoapp/Service/AndroidAutoEntityFactory.hpp>
 #include <f1x/openauto/autoapp/Service/ServiceFactory.hpp>
-#include <thread>
 
 #include <app/config.hpp>
 #include <app/theme.hpp>
@@ -35,6 +34,7 @@ class OpenAutoWorker : public QObject {
     inline void set_opacity(unsigned int alpha) { this->service_factory.setOpacity(alpha); }
     inline void resize() { this->service_factory.resize(); }
     inline void set_night_mode(bool mode) { this->service_factory.setNightMode(mode); }
+    inline void send_key_event(QKeyEvent *event) { this->service_factory.sendKeyEvent(event); }
 
    private:
     const int OPENAUTO_PORT = 5277;
@@ -74,6 +74,7 @@ class OpenAutoFrame : public QWidget {
 
    protected:
     void mouseDoubleClickEvent(QMouseEvent *);
+    inline void enterEvent(QEvent *) { this->setFocus(); }
 
    private:
     bool fullscreen = false;
@@ -88,6 +89,7 @@ class OpenAutoTab : public QWidget {
 
    public:
     OpenAutoTab(QWidget *parent = nullptr);
+    inline void send_key_event(QKeyEvent *event) { if (this->worker != nullptr) this->worker->send_key_event(event); }
 
    private:
     QWidget *msg_widget();

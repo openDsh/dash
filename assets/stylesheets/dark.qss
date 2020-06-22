@@ -104,7 +104,7 @@ QFrame[frameShape="5"][frameShadow="16"] {
 
 QListWidget {
     background-color: rgba(255, 255, 255, 10);
-    color: rgba(255, 255, 255);
+    color: rgb(255, 255, 255);
     border: none;
 }
 
@@ -237,4 +237,8 @@ Tuner::handle {
 
 Tuner::sub-page {
     background-color: rgb(224, 224, 224);
+}
+
+*[add_hint="true"] {
+    background-color: rgba(255, 255, 255, 8);
 }

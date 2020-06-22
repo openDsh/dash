@@ -10,15 +10,10 @@ int main(int argc, char *argv[])
 
     MainWindow window;
     window.setWindowFlags(Qt::FramelessWindowHint);
-    if (args.size() > 2) {
-        int w = args.at(1).toInt();
-        int h = args.at(2).toInt();
-        window.setFixedSize(w, h);
-    }
-    else {
-        ia.setOverrideCursor(Qt::BlankCursor);
+    if (args.size() > 2)
+        window.setFixedSize(args.at(1).toInt(), args.at(2).toInt());
+    else
         window.setFixedSize(ia.desktop()->screenGeometry().size());
-    }
     window.move(0, 0);
     window.show();
 

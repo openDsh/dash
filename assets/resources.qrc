@@ -28,6 +28,8 @@
         <file>icons/dark/arrow_right.svg</file>
         <file>icons/dark/wifi.svg</file>
         <file>icons/dark/widgets.svg</file>
+        <file>icons/dark/developer_board.svg</file>
+        <file>icons/dark/keyboard.svg</file>
         <file>icons/dark/linked_camera.svg</file>
         <file>icons/light/play.svg</file>
         <file>icons/light/pause.svg</file>
@@ -56,6 +58,8 @@
         <file>icons/light/arrow_right.svg</file>
         <file>icons/light/wifi.svg</file>
         <file>icons/light/widgets.svg</file>
+        <file>icons/light/developer_board.svg</file>
+        <file>icons/light/keyboard.svg</file>
         <file>icons/light/linked_camera.svg</file>
         <file>stylesheets/light.qss</file>
         <file>stylesheets/dark.qss</file>
