@@ -8,7 +8,11 @@
 
 ProgressIndicator::ProgressIndicator(QWidget* parent) : QFrame(parent)
 {
-    setFocusPolicy(Qt::NoFocus);
+    this->pen_width = BASE_PEN_WIDTH;
+    this->ellipse_point = BASE_ELLIPSE_POINT;
+
+    this->setFocusPolicy(Qt::NoFocus);
+    this->setMinimumSize(this->sizeHint());
 
     this->pen_width = BASE_PEN_WIDTH;
 
@@ -43,6 +47,12 @@ ProgressIndicator::ProgressIndicator(QWidget* parent) : QFrame(parent)
     group->addAnimation(angle_animation);
 
     group->start();
+}
+
+QSize ProgressIndicator::sizeHint()
+{
+    int size = (this->ellipse_point * 2) + this->pen_width + 1;
+    return QSize(size, size);
 }
 
 void ProgressIndicator::start_animation()

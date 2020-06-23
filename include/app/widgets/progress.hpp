@@ -15,6 +15,7 @@ class ProgressIndicator : public QFrame {
 
    public:
     ProgressIndicator(QWidget* parent = nullptr);
+    QSize sizeHint();
 
     inline int get_angle() { return this->angle; }
     inline void set_angle(int angle) { this->angle = angle; }
@@ -29,6 +30,7 @@ class ProgressIndicator : public QFrame {
     {
         this->pen_width = std::ceil(BASE_PEN_WIDTH * scale);
         this->ellipse_point = std::ceil(BASE_ELLIPSE_POINT * scale);
+        this->setMinimumSize(this->sizeHint());
     }
 
    public slots:

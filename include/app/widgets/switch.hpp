@@ -32,6 +32,7 @@ class Switch : public QAbstractButton {
     void paintEvent(QPaintEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
+    void checkStateSet() override;
     void nextCheckState() override;
 
    private:

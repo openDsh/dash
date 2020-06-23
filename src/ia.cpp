@@ -9,7 +9,7 @@ int main(int argc, char *argv[])
     QStringList args = QCoreApplication::arguments();
 
     MainWindow window;
-    window.setWindowFlags(Qt::FramelessWindowHint);
+    window.setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
     if (args.size() > 2)
         window.setFixedSize(args.at(1).toInt(), args.at(2).toInt());
     else

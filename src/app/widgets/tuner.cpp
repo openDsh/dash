@@ -7,9 +7,10 @@ Tuner::Tuner(QWidget *parent) : QSlider(Qt::Orientation::Horizontal, parent)
 {
     this->config = Config::get_instance();
 
+    setTracking(false);
     setRange(880, 1080);
     setTickInterval(1);
-    setSliderPosition(this->config->get_radio_station());
+    setValue(this->config->get_radio_station());
 
     connect(this, &QSlider::valueChanged, [this](int value) {
         this->config->set_radio_station(value);

@@ -18,7 +18,7 @@
         <file>icons/dark/fast_forward.svg</file>
         <file>icons/dark/fast_rewind.svg</file>
         <file>icons/dark/volume_off.svg</file>
-        <file>icons/dark/save.svg</file>
+        <file>icons/dark/save_alt.svg</file>
         <file>icons/dark/bluetooth_searching.svg</file>
         <file>icons/dark/playlist_add_check.svg</file>
         <file>icons/dark/playlist_add.svg</file>
@@ -28,9 +28,11 @@
         <file>icons/dark/arrow_right.svg</file>
         <file>icons/dark/wifi.svg</file>
         <file>icons/dark/widgets.svg</file>
+        <file>icons/dark/refresh.svg</file>
         <file>icons/dark/developer_board.svg</file>
         <file>icons/dark/keyboard.svg</file>
         <file>icons/dark/linked_camera.svg</file>
+        <file>icons/dark/dark_mode.svg</file>
         <file>icons/light/play.svg</file>
         <file>icons/light/pause.svg</file>
         <file>icons/light/brightness_low.svg</file>
@@ -48,7 +50,7 @@
         <file>icons/light/fast_forward.svg</file>
         <file>icons/light/fast_rewind.svg</file>
         <file>icons/light/volume_off.svg</file>
-        <file>icons/light/save.svg</file>
+        <file>icons/light/save_alt.svg</file>
         <file>icons/light/bluetooth_searching.svg</file>
         <file>icons/light/playlist_add_check.svg</file>
         <file>icons/light/playlist_add.svg</file>
@@ -58,9 +60,11 @@
         <file>icons/light/arrow_right.svg</file>
         <file>icons/light/wifi.svg</file>
         <file>icons/light/widgets.svg</file>
+        <file>icons/light/refresh.svg</file>
         <file>icons/light/developer_board.svg</file>
         <file>icons/light/keyboard.svg</file>
         <file>icons/light/linked_camera.svg</file>
+        <file>icons/light/dark_mode.svg</file>
         <file>stylesheets/light.qss</file>
         <file>stylesheets/dark.qss</file>
         <file>fonts/Titillium_Web/TitilliumWeb-Regular.ttf</file>

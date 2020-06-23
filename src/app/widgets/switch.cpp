@@ -63,6 +63,12 @@ void Switch::mouseReleaseEvent(QMouseEvent* event)
     }
 }
 
+void Switch::checkStateSet()
+{
+    QAbstractButton::checkStateSet();
+    this->offset = this->end_offset(this->isChecked());
+}
+
 void Switch::nextCheckState()
 {
     QAbstractButton::nextCheckState();

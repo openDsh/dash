@@ -36,9 +36,13 @@ class MainWindow : public QMainWindow {
     static void update_system_volume(int position);
     QWidget *window_widget();
     QTabWidget *tabs_widget();
-    QWidget *controls_widget();
+    QWidget *controls_bar_widget();
     QWidget *quick_view_widget();
-    QWidget *volume_widget();
+    QWidget *volume_widget(bool skip_buttons = false);
+    QWidget *brightness_widget(bool skip_buttons = false);
+    QWidget *controls_widget();
+    QWidget *power_control_widget();
+    QWidget *save_control_widget();
 
     Config *config;
     Theme *theme;

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.5.1)
 project(ia CXX)
-add_subdirectory(aasdk)
 
+add_subdirectory(aasdk)
 set(AASDK_INCLUDE_DIRS ${aasdk_SOURCE_DIR}/include)
 set(AASDK_LIBRARIES ${aasdk_SOURCE_DIR}/lib/libaasdk.so)
 set(AASDK_PROTO_INCLUDE_DIRS ${aasdk_BINARY_DIR})
@@ -54,10 +54,11 @@ endif(RPI_BUILD AND NOT GST_BUILD)
 if(GST_BUILD)
     find_package(Qt5GStreamer)
     find_package(PkgConfig REQUIRED)
-    pkg_check_modules(GST REQUIRED gstreamer-1.0>=1.4
-    gstreamer-sdp-1.0>=1.4
-    gstreamer-video-1.0>=1.4
-    gstreamer-app-1.0>=1.4)
+    pkg_check_modules(GST REQUIRED
+                      gstreamer-1.0>=1.4
+                      gstreamer-sdp-1.0>=1.4
+                      gstreamer-video-1.0>=1.4
+                      gstreamer-app-1.0>=1.4)
     add_definitions(-DUSE_GST)
     if(RPI_BUILD)
         add_definitions(-DRPI)

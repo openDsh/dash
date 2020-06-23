@@ -312,19 +312,24 @@ QWidget *LocalPlayerSubTab::seek_widget()
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
     QSlider *slider = new QSlider(Qt::Orientation::Horizontal, widget);
+    slider->setTracking(false);
     slider->setRange(0, 0);
-    QLabel *value = new QLabel(LocalPlayerSubTab::durationFmt(slider->sliderPosition()), widget);
+    QLabel *value = new QLabel(LocalPlayerSubTab::durationFmt(slider->value()), widget);
     value->setFont(Theme::font_14);
-    connect(slider, &QSlider::valueChanged,
-            [value](int position) { value->setText(LocalPlayerSubTab::durationFmt(position)); });
     connect(slider, &QSlider::sliderReleased,
-            [player = this->player, slider]() { player->setPosition(slider->value()); });
+            [player = this->player, slider]() { player->setPosition(slider->sliderPosition()); });
+    connect(slider, &QSlider::sliderMoved,
+            [value](int position) { value->setText(LocalPlayerSubTab::durationFmt(position)); });
     connect(this->player, &QMediaPlayer::durationChanged, [slider](qint64 duration) {
-        slider->setSliderPosition(0);
+        slider->setValue(0);
         slider->setRange(0, duration);
     });
-    connect(this->player, &QMediaPlayer::positionChanged,
-            [slider](qint64 position) { slider->setSliderPosition(position); });
+    connect(this->player, &QMediaPlayer::positionChanged, [slider, value](qint64 position) {
+        if (!slider->isSliderDown()) {
+            slider->setValue(position);
+            value->setText(LocalPlayerSubTab::durationFmt(position));
+        }
+    });
 
     layout->addStretch(4);
     layout->addWidget(slider, 28);
