@@ -166,7 +166,7 @@ QWidget *OpenAutoTab::msg_widget()
     QWidget *widget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
 
-    QLabel *label = new QLabel("connect device to start OpenAuto", widget);
+    QLabel *label = new QLabel("connect device to start Android Auto", widget);
     label->setFont(Theme::font_16);
     label->setAlignment(Qt::AlignCenter);
 

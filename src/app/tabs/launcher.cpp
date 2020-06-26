@@ -88,6 +88,16 @@ EmbeddedApp::EmbeddedApp(QWidget *parent) : QWidget(parent)
     layout->addLayout(this->container, 1);
 }
 
+EmbeddedApp::~EmbeddedApp()
+{
+    this->process->kill();
+    this->process->waitForFinished();
+
+    delete this->process;
+    delete this->container;
+    delete this->worker;
+}
+
 void EmbeddedApp::start(QString app)
 {
     this->process->setProgram(app);

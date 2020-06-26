@@ -83,9 +83,9 @@ QTabWidget *MainWindow::tabs_widget()
     });
 
     this->openauto = new OpenAutoTab(this);
-    this->openauto->setObjectName("OpenAuto");
-    Shortcut *openauto_shortcut = new Shortcut(this->config->get_shortcut("openauto_page"), this);
-    this->shortcuts->add_shortcut("openauto_page", "Open OpenAuto Page", openauto_shortcut);
+    this->openauto->setObjectName("Android Auto");
+    Shortcut *openauto_shortcut = new Shortcut(this->config->get_shortcut("android_auto_page"), this);
+    this->shortcuts->add_shortcut("android_auto_page", "Open Android Auto Page", openauto_shortcut);
     connect(openauto_shortcut, &Shortcut::activated, [widget, openauto = this->openauto]() {
         int idx = widget->indexOf(openauto);
         if (widget->isTabEnabled(idx)) widget->setCurrentIndex(idx);
@@ -137,7 +137,7 @@ QTabWidget *MainWindow::tabs_widget()
 
     int idx;
     idx = widget->addTab(openauto, QString());
-    this->theme->add_tab_icon("directions_car", openauto, Qt::Orientation::Vertical);
+    this->theme->add_tab_icon("android_auto", openauto, Qt::Orientation::Vertical);
     widget->setTabEnabled(idx, this->config->get_page(openauto));
     idx = widget->addTab(media, QString());
     this->theme->add_tab_icon("play_circle_outline", media, Qt::Orientation::Vertical);

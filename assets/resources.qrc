@@ -33,6 +33,7 @@
         <file>icons/dark/keyboard.svg</file>
         <file>icons/dark/linked_camera.svg</file>
         <file>icons/dark/dark_mode.svg</file>
+        <file>icons/dark/android_auto.svg</file>
         <file>icons/light/play.svg</file>
         <file>icons/light/pause.svg</file>
         <file>icons/light/brightness_low.svg</file>
@@ -65,6 +66,7 @@
         <file>icons/light/keyboard.svg</file>
         <file>icons/light/linked_camera.svg</file>
         <file>icons/light/dark_mode.svg</file>
+        <file>icons/light/android_auto.svg</file>
         <file>stylesheets/light.qss</file>
         <file>stylesheets/dark.qss</file>
         <file>fonts/Titillium_Web/TitilliumWeb-Regular.ttf</file>

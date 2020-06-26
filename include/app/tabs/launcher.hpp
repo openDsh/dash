@@ -51,6 +51,7 @@ class EmbeddedApp : public QWidget {
 
    public:
     EmbeddedApp(QWidget *parent = nullptr);
+    ~EmbeddedApp();
 
     void start(QString app);
     void end();
