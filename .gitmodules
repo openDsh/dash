@@ -1,8 +1,0 @@
-[submodule "aasdk"]
-	path = aasdk
-	url = https://github.com/jcwenger/aasdk.git
-	branch = develop
-[submodule "openauto"]
-	path = openauto
-	url = https://github.com/jcwenger/openauto.git
-	branch = develop
