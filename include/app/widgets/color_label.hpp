@@ -4,7 +4,7 @@
 #include <QWidget>
 #include <QLabel>
 
-#include <app/theme.hpp>
+#include "app/theme.hpp"
 
 class ColorLabel : public QWidget {
     Q_OBJECT

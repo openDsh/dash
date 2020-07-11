@@ -3,14 +3,12 @@
 
 #include <QMap>
 #include <QtWidgets>
-#include <f1x/openauto/autoapp/Configuration/Configuration.hpp>
+#include "openauto/Configuration/Configuration.hpp"
 
-#include <app/bluetooth.hpp>
-#include <app/config.hpp>
-#include <app/shortcuts.hpp>
-#include <app/theme.hpp>
-
-namespace aasdk = f1x::aasdk;
+#include "app/bluetooth.hpp"
+#include "app/config.hpp"
+#include "app/shortcuts.hpp"
+#include "app/theme.hpp"
 
 class SettingsTab : public QTabWidget {
     Q_OBJECT

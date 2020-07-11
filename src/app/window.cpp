@@ -4,14 +4,14 @@
 #include <math.h>
 #include <sstream>
 
-#include <app/modules/brightness.hpp>
-#include <app/tabs/camera.hpp>
-#include <app/tabs/data.hpp>
-#include <app/tabs/launcher.hpp>
-#include <app/tabs/media.hpp>
-#include <app/tabs/settings.hpp>
-#include <app/widgets/dialog.hpp>
-#include <app/window.hpp>
+#include "app/modules/brightness.hpp"
+#include "app/tabs/camera.hpp"
+#include "app/tabs/data.hpp"
+#include "app/tabs/launcher.hpp"
+#include "app/tabs/media.hpp"
+#include "app/tabs/settings.hpp"
+#include "app/widgets/dialog.hpp"
+#include "app/window.hpp"
 
 MainWindow::MainWindow()
 {

@@ -1,6 +1,6 @@
 #include <QtWidgets>
 
-#include <app/widgets/switch.hpp>
+#include "app/widgets/switch.hpp"
 
 Switch::Switch(QWidget* parent) : QAbstractButton(parent)
 {

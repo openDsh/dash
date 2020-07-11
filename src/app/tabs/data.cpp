@@ -1,9 +1,9 @@
 #include <QPalette>
 
-#include <app/config.hpp>
-#include <app/tabs/data.hpp>
-#include <app/window.hpp>
-#include <obd/conversions.hpp>
+#include "app/config.hpp"
+#include "app/tabs/data.hpp"
+#include "app/window.hpp"
+#include "obd/conversions.hpp"
 
 Gauge::Gauge(units_t units, QFont value_font, QFont unit_font, Gauge::Orientation orientation, int rate,
              std::vector<Command> cmds, int precision, obd_decoder_t decoder, QWidget *parent)

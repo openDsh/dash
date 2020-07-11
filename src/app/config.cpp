@@ -2,11 +2,11 @@
 #include <QDir>
 #include <QTimer>
 
-#include <app/config.hpp>
+#include "app/config.hpp"
 
 Config::Config()
     : QObject(qApp),
-      openauto_config(std::make_shared<f1x::openauto::autoapp::configuration::Configuration>()),
+      openauto_config(std::make_shared<openauto::configuration::Configuration>()),
       openauto_button_codes(openauto_config->getButtonCodes()),
       ia_config(QSettings::IniFormat, QSettings::UserScope, "ia")
 {

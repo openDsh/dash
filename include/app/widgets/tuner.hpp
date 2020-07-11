@@ -3,7 +3,7 @@
 
 #include <QSlider>
 
-#include <app/config.hpp>
+#include "app/config.hpp"
 
 class Tuner : public QSlider {
     Q_OBJECT

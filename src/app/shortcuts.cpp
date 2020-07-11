@@ -2,7 +2,7 @@
 #include <QElapsedTimer>
 #include <QTimer>
 
-#include <app/shortcuts.hpp>
+#include "app/shortcuts.hpp"
 
 static const QRegExp GPIOX_REGEX("gpio\\d+");
 static const QString GPIO_DIR("/sys/class/gpio");

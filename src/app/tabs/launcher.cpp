@@ -1,6 +1,6 @@
 #include <QElapsedTimer>
 
-#include <app/tabs/launcher.hpp>
+#include "app/tabs/launcher.hpp"
 
 XWorker::WindowProp::WindowProp(char *prop, unsigned long size)
 {

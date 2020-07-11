@@ -3,7 +3,7 @@
 #include <QLabel>
 #include <QList>
 
-#include <app/widgets/ip_input.hpp>
+#include "app/widgets/ip_input.hpp"
 
 IpInput::IpAddress::IpAddress(QString address_str)
 {

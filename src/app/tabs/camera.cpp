@@ -1,7 +1,7 @@
 #include <QLineEdit>
 
-#include <app/tabs/camera.hpp>
-#include <app/window.hpp>
+#include "app/tabs/camera.hpp"
+#include "app/window.hpp"
 
 CameraTab::CameraTab(QWidget *parent) : QWidget(parent)
 {

@@ -7,8 +7,8 @@
 #include <QString>
 #include <QVideoWidget>
 
-#include <app/config.hpp>
-#include <app/theme.hpp>
+#include "app/config.hpp"
+#include "app/theme.hpp"
 
 class CameraTab : public QWidget {
     Q_OBJECT

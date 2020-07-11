@@ -4,8 +4,8 @@
 #include <QProcess>
 #include <QtWidgets>
 
-#include <app/config.hpp>
-#include <app/theme.hpp>
+#include "app/config.hpp"
+#include "app/theme.hpp"
 
 #include <X11/Xatom.h>
 #include <X11/Xlib.h>

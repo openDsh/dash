@@ -13,7 +13,7 @@
 #include <QPushButton>
 #include <QString>
 
-#include <app/widgets/progress.hpp>
+#include "app/widgets/progress.hpp"
 
 class Bluetooth : public QObject {
     Q_OBJECT

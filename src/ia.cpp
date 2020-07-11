@@ -1,7 +1,7 @@
 #include <QApplication>
 #include <QStringList>
 
-#include <app/window.hpp>
+#include "app/window.hpp"
 
 int main(int argc, char *argv[])
 {

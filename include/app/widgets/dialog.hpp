@@ -9,7 +9,7 @@
 #include <QTimer>
 #include <QVBoxLayout>
 
-#include <app/theme.hpp>
+#include "app/theme.hpp"
 
 class Overlay : public QWidget {
     Q_OBJECT

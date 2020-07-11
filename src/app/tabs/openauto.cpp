@@ -1,9 +1,9 @@
-#include <app/config.hpp>
-#include <app/tabs/openauto.hpp>
-#include <app/theme.hpp>
-#include <app/widgets/ip_input.hpp>
-#include <app/widgets/progress.hpp>
-#include <app/window.hpp>
+#include "app/config.hpp"
+#include "app/tabs/openauto.hpp"
+#include "app/theme.hpp"
+#include "app/widgets/ip_input.hpp"
+#include "app/widgets/progress.hpp"
+#include "app/window.hpp"
 
 OpenAutoWorker::OpenAutoWorker(std::function<void(bool)> callback, QWidget *parent, bool night_mode)
     : QObject(qApp),
@@ -19,7 +19,7 @@ OpenAutoWorker::OpenAutoWorker(std::function<void(bool)> callback, QWidget *pare
       usb_hub(std::make_shared<aasdk::usb::USBHub>(usb_wrapper, io_service, query_chain_factory)),
       connected_accessories_enumerator(
           std::make_shared<aasdk::usb::ConnectedAccessoriesEnumerator>(usb_wrapper, io_service, query_chain_factory)),
-      app(std::make_shared<autoapp::App>(io_service, usb_wrapper, tcp_wrapper, android_auto_entity_factory, usb_hub,
+      app(std::make_shared<openauto::App>(io_service, usb_wrapper, tcp_wrapper, android_auto_entity_factory, usb_hub,
                                          connected_accessories_enumerator)),
       socket(std::make_shared<boost::asio::ip::tcp::socket>(io_service))
 {

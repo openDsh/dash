@@ -8,7 +8,7 @@
 #include <QElapsedTimer>
 #include <array>
 
-#include <app/theme.hpp>
+#include "app/theme.hpp"
 
 class IpInput : public QWidget {
     Q_OBJECT
