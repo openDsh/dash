@@ -55,38 +55,9 @@ else
   echo
 fi
 
-#move to build directory
-echo "Moving to build directory"
-cd build
-if [[ $? > 0 ]]
-  then
-    #if directory doesn't exist, then create
-    echo "Directory doesnt exist...creating"
-    mkdir build
-    if [[ $? > 0 ]]
-     then
-       echo $app " unable to create directory"
-       exit
-     else
-        cd build
-        if [[ $? > 0 ]]
-           then
-              echo $app "Cant change into directory"
-              exit
-            else
-              echo "moved directory"
-              echo
-        fi
-    fi
-   
-else
-  echo "moved directory"
-  echo
-fi
-
 #begin cmake
 echo "beginning cmake for raspberry pi"
-cmake -DRPI_BUILD=TRUE -DCMAKE_BUILD_TYPE=Release ../
+cmake -DRPI_BUILD=TRUE -DGST_BUILD=TRUE -DCMAKE_BUILD_TYPE=Release . 
 if [[ $? > 0 ]]
   then
     echo "Cmake error"
