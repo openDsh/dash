@@ -1,5 +1,4 @@
-#ifndef COMMAND_HPP_
-#define COMMAND_HPP_
+#pragma once
 
 #include <functional>
 #include <string>
@@ -23,4 +22,3 @@ struct Commands {
 
 extern Commands cmds;
 
-#endif

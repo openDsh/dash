@@ -1,5 +1,4 @@
-#ifndef BLUETOOTH_HPP_
-#define BLUETOOTH_HPP_
+#pragma once
 
 #include <BluezQt/Adapter>
 #include <BluezQt/Device>
@@ -56,4 +55,3 @@ class Bluetooth : public QObject {
     void scan_status(bool);
 };
 
-#endif

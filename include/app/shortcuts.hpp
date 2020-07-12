@@ -1,5 +1,4 @@
-#ifndef SHORTCUTS_HPP_
-#define SHORTCUTS_HPP_
+#pragma once
 
 #include <QApplication>
 #include <QFile>
@@ -85,4 +84,3 @@ class Shortcuts : public QObject {
     void shortcut_added(QString id, QString description, Shortcut *shortcut);
 };
 
-#endif

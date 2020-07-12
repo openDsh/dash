@@ -1,5 +1,4 @@
-#ifndef CONFIG_HPP_
-#define CONFIG_HPP_
+#pragma once
 
 #include "openauto/Configuration/Configuration.hpp"
 
@@ -168,4 +167,3 @@ class Config : public QObject {
     void save_status(bool status);
 };
 
-#endif

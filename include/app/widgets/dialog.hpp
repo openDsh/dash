@@ -1,5 +1,4 @@
-#ifndef DIALOG_HPP_
-#define DIALOG_HPP_
+#pragma once
 
 #include <QApplication>
 #include <QDialog>
@@ -82,4 +81,3 @@ class Dialog : public QDialog {
     }
 };
 
-#endif

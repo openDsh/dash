@@ -1,5 +1,4 @@
-#ifndef MEDIA_HPP_
-#define MEDIA_HPP_
+#pragma once
 
 #include <QMediaPlayer>
 #include <QtWidgets>
@@ -65,4 +64,3 @@ class LocalPlayerSubTab : public QWidget {
     QLabel *path_label;
 };
 
-#endif

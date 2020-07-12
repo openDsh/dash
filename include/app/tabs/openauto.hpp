@@ -1,5 +1,4 @@
-#ifndef OPENAUTO_HPP_
-#define OPENAUTO_HPP_
+#pragma once
 
 #include <QtWidgets>
 #include <thread>
@@ -100,4 +99,3 @@ class OpenAutoTab : public QWidget {
     void connect_wireless();
 };
 
-#endif

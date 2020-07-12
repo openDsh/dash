@@ -1,5 +1,4 @@
-#ifndef THEME_HPP_
-#define THEME_HPP_
+#pragma once
 
 #include <QAbstractScrollArea>
 #include <QApplication>
@@ -129,4 +128,3 @@ class Theme : public QObject {
     void color_updated();
 };
 
-#endif
