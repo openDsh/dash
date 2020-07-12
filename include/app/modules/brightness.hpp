@@ -1,5 +1,4 @@
-#ifndef BRIGHTNESS_HPP_
-#define BRIGHTNESS_HPP_
+#pragma once
 
 #include <QMainWindow>
 #include <QObject>
@@ -55,5 +54,3 @@ class XBrightnessModule : public BrightnessModule {
    private:
     QScreen *screen;
 };
-
-#endif

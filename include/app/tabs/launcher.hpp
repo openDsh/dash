@@ -1,5 +1,4 @@
-#ifndef LAUNCHER_HPP_
-#define LAUNCHER_HPP_
+#pragma once
 
 #include <QProcess>
 #include <QtWidgets>
@@ -86,5 +85,3 @@ class LauncherTab : public QWidget {
     QListWidget *folders;
     QListWidget *apps;
 };
-
-#endif

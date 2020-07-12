@@ -1,5 +1,4 @@
-#ifndef DIALOG_HPP_
-#define DIALOG_HPP_
+#pragma once
 
 #include <QApplication>
 #include <QDialog>
@@ -81,5 +80,3 @@ class Dialog : public QDialog {
         this->buttons->addWidget(button, 0, Qt::AlignRight);
     }
 };
-
-#endif

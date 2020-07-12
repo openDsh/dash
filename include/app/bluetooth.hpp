@@ -1,5 +1,4 @@
-#ifndef BLUETOOTH_HPP_
-#define BLUETOOTH_HPP_
+#pragma once
 
 #include <BluezQt/Adapter>
 #include <BluezQt/Device>
@@ -55,5 +54,3 @@ class Bluetooth : public QObject {
     void media_player_track_changed(BluezQt::MediaPlayerTrack);
     void scan_status(bool);
 };
-
-#endif

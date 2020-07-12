@@ -1,5 +1,4 @@
-#ifndef IP_INPUT_HPP_
-#define IP_INPUT_HPP_
+#pragma once
 
 #include <QFont>
 #include <QList>
@@ -35,5 +34,3 @@ class IpInput : public QWidget {
     QElapsedTimer *reset_timer;
     Theme *theme;
 };
-
-#endif

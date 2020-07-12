@@ -28,8 +28,8 @@ else (RTAUDIO_LIBRARIES AND RTAUDIO_INCLUDE_DIRS)
       /usr/local/include
       /opt/local/include
       /sw/include
-	PATH_SUFFIXES
-          rtaudio
+    PATH_SUFFIXES
+      rtaudio
   )
 
   find_library(RTAUDIO_LIBRARY

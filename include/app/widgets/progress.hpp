@@ -1,5 +1,4 @@
-#ifndef PROGRESS_H
-#define PROGRESS_H
+#pragma once
 
 #include <QColor>
 #include <QWidget>
@@ -53,5 +52,3 @@ class ProgressIndicator : public QFrame {
     int pen_width;
     int ellipse_point;
 };
-
-#endif

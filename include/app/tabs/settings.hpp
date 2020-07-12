@@ -1,5 +1,4 @@
-#ifndef SETTINGS_HPP_
-#define SETTINGS_HPP_
+#pragma once
 
 #include <QMap>
 #include <QtWidgets>
@@ -119,5 +118,3 @@ class OpenAutoSettingsSubTab : public QWidget {
     Config *config;
     Theme *theme;
 };
-
-#endif

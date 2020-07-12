@@ -1,5 +1,4 @@
-#ifndef THEME_HPP_
-#define THEME_HPP_
+#pragma once
 
 #include <QAbstractScrollArea>
 #include <QApplication>
@@ -133,5 +132,3 @@ class Theme : public QObject {
     void icons_updated(QList<tab_icon_t> &tab_icons, QList<button_icon_t> &button_icons, double scale);
     void color_updated();
 };
-
-#endif

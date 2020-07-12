@@ -1,5 +1,4 @@
-#ifndef COLOR_LABEL_HPP_
-#define COLOR_LABEL_HPP_
+#pragma once
 
 #include <QWidget>
 #include <QLabel>
@@ -23,5 +22,3 @@ class ColorLabel : public QWidget {
     QLabel *name;
     Theme *theme;
 };
-
-#endif

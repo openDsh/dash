@@ -1,5 +1,4 @@
-#ifndef DATA_HPP_
-#define DATA_HPP_
+#pragma once
 
 #include <QPair>
 #include <QtWidgets>
@@ -50,5 +49,3 @@ class DataTab : public QWidget {
 
     std::vector<Gauge *> gauges;
 };
-
-#endif
