@@ -23,6 +23,7 @@ class Theme : public QObject {
    public:
     enum Orientation { BOTTOM, RIGHT };
 
+    static const QFont font_10;
     static const QFont font_12;
     static const QFont font_14;
     static const QFont font_16;
@@ -32,6 +33,8 @@ class Theme : public QObject {
 
     static const QSize icon_16;
     static const QSize icon_24;
+    static const QSize icon_26;
+    static const QSize icon_28;
     static const QSize icon_32;
     static const QSize icon_36;
     static const QSize icon_42;
@@ -69,6 +72,7 @@ class Theme : public QObject {
     inline QIcon get_tab_icon(int idx) { return this->tab_icons[this->mode ? "dark" : "light"][idx].second; }
     inline QList<tab_icon_t> get_tab_icons() { return this->tab_icons[this->mode ? "dark" : "light"]; }
     void add_button_icon(QString name, QPushButton *button, QString active_name = QString());
+    QIcon add_button_icon2(QString name, QPushButton *button, QString active_name = QString());
     void update();
 
     inline static QFrame *br(QWidget *parent = nullptr, bool vertical = false)
@@ -122,6 +126,7 @@ class Theme : public QObject {
     QString parse_stylesheet(QString file);
     QString scale_stylesheet(QString stylesheet);
     QPixmap create_pixmap_variant(QPixmap &base, qreal opacity);
+    QIcon recolor_icon(QIcon icon, bool checkable);
 
    signals:
     void mode_updated(bool mode);

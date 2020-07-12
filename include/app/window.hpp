@@ -57,4 +57,44 @@ class MainWindow : public QMainWindow {
     void set_openauto_state(unsigned int alpha);
 };
 
+class Window2 : public QMainWindow {
+    Q_OBJECT
+
+   public:
+    Window2();
+    inline QList<QAbstractButton *> get_pages() { return this->rail_group->buttons(); }
+
+   protected:
+
+   private:
+    Config *config;
+    Theme *theme;
+    Shortcuts *shortcuts;
+
+    QVBoxLayout *rail;
+    QButtonGroup *rail_group;
+    QStackedLayout *pages;
+    QHBoxLayout *bar;
+
+    void init_config();
+    void init_theme();
+    void init_ui();
+
+    QBoxLayout *body();
+
+    void add_pages();
+    void add_page(QString name, QWidget *page, QString icon);
+    QWidget *quick_view_widget();
+    QWidget *controls_bar_widget();
+
+    QWidget *volume_widget(bool skip_buttons = false);
+    QWidget *brightness_widget(bool skip_buttons = false);
+    QWidget *controls_widget();
+    QWidget *power_control_widget();
+    QWidget *save_control_widget();
+    void update_system_volume(int position);
+
+   signals:
+};
+
 #endif

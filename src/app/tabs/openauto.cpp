@@ -93,72 +93,81 @@ void OpenAutoFrame::mouseDoubleClickEvent(QMouseEvent *)
     emit double_clicked(this->fullscreen);
 }
 
+// OpenAutoTab::OpenAutoTab(QWidget *parent) : QWidget(parent)
+// {
+//     this->config = Config::get_instance();
+
+//     this->theme = Theme::get_instance();
+//     connect(this->theme, &Theme::mode_updated, [this](bool mode) {
+//         if (this->worker != nullptr) this->worker->set_night_mode(mode);
+//     });
+
+//     OpenAutoFrame *frame = new OpenAutoFrame(this);
+//     MainWindow *window = qobject_cast<MainWindow *>(parent);
+//     connect(window, &MainWindow::set_openauto_state, [this, frame](unsigned int alpha) {
+//         if (this->worker != nullptr) {
+//             this->worker->set_opacity(alpha);
+//             this->worker->resize();
+//         }
+//         if (alpha > 0) frame->setFocus();
+//     });
+
+//     QStackedLayout *layout = new QStackedLayout(this);
+//     layout->setContentsMargins(0, 0, 0, 0);
+
+//     connect(frame, &OpenAutoFrame::toggle, [=](bool enable) {
+//         if (!enable && frame->is_fullscreen()) {
+//             window->unset_widget();
+//             window->remove_widget(frame);
+//             layout->addWidget(frame);
+//             layout->setCurrentIndex(1);
+//             frame->toggle_fullscreen();
+//             if (this->worker != nullptr) this->worker->resize();
+//         }
+//         layout->setCurrentIndex(enable ? 1 : 0);
+//     });
+//     connect(frame, &OpenAutoFrame::double_clicked, [=](bool fullscreen) {
+//         if (fullscreen) {
+//             layout->setCurrentIndex(0);
+//             layout->removeWidget(frame);
+//             window->add_widget(frame);
+//             window->set_widget();
+//         }
+//         else {
+//             window->unset_widget();
+//             window->remove_widget(frame);
+//             layout->addWidget(frame);
+//             layout->setCurrentIndex(1);
+//         }
+//         if (this->worker != nullptr) this->worker->resize();
+//         frame->setFocus();
+//     });
+
+//     connect(window, &MainWindow::is_ready, [this, layout, frame]() {
+//         frame->resize(this->size());
+//         auto callback = [frame](bool is_active) {
+//             frame->toggle(is_active);
+//             frame->setFocus();
+//         };
+//         if (this->worker == nullptr) this->worker = new OpenAutoWorker(callback, frame, this->theme->get_mode());
+//         BrightnessModule *module = this->config->get_brightness_module();
+//         if (module->update_androidauto())
+//             this->worker->set_opacity(this->config->get_brightness());
+
+//         layout->addWidget(this->msg_widget());
+//         layout->addWidget(frame);
+
+//         this->worker->start();
+//     });
+// }
+
 OpenAutoTab::OpenAutoTab(QWidget *parent) : QWidget(parent)
 {
     this->config = Config::get_instance();
-
     this->theme = Theme::get_instance();
-    connect(this->theme, &Theme::mode_updated, [this](bool mode) {
-        if (this->worker != nullptr) this->worker->set_night_mode(mode);
-    });
-
-    OpenAutoFrame *frame = new OpenAutoFrame(this);
-    MainWindow *window = qobject_cast<MainWindow *>(parent);
-    connect(window, &MainWindow::set_openauto_state, [this, frame](unsigned int alpha) {
-        if (this->worker != nullptr) {
-            this->worker->set_opacity(alpha);
-            this->worker->resize();
-        }
-        if (alpha > 0) frame->setFocus();
-    });
-
     QStackedLayout *layout = new QStackedLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
-
-    connect(frame, &OpenAutoFrame::toggle, [=](bool enable) {
-        if (!enable && frame->is_fullscreen()) {
-            window->unset_widget();
-            window->remove_widget(frame);
-            layout->addWidget(frame);
-            layout->setCurrentIndex(1);
-            frame->toggle_fullscreen();
-            if (this->worker != nullptr) this->worker->resize();
-        }
-        layout->setCurrentIndex(enable ? 1 : 0);
-    });
-    connect(frame, &OpenAutoFrame::double_clicked, [=](bool fullscreen) {
-        if (fullscreen) {
-            layout->setCurrentIndex(0);
-            layout->removeWidget(frame);
-            window->add_widget(frame);
-            window->set_widget();
-        }
-        else {
-            window->unset_widget();
-            window->remove_widget(frame);
-            layout->addWidget(frame);
-            layout->setCurrentIndex(1);
-        }
-        if (this->worker != nullptr) this->worker->resize();
-        frame->setFocus();
-    });
-
-    connect(window, &MainWindow::is_ready, [this, layout, frame]() {
-        frame->resize(this->size());
-        auto callback = [frame](bool is_active) {
-            frame->toggle(is_active);
-            frame->setFocus();
-        };
-        if (this->worker == nullptr) this->worker = new OpenAutoWorker(callback, frame, this->theme->get_mode());
-        BrightnessModule *module = this->config->get_brightness_module(this->config->get_brightness_module());
-        if (module->update_androidauto())
-            this->worker->set_opacity(this->config->get_brightness());
-
-        layout->addWidget(this->msg_widget());
-        layout->addWidget(frame);
-
-        this->worker->start();
-    });
+    layout->addWidget(this->msg_widget());
 }
 
 QWidget *OpenAutoTab::msg_widget()
@@ -210,11 +219,11 @@ QWidget *OpenAutoTab::wireless_widget()
     });
     layout->addWidget(button, 0, Qt::AlignCenter);
 
-    connect(this->worker, &OpenAutoWorker::wireless_connection_success, [this, widget, ip_input](QString address) {
-        widget->setEnabled(true);
-        this->config->set_wireless_address(address);
-    });
-    connect(this->worker, &OpenAutoWorker::wireless_connection_failure, [widget]() { widget->setEnabled(true); });
+    // connect(this->worker, &OpenAutoWorker::wireless_connection_success, [this, widget, ip_input](QString address) {
+    //     widget->setEnabled(true);
+    //     this->config->set_wireless_address(address);
+    // });
+    // connect(this->worker, &OpenAutoWorker::wireless_connection_failure, [widget]() { widget->setEnabled(true); });
 
     return widget;
 }

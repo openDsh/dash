@@ -21,6 +21,8 @@
 SettingsTab::SettingsTab(QWidget *parent) : QTabWidget(parent)
 {
     this->tabBar()->setFont(Theme::font_18);
+
+    this->fill_tabs();
 }
 
 void SettingsTab::fill_tabs()
@@ -128,7 +130,7 @@ QWidget *GeneralSettingsSubTab::brightness_module_select_widget()
 
     const QStringList modules = this->config->get_brightness_modules().keys();
 
-    QLabel *label = new QLabel(this->config->get_brightness_module(), widget);
+    QLabel *label = new QLabel(this->config->get_brightness_module_name(), widget);
     label->setAlignment(Qt::AlignCenter);
     label->setFont(Theme::font_16);
 
@@ -416,16 +418,16 @@ QWidget *LayoutSettingsSubTab::pages_widget()
     QGroupBox *group = new QGroupBox(widget);
     QVBoxLayout *group_layout = new QVBoxLayout(group);
 
-    for (tab_icon_t page : this->theme->get_tab_icons()) {
-        if (!page.first->property("prevent_disable").toBool()) {
-            QCheckBox *button = new QCheckBox(page.first->objectName(), group);
-            button->setFont(Theme::font_14);
-            button->setChecked(page.first->isEnabled());
-            connect(button, &QCheckBox::toggled, [page, config = this->config](bool checked) {
-                config->set_page(page.first, checked);
-            });
-            group_layout->addWidget(button);
-        }
+    Window2 *window = qobject_cast<Window2 *>(this->window());
+
+    for (QAbstractButton *page : window->get_pages()) {
+        QCheckBox *button = new QCheckBox(page->property("page").value<QWidget *>()->objectName(), group);
+        button->setFont(Theme::font_14);
+        button->setChecked(!page->isHidden());
+        connect(button, &QCheckBox::toggled, [page, config = this->config](bool checked) {
+            config->set_page(page->property("page").value<QWidget *>(), checked);
+        });
+        group_layout->addWidget(button);
     }
 
     layout->addWidget(group, 1, Qt::AlignHCenter);

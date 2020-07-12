@@ -2,6 +2,7 @@
 
 #include <QApplication>
 #include <QFile>
+#include <QBitmap>
 #include <QFontDatabase>
 #include <QIcon>
 #include <QObject>
@@ -14,6 +15,7 @@
 
 #include "app/theme.hpp"
 
+const QFont Theme::font_10 = QFont("Montserrat", 10);
 const QFont Theme::font_12 = QFont("Montserrat", 12);
 const QFont Theme::font_14 = QFont("Montserrat", 14);
 const QFont Theme::font_16 = QFont("Montserrat", 16);
@@ -23,6 +25,8 @@ const QFont Theme::font_36 = QFont("Montserrat", 36);
 
 const QSize Theme::icon_16 = QSize(16, 16);
 const QSize Theme::icon_24 = QSize(24, 24);
+const QSize Theme::icon_26 = QSize(26, 26);
+const QSize Theme::icon_28 = QSize(28, 28);
 const QSize Theme::icon_32 = QSize(32, 32);
 const QSize Theme::icon_36 = QSize(36, 36);
 const QSize Theme::icon_42 = QSize(42, 42);
@@ -96,6 +100,29 @@ QPixmap Theme::create_pixmap_variant(QPixmap &base, qreal opacity)
     return image;
 }
 
+QIcon Theme::recolor_icon(QIcon icon, bool checkable)
+{
+    QPixmap base = icon.pixmap(512);
+    QPixmap image(base.size());
+    QColor c = this->get_color(this->color);
+    c.setAlpha(this->mode ? 222 : 255);
+    image.fill(c);
+    image.setMask(base.createMaskFromColor(Qt::transparent));
+
+    QPixmap image2(base.size());
+    if (checkable)
+        image2.fill(this->mode ? QColor(255, 255, 255, 102) : QColor(0, 0, 0, 178));
+    else
+        image2.fill(this->mode ? QColor(255, 255, 255, 222) : QColor(0, 0, 0, 255));
+    image2.setMask(base.createMaskFromColor(Qt::transparent));
+
+    QIcon icon2;
+    icon2.addPixmap(image2, QIcon::Normal, QIcon::Off);
+    icon2.addPixmap(image, QIcon::Normal, QIcon::On);
+
+    return icon2;
+}
+
 void Theme::add_tab_icon(QString name, QWidget *widget, Qt::Orientation orientation)
 {
     QTransform t;
@@ -164,6 +191,11 @@ void Theme::add_button_icon(QString name, QPushButton *button, QString normal_na
     this->update();
 }
 
+QIcon Theme::add_button_icon2(QString name, QPushButton *button, QString normal_name)
+{
+    return this->recolor_icon(QIcon(QString(":/icons/%1.svg").arg(name)), button->isCheckable());
+}
+
 void Theme::update()
 {
     this->set_palette();
@@ -173,6 +205,18 @@ void Theme::update()
         QFont font = widget->font();
         font.setPointSize(std::ceil(font.pointSize() * this->scale));
         widget->setFont(font);
+
+        QAbstractButton *button = qobject_cast<QAbstractButton*>(widget);
+        if (button != nullptr && !button->icon().isNull()) {
+            button->setIcon(this->recolor_icon(button->icon(), button->property("page").isValid()));
+            QVariant base_icon_size = button->property("base_icon_size");
+            if (base_icon_size.isValid()) {
+                QSize size = base_icon_size.value<QSize>();
+                size.rwidth() *= this->scale;
+                size.rheight() *= this->scale;
+                button->setIconSize(size);
+            }
+        }
     }
 
     emit mode_updated(this->mode);

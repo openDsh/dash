@@ -14,6 +14,8 @@
 MediaTab::MediaTab(QWidget *parent) : QTabWidget(parent)
 {
     this->tabBar()->setFont(Theme::font_18);
+
+    this->fill_tabs();
 }
 
 void MediaTab::fill_tabs()
