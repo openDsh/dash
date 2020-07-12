@@ -12,7 +12,7 @@
 #include <QTextStream>
 #include <QTransform>
 
-#include <app/theme.hpp>
+#include "app/theme.hpp"
 
 const QFont Theme::font_12 = QFont("Montserrat", 12);
 const QFont Theme::font_14 = QFont("Montserrat", 14);

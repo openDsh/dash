@@ -1,9 +1,8 @@
-#ifndef TUNER_HPP_
-#define TUNER_HPP_
+#pragma once
 
 #include <QSlider>
 
-#include <app/config.hpp>
+#include "app/config.hpp"
 
 class Tuner : public QSlider {
     Q_OBJECT
@@ -28,4 +27,3 @@ class Tuner : public QSlider {
     QColor color;
 };
 
-#endif

@@ -4,7 +4,7 @@
 #include <QStyle>
 #include <QStyleOption>
 
-#include <app/widgets/progress.hpp>
+#include "app/widgets/progress.hpp"
 
 ProgressIndicator::ProgressIndicator(QWidget* parent) : QFrame(parent)
 {

@@ -1,5 +1,4 @@
-#ifndef CONVERSIONS_HPP_
-#define CONVERSIONS_HPP_
+#pragma once
 
 double kph_to_mph(double val) { return val * 0.621371; }
 
@@ -9,4 +8,3 @@ double gps_to_gph(double val) { return val * 0.0805; }
 
 double gps_to_lph(double val) { return val * 3.6; }
 
-#endif

@@ -3,7 +3,7 @@
 #include <QProcess>
 #include <QWindow>
 
-#include <app/modules/brightness.hpp>
+#include "app/modules/brightness.hpp"
 
 BrightnessModule::BrightnessModule(bool enable_androidauto_update) : QObject(qApp)
 {

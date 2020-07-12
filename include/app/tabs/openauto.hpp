@@ -1,26 +1,22 @@
-#ifndef OPENAUTO_HPP_
-#define OPENAUTO_HPP_
+#pragma once
 
 #include <QtWidgets>
 #include <thread>
-#include <f1x/aasdk/TCP/TCPWrapper.hpp>
-#include <f1x/aasdk/USB/AccessoryModeQueryChain.hpp>
-#include <f1x/aasdk/USB/AccessoryModeQueryChainFactory.hpp>
-#include <f1x/aasdk/USB/AccessoryModeQueryFactory.hpp>
-#include <f1x/aasdk/USB/ConnectedAccessoriesEnumerator.hpp>
-#include <f1x/aasdk/USB/USBHub.hpp>
-#include <f1x/openauto/autoapp/App.hpp>
-#include <f1x/openauto/autoapp/Configuration/Configuration.hpp>
-#include <f1x/openauto/autoapp/Configuration/IConfiguration.hpp>
-#include <f1x/openauto/autoapp/Configuration/RecentAddressesList.hpp>
-#include <f1x/openauto/autoapp/Service/AndroidAutoEntityFactory.hpp>
-#include <f1x/openauto/autoapp/Service/ServiceFactory.hpp>
+#include "aasdk/TCP/TCPWrapper.hpp"
+#include "aasdk/USB/AccessoryModeQueryChain.hpp"
+#include "aasdk/USB/AccessoryModeQueryChainFactory.hpp"
+#include "aasdk/USB/AccessoryModeQueryFactory.hpp"
+#include "aasdk/USB/ConnectedAccessoriesEnumerator.hpp"
+#include "aasdk/USB/USBHub.hpp"
+#include "openauto/App.hpp"
+#include "openauto/Configuration/Configuration.hpp"
+#include "openauto/Configuration/IConfiguration.hpp"
+#include "openauto/Configuration/RecentAddressesList.hpp"
+#include "openauto/Service/AndroidAutoEntityFactory.hpp"
+#include "openauto/Service/ServiceFactory.hpp"
 
-#include <app/config.hpp>
-#include <app/theme.hpp>
-
-namespace aasdk = f1x::aasdk;
-namespace autoapp = f1x::openauto::autoapp;
+#include "app/config.hpp"
+#include "app/theme.hpp"
 
 class OpenAutoWorker : public QObject {
     Q_OBJECT
@@ -45,16 +41,16 @@ class OpenAutoWorker : public QObject {
     libusb_context *usb_context;
     boost::asio::io_service io_service;
     boost::asio::io_service::work work;
-    std::shared_ptr<autoapp::configuration::Configuration> configuration;
+    std::shared_ptr<openauto::configuration::Configuration> configuration;
     aasdk::tcp::TCPWrapper tcp_wrapper;
     aasdk::usb::USBWrapper usb_wrapper;
     aasdk::usb::AccessoryModeQueryFactory query_factory;
     aasdk::usb::AccessoryModeQueryChainFactory query_chain_factory;
-    autoapp::service::ServiceFactory service_factory;
-    autoapp::service::AndroidAutoEntityFactory android_auto_entity_factory;
+    openauto::service::ServiceFactory service_factory;
+    openauto::service::AndroidAutoEntityFactory android_auto_entity_factory;
     std::shared_ptr<aasdk::usb::USBHub> usb_hub;
     std::shared_ptr<aasdk::usb::ConnectedAccessoriesEnumerator> connected_accessories_enumerator;
-    std::shared_ptr<autoapp::App> app;
+    std::shared_ptr<openauto::App> app;
     std::shared_ptr<boost::asio::ip::tcp::socket> socket;
     std::vector<std::thread> thread_pool;
 
@@ -103,4 +99,3 @@ class OpenAutoTab : public QWidget {
     void connect_wireless();
 };
 
-#endif

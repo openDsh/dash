@@ -1,5 +1,4 @@
-#ifndef WINDOW_HPP_
-#define WINDOW_HPP_
+#pragma once
 
 #include <stdlib.h>
 
@@ -57,4 +56,3 @@ class MainWindow : public QMainWindow {
     void set_openauto_state(unsigned int alpha);
 };
 
-#endif

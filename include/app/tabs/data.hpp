@@ -1,10 +1,9 @@
-#ifndef DATA_HPP_
-#define DATA_HPP_
+#pragma once
 
 #include <QPair>
 #include <QtWidgets>
 
-#include <obd/obd.hpp>
+#include "obd/obd.hpp"
 
 typedef std::function<double(std::vector<double>, bool)> obd_decoder_t;
 typedef QPair<QString, QString> units_t;
@@ -51,4 +50,3 @@ class DataTab : public QWidget {
     std::vector<Gauge *> gauges;
 };
 
-#endif

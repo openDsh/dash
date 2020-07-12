@@ -8,8 +8,8 @@
 #include <QListWidgetItem>
 #include <QMediaPlaylist>
 
-#include <app/tabs/media.hpp>
-#include <app/window.hpp>
+#include "app/tabs/media.hpp"
+#include "app/window.hpp"
 
 MediaTab::MediaTab(QWidget *parent) : QTabWidget(parent)
 {

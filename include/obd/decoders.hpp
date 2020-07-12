@@ -1,5 +1,4 @@
-#ifndef DECODERS_HPP_
-#define DECODERS_HPP_
+#pragma once
 
 #include <obd/message.hpp>
 
@@ -13,4 +12,3 @@ double speed(Response resp) { return resp.A; }
 
 double flow(Response resp) { return ((256.0 * resp.A) + resp.B) / 100.0; }
 
-#endif

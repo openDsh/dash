@@ -1,7 +1,7 @@
 #include <math.h>
 #include <QPainter>
 
-#include <app/widgets/tuner.hpp>
+#include "app/widgets/tuner.hpp"
 
 Tuner::Tuner(QWidget *parent) : QSlider(Qt::Orientation::Horizontal, parent)
 {

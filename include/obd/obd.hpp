@@ -1,5 +1,4 @@
-#ifndef OBD_HPP_
-#define OBD_HPP_
+#pragma once
 
 #include <termios.h>
 
@@ -36,4 +35,3 @@ class OBD {
     bool connected = false;
 };
 
-#endif

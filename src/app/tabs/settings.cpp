@@ -1,23 +1,22 @@
-#include <aasdk_proto/ButtonCodeEnum.pb.h>
-#include <aasdk_proto/VideoFPSEnum.pb.h>
-#include <aasdk_proto/VideoResolutionEnum.pb.h>
-#include <algorithm>
 #include <BluezQt/Device>
 #include <BluezQt/PendingCall>
 #include <QLabel>
 #include <QScrollArea>
-#include <f1x/openauto/autoapp/Configuration/AudioOutputBackendType.hpp>
-#include <f1x/openauto/autoapp/Configuration/BluetootAdapterType.hpp>
-#include <f1x/openauto/autoapp/Configuration/HandednessOfTrafficType.hpp>
 
-#include <app/config.hpp>
-#include <app/tabs/settings.hpp>
-#include <app/theme.hpp>
-#include <app/widgets/color_label.hpp>
-#include <app/widgets/switch.hpp>
-#include <app/window.hpp>
+#include <aasdk_proto/ButtonCodeEnum.pb.h>
+#include <aasdk_proto/VideoFPSEnum.pb.h>
+#include <aasdk_proto/VideoResolutionEnum.pb.h>
 
-namespace autoapp = f1x::openauto::autoapp;
+#include "openauto/Configuration/AudioOutputBackendType.hpp"
+#include "openauto/Configuration/BluetootAdapterType.hpp"
+#include "openauto/Configuration/HandednessOfTrafficType.hpp"
+
+#include "app/config.hpp"
+#include "app/tabs/settings.hpp"
+#include "app/theme.hpp"
+#include "app/widgets/color_label.hpp"
+#include "app/widgets/switch.hpp"
+#include "app/window.hpp"
 
 SettingsTab::SettingsTab(QWidget *parent) : QTabWidget(parent)
 {
@@ -824,12 +823,12 @@ QWidget *OpenAutoSettingsSubTab::rhd_row_widget()
     Switch *toggle = new Switch(widget);
     toggle->scale(this->config->get_scale());
     toggle->setChecked(this->config->openauto_config->getHandednessOfTrafficType() ==
-                       autoapp::configuration::HandednessOfTrafficType::RIGHT_HAND_DRIVE);
+                       openauto::configuration::HandednessOfTrafficType::RIGHT_HAND_DRIVE);
     connect(this->config, &Config::scale_changed, [toggle](double scale) { toggle->scale(scale); });
     connect(toggle, &Switch::stateChanged, [config = this->config](bool state) {
         config->openauto_config->setHandednessOfTrafficType(
-            state ? autoapp::configuration::HandednessOfTrafficType::RIGHT_HAND_DRIVE
-                  : autoapp::configuration::HandednessOfTrafficType::LEFT_HAND_DRIVE);
+            state ? openauto::configuration::HandednessOfTrafficType::RIGHT_HAND_DRIVE
+                  : openauto::configuration::HandednessOfTrafficType::LEFT_HAND_DRIVE);
     });
     layout->addWidget(toggle, 1, Qt::AlignHCenter);
 
@@ -963,12 +962,12 @@ QWidget *OpenAutoSettingsSubTab::rt_audio_row_widget()
     Switch *toggle = new Switch(widget);
     toggle->scale(this->config->get_scale());
     toggle->setChecked(this->config->openauto_config->getAudioOutputBackendType() ==
-                       autoapp::configuration::AudioOutputBackendType::RTAUDIO);
+                       openauto::configuration::AudioOutputBackendType::RTAUDIO);
     connect(this->config, &Config::scale_changed, [toggle](double scale) { toggle->scale(scale); });
     connect(toggle, &Switch::stateChanged, [config = this->config](bool state) {
         config->openauto_config->setAudioOutputBackendType(state
-                                                               ? autoapp::configuration::AudioOutputBackendType::RTAUDIO
-                                                               : autoapp::configuration::AudioOutputBackendType::QT);
+                                                               ? openauto::configuration::AudioOutputBackendType::RTAUDIO
+                                                               : openauto::configuration::AudioOutputBackendType::QT);
     });
     layout->addWidget(toggle, 1, Qt::AlignHCenter);
 
@@ -1019,11 +1018,11 @@ QWidget *OpenAutoSettingsSubTab::bluetooth_row_widget()
     Switch *toggle = new Switch(widget);
     toggle->scale(this->config->get_scale());
     toggle->setChecked(this->config->openauto_config->getBluetoothAdapterType() ==
-                       autoapp::configuration::BluetoothAdapterType::LOCAL);
+                       openauto::configuration::BluetoothAdapterType::LOCAL);
     connect(this->config, &Config::scale_changed, [toggle](double scale) { toggle->scale(scale); });
     connect(toggle, &Switch::stateChanged, [config = this->config](bool state) {
-        config->openauto_config->setBluetoothAdapterType(state ? autoapp::configuration::BluetoothAdapterType::LOCAL
-                                                               : autoapp::configuration::BluetoothAdapterType::NONE);
+        config->openauto_config->setBluetoothAdapterType(state ? openauto::configuration::BluetoothAdapterType::LOCAL
+                                                               : openauto::configuration::BluetoothAdapterType::NONE);
     });
     layout->addWidget(toggle, 1, Qt::AlignHCenter);
 

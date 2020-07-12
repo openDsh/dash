@@ -1,5 +1,4 @@
-#ifndef CAMERA_HPP_
-#define CAMERA_HPP_
+#pragma once
 
 #include <QLabel>
 #include <QMediaPlayer>
@@ -7,8 +6,8 @@
 #include <QString>
 #include <QVideoWidget>
 
-#include <app/config.hpp>
-#include <app/theme.hpp>
+#include "app/config.hpp"
+#include "app/theme.hpp"
 
 class CameraTab : public QWidget {
     Q_OBJECT
@@ -34,4 +33,3 @@ class CameraTab : public QWidget {
     void disconnected();
 };
 
-#endif

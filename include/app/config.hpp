@@ -1,7 +1,6 @@
-#ifndef CONFIG_HPP_
-#define CONFIG_HPP_
+#pragma once
 
-#include <f1x/openauto/autoapp/Configuration/Configuration.hpp>
+#include "openauto/Configuration/Configuration.hpp"
 
 #include <QFrame>
 #include <QKeySequence>
@@ -10,7 +9,7 @@
 #include <QString>
 #include <QWidget>
 
-#include <app/modules/brightness.hpp>
+#include "app/modules/brightness.hpp"
 
 class Config : public QObject {
     Q_OBJECT
@@ -123,8 +122,8 @@ class Config : public QObject {
     inline QString get_cam_stream_url() { return cam_stream_url; }
     inline void set_cam_stream_url(QString stream_url) { this->cam_stream_url = stream_url; }
 
-    std::shared_ptr<f1x::openauto::autoapp::configuration::Configuration> openauto_config;
-    f1x::openauto::autoapp::configuration::Configuration::ButtonCodes openauto_button_codes;
+    std::shared_ptr<openauto::configuration::Configuration> openauto_config;
+    openauto::configuration::Configuration::ButtonCodes openauto_button_codes;
 
     static Config *get_instance();
 
@@ -168,4 +167,3 @@ class Config : public QObject {
     void save_status(bool status);
 };
 
-#endif

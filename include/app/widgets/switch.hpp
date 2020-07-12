@@ -1,5 +1,4 @@
-#ifndef SWITCH_HPP_
-#define SWITCH_HPP_
+#pragma once
 
 #include <QtWidgets>
 
@@ -55,4 +54,3 @@ class Switch : public QAbstractButton {
     void stateChanged(bool state);
 };
 
-#endif

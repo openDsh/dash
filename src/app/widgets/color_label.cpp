@@ -3,8 +3,8 @@
 #include <QMap>
 #include <QString>
 
-#include <app/config.hpp>
-#include <app/widgets/color_label.hpp>
+#include "app/config.hpp"
+#include "app/widgets/color_label.hpp"
 
 ColorLabel::ColorLabel(QSize block_size, QWidget *parent) : QWidget(parent)
 {
@@ -47,3 +47,4 @@ void ColorLabel::update(QString color)
     block.fill(this->theme->get_color(color));
     this->icon->setPixmap(block);
 }
+

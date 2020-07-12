@@ -1,5 +1,4 @@
-#ifndef DIALOG_HPP_
-#define DIALOG_HPP_
+#pragma once
 
 #include <QApplication>
 #include <QDialog>
@@ -9,7 +8,7 @@
 #include <QTimer>
 #include <QVBoxLayout>
 
-#include <app/theme.hpp>
+#include "app/theme.hpp"
 
 class Overlay : public QWidget {
     Q_OBJECT
@@ -82,4 +81,3 @@ class Dialog : public QDialog {
     }
 };
 
-#endif

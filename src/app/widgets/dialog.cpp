@@ -4,8 +4,8 @@
 #include <QKeyEvent>
 #include <QPropertyAnimation>
 
-#include <app/config.hpp>
-#include <app/widgets/dialog.hpp>
+#include "app/config.hpp"
+#include "app/widgets/dialog.hpp"
 
 Dialog::Dialog(bool fullscreen, QWidget *parent) : QDialog(parent, Qt::FramelessWindowHint)
 {

@@ -1,11 +1,10 @@
-#ifndef LAUNCHER_HPP_
-#define LAUNCHER_HPP_
+#pragma once
 
 #include <QProcess>
 #include <QtWidgets>
 
-#include <app/config.hpp>
-#include <app/theme.hpp>
+#include "app/config.hpp"
+#include "app/theme.hpp"
 
 #include <X11/Xatom.h>
 #include <X11/Xlib.h>
@@ -87,4 +86,3 @@ class LauncherTab : public QWidget {
     QListWidget *apps;
 };
 
-#endif

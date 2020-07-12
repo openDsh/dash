@@ -1,13 +1,12 @@
-#ifndef MEDIA_HPP_
-#define MEDIA_HPP_
+#pragma once
 
 #include <QMediaPlayer>
 #include <QtWidgets>
 
-#include <app/bluetooth.hpp>
-#include <app/config.hpp>
-#include <app/theme.hpp>
-#include <app/widgets/tuner.hpp>
+#include "app/bluetooth.hpp"
+#include "app/config.hpp"
+#include "app/theme.hpp"
+#include "app/widgets/tuner.hpp"
 
 class MediaTab : public QTabWidget {
     Q_OBJECT
@@ -65,4 +64,3 @@ class LocalPlayerSubTab : public QWidget {
     QLabel *path_label;
 };
 
-#endif
