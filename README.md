@@ -65,11 +65,3 @@ cmake -DRPI_BUILD=TRUE -DGST_BUILD=TRUE .
 make
 ```
 
-
-
-**FUTURE ADDITION WHEN WIKI IS BUILT FOR OPENDASH**
-Utilize the wiki to follow building instructions.  The Wiki sidebar has the instructions broken into sections with steps to build for Linux and the Raspberry Pi seperately.  There is another section to follow for using qt-gstreamer for graphics-acceleration.
-
-The Wiki explains the tabs of the UI and the features included in each.  There are helpful tips to ensure each user can get the most out the experience.
-
-Make sure to read through the Running section for the particulars, restrictions, and future enhancements.
