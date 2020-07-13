@@ -1,6 +1,6 @@
-# IntelligentAuto
+# OpenDash
 
-IntelligentAuto is a Qt-based infotainment center for your current Linux OpenAuto installation!
+The IntelligentAuto dashboard is a Qt-based infotainment center for your new Linux OpenAuto installation!
 
 Main features include:
 
@@ -12,76 +12,39 @@ Main features include:
 * theming (dark/light mode and accent color)
 * brightness (simulated)
 
-![home](https://github.com/rsjudka/intelligent-auto/blob/master/docs/imgs/home.png)
+![home](https://github.com/robert5974/intelligent-auto/blob/master/docs/imgs/home.png)
 
-![openauto_maps](https://github.com/rsjudka/intelligent-auto/blob/master/docs/imgs/openauto_maps.png)
+![openauto_maps](https://github.com/robert5974/intelligent-auto/blob/master/docs/imgs/openauto_maps.png)
 
-![openauto_spotify](https://github.com/rsjudka/intelligent-auto/blob/master/docs/imgs/openauto_spotify.png)
+![openauto_spotify](https://github.com/robert5974/intelligent-auto/blob/master/docs/imgs/openauto_spotify.png)
 
-![media](https://github.com/rsjudka/intelligent-auto/blob/master/docs/imgs/media.png)
+![media](https://github.com/robert5974/intelligent-auto/blob/master/docs/imgs/media.png)
 
-![data](https://github.com/rsjudka/intelligent-auto/blob/master/docs/imgs/data.png)
+![data](https://github.com/robert5974/intelligent-auto/blob/master/docs/imgs/data.png)
 
-![settings](https://github.com/rsjudka/intelligent-auto/blob/master/docs/imgs/settings.png)
+![settings](https://github.com/robert5974/intelligent-auto/blob/master/docs/imgs/settings.png)
 
 ## Getting Started
 
-### Install.sh automated install (Raspberry Pi only)
-First you need to run the executable with the following command:
-
-`./install.sh`
-
-Once installed it will start up, to run afterwards, navigate to bin folder and run:
-
-`./ia`
-
-Video walk through: 
-
-https://youtu.be/CIdEN2JNAzw
 
 ## Manual Install
 
-### Prerequisites
+## Prerequisites
 
-The following packages have been used while developing this application (NOTE some things may be missing and others are not actually needed):
+The following packages have been used while developing this application.
+> **(NOTE some things may be missing and others are not actually needed)**
 
-* alsa-utils
-* cmake
-* libboost-all-dev
-* libusb-1.0.0-dev
-* libssl-dev
-* libprotobuf-dev
-* protobuf-c-compiler
-* protobuf-compiler
-* libqt5multimedia5
-* libqt5multimedia5-plugins
-* libqt5multimediawidgets5
-* qtmultimedia5-dev
-* libqt5bluetooth5
-* libqt5bluetooth5-bin
-* qtconnectivity5-dev
-* pulseaudio
-* librtaudio-dev
-* librtaudio6
-* libkf5bluezqt-dev
-* libtag1-dev
+**1. Install the following packages:**
 
-If you plan on using the Qt video library instead of the OMX library (i.e. not using a Raspberry Pi) you'll also most likely want the following packages:
+```
+sudo apt update
 
-* libgstreamer1.0-0
-* gstreamer1.0-plugins-base
-* gstreamer1.0-plugins-good
-* gstreamer1.0-plugins-bad
-* gstreamer1.0-plugins-ugly
-* gstreamer1.0-libav
-* gstreamer1.0-doc
-* gstreamer1.0-tools
-* gstreamer1.0-x
-* gstreamer1.0-alsa
-* gstreamer1.0-gl
-* gstreamer1.0-gtk3
-* gstreamer1.0-qt5
-* gstreamer1.0-pulseaudio
+sudo apt install alsa-utils cmake libboost-all-dev libusb-1.0.0-dev libssl-dev libprotobuf-dev protobuf-c-compiler protobuf-compiler libqt5multimedia5 libqt5multimedia5-plugins libqt5multimediawidgets5qtmultimedia5-dev libqt5bluetooth5 libqt5bluetooth5-bin qtconnectivity5-dev pulseaudio librtaudio-dev librtaudio6 libkf5bluezqt-dev libtag1-dev qt5-default qml-module-qtquick2 qtdeclarative5-dev qtmultimedia5-dev qml-module-qtquick* qml-module-qtmultimedia qml-module-qt-labs-settings qml-module-qt-labs-folderlistmodel libqt5xmlpatterns5-dev qml-module-qtbluetooth libqt5charts5 qml-module-qtcharts build-essential openssl libglib2.0-dev libboost-dev libudev-dev libgstreamer1.0-dev gstreamer1.0-plugins-base-apps gstreamer1.0-plugins-bad gstreamer1.0-libav gstreamer1.0-alsa libgstreamer-plugins-base1.0-dev gstreamer1.0-pulseaudio libfaad-dev libfftw3-dev librtlsdr-dev libusb-1.0-0-dev mesa-common-dev libglu1-mesa-dev zlib1g-dev portaudio19-dev libsndfile1-dev libsamplerate0-dev bluez bluez-obexd pulseaudio-module-bluetooth  qml-module-qtbluetooth qml-module-org-kde-bluezqt qtbase5-private-dev libcanberra-dev libgconf2-dev libpulse-dev libmp3lame-dev libsoapysdr-dev libmpg123-dev
+```
+
+_If you plan on using the Qt video library instead of the OMX library navigate to the [qt-gstreamer](https://github.com/robert5974/intelligent-auto/wiki/qt-gstreamer) section of the sidebar and follow the instructions, then return to step 2_
+
+Continue following the steps to build the Dashboard.
 
 For a Raspberry Pi, you will also need to run the following commands:
 ```
@@ -91,53 +54,22 @@ make
 
 ### Building
 
-It is assumed you have cloned this repo with all submodules and are in the root directory.
-
+## Clone the repo, Run cmake, and Compile
 ```
-mkdir build
-cd build
-cmake -DCMAKE_BUILD_TYPE=Release ../
+git clone https://github.com/openDsh/dash
+
+cd dash
+
+cmake -DRPI_BUILD=TRUE -DGST_BUILD=TRUE .
+
 make
 ```
 
-If building this for a Raspberry Pi, add `-DRPI_BUILD=TRUE` to the `cmake` command.
 
-### Running
 
-Building dash will create the `ia` binary in `bin/`. Depending on what you're running it on, you may need to make some adjustments to your system.
+**FUTURE ADDITION WHEN WIKI IS BUILT FOR OPENDASH**
+Utilize the wiki to follow building instructions.  The Wiki sidebar has the instructions broken into sections with steps to build for Linux and the Raspberry Pi seperately.  There is another section to follow for using qt-gstreamer for graphics-acceleration.
 
-Some things to consider when configuring your system:
+The Wiki explains the tabs of the UI and the features included in each.  There are helpful tips to ensure each user can get the most out the experience.
 
-* use a desktop environment that supports transparency (consider using xfce on Raspberry Pi)
-* set background color to black and hide any desktop elements (icons, panel, dock, etc.)
-* set USB permissions
-
-### Gotchas
-
-Adjusting the brightness does not actually change the screens brightness, it just changes the opacity of the window.
-
-Authentication of bluetooth connections are not handled in the application (i.e. the first time you are connecting a device). To keep things simple, you could install `blueman` which will prompt you for the necessary actions. If you are still having problems, you may need to try manually authenticating the bluetooth connection.
-
-There is currently no option for setting the OBD-II interface. Right now it is assumed you have an adapter connected on `/dev/ttyUSB0`.
-
-Settings are saved periodically every 10 seconds (or anytime the `save` button is clicked).
-
-Not all OpenAuto settings are acessible.
-
-If using GStreamer for your video backend (i.e. not a Raspberry Pi), you may get some black bars around the margins of OpenAuto. I'm still trying to figure out a way for it to ignore the aspect ratio.
-
-### Future Features/Fixes
-
-- [ ] add radio player (UI elements exist, just haven't had anything to interface with yet)
-- [ ] support bluetooth OBD-II adapter
-- [ ] control screen brightness
-- [ ] incorporate wireless OpenAuto
-- [ ] add wireless hotspot controls
-- [ ] add modular OBD-II data tabs
-- [ ] add OBD-II error codes tab
-- [ ] add dashcam video tab
-- [ ] ignore apsect ratio of OpenAuto for GStreamer backend
-- [ ] debug issue for OpenAuto randomly disconnecting
-- [ ] add automatic light/dark mode
-- [ ] add local media player
-- [ ] add audio equalizer
+Make sure to read through the Running section for the particulars, restrictions, and future enhancements.
