@@ -1,16 +1,19 @@
 # OpenDash
 
-The IntelligentAuto dashboard is a Qt-based infotainment center for your new Linux OpenAuto installation!
-
+OpenDash is a Qt-based infotainment center for your Linux OpenAuto installation!
 Main features include:
 
-* volume control
-* responsive UI (adjusts to any screen size)
-* embedded OpenAuto
-* bluetooth media control
-* read vehicle OBD-II data
-* theming (dark/light mode and accent color)
-* brightness (simulated)
+*	Embedded OpenAuto `Windowed/Fullscreen`
+*	Wireless OpenAuto Capability
+*	On-screen Volume Control
+*	Responsive Scalable UI `Adjustable for screen size`
+*	Bluetooth Media Control
+*	Real-Time Vehicle OBD-II Data `Read-Only`
+*	Theming `Dark/Light mode` `Selectable Accent Colors (Fire, Azure, Lilac, Jade, Rose, Steel)`
+*	True Raspberry Pi 7” Official Touchscreen Brightness Control
+*	App-Launcher built in
+*	Camera Access `Streaming/Local` `Backup` `Dash`
+*	Keyboard Shortcuts `GPIO Triggerable`
 
 ![home](https://github.com/robert5974/intelligent-auto/blob/master/docs/imgs/home.png)
 
