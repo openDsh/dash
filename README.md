@@ -17,7 +17,7 @@ Main features include:
 
 ![home](https://github.com/robert5974/intelligent-auto/blob/master/docs/imgs/home.png)
 
-![openauto_maps](https://github.com/robert5974/dash/blob/master/docs/imgs/IA_openauto_tab_USB_connectedmaps.PNG)
+![openauto_maps](https://github.com/robert5974/dash/blob/master/docs/imgs/IA_openauto_tab_USB_connectedmaps.png)
 
 ![openauto_spotify](https://github.com/robert5974/intelligent-auto/blob/master/docs/imgs/openauto_spotify.png)
 
