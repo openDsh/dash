@@ -1,7 +1,7 @@
 
 function( findRpiRevision OUTPUT )
     # Find it with an automated script
-    execute_process( COMMAND grep -Po "^Revision\\s*:\\s*\\K[[:xdigit:]]+" /proc/cpuinfo OUTPUT_VARIABLE TMP )
+    execute_process( COMMAND grep -Po "^Revision\\s*:\\s*\\K[[:xdigit:]]+" /proc/cpuinfo OUTPUT_VARIABLE TMP OUTPUT_STRIP_TRAILING_WHITESPACE )
 
     # If have not found the Revision number, use the last version
     if ( TMP )
