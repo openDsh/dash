@@ -45,8 +45,8 @@ QWidget *CameraTab::connect_widget()
     QCheckBox *network_toggle = new QCheckBox("Network", this);
     network_toggle->setFont(Theme::font_14);
     connect(network_toggle, &QCheckBox::toggled, [this, cam_stack](bool checked) {
-	cam_stack->setCurrentIndex(checked? 1 : 0);
-        this->status->setText("");
+        cam_stack->setCurrentIndex(checked? 1 : 0);
+        this->status->clear();
         this->config->set_cam_is_network(checked);
     });
     network_toggle->setChecked(this->config->get_cam_is_network());
