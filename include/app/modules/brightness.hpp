@@ -9,13 +9,9 @@ class BrightnessModule : public QObject {
     Q_OBJECT
 
    public:
-    BrightnessModule(bool enable_androidauto_update);
+    BrightnessModule() {}
 
     virtual void set_brightness(int brightness) = 0;
-    inline bool update_androidauto() { return this->enable_androidauto_update; }
-
-   private:
-    bool enable_androidauto_update;
 };
 
 class MockedBrightnessModule : public BrightnessModule {

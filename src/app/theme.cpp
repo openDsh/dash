@@ -116,7 +116,12 @@ QIcon Theme::recolor_icon(QIcon icon, bool checkable)
         image2.fill(this->mode ? QColor(255, 255, 255, 222) : QColor(0, 0, 0, 255));
     image2.setMask(base.createMaskFromColor(Qt::transparent));
 
+    QPixmap image3(base.size());
+    image3.fill(this->mode ? QColor(255, 255, 255, 128) : QColor(0, 0, 0, 97));
+    image3.setMask(base.createMaskFromColor(Qt::transparent));
+
     QIcon icon2;
+    icon2.addPixmap(image3, QIcon::Disabled);
     icon2.addPixmap(image2, QIcon::Normal, QIcon::Off);
     icon2.addPixmap(image, QIcon::Normal, QIcon::On);
 
@@ -193,6 +198,7 @@ void Theme::add_button_icon(QString name, QPushButton *button, QString normal_na
 
 QIcon Theme::add_button_icon2(QString name, QPushButton *button, QString normal_name)
 {
+    button->setProperty("base_icon_size", QVariant::fromValue(button->iconSize()));
     return this->recolor_icon(QIcon(QString(":/icons/%1.svg").arg(name)), button->isCheckable());
 }
 

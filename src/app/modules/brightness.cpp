@@ -5,16 +5,11 @@
 
 #include "app/modules/brightness.hpp"
 
-BrightnessModule::BrightnessModule(bool enable_androidauto_update) : QObject(qApp)
-{
-    this->enable_androidauto_update = enable_androidauto_update;
-}
-
-MockedBrightnessModule::MockedBrightnessModule(QMainWindow *window) : BrightnessModule(true) { this->window = window; }
+MockedBrightnessModule::MockedBrightnessModule(QMainWindow *window) : BrightnessModule() { this->window = window; }
 
 void MockedBrightnessModule::set_brightness(int brightness) { this->window->setWindowOpacity(brightness / 255.0); }
 
-RpiBrightnessModule::RpiBrightnessModule() : BrightnessModule(false), brightness_attribute(this->PATH)
+RpiBrightnessModule::RpiBrightnessModule() : BrightnessModule(), brightness_attribute(this->PATH)
 {
     this->brightness_attribute.open(QIODevice::WriteOnly);
 }
@@ -33,7 +28,7 @@ void RpiBrightnessModule::set_brightness(int brightness)
     }
 }
 
-XBrightnessModule::XBrightnessModule() : BrightnessModule(false) { this->screen = QGuiApplication::primaryScreen(); }
+XBrightnessModule::XBrightnessModule() : BrightnessModule() { this->screen = QGuiApplication::primaryScreen(); }
 
 void XBrightnessModule::set_brightness(int brightness)
 {

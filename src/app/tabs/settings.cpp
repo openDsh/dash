@@ -418,7 +418,7 @@ QWidget *LayoutSettingsSubTab::pages_widget()
     QGroupBox *group = new QGroupBox(widget);
     QVBoxLayout *group_layout = new QVBoxLayout(group);
 
-    Window2 *window = qobject_cast<Window2 *>(this->window());
+    DashWindow *window = qobject_cast<DashWindow *>(this->window());
 
     for (QAbstractButton *page : window->get_pages()) {
         QCheckBox *button = new QCheckBox(page->property("page").value<QWidget *>()->objectName(), group);

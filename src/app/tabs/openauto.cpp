@@ -1,11 +1,12 @@
-#include "app/config.hpp"
 #include "app/tabs/openauto.hpp"
+
+#include "app/config.hpp"
 #include "app/theme.hpp"
 #include "app/widgets/ip_input.hpp"
 #include "app/widgets/progress.hpp"
 #include "app/window.hpp"
 
-OpenAutoWorker::OpenAutoWorker(std::function<void(bool)> callback, QWidget *parent, bool night_mode)
+OpenAutoWorker::OpenAutoWorker(std::function<void(bool)> callback, bool night_mode, QWidget *frame)
     : QObject(qApp),
       io_service(),
       work(io_service),
@@ -14,13 +15,13 @@ OpenAutoWorker::OpenAutoWorker(std::function<void(bool)> callback, QWidget *pare
       usb_wrapper((libusb_init(&usb_context), usb_context)),
       query_factory(usb_wrapper, io_service),
       query_chain_factory(usb_wrapper, io_service, query_factory),
-      service_factory(io_service, configuration, parent, callback, night_mode),
+      service_factory(io_service, configuration, frame, callback, night_mode),
       android_auto_entity_factory(io_service, configuration, service_factory),
       usb_hub(std::make_shared<aasdk::usb::USBHub>(usb_wrapper, io_service, query_chain_factory)),
       connected_accessories_enumerator(
           std::make_shared<aasdk::usb::ConnectedAccessoriesEnumerator>(usb_wrapper, io_service, query_chain_factory)),
       app(std::make_shared<openauto::App>(io_service, usb_wrapper, tcp_wrapper, android_auto_entity_factory, usb_hub,
-                                         connected_accessories_enumerator)),
+                                          connected_accessories_enumerator)),
       socket(std::make_shared<boost::asio::ip::tcp::socket>(io_service))
 {
     this->create_usb_workers();
@@ -55,7 +56,7 @@ void OpenAutoWorker::connect_wireless(QString address)
 
 void OpenAutoWorker::create_usb_workers()
 {
-    auto worker = [this]() {
+    std::function<void()> worker = [this]() {
         timeval event_timeout = {180, 0};
         while (!this->io_service.stopped())
             libusb_handle_events_timeout_completed(this->usb_context, &event_timeout, nullptr);
@@ -69,22 +70,12 @@ void OpenAutoWorker::create_usb_workers()
 
 void OpenAutoWorker::create_io_service_workers()
 {
-    auto worker = [this]() { this->io_service.run(); };
+    std::function<void()> worker = [this]() { this->io_service.run(); };
 
     this->thread_pool.emplace_back(worker);
     this->thread_pool.emplace_back(worker);
     this->thread_pool.emplace_back(worker);
     this->thread_pool.emplace_back(worker);
-}
-
-OpenAutoFrame::OpenAutoFrame(QWidget *parent) : QWidget(parent)
-{
-    QVBoxLayout *layout = new QVBoxLayout(this);
-    layout->setContentsMargins(0, 0, 0, 0);
-
-    QWidget *frame = new QWidget(this);
-    frame->setStyleSheet("background-color: rgb(0, 0, 0);");
-    layout->addWidget(frame);
 }
 
 void OpenAutoFrame::mouseDoubleClickEvent(QMouseEvent *)
@@ -93,84 +84,48 @@ void OpenAutoFrame::mouseDoubleClickEvent(QMouseEvent *)
     emit double_clicked(this->fullscreen);
 }
 
-// OpenAutoTab::OpenAutoTab(QWidget *parent) : QWidget(parent)
-// {
-//     this->config = Config::get_instance();
-
-//     this->theme = Theme::get_instance();
-//     connect(this->theme, &Theme::mode_updated, [this](bool mode) {
-//         if (this->worker != nullptr) this->worker->set_night_mode(mode);
-//     });
-
-//     OpenAutoFrame *frame = new OpenAutoFrame(this);
-//     MainWindow *window = qobject_cast<MainWindow *>(parent);
-//     connect(window, &MainWindow::set_openauto_state, [this, frame](unsigned int alpha) {
-//         if (this->worker != nullptr) {
-//             this->worker->set_opacity(alpha);
-//             this->worker->resize();
-//         }
-//         if (alpha > 0) frame->setFocus();
-//     });
-
-//     QStackedLayout *layout = new QStackedLayout(this);
-//     layout->setContentsMargins(0, 0, 0, 0);
-
-//     connect(frame, &OpenAutoFrame::toggle, [=](bool enable) {
-//         if (!enable && frame->is_fullscreen()) {
-//             window->unset_widget();
-//             window->remove_widget(frame);
-//             layout->addWidget(frame);
-//             layout->setCurrentIndex(1);
-//             frame->toggle_fullscreen();
-//             if (this->worker != nullptr) this->worker->resize();
-//         }
-//         layout->setCurrentIndex(enable ? 1 : 0);
-//     });
-//     connect(frame, &OpenAutoFrame::double_clicked, [=](bool fullscreen) {
-//         if (fullscreen) {
-//             layout->setCurrentIndex(0);
-//             layout->removeWidget(frame);
-//             window->add_widget(frame);
-//             window->set_widget();
-//         }
-//         else {
-//             window->unset_widget();
-//             window->remove_widget(frame);
-//             layout->addWidget(frame);
-//             layout->setCurrentIndex(1);
-//         }
-//         if (this->worker != nullptr) this->worker->resize();
-//         frame->setFocus();
-//     });
-
-//     connect(window, &MainWindow::is_ready, [this, layout, frame]() {
-//         frame->resize(this->size());
-//         auto callback = [frame](bool is_active) {
-//             frame->toggle(is_active);
-//             frame->setFocus();
-//         };
-//         if (this->worker == nullptr) this->worker = new OpenAutoWorker(callback, frame, this->theme->get_mode());
-//         BrightnessModule *module = this->config->get_brightness_module();
-//         if (module->update_androidauto())
-//             this->worker->set_opacity(this->config->get_brightness());
-
-//         layout->addWidget(this->msg_widget());
-//         layout->addWidget(frame);
-
-//         this->worker->start();
-//     });
-// }
-
-OpenAutoTab::OpenAutoTab(QWidget *parent) : QWidget(parent)
+OpenAutoTab::OpenAutoTab(QWidget *parent) : QStackedWidget(parent)
 {
     this->config = Config::get_instance();
     this->theme = Theme::get_instance();
-    QStackedLayout *layout = new QStackedLayout(this);
-    layout->setContentsMargins(0, 0, 0, 0);
-    layout->addWidget(this->msg_widget());
+
+    this->frame = new OpenAutoFrame(this);
+
+    std::function<void(bool)> callback = [frame = this->frame](bool active) { frame->toggle(active); };
+    this->worker = new OpenAutoWorker(callback, this->theme->get_mode(), frame);
+    this->worker->start();
+
+    connect(this->frame, &OpenAutoFrame::toggle, [this](bool enable) {
+        if (!enable && this->frame->is_fullscreen()) {
+            this->addWidget(frame);
+            this->frame->toggle_fullscreen();
+        }
+        this->setCurrentIndex(enable ? 1 : 0);
+    });
+    connect(this->frame, &OpenAutoFrame::double_clicked, [this](bool fullscreen) {
+        if (fullscreen) {
+            emit toggle_fullscreen(this->frame);
+        }
+        else {
+            this->addWidget(frame);
+            this->setCurrentWidget(frame);
+        }
+        this->worker->update_size();
+    });
+    connect(this->theme, &Theme::mode_updated, [this](bool mode) { this->worker->set_night_mode(mode); });
+
+    this->addWidget(this->connect_msg());
+    this->addWidget(this->frame);
 }
 
-QWidget *OpenAutoTab::msg_widget()
+void OpenAutoTab::resizeEvent(QResizeEvent *event)
+{
+    QWidget::resizeEvent(event);
+    this->frame->resize(this->size());
+    this->worker->update_size();
+}
+
+QWidget *OpenAutoTab::connect_msg()
 {
     QWidget *widget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
@@ -179,10 +134,11 @@ QWidget *OpenAutoTab::msg_widget()
     label->setFont(Theme::font_16);
     label->setAlignment(Qt::AlignCenter);
 
-    QWidget *connection = this->wireless_widget();
-    if (!this->config->get_wireless_active()) connection->hide();
+    QWidget *connection = this->wireless_config();
+    if (!this->config->get_wireless_active())
+        connection->hide();
 
-    QCheckBox *wireless_button = new QCheckBox("Wireless", widget);
+    QCheckBox *wireless_button = new QCheckBox("wireless", widget);
     wireless_button->setFont(Theme::font_14);
     wireless_button->setChecked(this->config->get_wireless_active());
     connect(wireless_button, &QCheckBox::toggled, [config = this->config, connection](bool checked) {
@@ -190,16 +146,14 @@ QWidget *OpenAutoTab::msg_widget()
         config->set_wireless_active(checked);
     });
 
-    layout->addStretch();
-    layout->addWidget(label, 1);
-    layout->addWidget(connection, 1);
-    layout->addStretch();
-    layout->addWidget(wireless_button, 1, Qt::AlignLeft);
+    layout->addWidget(label);
+    layout->addWidget(connection);
+    layout->addWidget(wireless_button, 0, Qt::AlignLeft);
 
     return widget;
 }
 
-QWidget *OpenAutoTab::wireless_widget()
+QWidget *OpenAutoTab::wireless_config()
 {
     QWidget *widget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
@@ -207,23 +161,34 @@ QWidget *OpenAutoTab::wireless_widget()
     IpInput *ip_input = new IpInput(this->config->get_wireless_address(), QFont("Titillium Web", 24), widget);
     layout->addWidget(ip_input);
 
+    QLabel *status = new QLabel(widget);
+    status->setFont(Theme::font_16);
+    status->setAlignment(Qt::AlignCenter);
+    layout->addWidget(status);
+
     QPushButton *button = new QPushButton("connect", widget);
     button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
     button->setFont(Theme::font_14);
     button->setFlat(true);
     button->setIconSize(Theme::icon_36);
-    Theme::get_instance()->add_button_icon("wifi", button);
-    connect(button, &QPushButton::clicked, [this, widget, ip_input]() {
+    button->setIcon(this->theme->add_button_icon2("wifi", button));
+    connect(button, &QPushButton::clicked, [this, widget, ip_input, status]() {
+        status->setText("connecting...");
         widget->setEnabled(false);
         this->worker->connect_wireless(ip_input->active_address());
     });
     layout->addWidget(button, 0, Qt::AlignCenter);
 
-    // connect(this->worker, &OpenAutoWorker::wireless_connection_success, [this, widget, ip_input](QString address) {
-    //     widget->setEnabled(true);
-    //     this->config->set_wireless_address(address);
-    // });
-    // connect(this->worker, &OpenAutoWorker::wireless_connection_failure, [widget]() { widget->setEnabled(true); });
+    connect(this->worker, &OpenAutoWorker::wireless_connection_success,
+            [this, widget, ip_input, status](QString address) {
+                status->setText(QString());
+                widget->setEnabled(true);
+                this->config->set_wireless_address(address);
+            });
+    connect(this->worker, &OpenAutoWorker::wireless_connection_failure, [widget, status]() {
+        status->setText("connection failed");
+        widget->setEnabled(true);
+    });
 
     return widget;
 }
