@@ -1,5 +1,4 @@
-#ifndef CAMERA_HPP_
-#define CAMERA_HPP_
+#pragma once
 
 #include <QLabel>
 #include <QMediaPlayer>
@@ -13,8 +12,8 @@
 #include <QCameraViewfinder>
 #include <QCameraViewfinderSettings>
 
-#include <app/config.hpp>
-#include <app/theme.hpp>
+#include "app/config.hpp"
+#include "app/theme.hpp"
 
 class CameraTab : public QWidget {
     Q_OBJECT
@@ -56,5 +55,3 @@ class CameraTab : public QWidget {
     void next_cam();
     void prev_cam();
 };
-
-#endif

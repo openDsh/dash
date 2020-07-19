@@ -3,8 +3,8 @@
 #include <QCameraInfo>
 #include <QCameraImageCapture>
 
-#include <app/tabs/camera.hpp>
-#include <app/window.hpp>
+#include "app/tabs/camera.hpp"
+#include "app/window.hpp"
 
 CameraTab::CameraTab(QWidget *parent) : QWidget(parent)
 {
@@ -145,14 +145,14 @@ QWidget *CameraTab::camera_selector()
     QWidget *selector = this->selector_widget(label);
     this->populate_local_cams();
     connect(this, &CameraTab::prev_cam, [this, label]() {
-        local_index=(local_index - 1 + local_cams.size()) % this->local_cams.size();
+        this->local_index = (this->local_index - 1 + this->local_cams.size()) % this->local_cams.size();
         auto cam = this->local_cams.at(local_index);
         label->setText(cam.first);
         this->config->set_cam_local_device(cam.second);
     });
     connect(this, &CameraTab::next_cam, [this, label]() {
-        local_index=(local_index+1)%this->local_cams.size();
-        auto cam = this->local_cams.at(local_index);
+        this->local_index = (this->local_index + 1) % this->local_cams.size();
+        auto cam = this->local_cams.at(this->local_index);
         label->setText(cam.first);
         this->config->set_cam_local_device(cam.second);
     });
@@ -215,7 +215,7 @@ bool CameraTab::populate_local_cams()
     int i = 0;
     for (auto const &cam : cameras) {
       QString pretty_name = cam.description() + " at " + cam.deviceName();
-      local_cams.append(QPair<QString,QString>(pretty_name, cam.deviceName()));
+      this->local_cams.append(QPair<QString,QString>(pretty_name, cam.deviceName()));
       if (cam.deviceName() == default_device)
           this->local_index = i;
       i++;
