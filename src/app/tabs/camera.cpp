@@ -123,7 +123,7 @@ QPushButton *CameraTab::connect_button()
     connect_button->setFlat(true);
     connect_button->setIconSize(Theme::icon_36);
     connect(connect_button, &QPushButton::clicked, [this]() {
-        this->status->setText("");
+        this->status->clear();
         if (this->config->get_cam_is_network())
             this->connect_network_stream();
         else
