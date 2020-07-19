@@ -47,7 +47,7 @@ QWidget *CameraTab::connect_widget()
         network_cam->setVisible(checked);
         local_cams->setVisible(!checked);
         this->status->setText("");
-    this->config->set_cam_is_network(checked);
+        this->config->set_cam_is_network(checked);
     });
     network_toggle->setChecked(this->config->get_cam_is_network());
 
@@ -145,7 +145,7 @@ QWidget *CameraTab::camera_selector()
     QWidget *selector = this->selector_widget(label);
     this->populate_local_cams();
     connect(this, &CameraTab::prev_cam, [this, label]() {
-        local_index=(local_index-1+local_cams.size())%this->local_cams.size();
+        local_index=(local_index - 1 + local_cams.size()) % this->local_cams.size();
         auto cam = this->local_cams.at(local_index);
         label->setText(cam.first);
         this->config->set_cam_local_device(cam.second);
@@ -213,11 +213,11 @@ bool CameraTab::populate_local_cams()
         default_device = QCameraInfo::defaultCamera().deviceName();
 
     int i = 0;
-    for (auto const& cam : cameras) {
+    for (auto const &cam : cameras) {
       QString pretty_name = cam.description() + " at " + cam.deviceName();
       local_cams.append(QPair<QString,QString>(pretty_name, cam.deviceName()));
       if (cam.deviceName() == default_device)
-      this->local_index = i;
+          this->local_index = i;
       i++;
     }
 
@@ -281,7 +281,7 @@ void CameraTab::connect_local_stream()
         this->local_cam = nullptr;
     }
 
-    const QString& local = this->config->get_cam_local_device();
+    const QString &local = this->config->get_cam_local_device();
     if (!this->local_cam_available(local)) {
         this->status->setText("Camera unavailable");
         return;
@@ -300,7 +300,7 @@ void CameraTab::choose_video_resolution()
     QCameraImageCapture imageCapture(this->local_cam);
     int min_gap = 10000, xgap, ygap;
     QSize max_fit;
-    for (auto const& resolution : imageCapture.supportedResolutions()) {
+    for (auto const &resolution : imageCapture.supportedResolutions()) {
         xgap = window_size.width() - resolution.width();
         ygap = window_size.height() - resolution.height();
         if (xgap >= 0 && ygap >= 0 && xgap+ygap < min_gap) {
@@ -318,7 +318,7 @@ void CameraTab::choose_video_resolution()
     this->local_cam->setViewfinderSettings(this->local_cam_settings);
 }
 
-bool CameraTab::local_cam_available(const QString& device)
+bool CameraTab::local_cam_available(const QString &device)
 {
     if (device.isEmpty())
         return false;
