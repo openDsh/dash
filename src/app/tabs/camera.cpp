@@ -38,14 +38,14 @@ QWidget *CameraTab::connect_widget()
     this->status = new QLabel(widget);
     this->status->setFont(Theme::font_16);
 
-    QWidget *local_cams = this->camera_selector();
-    QWidget *network_cam = this->input_widget();
-    network_cam->setVisible(false);
+    QWidget *cam_stack_widget = new QWidget(widget);
+    QStackedLayout *cam_stack = new QStackedLayout(cam_stack_widget);
+    cam_stack->addWidget(this->local_cam_selector());
+    cam_stack->addWidget(this->network_cam_selector());
     QCheckBox *network_toggle = new QCheckBox("Network", this);
     network_toggle->setFont(Theme::font_14);
-    connect(network_toggle, &QCheckBox::toggled, [this, network_cam, local_cams](bool checked) {
-        network_cam->setVisible(checked);
-        local_cams->setVisible(!checked);
+    connect(network_toggle, &QCheckBox::toggled, [this, cam_stack](bool checked) {
+	cam_stack->setCurrentIndex(checked? 1 : 0);
         this->status->setText("");
         this->config->set_cam_is_network(checked);
     });
@@ -54,8 +54,7 @@ QWidget *CameraTab::connect_widget()
     layout->addStretch();
     layout->addWidget(label, 0, Qt::AlignCenter);
     layout->addStretch();
-    layout->addWidget(local_cams);
-    layout->addWidget(network_cam);
+    layout->addWidget(cam_stack_widget);
     layout->addWidget(this->status, 0, Qt::AlignCenter);
     layout->addWidget(this->connect_button(), 0, Qt::AlignCenter);
     layout->addStretch();
@@ -134,7 +133,7 @@ QPushButton *CameraTab::connect_button()
     return connect_button;
 }
 
-QWidget *CameraTab::camera_selector()
+QWidget *CameraTab::local_cam_selector()
 {
     QWidget *widget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
@@ -228,7 +227,7 @@ bool CameraTab::populate_local_cams()
     return true;
 }
 
-QWidget *CameraTab::input_widget()
+QWidget *CameraTab::network_cam_selector()
 {
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
