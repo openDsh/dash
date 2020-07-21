@@ -31,6 +31,7 @@ class Theme : public QObject {
     static const QFont font_36;
 
     static const QSize icon_16;
+    static const QSize icon_20;
     static const QSize icon_24;
     static const QSize icon_26;
     static const QSize icon_28;
@@ -68,10 +69,8 @@ class Theme : public QObject {
     }
 
     void add_tab_icon(QString name, QWidget *widget, Qt::Orientation orientation = Qt::Orientation::Horizontal);
-    inline QIcon get_tab_icon(int idx) { return this->tab_icons[this->mode ? "dark" : "light"][idx].second; }
-    inline QList<tab_icon_t> get_tab_icons() { return this->tab_icons[this->mode ? "dark" : "light"]; }
     void add_button_icon(QString name, QPushButton *button, QString active_name = QString());
-    QIcon add_button_icon2(QString name, QPushButton *button, QString active_name = QString());
+    QIcon add_button_icon2(QString name, QPushButton *button, QString alt_name = QString());
     void update();
 
     inline static QFrame *br(QWidget *parent = nullptr, bool vertical = false)
@@ -115,8 +114,6 @@ class Theme : public QObject {
 
     QPalette palette;
     QString color;
-    QMap<QString, QList<tab_icon_t>> tab_icons;
-    QMap<QString, QList<button_icon_t>> button_icons;
     QMap<QString, QString> stylesheets;
     bool mode = false;
     double scale = 1.0;
@@ -125,10 +122,11 @@ class Theme : public QObject {
     QString parse_stylesheet(QString file);
     QString scale_stylesheet(QString stylesheet);
     QPixmap create_pixmap_variant(QPixmap &base, qreal opacity);
-    QIcon recolor_icon(QIcon icon, bool checkable);
+    QIcon themed_button_icon(QIcon icon, QAbstractButton *button);
+
+    inline QColor get_base_color() { return this->mode ? QColor(255, 255, 255) : QColor(0, 0, 0); }
 
    signals:
     void mode_updated(bool mode);
-    void icons_updated(QList<tab_icon_t> &tab_icons, QList<button_icon_t> &button_icons, double scale);
     void color_updated();
 };

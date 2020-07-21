@@ -36,7 +36,7 @@ QWidget *CameraTab::camera_widget()
         this->status->setText(QString());
         this->player->stop();
     });
-    this->theme->add_button_icon("close", button);
+    button->setIcon(this->theme->add_button_icon2("close", button));
     layout->addWidget(button, 0, Qt::AlignRight);
 
     QVideoWidget *video = new QVideoWidget(widget);
@@ -62,7 +62,7 @@ QWidget *CameraTab::connect_widget()
     button->setFont(Theme::font_14);
     button->setFlat(true);
     button->setIconSize(Theme::icon_36);
-    this->theme->add_button_icon("wifi", button);
+    button->setIcon(this->theme->add_button_icon2("wifi", button));
     connect(button, &QPushButton::clicked, [this]() {
         this->connect_stream();
         this->config->set_cam_stream_url(this->url);

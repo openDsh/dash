@@ -152,12 +152,12 @@ void DashWindow::add_page(QString name, QWidget *page, QString icon)
     page->setObjectName(name);
 
     QPushButton *button = new QPushButton();
+    button->setProperty("page", QVariant::fromValue(page));
     button->setCheckable(true);
     button->setFlat(true);
     button->setIconSize(Theme::icon_32);
     button->setIcon(this->theme->add_button_icon2(icon, button));
 
-    button->setProperty("page", QVariant::fromValue(page));
 
     int idx = this->pages->addWidget(page);
     this->rail_group->addButton(button, idx);
