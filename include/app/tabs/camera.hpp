@@ -29,7 +29,7 @@ class CameraTab : public QWidget {
     QPushButton *connect_button();
     QWidget *network_cam_selector();
     QWidget *selector_widget(QWidget *selection);
-    bool populate_local_cams();
+    void populate_local_cams();
     void connect_network_stream();
     void connect_local_stream();
     bool local_cam_available(const QString &device);

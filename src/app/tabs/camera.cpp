@@ -114,14 +114,12 @@ QWidget *CameraTab::network_camera_widget()
     return widget;
 }
 
-
 QPushButton *CameraTab::connect_button()
 {
     QPushButton *connect_button = new QPushButton("connect", this);
     connect_button->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     connect_button->setFont(Theme::font_14);
     connect_button->setFlat(true);
-    connect_button->setIconSize(Theme::icon_36);
     connect(connect_button, &QPushButton::clicked, [this]() {
         this->status->clear();
         if (this->config->get_cam_is_network())
@@ -202,7 +200,7 @@ QWidget *CameraTab::selector_widget(QWidget *selection)
     return widget;
 }
 
-bool CameraTab::populate_local_cams()
+void CameraTab::populate_local_cams()
 {
     this->local_cams.clear();
     this->local_index=0;
@@ -222,9 +220,7 @@ bool CameraTab::populate_local_cams()
 
     if (this->local_cams.isEmpty()) {
         this->local_cams.append(QPair<QString,QString>(QString("<No local cameras found>"),QString()));
-        return false;
     }
-    return true;
 }
 
 QWidget *CameraTab::network_cam_selector()
