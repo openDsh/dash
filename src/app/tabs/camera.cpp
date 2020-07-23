@@ -309,7 +309,11 @@ void CameraTab::choose_video_resolution()
     }
     else
         qDebug() << "No suitable resolutions found to fit in" << window_size;
-    //    this->local_cam_settings.setPixelFormat(QVideoFrame::Format_YV12);
+
+    if (this->config->get_cam_local_format_override() > 0) {
+      this->local_cam_settings.setPixelFormat(this->config->get_cam_local_format_override());
+      qDebug() << "Overriding local cam format to" << this->config->get_cam_local_format_override();
+    }
     this->local_cam->setViewfinderSettings(this->local_cam_settings);
 }
 

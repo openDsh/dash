@@ -8,6 +8,7 @@
 #include <QSettings>
 #include <QString>
 #include <QWidget>
+#include <QVideoFrame>
 
 #include "app/modules/brightness.hpp"
 
@@ -131,6 +132,9 @@ class Config : public QObject {
     std::shared_ptr<openauto::configuration::Configuration> openauto_config;
     openauto::configuration::Configuration::ButtonCodes openauto_button_codes;
 
+    inline QVideoFrame::PixelFormat get_cam_local_format_override() { return this->cam_local_format_override; }
+    inline void set_cam_local_format_override(QVideoFrame::PixelFormat local_format) { this->cam_local_format_override = local_format; }
+
     static Config *get_instance();
 
    private:
@@ -162,6 +166,7 @@ class Config : public QObject {
     QString cam_local_device;
     QString cam_name;
     bool cam_is_network;
+    QVideoFrame::PixelFormat cam_local_format_override;
     QMap<QString, bool> pages;
 
    signals:

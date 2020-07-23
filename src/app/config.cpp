@@ -33,6 +33,7 @@ Config::Config()
     this->cam_network_url = this->ia_config.value("Camera/stream_url").toString();
     this->cam_local_device = this->ia_config.value("Camera/local_device").toString();
     this->cam_is_network = this->ia_config.value("Camera/is_network").toBool();
+    this->cam_local_format_override = this->ia_config.value("Camera/local_format_override").value<QVideoFrame::PixelFormat>();
     this->ia_config.beginGroup("Pages");
     for (auto key : this->ia_config.childKeys())
         this->pages[key] = this->ia_config.value(key, true).toBool();
@@ -97,6 +98,8 @@ void Config::save()
         this->ia_config.setValue("Camera/local_device", this->cam_local_device);
     if (this->cam_is_network != this->ia_config.value("Camera/is_network").toBool())
         this->ia_config.setValue("Camera/is_network", this->cam_is_network);
+    if (this->cam_local_format_override != this->ia_config.value("Camera/local_format_override").value<QVideoFrame::PixelFormat>())
+        this->ia_config.setValue("Camera/local_format_override", this->cam_local_format_override);
     for (auto id : this->pages.keys()) {
         QString config_key = QString("Pages/%1").arg(id);
         bool page_enabled = this->pages[id];
