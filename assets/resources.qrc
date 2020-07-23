@@ -31,7 +31,7 @@
         <file>icons/dark/refresh.svg</file>
         <file>icons/dark/developer_board.svg</file>
         <file>icons/dark/keyboard.svg</file>
-        <file>icons/dark/linked_camera.svg</file>
+        <file>icons/dark/camera.svg</file>
         <file>icons/dark/dark_mode.svg</file>
         <file>icons/dark/android_auto.svg</file>
         <file>icons/light/play.svg</file>
@@ -64,7 +64,7 @@
         <file>icons/light/refresh.svg</file>
         <file>icons/light/developer_board.svg</file>
         <file>icons/light/keyboard.svg</file>
-        <file>icons/light/linked_camera.svg</file>
+        <file>icons/light/camera.svg</file>
         <file>icons/light/dark_mode.svg</file>
         <file>icons/light/android_auto.svg</file>
         <file>stylesheets/light.qss</file>
