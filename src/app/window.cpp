@@ -134,7 +134,7 @@ void DashWindow::add_pages()
     this->add_page("Android Auto", this->openauto, "android_auto");
     this->add_page("Media", new MediaTab(this), "play_circle_outline");
     this->add_page("Data", new DataTab(this), "speed");
-    this->add_page("Camera", new CameraTab(this), "linked_camera");
+    this->add_page("Camera", new CameraTab(this), "camera");
     this->add_page("Launcher", new LauncherTab(this), "widgets");
     this->add_page("Settings", new SettingsTab(this), "tune");
 
