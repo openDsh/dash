@@ -94,7 +94,7 @@ QWidget *BluetoothPlayerSubTab::controls_widget()
         BluezQt::MediaPlayerPtr media_player = bluetooth->get_media_player().second;
         if (media_player != nullptr) media_player->previous()->waitForFinished();
     });
-    previous_button->setIcon(theme->add_button_icon2("skip_previous", previous_button));
+    previous_button->setIcon(theme->make_button_icon("skip_previous", previous_button));
     layout->addStretch();
     layout->addWidget(previous_button);
 
@@ -119,7 +119,7 @@ QWidget *BluetoothPlayerSubTab::controls_widget()
             [play_button](BluezQt::MediaPlayer::Status status) {
                 play_button->setChecked(status == BluezQt::MediaPlayer::Status::Playing);
             });
-    play_button->setIcon(theme->add_button_icon2("play", play_button, "pause"));
+    play_button->setIcon(theme->make_button_icon("play", play_button, "pause"));
     layout->addStretch();
     layout->addWidget(play_button);
 
@@ -130,7 +130,7 @@ QWidget *BluetoothPlayerSubTab::controls_widget()
         BluezQt::MediaPlayerPtr media_player = bluetooth->get_media_player().second;
         if (media_player != nullptr) media_player->next()->waitForFinished();
     });
-    forward_button->setIcon(theme->add_button_icon2("skip_next", forward_button));
+    forward_button->setIcon(theme->make_button_icon("skip_next", forward_button));
     layout->addStretch();
     layout->addWidget(forward_button);
     layout->addStretch();
@@ -181,7 +181,7 @@ QWidget *RadioPlayerSubTab::controls_widget()
     QPushButton *scan_reverse_button = new QPushButton(widget);
     scan_reverse_button->setFlat(true);
     scan_reverse_button->setIconSize(Theme::icon_84);
-    scan_reverse_button->setIcon(this->theme->add_button_icon2("fast_rewind", scan_reverse_button));
+    scan_reverse_button->setIcon(this->theme->make_button_icon("fast_rewind", scan_reverse_button));
     connect(scan_reverse_button, &QPushButton::clicked,
             [tuner = this->tuner]() { tuner->setSliderPosition(tuner->sliderPosition() - 5); });
     layout->addStretch();
@@ -190,7 +190,7 @@ QWidget *RadioPlayerSubTab::controls_widget()
     QPushButton *prev_station_button = new QPushButton(widget);
     prev_station_button->setFlat(true);
     prev_station_button->setIconSize(Theme::icon_84);
-    prev_station_button->setIcon(this->theme->add_button_icon2("skip_previous", prev_station_button));
+    prev_station_button->setIcon(this->theme->make_button_icon("skip_previous", prev_station_button));
     connect(prev_station_button, &QPushButton::clicked,
             [tuner = this->tuner]() { tuner->setSliderPosition(tuner->sliderPosition() - 1); });
     layout->addStretch();
@@ -199,7 +199,7 @@ QWidget *RadioPlayerSubTab::controls_widget()
     QPushButton *next_station_button = new QPushButton(widget);
     next_station_button->setFlat(true);
     next_station_button->setIconSize(Theme::icon_84);
-    next_station_button->setIcon(this->theme->add_button_icon2("skip_next", next_station_button));
+    next_station_button->setIcon(this->theme->make_button_icon("skip_next", next_station_button));
     connect(next_station_button, &QPushButton::clicked,
             [tuner = this->tuner]() { tuner->setSliderPosition(tuner->sliderPosition() + 1); });
     layout->addStretch();
@@ -208,7 +208,7 @@ QWidget *RadioPlayerSubTab::controls_widget()
     QPushButton *scan_forward_button = new QPushButton(widget);
     scan_forward_button->setFlat(true);
     scan_forward_button->setIconSize(Theme::icon_84);
-    scan_forward_button->setIcon(this->theme->add_button_icon2("fast_forward", scan_forward_button));
+    scan_forward_button->setIcon(this->theme->make_button_icon("fast_forward", scan_forward_button));
     connect(scan_forward_button, &QPushButton::clicked,
             [tuner = this->tuner]() { tuner->setSliderPosition(tuner->sliderPosition() + 5); });
     layout->addStretch();
@@ -224,7 +224,7 @@ QWidget *RadioPlayerSubTab::controls_widget()
     mute_button->setIconSize(Theme::icon_48);
     connect(mute_button, &QPushButton::clicked,
             [config = this->config](bool checked = false) { config->set_radio_muted(checked); });
-    mute_button->setIcon(this->theme->add_button_icon2("volume_off", mute_button));
+    mute_button->setIcon(this->theme->make_button_icon("volume_off", mute_button));
     layout->addStretch();
     layout->addWidget(mute_button);
     layout->addStretch();
@@ -270,7 +270,7 @@ QWidget *LocalPlayerSubTab::playlist_widget()
     connect(home_button, &QPushButton::clicked, [this](bool checked = false) {
         this->config->set_media_home(checked ? this->path_label->text() : QDir().absolutePath());
     });
-    home_button->setIcon(theme->add_button_icon2("playlist_add", home_button, "playlist_add_check"));
+    home_button->setIcon(theme->make_button_icon("playlist_add", home_button, "playlist_add_check"));
     layout->addWidget(home_button, 0, Qt::AlignTop);
 
     QListWidget *folders = new QListWidget(widget);
@@ -356,7 +356,7 @@ QWidget *LocalPlayerSubTab::controls_widget()
         player->playlist()->previous();
         player->play();
     });
-    previous_button->setIcon(theme->add_button_icon2("skip_previous", previous_button));
+    previous_button->setIcon(theme->make_button_icon("skip_previous", previous_button));
     layout->addStretch();
     layout->addWidget(previous_button);
 
@@ -374,7 +374,7 @@ QWidget *LocalPlayerSubTab::controls_widget()
     });
     connect(this->player, &QMediaPlayer::stateChanged,
             [play_button](QMediaPlayer::State state) { play_button->setChecked(state == QMediaPlayer::PlayingState); });
-    play_button->setIcon(theme->add_button_icon2("play", play_button, "pause"));
+    play_button->setIcon(theme->make_button_icon("play", play_button, "pause"));
     layout->addStretch();
     layout->addWidget(play_button);
 
@@ -385,7 +385,7 @@ QWidget *LocalPlayerSubTab::controls_widget()
         player->playlist()->next();
         player->play();
     });
-    forward_button->setIcon(theme->add_button_icon2("skip_next", forward_button));
+    forward_button->setIcon(theme->make_button_icon("skip_next", forward_button));
     layout->addStretch();
     layout->addWidget(forward_button);
     layout->addStretch();

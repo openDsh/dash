@@ -156,7 +156,7 @@ void DashWindow::add_page(QString name, QWidget *page, QString icon)
     button->setCheckable(true);
     button->setFlat(true);
     button->setIconSize(Theme::icon_32);
-    button->setIcon(this->theme->add_button_icon2(icon, button));
+    button->setIcon(this->theme->make_button_icon(icon, button));
 
 
     int idx = this->pages->addWidget(page);
@@ -191,7 +191,7 @@ QWidget *DashWindow::controls_bar_widget()
     QPushButton *save_button = new QPushButton(widget);
     save_button->setFlat(true);
     save_button->setIconSize(Theme::icon_26);
-    save_button->setIcon(this->theme->add_button_icon2("save_alt", save_button));
+    save_button->setIcon(this->theme->make_button_icon("save_alt", save_button));
     connect(save_button, &QPushButton::clicked, [this, save_button]() {
         Dialog *dialog = new Dialog(false, save_button);
         dialog->set_body(this->save_control_widget());
@@ -203,7 +203,7 @@ QWidget *DashWindow::controls_bar_widget()
     QPushButton *shutdown_button = new QPushButton(widget);
     shutdown_button->setFlat(true);
     shutdown_button->setIconSize(Theme::icon_26);
-    shutdown_button->setIcon(this->theme->add_button_icon2("power_settings_new", shutdown_button));
+    shutdown_button->setIcon(this->theme->make_button_icon("power_settings_new", shutdown_button));
     connect(shutdown_button, &QPushButton::clicked, [this]() {
         Dialog *dialog = new Dialog(true, this);
         dialog->set_title("power off");
@@ -215,7 +215,7 @@ QWidget *DashWindow::controls_bar_widget()
     QPushButton *exit_button = new QPushButton(widget);
     exit_button->setFlat(true);
     exit_button->setIconSize(Theme::icon_26);
-    exit_button->setIcon(this->theme->add_button_icon2("close", exit_button));
+    exit_button->setIcon(this->theme->make_button_icon("close", exit_button));
     connect(exit_button, &QPushButton::clicked, []() { qApp->exit(); });
 
     QWidget *quick_view = this->quick_view_widget();
@@ -257,13 +257,13 @@ QWidget *DashWindow::volume_widget(bool skip_buttons)
         QPushButton *lower_button = new QPushButton(widget);
         lower_button->setFlat(true);
         lower_button->setIconSize(Theme::icon_26);
-        lower_button->setIcon(this->theme->add_button_icon2("volume_down", lower_button));
+        lower_button->setIcon(this->theme->make_button_icon("volume_down", lower_button));
         connect(lower_button, &QPushButton::clicked, [slider]() { slider->setValue(slider->value() - 10); });
 
         QPushButton *raise_button = new QPushButton(widget);
         raise_button->setFlat(true);
         raise_button->setIconSize(Theme::icon_26);
-        raise_button->setIcon(this->theme->add_button_icon2("volume_up", raise_button));
+        raise_button->setIcon(this->theme->make_button_icon("volume_up", raise_button));
         connect(raise_button, &QPushButton::clicked, [slider]() { slider->setValue(slider->value() + 10); });
 
         layout->addWidget(lower_button);
@@ -294,13 +294,13 @@ QWidget *DashWindow::brightness_widget(bool skip_buttons)
         QPushButton *dim_button = new QPushButton(widget);
         dim_button->setFlat(true);
         dim_button->setIconSize(Theme::icon_26);
-        dim_button->setIcon(this->theme->add_button_icon2("brightness_low", dim_button));
+        dim_button->setIcon(this->theme->make_button_icon("brightness_low", dim_button));
         connect(dim_button, &QPushButton::clicked, [slider]() { slider->setValue(slider->value() - 18); });
 
         QPushButton *brighten_button = new QPushButton(widget);
         brighten_button->setFlat(true);
         brighten_button->setIconSize(Theme::icon_26);
-        brighten_button->setIcon(this->theme->add_button_icon2("brightness_high", brighten_button));
+        brighten_button->setIcon(this->theme->make_button_icon("brightness_high", brighten_button));
         connect(brighten_button, &QPushButton::clicked, [slider]() { slider->setValue(slider->value() + 18); });
 
         layout->addWidget(dim_button);
@@ -322,7 +322,7 @@ QWidget *DashWindow::controls_widget()
     QPushButton *volume = new QPushButton(widget);
     volume->setFlat(true);
     volume->setIconSize(Theme::icon_26);
-    volume->setIcon(this->theme->add_button_icon2("volume_up", volume));
+    volume->setIcon(this->theme->make_button_icon("volume_up", volume));
     QElapsedTimer *volume_timer = new QElapsedTimer();
     connect(volume, &QPushButton::pressed, [volume_timer]() { volume_timer->start(); });
     connect(volume, &QPushButton::released, [this, volume, volume_timer]() {
@@ -343,7 +343,7 @@ QWidget *DashWindow::controls_widget()
     QPushButton *brightness = new QPushButton(widget);
     brightness->setFlat(true);
     brightness->setIconSize(Theme::icon_26);
-    brightness->setIcon(this->theme->add_button_icon2("brightness_high", brightness));
+    brightness->setIcon(this->theme->make_button_icon("brightness_high", brightness));
     connect(brightness, &QPushButton::clicked, [this, brightness]() {
         Dialog *dialog = new Dialog(false, brightness);
         dialog->set_body(this->brightness_widget(true));
@@ -358,7 +358,7 @@ QWidget *DashWindow::controls_widget()
     QPushButton *dark_mode = new QPushButton(widget);
     dark_mode->setFlat(true);
     dark_mode->setIconSize(Theme::icon_26);
-    dark_mode->setIcon(this->theme->add_button_icon2("dark_mode", dark_mode));
+    dark_mode->setIcon(this->theme->make_button_icon("dark_mode", dark_mode));
     connect(dark_mode, &QPushButton::clicked, [this]() {
         bool mode = !theme->get_mode();
         this->theme->set_mode(mode);
@@ -384,7 +384,7 @@ QWidget *DashWindow::power_control_widget()
     QPushButton *restart = new QPushButton(widget);
     restart->setFlat(true);
     restart->setIconSize(Theme::icon_42);
-    restart->setIcon(this->theme->add_button_icon2("refresh", restart));
+    restart->setIcon(this->theme->make_button_icon("refresh", restart));
     connect(restart, &QPushButton::clicked, []() {
         sync();
         if (system("shutdown -r now") < 0)
@@ -395,7 +395,7 @@ QWidget *DashWindow::power_control_widget()
     QPushButton *power_off = new QPushButton(widget);
     power_off->setFlat(true);
     power_off->setIconSize(Theme::icon_42);
-    power_off->setIcon(this->theme->add_button_icon2("power_settings_new", power_off));
+    power_off->setIcon(this->theme->make_button_icon("power_settings_new", power_off));
     connect(power_off, &QPushButton::clicked, []() {
         sync();
         if (system("shutdown -h now") < 0)

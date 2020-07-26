@@ -68,9 +68,7 @@ class Theme : public QObject {
         this->update();
     }
 
-    void add_tab_icon(QString name, QWidget *widget, Qt::Orientation orientation = Qt::Orientation::Horizontal);
-    void add_button_icon(QString name, QPushButton *button, QString active_name = QString());
-    QIcon add_button_icon2(QString name, QPushButton *button, QString alt_name = QString());
+    QIcon make_button_icon(QString name, QPushButton *button, QString alt_name = QString());
     void update();
 
     inline static QFrame *br(QWidget *parent = nullptr, bool vertical = false)

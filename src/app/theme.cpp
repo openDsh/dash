@@ -150,12 +150,7 @@ QIcon Theme::themed_button_icon(QIcon icon, QAbstractButton *button)
     return themed_icon;
 }
 
-void Theme::add_button_icon(QString name, QPushButton *button, QString normal_name)
-{
-    return;
-}
-
-QIcon Theme::add_button_icon2(QString name, QPushButton *button, QString alt_name)
+QIcon Theme::make_button_icon(QString name, QPushButton *button, QString alt_name)
 {
     button->setProperty("base_icon_size", QVariant::fromValue(button->iconSize()));
     if (!alt_name.isNull())

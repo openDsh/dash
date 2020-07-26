@@ -171,7 +171,7 @@ QWidget *OpenAutoTab::wireless_config()
     button->setFont(Theme::font_14);
     button->setFlat(true);
     button->setIconSize(Theme::icon_36);
-    button->setIcon(this->theme->add_button_icon2("wifi", button));
+    button->setIcon(this->theme->make_button_icon("wifi", button));
     connect(button, &QPushButton::clicked, [this, widget, ip_input, status]() {
         status->setText("connecting...");
         widget->setEnabled(false);

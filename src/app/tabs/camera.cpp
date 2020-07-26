@@ -80,7 +80,7 @@ QWidget *CameraTab::local_camera_widget()
         this->local_cam->deleteLater();
         this->local_cam = nullptr;
     });
-    this->theme->add_button_icon("close", disconnect);
+    disconnect->setIcon(this->theme->make_button_icon("close", disconnect));
     layout->addWidget(disconnect, 0, Qt::AlignRight);
 
     this->local_video_widget = new QCameraViewfinder(widget);
@@ -104,7 +104,7 @@ QWidget *CameraTab::network_camera_widget()
         this->status->setText(QString());
         this->player->stop();
     });
-    this->theme->add_button_icon("close", disconnect);
+    disconnect->setIcon(this->theme->make_button_icon("close", disconnect));
     layout->addWidget(disconnect, 0, Qt::AlignRight);
 
     QVideoWidget *video = new QVideoWidget(widget);
@@ -160,7 +160,7 @@ QWidget *CameraTab::local_cam_selector()
     QPushButton *refresh_button = new QPushButton(widget);
     refresh_button->setFont(Theme::font_14);
     refresh_button->setFlat(true);
-    this->theme->add_button_icon("refresh", refresh_button);
+    refresh_button->setIcon(this->theme->make_button_icon("refresh", refresh_button));
 
     refresh_row->addStretch(1);
     refresh_row->addWidget(refresh_button);
@@ -182,13 +182,13 @@ QWidget *CameraTab::selector_widget(QWidget *selection)
     QPushButton *left_button = new QPushButton(widget);
     left_button->setFlat(true);
     left_button->setIconSize(Theme::icon_32);
-    this->theme->add_button_icon("arrow_left", left_button);
+    left_button->setIcon(this->theme->make_button_icon("arrow_left", left_button));
     connect(left_button, &QPushButton::clicked, this, &CameraTab::prev_cam);
 
     QPushButton *right_button = new QPushButton(this);
     right_button->setFlat(true);
     right_button->setIconSize(Theme::icon_32);
-    this->theme->add_button_icon("arrow_right", right_button);
+    right_button->setIcon(this->theme->make_button_icon("arrow_right", right_button));
     connect(right_button, &QPushButton::clicked, this, &CameraTab::next_cam);
 
     layout->addStretch(1);

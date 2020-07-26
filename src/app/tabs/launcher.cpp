@@ -81,7 +81,7 @@ EmbeddedApp::EmbeddedApp(QWidget *parent) : QWidget(parent)
     button->setFlat(true);
     button->setIconSize(Theme::icon_20);
     connect(button, &QPushButton::clicked, [this]() { this->end(); });
-    button->setIcon(Theme::get_instance()->add_button_icon2("close", button));
+    button->setIcon(Theme::get_instance()->make_button_icon("close", button));
     
     layout->addWidget(button, 0, Qt::AlignRight);
 
@@ -173,7 +173,7 @@ QWidget *LauncherTab::app_select_widget()
     connect(home_button, &QPushButton::clicked, [this](bool checked = false) {
         this->config->set_launcher_home(checked ? this->path_label->text() : QDir().absolutePath());
     });
-    home_button->setIcon(theme->add_button_icon2("playlist_add", home_button, "playlist_add_check"));
+    home_button->setIcon(theme->make_button_icon("playlist_add", home_button, "playlist_add_check"));
     layout->addWidget(home_button, 0, Qt::AlignTop);
 
     this->folders = new QListWidget(widget);
