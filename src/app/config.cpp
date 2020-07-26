@@ -8,7 +8,7 @@ Config::Config()
     : QObject(qApp),
       openauto_config(std::make_shared<openauto::configuration::Configuration>()),
       openauto_button_codes(openauto_config->getButtonCodes()),
-      ia_config(QSettings::IniFormat, QSettings::UserScope, "ia")
+      ia_config(QSettings::IniFormat, QSettings::UserScope, "dash")
 {
     this->volume = this->ia_config.value("volume", 50).toInt();
     this->dark_mode = this->ia_config.value("dark_mode", false).toBool();

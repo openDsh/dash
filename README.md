@@ -33,7 +33,7 @@ First you need to run the executable with the following command:
 
 Once installed it will start up, to run afterwards, navigate to bin folder and run:
 
-`./ia`
+`./dash`
 
 Video walk through: 
 
@@ -104,7 +104,7 @@ If building this for a Raspberry Pi, add `-DRPI_BUILD=TRUE` to the `cmake` comma
 
 ### Running
 
-Building dash will create the `ia` binary in `bin/`. Depending on what you're running it on, you may need to make some adjustments to your system.
+Building dash will create the `dash` binary in `bin/`. Depending on what you're running it on, you may need to make some adjustments to your system.
 
 Some things to consider when configuring your system:
 

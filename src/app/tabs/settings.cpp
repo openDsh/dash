@@ -137,7 +137,7 @@ QWidget *GeneralSettingsSubTab::brightness_module_select_widget()
     QPushButton *left_button = new QPushButton(widget);
     left_button->setFlat(true);
     left_button->setIconSize(Theme::icon_32);
-    this->theme->add_button_icon("arrow_left", left_button);
+    left_button->setIcon(this->theme->add_button_icon2("arrow_left", left_button));
     connect(left_button, &QPushButton::clicked, [this, label, modules]() {
         int total_modules = modules.size();
         QString module =
@@ -149,7 +149,7 @@ QWidget *GeneralSettingsSubTab::brightness_module_select_widget()
     QPushButton *right_button = new QPushButton(widget);
     right_button->setFlat(true);
     right_button->setIconSize(Theme::icon_32);
-    this->theme->add_button_icon("arrow_right", right_button);
+    right_button->setIcon(this->theme->add_button_icon2("arrow_right", right_button));
     connect(right_button, &QPushButton::clicked, [this, label, modules]() {
         QString module = modules[(modules.indexOf(label->text()) + 1) % modules.size()];
         label->setText(module);
@@ -203,13 +203,13 @@ QWidget *GeneralSettingsSubTab::brightness_widget()
     QPushButton *dim_button = new QPushButton(widget);
     dim_button->setFlat(true);
     dim_button->setIconSize(Theme::icon_32);
-    this->theme->add_button_icon("brightness_low", dim_button);
+    dim_button->setIcon(this->theme->add_button_icon2("brightness_low", dim_button));
     connect(dim_button, &QPushButton::clicked, [slider]() { slider->setValue(slider->value() - 18); });
 
     QPushButton *brighten_button = new QPushButton(widget);
     brighten_button->setFlat(true);
     brighten_button->setIconSize(Theme::icon_32);
-    this->theme->add_button_icon("brightness_high", brighten_button);
+    brighten_button->setIcon(this->theme->add_button_icon2("brightness_high", brighten_button));
     connect(brighten_button, &QPushButton::clicked, [slider]() { slider->setValue(slider->value() + 18); });
 
     layout->addStretch(1);
@@ -269,7 +269,7 @@ QWidget *GeneralSettingsSubTab::color_select_widget()
     QPushButton *left_button = new QPushButton(widget);
     left_button->setFlat(true);
     left_button->setIconSize(Theme::icon_32);
-    this->theme->add_button_icon("arrow_left", left_button);
+    left_button->setIcon(this->theme->add_button_icon2("arrow_left", left_button));
     connect(left_button, &QPushButton::clicked, [this, colors, label]() {
         int total_colors = colors.size();
         QString color = colors[((colors.indexOf(label->text()) - 1) % total_colors + total_colors) % total_colors];
@@ -281,7 +281,7 @@ QWidget *GeneralSettingsSubTab::color_select_widget()
     QPushButton *right_button = new QPushButton(widget);
     right_button->setFlat(true);
     right_button->setIconSize(Theme::icon_32);
-    this->theme->add_button_icon("arrow_right", right_button);
+    right_button->setIcon(this->theme->add_button_icon2("arrow_right", right_button));
     connect(right_button, &QPushButton::clicked, [this, colors, label]() {
         QString color = colors[(colors.indexOf(label->text()) + 1) % colors.size()];
         label->update(color);
@@ -359,13 +359,13 @@ QWidget *GeneralSettingsSubTab::volume_widget()
     QPushButton *lower_button = new QPushButton(widget);
     lower_button->setFlat(true);
     lower_button->setIconSize(Theme::icon_32);
-    this->theme->add_button_icon("volume_down", lower_button);
+    lower_button->setIcon(this->theme->add_button_icon2("volume_down", lower_button));
     connect(lower_button, &QPushButton::clicked, [slider]() { slider->setValue(slider->value() - 10); });
 
     QPushButton *raise_button = new QPushButton(widget);
     raise_button->setFlat(true);
     raise_button->setIconSize(Theme::icon_32);
-    this->theme->add_button_icon("volume_up", raise_button);
+    raise_button->setIcon(this->theme->add_button_icon2("volume_up", raise_button));
     connect(raise_button, &QPushButton::clicked, [slider]() { slider->setValue(slider->value() + 10); });
 
     layout->addStretch(1);
@@ -482,7 +482,7 @@ QWidget *LayoutSettingsSubTab::quick_view_select_widget()
     QPushButton *left_button = new QPushButton(widget);
     left_button->setFlat(true);
     left_button->setIconSize(Theme::icon_32);
-    this->theme->add_button_icon("arrow_left", left_button);
+    left_button->setIcon(this->theme->add_button_icon2("arrow_left", left_button));
     connect(left_button, &QPushButton::clicked, [this, label, views]() {
         int total_views = views.size();
         QString view = views[((views.indexOf(label->text()) - 1) % total_views + total_views) % total_views];
@@ -493,7 +493,7 @@ QWidget *LayoutSettingsSubTab::quick_view_select_widget()
     QPushButton *right_button = new QPushButton(widget);
     right_button->setFlat(true);
     right_button->setIconSize(Theme::icon_32);
-    this->theme->add_button_icon("arrow_right", right_button);
+    right_button->setIcon(this->theme->add_button_icon2("arrow_right", right_button));
     connect(right_button, &QPushButton::clicked, [this, label, views]() {
         QString view = views[(views.indexOf(label->text()) + 1) % views.size()];
         label->setText(view);
@@ -600,7 +600,7 @@ QWidget *BluetoothSettingsSubTab::scanner_widget()
     button->setCheckable(true);
     button->setEnabled(this->bluetooth->has_adapter());
     button->setIconSize(Theme::icon_36);
-    this->theme->add_button_icon("bluetooth_searching", button);
+    button->setIcon(this->theme->add_button_icon2("bluetooth_searching", button));
     connect(button, &QPushButton::clicked, [bluetooth = this->bluetooth](bool checked) {
         if (checked)
             bluetooth->start_scan();
@@ -749,7 +749,7 @@ QWidget *ShortcutsSettingsSubTab::shortcut_input_widget(QString id, Shortcut *sh
     else
         symbol->setChecked(shortcut->to_str().startsWith("gpio"));
     symbol->setIconSize(Theme::icon_32);
-    this->theme->add_button_icon("developer_board", symbol, "keyboard");
+    symbol->setIcon(this->theme->add_button_icon2("keyboard", symbol, "developer_board"));
 
     ShortcutInput *input = new ShortcutInput(shortcut->to_str(), widget);
     input->setProperty("add_hint", true);
