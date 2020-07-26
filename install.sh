@@ -35,7 +35,7 @@ if [ $# -gt 0 ]; then
     done
 
 else
-    echo "Your command line contains no arguments"
+    echo "Running Full install"
     deps=true
     aasdk=true
     gstreamer=true
