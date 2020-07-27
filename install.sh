@@ -1,5 +1,21 @@
 #!/bin/bash
-echo "Running apt update"
+
+#repo addresses
+aasdkRepo="https://github.com/OpenDsh/aasdk"
+gstreamerRepo="git://anongit.freedesktop.org/gstreamer/qt-gstreamer"
+openautoRepo="https://github.com/rhysmorgan134/openauto.git"
+
+#Help text
+display_help() {
+    echo
+    echo "   --deps           install all dependencies"
+    echo "   --aasdk          install and build aasdk"
+    echo "   --openauto       install and build openauto "
+    echo "   --gstreamer      install and build gstreamer "
+    echo "   --dash           install and build dash "
+    echo
+    exit 1
+}
 
 #set default arguments
 deps=false
@@ -25,17 +41,17 @@ if [ $# -gt 0 ]; then
                                     ;;
             --perms )          perms=true
                                     ;;
-            -h | --help )           usage
+            -h | --help )           display_help
                                     exit
                                     ;;
-            * )                     usage
+            * )                     display_help
                                     exit 1
         esac
         shift
     done
 
 else
-    echo "Running Full install"
+    echo "Full install running"
     deps=true
     aasdk=true
     gstreamer=true
@@ -89,6 +105,8 @@ dependencies=(
 if [ "$deps" = true ]; then
   #loop through dependencies and install
 	echo "installing dependencies"
+	echo "Running apt update"
+	sudo apt update
   for app in ${dependencies[@]}; do
     echo "installing: " $app
     sudo apt -qq -o=Dpkg::Use-Pty=0 install $app -y > /dev/null 2> /dev/null
@@ -115,7 +133,7 @@ if [ "$aasdk" = true ]; then
   cd ..
 
   #clone aasdk
-  git clone https://github.com/OpenDsh/aasdk
+  git clone $aasdkRepo
   if [[ $? > 0 ]]
       then
         cd aasdk
@@ -124,7 +142,7 @@ if [ "$aasdk" = true ]; then
             echo "clone/pull error"
           exit
         else
-          git pull https://github.com/OpenDsh/aasdk
+          git pull $aasdkRepo
           echo "cloned OK"
           cd ..
           echo
@@ -186,7 +204,7 @@ if [ "$gstreamer" = true ]; then
   cd ..
   #clone gstreamer
   echo "Cloning Gstreamer"
-  git clone git://anongit.freedesktop.org/gstreamer/qt-gstreamer
+  git clone $gstreamerRepo
   if [[ $? > 0 ]]
     then
       cd qt-gstreamer
@@ -195,7 +213,7 @@ if [ "$gstreamer" = true ]; then
           echo "clone/pull error"
         exit
       else
-        git pull git://anongit.freedesktop.org/gstreamer/qt-gstreamer
+        git pull gstreamerRepo
         echo "cloned OK"
         cd ..
         echo
@@ -279,7 +297,7 @@ if [ "$openauto" = true ]; then
   cd ..
 
   clone openauto
-  git clone https://github.com/openDsh/openauto.git
+  git clone $openautoRepo
   if [[ $? > 0 ]]
     then
       cd openauto
@@ -288,7 +306,7 @@ if [ "$openauto" = true ]; then
           echo "clone/pull error"
         exit
       else
-        git pull https://github.com/openDsh/openauto.git
+        git pull $openautoRepo
         echo "cloned OK"
         cd ..
         echo
