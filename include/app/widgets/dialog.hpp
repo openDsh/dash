@@ -47,7 +47,7 @@ class Dialog : public QDialog {
     }
     inline void set_button(QPushButton *button)
     {
-        if (!this->overlay_enabled && this->fullscreen) this->add_cancel_button();
+        if (this->buttons->count() < 2) this->add_cancel_button();
         button->setFont(Theme::font_16);
         button->setFlat(true);
         this->buttons->addWidget(button, 0, Qt::AlignRight);

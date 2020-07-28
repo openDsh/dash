@@ -32,6 +32,7 @@ class Theme : public QObject {
 
     static const QSize icon_16;
     static const QSize icon_20;
+    static const QSize icon_22;
     static const QSize icon_24;
     static const QSize icon_26;
     static const QSize icon_28;

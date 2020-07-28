@@ -11,6 +11,8 @@ Dialog::Dialog(bool fullscreen, QWidget *parent) : QDialog(parent, Qt::Frameless
 {
     this->setAttribute(Qt::WA_TranslucentBackground, true);
 
+    // do we need a resizeEvent to set a max of window size??
+
     this->fullscreen = fullscreen;
     if (this->fullscreen) {
         if (false) {
@@ -61,6 +63,7 @@ QWidget *Dialog::content_widget()
     layout->addLayout(this->body);
 
     this->buttons = new QHBoxLayout();
+    this->buttons->addStretch();
     if (!this->overlay_enabled && this->fullscreen) this->add_cancel_button();
     layout->addLayout(this->buttons);
 

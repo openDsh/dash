@@ -34,6 +34,7 @@
         <file>icons/camera.svg</file>
         <file>icons/dark_mode.svg</file>
         <file>icons/android_auto.svg</file>
+        <file>icons/settings.svg</file>
         <file>icons/light/check.svg</file>
         <file>icons/dark/check.svg</file>
         <file>stylesheets/light.qss</file>
