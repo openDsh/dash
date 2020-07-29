@@ -2,6 +2,7 @@
 #include <QCamera>
 #include <QCameraInfo>
 #include <QCameraImageCapture>
+#include <QTimer>
 
 #include "app/tabs/camera.hpp"
 #include "app/window.hpp"
@@ -12,6 +13,8 @@ CameraTab::CameraTab(QWidget *parent) : QWidget(parent)
     this->player = new QMediaPlayer(this);
     this->local_cam = nullptr;
     this->local_index = 0;
+    this->reconnect_timer = new QTimer(this);
+    connect(this->reconnect_timer, &QTimer::timeout, this, &CameraTab::count_down);
 
     this->config = Config::get_instance();
 
@@ -22,9 +25,20 @@ CameraTab::CameraTab(QWidget *parent) : QWidget(parent)
     layout->addWidget(this->local_camera_widget());
     layout->addWidget(this->network_camera_widget());
 
-    connect(this, &CameraTab::disconnected, [layout]() { layout->setCurrentIndex(0); });
+    connect(this, &CameraTab::disconnected, [layout,this]() {
+        layout->setCurrentIndex(0);
+        if (this->config->get_cam_autoconnect()) {
+            qDebug() << "Camera disconnected. Auto reconnect in" << this->config->get_cam_autoconnect_time_secs() << "seconds";
+            this->reconnect_message = this->status->text() + ". reconnecting in %1 ";
+            this->reconnect_in_secs = this->config->get_cam_autoconnect_time_secs();
+            this->reconnect_timer->start(1000);
+        }
+    });
     connect(this, &CameraTab::connected_local, [layout]() { layout->setCurrentIndex(1); });
     connect(this, &CameraTab::connected_network, [layout]() { layout->setCurrentIndex(2); });
+
+    if (this->config->get_cam_autoconnect())
+        this->connect_cam();
 }
 
 QWidget *CameraTab::connect_widget()
@@ -42,6 +56,20 @@ QWidget *CameraTab::connect_widget()
     QStackedLayout *cam_stack = new QStackedLayout(cam_stack_widget);
     cam_stack->addWidget(this->local_cam_selector());
     cam_stack->addWidget(this->network_cam_selector());
+
+    QCheckBox *auto_reconnect_toggle = new QCheckBox("Automatically reconnect", this);
+    auto_reconnect_toggle->setFont(Theme::font_14);
+    auto_reconnect_toggle->setLayoutDirection(Qt::RightToLeft);
+    auto_reconnect_toggle->setChecked(this->config->get_cam_autoconnect());
+    connect(auto_reconnect_toggle, &QCheckBox::toggled, [this](bool checked) {
+        this->config->set_cam_autoconnect(checked);
+        if (!checked) emit autoconnect_disabled(); });
+    connect(this, &CameraTab::autoconnect_disabled, [auto_reconnect_toggle, this]() {
+        this->reconnect_timer->stop();
+        this->config->set_cam_autoconnect(false);
+        auto_reconnect_toggle->setChecked(false);
+    });
+
     QCheckBox *network_toggle = new QCheckBox("Network", this);
     network_toggle->setFont(Theme::font_14);
     connect(network_toggle, &QCheckBox::toggled, [this, cam_stack](bool checked) {
@@ -51,14 +79,21 @@ QWidget *CameraTab::connect_widget()
     });
     network_toggle->setChecked(this->config->get_cam_is_network());
 
+    QWidget *checkboxes_widget = new QWidget(this);
+    QHBoxLayout *checkboxes = new QHBoxLayout(checkboxes_widget);
+    checkboxes->addWidget(network_toggle);
+    checkboxes->addStretch();
+    checkboxes->addWidget(auto_reconnect_toggle);
+
     layout->addStretch();
     layout->addWidget(label, 0, Qt::AlignCenter);
     layout->addStretch();
     layout->addWidget(cam_stack_widget);
     layout->addWidget(this->status, 0, Qt::AlignCenter);
+    layout->addStretch();
     layout->addWidget(this->connect_button(), 0, Qt::AlignCenter);
     layout->addStretch();
-    layout->addWidget(network_toggle, 1, Qt::AlignLeft);
+    layout->addWidget(checkboxes_widget);
 
     return widget;
 }
@@ -75,6 +110,7 @@ QWidget *CameraTab::local_camera_widget()
     disconnect->setIconSize(Theme::icon_16);
     connect(disconnect, &QPushButton::clicked, [this]() {
         this->status->setText(QString());
+        emit autoconnect_disabled();
         this->local_cam->stop();
         this->local_cam->unload();
         this->local_cam->deleteLater();
@@ -100,6 +136,7 @@ QWidget *CameraTab::network_camera_widget()
     disconnect->setFlat(true);
     disconnect->setIconSize(Theme::icon_16);
     connect(disconnect, &QPushButton::clicked, [this]() {
+        emit autoconnect_disabled();
         this->player->setMedia(QUrl());
         this->status->setText(QString());
         this->player->stop();
@@ -118,17 +155,29 @@ QPushButton *CameraTab::connect_button()
 {
     QPushButton *connect_button = new QPushButton("connect", this);
     connect_button->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-    connect_button->setFont(Theme::font_14);
+    connect_button->setFont(Theme::font_16);
     connect_button->setFlat(true);
-    connect(connect_button, &QPushButton::clicked, [this]() {
-        this->status->clear();
-        if (this->config->get_cam_is_network())
-            this->connect_network_stream();
-        else
-            this->connect_local_stream();
-    });
+    connect(connect_button, &QPushButton::clicked, this, &CameraTab::connect_cam);
 
     return connect_button;
+}
+
+void CameraTab::count_down()
+{
+    this->reconnect_in_secs--;
+    this->status->setText(this->reconnect_message.arg(this->reconnect_in_secs) + (this->reconnect_in_secs == 1? "second":"seconds"));
+    if (this->reconnect_in_secs == 0)
+        this->connect_cam();
+}
+
+void CameraTab::connect_cam()
+{
+    this->reconnect_timer->stop();
+    this->status->clear();
+    if (this->config->get_cam_is_network())
+        this->connect_network_stream();
+    else
+        this->connect_local_stream();
 }
 
 QWidget *CameraTab::local_cam_selector()
@@ -232,7 +281,14 @@ QWidget *CameraTab::network_cam_selector()
     input->setContextMenuPolicy(Qt::NoContextMenu);
     input->setFont(Theme::font_18);
     input->setAlignment(Qt::AlignCenter);
-    connect(input, &QLineEdit::textEdited, [this](QString text) { this->config->set_cam_network_url(text); });
+    connect(input, &QLineEdit::textEdited, [this](QString text) {
+        this->status->clear();
+        this->config->set_cam_network_url(text);
+        this->reconnect_timer->stop();
+    });
+    connect(input, &QLineEdit::cursorPositionChanged, [this](int, int) {
+        this->reconnect_timer->stop();
+        this->status->clear(); });
     connect(input, &QLineEdit::returnPressed, this, &CameraTab::connect_network_stream);
 
     layout->addStretch(1);

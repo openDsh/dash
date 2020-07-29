@@ -34,6 +34,8 @@ Config::Config()
     this->cam_local_device = this->ia_config.value("Camera/local_device").toString();
     this->cam_is_network = this->ia_config.value("Camera/is_network").toBool();
     this->cam_local_format_override = this->ia_config.value("Camera/local_format_override").value<QVideoFrame::PixelFormat>();
+    this->cam_autoconnect = this->ia_config.value("Camera/automatically_reconnect").toBool();
+    this->cam_autoconnect_time_secs = this->ia_config.value("Camera/auto_reconnect_time_secs", 6).toInt();
     this->ia_config.beginGroup("Pages");
     for (auto key : this->ia_config.childKeys())
         this->pages[key] = this->ia_config.value(key, true).toBool();
@@ -100,6 +102,10 @@ void Config::save()
         this->ia_config.setValue("Camera/is_network", this->cam_is_network);
     if (this->cam_local_format_override != this->ia_config.value("Camera/local_format_override").value<QVideoFrame::PixelFormat>())
         this->ia_config.setValue("Camera/local_format_override", this->cam_local_format_override);
+    if (this->cam_autoconnect != this->ia_config.value("Camera/automatically_reconnect").toBool())
+        this->ia_config.setValue("Camera/automatically_reconnect", this->cam_autoconnect);
+    if (this->cam_autoconnect_time_secs != this->ia_config.value("Camera/auto_reconnect_time_secs").toInt())
+        this->ia_config.setValue("Camera/auto_reconnect_time_secs", this->cam_autoconnect_time_secs);
     for (auto id : this->pages.keys()) {
         QString config_key = QString("Pages/%1").arg(id);
         bool page_enabled = this->pages[id];
