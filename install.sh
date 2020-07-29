@@ -22,8 +22,10 @@ OS_RELEASE_FILE="/etc/os-release"
 
 if grep -q "Raspbian" ${OS_RELEASE_FILE}; then
   installArgs="-DRPI_BUILD=true"
+  isRpi=true
 else
-  installArgs="-DRPI_BUILD=false"
+  installArgs=""
+  isRpi=false
 fi
 
 #check to see if there are any arguments supplied, if none are supplied run full install
@@ -286,13 +288,15 @@ else
   cd ..
 
   #Make ilclient
-  echo making ilclient
-  make /opt/vc/src/hello_pi/libs/ilclient
-  if [[ $? -eq 0 ]]; then
-    echo -e ilclient make ok'\n'
-  else
-    echo Error making ilclient check logs
-    exit
+  if $isRpi; then
+    echo making ilclient
+    make /opt/vc/src/hello_pi/libs/ilclient
+    if [[ $? -eq 0 ]]; then
+      echo -e ilclient make ok'\n'
+    else
+      echo Error making ilclient check logs
+      exit
+    fi
   fi
 
   echo -e cloning openauto'\n'
