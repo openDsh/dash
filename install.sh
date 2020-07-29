@@ -17,15 +17,24 @@ display_help() {
     exit 1
 }
 
-#set default arguments
-deps=false
-aasdk=false
-gstreamer=false
-openauto=false
-dash=false
-perms=false
+#TODO test on non raspbian build
+OS_RELEASE_FILE="/etc/os-release"
 
+if grep -q "Raspbian" ${OS_RELEASE_FILE}; then
+  installArgs="-DRPI_BUILD=true"
+else
+  installArgs="-DRPI_BUILD=false"
+fi
+
+#check to see if there are any arguments supplied, if none are supplied run full install
 if [ $# -gt 0 ]; then
+  #initialize all arguments to false before looping to find which are available
+  deps=false
+  aasdk=false
+  gstreamer=false
+  openauto=false
+  dash=false
+  perms=false
     while [ "$1" != "" ]; do
         case $1 in
             --deps )           shift
@@ -49,9 +58,8 @@ if [ $# -gt 0 ]; then
         esac
         shift
     done
-
 else
-    echo "Full install running"
+    echo -e Full install running'\n'
     deps=true
     aasdk=true
     gstreamer=true
@@ -59,8 +67,6 @@ else
     dash=true
     perms=true
 fi
-
-
 
 #Array of dependencies any new dependencies can be added here
 dependencies=(
@@ -85,8 +91,8 @@ dependencies=(
 "libkf5bluezqt-dev"
 "libtag1-dev"
 "qml-module-qtquick2"
-"doxygen"
-"qml-module-qtquick*"
+#TODO delete below after test
+#"qml-module-qtquick*"
 "libglib2.0-dev"
 "libgstreamer1.0-dev"
 "gstreamer1.0-plugins-base-apps"
@@ -102,324 +108,284 @@ dependencies=(
 )
 
 ###############################  dependencies  #########################
-if [ "$deps" = true ]; then
-  #loop through dependencies and install
-	echo "installing dependencies"
-	echo "Running apt update"
-	sudo apt update
-  for app in ${dependencies[@]}; do
-    echo "installing: " $app
-    sudo apt -qq -o=Dpkg::Use-Pty=0 install $app -y > /dev/null 2> /dev/null
+if [ $deps = false ]
+  then
+    echo skipping dependencies '\n'
+  else
+    #loop through dependencies and install
+    echo installing dependencies
+    echo Running apt update
+    sudo apt update
 
-    if [[ $? > 0 ]]
-      then
-          echo $app " Failed to install, quitting"
-          exit
-      else
-          echo $app " Installed ok"
-          echo
+    installString="sudo apt install "
+
+    #create apt install string
+    for i in ${dependencies[@]}; do
+      installString+=" $i"
+    done
+
+    #run install
+    echo ${installString}
+    ${installString}
+    if [[ $? -eq 0 ]]; then
+        echo -e All dependencies Installed ok '\n'
+    else
+        echo Package failed to install with error code $?, quitting check logs above
+        exit
     fi
-  done
-  echo "All dependencies installed"
-  echo
-else
-	echo "skipping dependencies"
 fi
 
 
 ###############################  AASDK #########################
-if [ "$aasdk" = true ]; then
+if [ $aasdk = false ]; then
+	echo -e Skipping aasdk '\n'
+else
   #change to parent directory
   cd ..
 
   #clone aasdk
   git clone $aasdkRepo
-  if [[ $? > 0 ]]
-      then
-        cd aasdk
-        if [[ $? > 0 ]]
-          then
-            echo "clone/pull error"
-          exit
-        else
-          git pull $aasdkRepo
-          echo "cloned OK"
-          cd ..
-          echo
-        fi
+  if [[ $? -eq 0 ]]; then
+    echo -e Aasdk Cloned ok '\n'
   else
-    echo "cloned ok"
-    echo
+    cd aasdk
+    if [[ $? -eq 0 ]]; then
+      git pull $aasdkRepo
+      echo -e Aasdk Cloned OK '\n'
+      cd ..
+    else
+      echo Aasdk clone/pull error
+      exit
+    fi
   fi
 
   #change into aasdk folder
-  echo "moving to aasdk"
+  echo -e moving to aasdk '\n'
   cd aasdk
 
   #beginning cmake
   cmake -DCMAKE_BUILD_TYPE=Release .
-  if [[ $? > 0 ]]
-    then
-      echo "CMake error check logs"
-    exit
+  if [[ $? -eq 0 ]]; then
+      echo -e Aasdk CMake completed successfully'\n'
   else
-    echo "Cmake ok"
-    echo
+    echo Aasdk CMake failed with code $?
+    exit
   fi
 
   #beginning make
   make -j2
 
-  if [[ $? > 0 ]]
-    then
-      echo "make error check logs"
-    exit
+  if [[ $? -eq 0 ]]; then
+    echo -e Aasdk Make completed successfully '\n'
   else
-    echo "make ok"
-    echo
+    echo Aasdk Make failed with code $?
+    exit
   fi
 
   #begin make install
   sudo make install
 
-  if [[ $? > 0 ]]
+  if [[ $? -eq 0 ]]
     then
-      echo "install error check logs"
-    exit
-  else
-    echo "installed ok ok"
+    echo -e Aasdk installed ok'\n'
     echo
+  else
+    echo Aasdk install failed with code $?
+    exit
   fi
   cd ../dash
-else
-	echo "skipping aasdk"
 fi
 
 
 ###############################  gstreamer  #########################
 #check if gstreamer install is requested
-if [ "$gstreamer" = true ]; then
-  echo "installing gstreamer"
+if [ $gstreamer = true ]; then
+  echo installing gstreamer
+
   #change to parent directory
   cd ..
+
   #clone gstreamer
-  echo "Cloning Gstreamer"
+  echo Cloning Gstreamer
   git clone $gstreamerRepo
-  if [[ $? > 0 ]]
-    then
-      cd qt-gstreamer
-      if [[ $? > 0 ]]
-        then
-          echo "clone/pull error"
-        exit
-      else
-        git pull gstreamerRepo
-        echo "cloned OK"
-        cd ..
-        echo
-      fi
+  if [[ $? -eq 0 ]]; then
+    echo -e Gstreamer cloned OK
   else
-    echo "cloned OK"
-    echo
+    cd qt-gstreamer
+      if [[ $? -eq 0 ]]; then
+        git pull gstreamerRepo
+        echo -e cloned OK '\n'
+        cd ..
+      else
+          echo Gstreamer clone/pull error
+        exit
+      fi
   fi
 
   #change into newly cloned directory
   cd qt-gstreamer
 
   #create build directory
-  echo "creating Gstreamer build directory"
-
+  echo creating Gstreamer build directory
   mkdir build
 
-  if [[ $? > 0 ]]
-    then
-      echo "unable to create Gstreamer build directory assuming it exists..."
+  if [[ $? -eq 0 ]]; then
+    echo -e Gstreamer build directory made
   else
-    echo "build directory made"
-    echo
+    echo Unable to create Gstreamer build directory assuming it exists...
   fi
 
   cd build
 
   #run cmake
-  echo "beginning cmake"
-
+  echo Beginning cmake
   cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_LIBDIR=lib/$(dpkg-architecture -qDEB_HOST_MULTIARCH) -DCMAKE_INSTALL_INCLUDEDIR=include -DQT_VERSION=5 -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS=-std=c++11
 
-  if [[ $? > 0 ]]
-    then
-      echo "cmake failed"
-    exit
+  if [[ $? -eq 0 ]]; then
+    echo -e Make ok'\n'
   else
-    echo "make ok"
-    echo
+    echo Gstreamer CMake failed
+    exit
   fi
 
-  #make j4
-  echo "making J4"
+  echo Making Gstreamer
   make -j4
 
-  if [[ $? > 0 ]]
-    then
-      echo "make error check logs"
-    exit
+  if [[ $? -eq 0 ]]; then
+    echo -e Gstreamer make ok'\n'
   else
-    echo "make ok"
-    echo
+    echo Make failed with error code $?
+    exit
   fi
 
   #run make install
-  echo "beginning make install"
+  echo Beginning make install
   sudo make install
 
-  if [[ $? > 0 ]]
-    then
-      echo "install error check logs"
-    exit
+  if [[ $? -eq 0 ]]; then
+    echo -e Gstreamer installed ok'\n'
   else
-    echo "installed ok"
-    echo
+    echo Gstreamer make install failed with error code $?
+    exit
   fi
 
-  #run ldconfig
   sudo ldconfig
   cd ../../dash
 
 else
-	echo "skipping gstreamer"
+	echo -e Skipping Gstreamer'\n'
 fi
 
 
 
 ###############################  openauto  #########################
-if [ "$openauto" = true ]; then
-  echo "installing openauto"
+if [ $openauto = false ]; then
+  echo -e skipping openauto'\n'
+else
+  echo Installing openauto
   cd ..
 
-  clone openauto
-  git clone $openautoRepo
-  if [[ $? > 0 ]]
-    then
-      cd openauto
-      if [[ $? > 0 ]]
-        then
-          echo "clone/pull error"
-        exit
-      else
-        git pull $openautoRepo
-        echo "cloned OK"
-        cd ..
-        echo
-      fi
+  #Make ilclient
+  echo making ilclient
+  make /opt/vc/src/hello_pi/libs/ilclient
+  if [[ $? -eq 0 ]]; then
+    echo -e ilclient make ok'\n'
   else
-    echo "cloned OK"
-    echo
+    echo Error making ilclient check logs
+    exit
+  fi
+
+  echo -e cloning openauto'\n'
+  git clone $openautoRepo
+  if [[ $? -eq 0 ]]; then
+    echo -e cloned OK'\n'
+  else
+    cd openauto
+    if [[ $? -eq 0 ]]; then
+      git pull $openautoRepo
+      echo -e Openauto cloned OK'\n'
+      cd ..
+    else
+      echo Openauto clone/pull error
+      exit
+    fi
   fi
 
   cd openauto
 
-  #beginning cmake
-  cmake -DRPI_BUILD=true -DGST_BUILD=true
-  if [[ $? > 0 ]]
-    then
-      echo "cmake error check logs"
-    exit
+  echo Beginning openauto cmake
+  cmake ${installArgs} -DGST_BUILD=true
+  if [[ $? -eq 0 ]]; then
+    echo -e Openauto CMake OK'\n'
   else
-    echo "cmake OK"
-    echo
+    echo Openauto CMake failed with error code $?
+    exit
   fi
 
-  #beginning cmake
+  echo Beginning openauto make
   make
-  if [[ $? > 0 ]]
-    then
-      echo "make error check logs"
-    exit
+  if [[ $? -eq 0 ]]; then
+    echo -e Openauto make OK'\n'
   else
-    echo "make OK"
-    echo
+    echo Openauto make failed with error code $?
+    exit
   fi
 
   #run make install
-  echo "beginning make install"
+  echo Beginning make install
   sudo make install
-  if [[ $? > 0 ]]
-    then
-      echo "install error check logs"
-    exit
+  if [[ $? -eq 0 ]]; then
+    echo -e Openauto installed ok'\n'
   else
-    echo "installed ok"
-    echo
+    echo Openauto make install failed with error code $?
+    exit
   fi
   cd ../dash
-else
-	echo "skipping openauto"
 fi
 
 
 ###############################  dash  #########################
-if [ "$dash" = true ]; then
-  #loop through dependencies and install
-	echo "installing dash"
-  echo "making ilclient"
-  make /opt/vc/src/hello_pi/libs/ilclient
-  if [[ $? > 0 ]]
-    then
-      echo "error making ilclient check logs"
-    exit
+if [ $dash = false ]; then
+	echo -e Skipping dash'\n'
+else
+	echo -e Installing dash'\n'
+  echo Running CMake for dash
+  cmake ${installArgs} -DGST_BUILD=TRUE .
+  if [[ $? -eq 0 ]]; then
+    echo -e Dash CMake OK'\n'
   else
-    echo "make ok"
-    echo
+    echo Dash CMake failed with error code $?
+    exit
   fi
 
-  echo "running cmake for dash"
-  cmake -DRPI_BUILD=TRUE -DGST_BUILD=TRUE .
-  if [[ $? > 0 ]]
-    then
-      echo "cmake error check logs"
-    exit
-  else
-    echo "cmake OK"
-    echo
-  fi
-
-  echo "running make"
+  echo Running Dash make
   make
-  if [[ $? > 0 ]]
-    then
-      echo "make error check output above"
-      exit
-    else
-      echo "make ok, executable can be found ../bin/ia"
+  if [[ $? -eq 0 ]]; then
+      echo -e Dash make ok, executable can be found ../bin/ia
       echo
 
-      #check if usb rules exist
-      echo "checking if permissions exist"
-
+      #check and add usb rules for openauto if they dont exist
+      echo Checking if permissions exist
       #udev rule to be created below, change as needed
       FILE=/etc/udev/rules.d/51-iadash.rules
-      if [[ -f "$FILE" ]]
-        then
-          echo "rules exists"
-          echo
-        else
-          sudo touch $FILE
-
+      if [[ ! -f "$FILE" ]]; then
           # OPEN USB RULE, CREATE MORE SECURE RULE IF REQUIRED
           echo "SUBSYSTEM==\"usb\", ATTR{idVendor}==\"*\", ATTR{idProduct}==\"*\", MODE=\"0660\", GROUP=\"plugdev\"" | sudo tee $FILE
-        if [[ $? > 0 ]]
-          then
-            echo "unable to create permissions"
+        if [[ $? -eq 0 ]]; then
+            echo -e Permissions created'\n'
           else
-            echo "permissions created"
+            echo -e Unable to create permissions'\n'
         fi
+        else
+          echo -e Rules exists'\n'
       fi
+    else
+      echo Dash make failed with error code $?
+      exit
   fi
 
   #Start app
-  echo "starting app"
+  echo Starting app
   cd bin
   ./ia
-else
-	echo "skipping dash"
 fi
