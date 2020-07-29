@@ -17,9 +17,10 @@ display_help() {
     exit 1
 }
 
-#TODO test on non raspbian build
+#location of OS details for linux
 OS_RELEASE_FILE="/etc/os-release"
 
+#check if Raspian is in the file, if not set the install Args to be false
 if grep -q "Raspbian" ${OS_RELEASE_FILE}; then
   installArgs="-DRPI_BUILD=true"
   isRpi=true
@@ -93,8 +94,6 @@ dependencies=(
 "libkf5bluezqt-dev"
 "libtag1-dev"
 "qml-module-qtquick2"
-#TODO delete below after test
-#"qml-module-qtquick*"
 "libglib2.0-dev"
 "libgstreamer1.0-dev"
 "gstreamer1.0-plugins-base-apps"
@@ -119,7 +118,7 @@ if [ $deps = false ]
     echo Running apt update
     sudo apt update
 
-    installString="sudo apt install "
+    installString="sudo apt install -y "
 
     #create apt install string
     for i in ${dependencies[@]}; do
@@ -127,7 +126,6 @@ if [ $deps = false ]
     done
 
     #run install
-    echo ${installString}
     ${installString}
     if [[ $? -eq 0 ]]; then
         echo -e All dependencies Installed ok '\n'
@@ -387,6 +385,27 @@ else
       echo Dash make failed with error code $?
       exit
   fi
+
+  #Setting openGL driver and GPU memory to 256mb
+  if $isRpi; then
+    sudo raspi-config nonint do_memory_split 256
+    if [[ $? -eq 0 ]]; then
+      echo -e Memory set to 256mb'\n'
+    else
+      echo Setting memory failed with error code $? please set manually
+      exit
+    fi
+
+    sudo raspi-config nonint do_gldriver G2
+    if [[ $? -eq 0 ]]; then
+      echo -e OpenGL set ok'\n'
+    else
+      echo Setting openGL failed with error code $? please set manually
+      exit
+    fi
+
+  fi
+
 
   #Start app
   echo Starting app
