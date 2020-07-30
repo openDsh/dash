@@ -5,11 +5,29 @@
 #include "app/window.hpp"
 #include "obd/conversions.hpp"
 
+void print_payload(QByteArray payload){
+    QString str = QString(payload);
+    std::cout<<"PAYLOAD OF ID 323 IS "<<str.toStdString()<<std::endl;
+}
+void print_payload2(QByteArray payload){
+    QString str = QString(payload);
+    std::cout<<"PAYLOAD OF ID 420 IS "<<str.toStdString()<<std::endl;
+}
+
+
 Gauge::Gauge(units_t units, QFont value_font, QFont unit_font, Gauge::Orientation orientation, int rate,
              std::vector<Command> cmds, int precision, obd_decoder_t decoder, QWidget *parent)
     : QWidget(parent)
 {
     Config *config = Config::get_instance();
+    SocketCANBus *bus = SocketCANBus::get_instance();
+    std::function<void(QByteArray)> func = print_payload;
+    std::function<void(QByteArray)> func2 = print_payload2;
+
+    bus->registerFrameHandler(323, func);
+    bus->registerFrameHandler(420, func2);
+
+
     this->si = config->get_si_units();
 
     this->rate = rate;
