@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <math.h>
 #include <sstream>
+#include <iostream>
 
 #include "app/modules/brightness.hpp"
 #include "app/tabs/camera.hpp"
@@ -12,6 +13,32 @@
 #include "app/tabs/settings.hpp"
 #include "app/widgets/dialog.hpp"
 #include "app/window.hpp"
+#include "canbus/socketcanbus.hpp"
+
+bool loadPlugin(SocketCANBus* bus, Theme* theme)
+{
+    std::cout<<"TRYING TO LOAD PLUGINS"<<std::endl;
+    QDir pluginsDir(QCoreApplication::applicationDirPath());
+    pluginsDir.cd("plugins");
+    const QStringList entries = pluginsDir.entryList(QDir::Files);
+    qDebug() << entries;
+    for (const QString &fileName : entries) {
+        QPluginLoader pluginLoader(pluginsDir.absoluteFilePath(fileName));
+        QObject *plugin = pluginLoader.instance();
+        if (plugin) {
+            std::cout<<"yes plugin"<<std::endl;
+            VehicleInterface* vehicleInterface = qobject_cast<VehicleInterface *>(plugin);
+            if (vehicleInterface){
+                std::cout<<"FOUND PLUGIN"<<std::endl;
+                vehicleInterface->init(bus, theme);
+                return true;
+            }
+            pluginLoader.unload();
+        }
+    }
+    std::cout<<"NO LOAD"<<std::endl;
+    return false;
+}
 
 MainWindow::MainWindow()
 {
@@ -47,6 +74,8 @@ MainWindow::MainWindow()
     this->layout->addWidget(this->window_widget());
 
     setCentralWidget(widget);
+
+    loadPlugin(SocketCANBus::get_instance(), this->theme);
 }
 
 QWidget *MainWindow::window_widget()
@@ -464,7 +493,7 @@ QWidget *MainWindow::save_control_widget()
 void MainWindow::update_system_volume(int position)
 {
     QProcess *lProc = new QProcess();
-    std::string command = "amixer set Master " + std::to_string(position) + "% --quiet";
+    std::string command = "";
     lProc->start(QString(command.c_str()));
     lProc->waitForFinished();
 }

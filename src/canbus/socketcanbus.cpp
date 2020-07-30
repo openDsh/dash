@@ -24,6 +24,10 @@ SocketCANBus::~SocketCANBus()
    
 }
 
+bool SocketCANBus::writeFrame(QCanBusFrame frame){
+    bus->writeFrame(frame);
+}
+
 SocketCANBus *SocketCANBus::get_instance()
 {
     static SocketCANBus bus;
@@ -38,20 +42,23 @@ void SocketCANBus::framesAvailable()
         for(int i = 0; i<frames.length(); i++){
             QCanBusFrame frame = frames.at(i);
             QString frameString = QString(frame.payload());
-            DASH_LOG(info) <<"[SocketCANBus] FRAME: " << frame.frameId()
-            << " PAYLOAD: "<<frameString.toStdString();
+            // DASH_LOG(info) <<"[SocketCANBus] FRAME: " << frame.frameId()
+            // << " PAYLOAD: "<<frameString.toStdString();
             if (callbacks.find(frame.frameId()) != callbacks.end())
             {
-                callbacks[frame.frameId()](frame.payload());
+                for(auto callback : callbacks[frame.frameId()]){
+                    callback(frame.payload());
+                }
             }
         }
     }
+    
 } 
 
 
 void SocketCANBus::registerFrameHandler(int id, std::function<void(QByteArray)> callback)
 {
-    callbacks[id] = callback;
+    callbacks[id].push_back(callback);
     QCanBusDevice::Filter filter;
     filter.frameId = id;
     filter.frameIdMask = 0xFFF;

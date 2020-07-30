@@ -11,6 +11,12 @@
 #include <QRegularExpression>
 #include <QTextStream>
 #include <QTransform>
+#include "canbus/socketcanbus.hpp"
+#include "canbus/vehicleinterface.hpp"
+#include <iostream>
+#include <QDir>
+#include <QPluginLoader>
+#include <QDebug>
 
 #include "app/theme.hpp"
 
@@ -34,8 +40,11 @@ const QSize Theme::icon_96 = QSize(96, 96);
 const QColor Theme::danger_color = QColor(211, 47, 47);
 const QColor Theme::success_color = QColor(56, 142, 60);
 
+
+
 Theme::Theme() : QObject(qApp), palette(), color("azure")
 {
+    SocketCANBus *bus = SocketCANBus::get_instance();
     QFontDatabase::addApplicationFont(":/fonts/Titillium_Web/TitilliumWeb-Regular.ttf");
     QFontDatabase::addApplicationFont(":/fonts/Montserrat/Montserrat-LightItalic.ttf");
     QFontDatabase::addApplicationFont(":/fonts/Montserrat/Montserrat-Regular.ttf");

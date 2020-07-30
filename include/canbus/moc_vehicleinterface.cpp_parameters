@@ -1,0 +1,5 @@
+-DBOOST_ALL_DYN_LINK
+-DUSE_GST
+-o
+/home/icecube45/dash/include/canbus/moc_vehicleinterface.cpp
+/home/icecube45/dash/include/canbus/vehicleinterface.hpp
