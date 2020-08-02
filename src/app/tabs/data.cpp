@@ -18,7 +18,8 @@ Gauge::Gauge(units_t units, QFont value_font, QFont unit_font, Gauge::Orientatio
     using namespace std::placeholders;
     std::function<void(QByteArray)> callback = std::bind(&Gauge::can_callback, this, std::placeholders::_1);
 
-    bus->registerFrameHandler(cmds[0].frame.frameId()+0x40, callback);
+    bus->registerFrameHandler(cmds[0].frame.frameId()+0x9, callback);
+    DASH_LOG(info)<<"[Gauges] Registered frame handler for id "<<(cmds[0].frame.frameId()+0x9);
 
     this->si = config->get_si_units();
 
@@ -26,7 +27,7 @@ Gauge::Gauge(units_t units, QFont value_font, QFont unit_font, Gauge::Orientatio
     this->precision = precision;
 
     this->cmds = cmds;
-
+    this->decoder = decoder;
 
     QBoxLayout *layout;
     if (orientation == BOTTOM)
@@ -63,11 +64,10 @@ Gauge::Gauge(units_t units, QFont value_font, QFont unit_font, Gauge::Orientatio
 }
 
 void Gauge::can_callback(QByteArray payload){
-    std::cout<<"CAN CALLBACK"<<std::endl;
     Response resp = Response(payload);
     for(auto cmd : cmds){
         if(cmd.frame.payload().at(2) == resp.PID){
-            value_label->setText(this->format_value(decoder(cmd.decoder(resp), this->si)));
+            value_label->setText(this->format_value(this->decoder(cmd.decoder(resp), this->si)));
         }
     }
 }
