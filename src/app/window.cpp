@@ -15,28 +15,27 @@
 #include "app/window.hpp"
 #include "canbus/socketcanbus.hpp"
 
-bool loadPlugin(SocketCANBus* bus, Theme* theme)
+bool loadVehiclePlugin(SocketCANBus* bus)
 {
-    std::cout<<"TRYING TO LOAD PLUGINS"<<std::endl;
+    DASH_LOG(info)<<"[VehicleInterface] Looking for vehicle plugin";
     QDir pluginsDir(QCoreApplication::applicationDirPath());
     pluginsDir.cd("plugins");
     const QStringList entries = pluginsDir.entryList(QDir::Files);
-    qDebug() << entries;
     for (const QString &fileName : entries) {
+        std::cout<<fileName.toStdString()<<std::endl;
         QPluginLoader pluginLoader(pluginsDir.absoluteFilePath(fileName));
         QObject *plugin = pluginLoader.instance();
         if (plugin) {
-            std::cout<<"yes plugin"<<std::endl;
             VehicleInterface* vehicleInterface = qobject_cast<VehicleInterface *>(plugin);
             if (vehicleInterface){
-                std::cout<<"FOUND PLUGIN"<<std::endl;
-                vehicleInterface->init(bus, theme);
+                DASH_LOG(info)<<"[VehicleInterface] Found plugin "<<fileName.toStdString();
+                vehicleInterface->init(bus);
                 return true;
             }
             pluginLoader.unload();
         }
     }
-    std::cout<<"NO LOAD"<<std::endl;
+    DASH_LOG(info)<<"[VehicleInterface] No plugin loaded";
     return false;
 }
 
@@ -75,7 +74,7 @@ MainWindow::MainWindow()
 
     setCentralWidget(widget);
 
-    loadPlugin(SocketCANBus::get_instance(), this->theme);
+    loadVehiclePlugin(SocketCANBus::get_instance());
 }
 
 QWidget *MainWindow::window_widget()

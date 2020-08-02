@@ -2,9 +2,13 @@
 #include <iostream>
 #include <stdlib.h>
 #include <QByteArray>
+#include <boost/log/trivial.hpp>
+
 #include "app/theme.hpp"
 #include "canbus/socketcanbus.hpp"
 #include "canbus/vehicleinterface.hpp"
+
+#define G37_LOG(severity) BOOST_LOG_TRIVIAL(severity) << "[G37VehiclePlugin] "
 
 class InfinitiG37 : public QObject, public VehicleInterface
 {
@@ -13,7 +17,7 @@ class InfinitiG37 : public QObject, public VehicleInterface
     Q_INTERFACES(VehicleInterface)
 
     public:
-        bool init(SocketCANBus* canbus, Theme* theme) override;
+        bool init(SocketCANBus* canbus) override;
 
     private:
         static void monitorHeadlightStatus(QByteArray payload);

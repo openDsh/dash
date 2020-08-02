@@ -1,12 +1,11 @@
 #pragma once
 #include "socketcanbus.hpp"
-#include "app/theme.hpp"
 
 class VehicleInterface
 {
 public:
     virtual ~VehicleInterface() = default;
-    virtual bool init(SocketCANBus* canbus, Theme* theme) = 0;
+    virtual bool init(SocketCANBus* canbus) = 0;
 };
 
 #define VehicleInterface_iid "org.dash.canbus.VehicleInterface"

@@ -1,11 +1,13 @@
 #include "infiniti_g37.hpp"
 
-bool InfinitiG37::init(SocketCANBus* canbus, Theme* theme){
-    std::cout<<"INIT OF G37"<<std::endl;
+Theme* InfinitiG37::theme = nullptr;
+
+bool InfinitiG37::init(SocketCANBus* canbus){
     std::function<void(QByteArray)> headlightCallback = monitorHeadlightStatus;
     canbus->registerFrameHandler(0x60D, headlightCallback);
     std::function<void(QByteArray)> climateControlCallback = updateClimateDisplay;
-    this->theme = theme;
+    this->theme = Theme::get_instance();
+    G37_LOG(info)<<"loaded successfully";
     return true;
 }
 
@@ -22,7 +24,6 @@ bool InfinitiG37::init(SocketCANBus* canbus, Theme* theme){
 //         07 = ON
 
 void InfinitiG37::monitorHeadlightStatus(QByteArray payload){
-    std::cout<<"G37 Got Headlight Status"<<std::endl;
     if(payload.at(0) == 0x0E){
         //headlights are ON - turn to dark mode
         if(theme->get_mode() != true){
@@ -37,12 +38,49 @@ void InfinitiG37::monitorHeadlightStatus(QByteArray payload){
     }
 }
 
+// 54B
+// 54B  03 08 80 02 04 00 00 01 
+
+
+// 1st byte 
+//  AC status
+//  0x03: OFF
+//  0x02 ON - cold?
+// 3rd byte:
+//   mode:
+//    A0 defrost+leg
+//    88 head
+//    90 head+feet
+//    98 feet
+//    A8 defrost
+// 4th byte:
+//  duel climate:
+//      61: on & recirculation?
+//      01: off & recirculation
+//      62: on
+//      02: off
+//      
+// 5th byte:
+//    fan:
+//     04 off
+//     0C 1
+//     14 2
+//     1C 3
+//     24 4
+//     2C 5
+//     34 6
+//     3C 7
+//
+
+
 
 // 542  00 5A 00 00 00 00 00 01 | 90F
 // 542  00 3C 00 00 00 00 00 01 | 60F
 // SECOND BYTE:
 //     temperature goal:
 //         1:1 to temperature in F
+// THIRD BYTE:
+//      duel climate temp goal
 
 void InfinitiG37::updateClimateDisplay(QByteArray payload){
     //theme->temperature = payload.at(1);
