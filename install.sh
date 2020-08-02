@@ -213,7 +213,7 @@ if [ $gstreamer = true ]; then
   else
     cd qt-gstreamer
       if [[ $? -eq 0 ]]; then
-        git pull gstreamerRepo
+        git pull $gstreamerRepo
         echo -e cloned OK '\n'
         cd ..
       else
