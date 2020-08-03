@@ -21,7 +21,10 @@ SocketCANBus::SocketCANBus(QString canInterface)
 
 SocketCANBus::~SocketCANBus()
 {
-   
+    DASH_LOG(info) << "[SocketCANBus] Disconnecting and deleting bus";
+    if(bus->state() == QCanBusDevice::ConnectedState){
+        bus->disconnectDevice();
+    }
 }
 
 bool SocketCANBus::writeFrame(QCanBusFrame frame){

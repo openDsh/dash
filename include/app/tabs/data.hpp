@@ -31,11 +31,14 @@ class Gauge : public QWidget {
 
     obd_decoder_t decoder;
     std::vector<Command> cmds;
+    std::map<int, double> dataMap;
+
 
     bool si;
     int rate;
     int precision;
     QTimer *timer;
+
 
    signals:
     void toggle_unit(bool si);

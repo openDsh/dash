@@ -86,7 +86,6 @@ dependencies=(
 "libtag1-dev"
 "qml-module-qtquick2"
 "doxygen"
-"qml-module-qtquick*"
 "libglib2.0-dev"
 "libgstreamer1.0-dev"
 "gstreamer1.0-plugins-base-apps"
@@ -369,9 +368,10 @@ if [ "$dash" = true ]; then
     echo "make ok"
     echo
   fi
-
+  mkdir build
+  cd build
   echo "running cmake for dash"
-  cmake -DGST_BUILD=TRUE .
+  cmake -DGST_BUILD=true ../
   if [[ $? > 0 ]]
     then
       echo "cmake error check logs"
@@ -404,7 +404,6 @@ if [ "$dash" = true ]; then
           sudo touch $FILE
 
           # OPEN USB RULE, CREATE MORE SECURE RULE IF REQUIRED
-          echo "SUBSYSTEM==\"usb\", ATTR{idVendor}==\"*\", ATTR{idProduct}==\"*\", MODE=\"0660\", GROUP=\"plugdev\"" | sudo tee $FILE
         if [[ $? > 0 ]]
           then
             echo "unable to create permissions"
@@ -413,6 +412,7 @@ if [ "$dash" = true ]; then
         fi
       fi
   fi
+  cd ..
 
   #Start app
   echo "starting app"
