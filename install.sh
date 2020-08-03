@@ -350,9 +350,19 @@ fi
 if [ $dash = false ]; then
 	echo -e Skipping dash'\n'
 else
+
+  mkdir build
+  if [[ $? -eq 0 ]]; then
+    echo -e dash build directory made
+  else
+    echo Unable to create dash build directory assuming it exists...
+  fi
+
+  cd build
+
 	echo -e Installing dash'\n'
   echo Running CMake for dash
-  cmake ${installArgs} -DGST_BUILD=TRUE .
+  cmake ${installArgs} -DGST_BUILD=TRUE ../
   if [[ $? -eq 0 ]]; then
     echo -e Dash CMake OK'\n'
   else
@@ -409,6 +419,6 @@ else
 
   #Start app
   echo Starting app
-  cd bin
+  cd ../bin
   ./ia
 fi
