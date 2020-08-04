@@ -42,12 +42,15 @@ class Dialog : public QDialog {
     inline void set_body(QWidget *widget)
     {
         this->body->addWidget(widget);
+        this->adjustSize();
         qApp->processEvents();
         Theme::get_instance()->update();
+        this->adjustSize();
     }
     inline void set_button(QPushButton *button)
     {
-        if (this->buttons->count() < 2) this->add_cancel_button();
+        if (this->buttons->count() == 0)
+            this->add_cancel_button();
         button->setFont(Theme::font_16);
         button->setFlat(true);
         this->buttons->addWidget(button, 0, Qt::AlignRight);
@@ -73,6 +76,8 @@ class Dialog : public QDialog {
 
     inline void add_cancel_button()
     {
+        this->buttons->addStretch();
+
         QPushButton *button = new QPushButton("cancel", this);
         button->setFont(Theme::font_16);
         button->setFlat(true);

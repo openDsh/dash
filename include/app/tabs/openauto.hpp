@@ -90,17 +90,17 @@ class OpenAutoSettingsSubTab : public QWidget {
 
    private:
     QWidget *settings_widget();
-    QWidget *rhd_row_widget();
-    QWidget *frame_rate_row_widget();
-    QWidget *resolution_row_widget();
-    QWidget *dpi_row_widget();
-    QWidget *dpi_widget();
-    QWidget *rt_audio_row_widget();
-    QWidget *audio_channels_row_widget();
-    QWidget *bluetooth_row_widget();
-    QWidget *touchscreen_row_widget();
-    QCheckBox *button_checkbox(QString name, QString key, aasdk::proto::enums::ButtonCode::Enum code, QWidget *parent);
-    QWidget *buttons_row_widget();
+    QBoxLayout *rhd_row_widget();
+    QBoxLayout *frame_rate_row_widget();
+    QBoxLayout *resolution_row_widget();
+    QBoxLayout *dpi_row_widget();
+    QBoxLayout *dpi_widget();
+    QBoxLayout *rt_audio_row_widget();
+    QBoxLayout *audio_channels_row_widget();
+    QBoxLayout *bluetooth_row_widget();
+    QBoxLayout *touchscreen_row_widget();
+    QCheckBox *button_checkbox(QString name, QString key, aasdk::proto::enums::ButtonCode::Enum code);
+    QBoxLayout *buttons_row_widget();
 
     Bluetooth *bluetooth;
     Config *config;

@@ -3,6 +3,7 @@
 #include <QGridLayout>
 #include <QKeyEvent>
 #include <QPropertyAnimation>
+#include <QRect>
 
 #include "app/config.hpp"
 #include "app/widgets/dialog.hpp"
@@ -10,8 +11,6 @@
 Dialog::Dialog(bool fullscreen, QWidget *parent) : QDialog(parent, Qt::FramelessWindowHint)
 {
     this->setAttribute(Qt::WA_TranslucentBackground, true);
-
-    // do we need a resizeEvent to set a max of window size??
 
     this->fullscreen = fullscreen;
     if (this->fullscreen) {
@@ -63,8 +62,8 @@ QWidget *Dialog::content_widget()
     layout->addLayout(this->body);
 
     this->buttons = new QHBoxLayout();
-    this->buttons->addStretch();
-    if (!this->overlay_enabled && this->fullscreen) this->add_cancel_button();
+    if (!this->overlay_enabled && this->fullscreen)
+        this->add_cancel_button();
     layout->addLayout(this->buttons);
 
     return frame;
@@ -110,6 +109,16 @@ void Dialog::keyPressEvent(QKeyEvent *event)
 void Dialog::showEvent(QShowEvent *event)
 {
     QWidget::showEvent(event);
+
+    if (!this->overlay_enabled && this->fullscreen) {
+        if (QWidget *parent = this->parentWidget()) {
+            QRect geometry = parent->geometry();
+            int margin = std::ceil(24 * Config::get_instance()->get_scale()) * 2;
+            this->setFixedWidth(std::min(this->width(), geometry.width() - margin));
+            this->setFixedHeight(std::min(this->height(), geometry.height() - margin));
+        }
+    }
+
     this->set_position();
 }
 
