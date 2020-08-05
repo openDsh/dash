@@ -22,13 +22,12 @@ bool loadVehiclePlugin(SocketCANBus* bus)
     pluginsDir.cd("plugins");
     const QStringList entries = pluginsDir.entryList(QDir::Files);
     for (const QString &fileName : entries) {
-        std::cout<<fileName.toStdString()<<std::endl;
         QPluginLoader pluginLoader(pluginsDir.absoluteFilePath(fileName));
         QObject *plugin = pluginLoader.instance();
         if (plugin) {
             VehicleInterface* vehicleInterface = qobject_cast<VehicleInterface *>(plugin);
             if (vehicleInterface){
-                DASH_LOG(info)<<"[VehicleInterface] Found plugin "<<fileName.toStdString();
+                DASH_LOG(info)<<"[VehicleInterface] Loading plugin "<<fileName.toStdString();
                 vehicleInterface->init(bus);
                 return true;
             }

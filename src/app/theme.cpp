@@ -44,7 +44,7 @@ const QColor Theme::success_color = QColor(56, 142, 60);
 
 Theme::Theme() : QObject(qApp), palette(), color("azure")
 {
-    SocketCANBus *bus = SocketCANBus::get_instance();
+    ICANBus *bus = SocketCANBus::get_instance();
     QFontDatabase::addApplicationFont(":/fonts/Titillium_Web/TitilliumWeb-Regular.ttf");
     QFontDatabase::addApplicationFont(":/fonts/Montserrat/Montserrat-LightItalic.ttf");
     QFontDatabase::addApplicationFont(":/fonts/Montserrat/Montserrat-Regular.ttf");

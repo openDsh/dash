@@ -2,7 +2,7 @@
 
 Theme* InfinitiG37::theme = nullptr;
 
-bool InfinitiG37::init(SocketCANBus* canbus){
+bool InfinitiG37::init(ICANBus* canbus){
     std::function<void(QByteArray)> headlightCallback = monitorHeadlightStatus;
     canbus->registerFrameHandler(0x60D, headlightCallback);
     std::function<void(QByteArray)> climateControlCallback = updateClimateDisplay;

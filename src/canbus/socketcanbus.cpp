@@ -27,8 +27,9 @@ SocketCANBus::~SocketCANBus()
     }
 }
 
-bool SocketCANBus::writeFrame(QCanBusFrame frame){
-    bus->writeFrame(frame);
+bool SocketCANBus::writeFrame(QCanBusFrame frame)
+{
+    return bus->writeFrame(frame);
 }
 
 SocketCANBus *SocketCANBus::get_instance()
@@ -44,9 +45,6 @@ void SocketCANBus::framesAvailable()
         QVector<QCanBusFrame> frames =  bus->readAllFrames();
         for(int i = 0; i<frames.length(); i++){
             QCanBusFrame frame = frames.at(i);
-            QString frameString = QString(frame.payload());
-            // DASH_LOG(info) <<"[SocketCANBus] FRAME: " << frame.frameId()
-            // << " PAYLOAD: "<<frameString.toStdString();
             if (callbacks.find(frame.frameId()) != callbacks.end())
             {
                 for(auto callback : callbacks[frame.frameId()]){

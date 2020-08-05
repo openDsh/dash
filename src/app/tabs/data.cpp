@@ -4,6 +4,7 @@
 #include "app/tabs/data.hpp"
 #include "app/window.hpp"
 #include "obd/conversions.hpp"
+#include "canbus/elm327.hpp"
 
 
 
@@ -13,7 +14,7 @@ Gauge::Gauge(units_t units, QFont value_font, QFont unit_font, Gauge::Orientatio
 : QWidget(parent)
 {
     Config *config = Config::get_instance();
-    SocketCANBus *bus = SocketCANBus::get_instance();
+    ICANBus *bus = elm327::get_instance();
 
     using namespace std::placeholders;
     std::function<void(QByteArray)> callback = std::bind(&Gauge::can_callback, this, std::placeholders::_1);
@@ -93,9 +94,7 @@ QString Gauge::null_value()
 
 DataTab::DataTab(QWidget *parent) : QWidget(parent)
 {
-    SocketCANBus *bus = SocketCANBus::get_instance();
-
-    
+    ICANBus *bus = SocketCANBus::get_instance();
 
     QHBoxLayout *layout = new QHBoxLayout(this);
 

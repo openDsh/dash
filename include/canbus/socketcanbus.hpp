@@ -7,16 +7,17 @@
 #include <QVariant>
 
 #include "DashLog.hpp"
+#include "canbus/ICANBus.hpp"
 
-class SocketCANBus : public QObject
+class SocketCANBus : public QObject, public ICANBus
 {
     Q_OBJECT
     public:
         SocketCANBus(QString canInterface = "can0");
         ~SocketCANBus();
         static SocketCANBus *get_instance();
-        void registerFrameHandler(int id, std::function<void(QByteArray)> callback);
-        bool writeFrame(QCanBusFrame frame);
+        void registerFrameHandler(int id, std::function<void(QByteArray)> callback) override;
+        bool writeFrame(QCanBusFrame frame) override;
 
     private:
         bool socketCANAvailable = false;

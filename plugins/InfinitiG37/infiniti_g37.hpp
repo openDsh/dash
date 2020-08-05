@@ -17,7 +17,7 @@ class InfinitiG37 : public QObject, public VehicleInterface
     Q_INTERFACES(VehicleInterface)
 
     public:
-        bool init(SocketCANBus* canbus) override;
+        bool init(ICANBus* canbus) override;
 
     private:
         static void monitorHeadlightStatus(QByteArray payload);
