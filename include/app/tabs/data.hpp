@@ -49,3 +49,4 @@ class DataTab : public QWidget {
 
     std::vector<Gauge *> gauges;
 };
+
