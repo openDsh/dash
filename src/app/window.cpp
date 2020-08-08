@@ -145,6 +145,17 @@ void DashWindow::add_pages()
             break;
         }
     }
+
+    Shortcut *shortcut = new Shortcut(this->config->get_shortcut("cycle_pages"), this);
+    this->shortcuts->add_shortcut("cycle_pages", "Cycle Pages", shortcut);
+    connect(shortcut, &Shortcut::activated, [this]() {
+        int idx = this->rail_group->checkedId();
+        QList<QAbstractButton *> buttons = this->rail_group->buttons();
+        do {
+            idx = (idx + 1) % buttons.size();
+        } while (buttons[idx]->isHidden());
+        buttons[idx]->setChecked(true);
+    });
 }
 
 void DashWindow::add_page(QString name, QWidget *page, QString icon)
@@ -158,6 +169,12 @@ void DashWindow::add_page(QString name, QWidget *page, QString icon)
     button->setIconSize(Theme::icon_32);
     button->setIcon(this->theme->make_button_icon(icon, button));
 
+    Shortcut *shortcut = new Shortcut(this->config->get_shortcut(name), this);
+    this->shortcuts->add_shortcut(name, name, shortcut);
+    connect(shortcut, &Shortcut::activated, [this, button]() {
+        if (!button->isHidden())
+            button->setChecked(true);
+    });
 
     int idx = this->pages->addWidget(page);
     this->rail_group->addButton(button, idx);
