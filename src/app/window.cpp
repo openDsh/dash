@@ -412,6 +412,8 @@ QWidget *DashWindow::save_control_widget()
 {
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setSpacing(0);
 
     QLabel *check = new QLabel("✓", widget);
     check->setFont(Theme::font_24);
