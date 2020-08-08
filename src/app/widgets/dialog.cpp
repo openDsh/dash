@@ -13,17 +13,8 @@ Dialog::Dialog(bool fullscreen, QWidget *parent) : QDialog(parent, Qt::Frameless
     this->setAttribute(Qt::WA_TranslucentBackground, true);
 
     this->fullscreen = fullscreen;
-    if (this->fullscreen) {
-        if (false) {
-            this->resize(parent->size());
-            Overlay *overlay = new Overlay(this);
-            overlay->resize(parent->size());
-            connect(overlay, &Overlay::close, [this]() { this->close(); });
-            this->overlay_enabled = true;
-        }
-    }
 
-    QGridLayout *layout = new QGridLayout(this);
+    QHBoxLayout *layout = new QHBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
     layout->addWidget(this->content_widget());
@@ -52,17 +43,22 @@ void Dialog::open(int timeout)
 QWidget *Dialog::content_widget()
 {
     QFrame *frame = new QFrame(this);
-    if (this->fullscreen) frame->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     QVBoxLayout *layout = new QVBoxLayout(frame);
 
     this->title = new QVBoxLayout();
+    this->title->setContentsMargins(0, 0, 0, 0);
+    this->title->setSpacing(0);
     layout->addLayout(this->title);
 
     this->body = new QVBoxLayout();
+    this->body->setContentsMargins(0, 0, 0, 0);
+    this->body->setSpacing(0);
     layout->addLayout(this->body);
 
     this->buttons = new QHBoxLayout();
-    if (!this->overlay_enabled && this->fullscreen)
+    this->buttons->setContentsMargins(0, 0, 0, 0);
+    this->buttons->setSpacing(0);
+    if (this->fullscreen)
         this->add_cancel_button();
     layout->addLayout(this->buttons);
 
@@ -110,12 +106,11 @@ void Dialog::showEvent(QShowEvent *event)
 {
     QWidget::showEvent(event);
 
-    if (!this->overlay_enabled && this->fullscreen) {
+    if (this->fullscreen) {
         if (QWidget *parent = this->parentWidget()) {
-            QRect geometry = parent->geometry();
             int margin = std::ceil(24 * Config::get_instance()->get_scale()) * 2;
-            this->setFixedWidth(std::min(this->width(), geometry.width() - margin));
-            this->setFixedHeight(std::min(this->height(), geometry.height() - margin));
+            this->setFixedWidth(std::min(this->width(), parent->width() - margin));
+            this->setFixedHeight(std::min(this->height(), parent->height() - margin));
         }
     }
 

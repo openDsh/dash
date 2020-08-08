@@ -50,9 +50,10 @@ Config::Config()
     timer->start(10000);
 }
 
-void Config::save()
+void Config::save(bool send_status)
 {
-    emit save_status(true);
+    if (send_status)
+        emit save_status(true);
 
     if (this->volume != this->ia_config.value("volume", 50).toInt())
         this->ia_config.setValue("volume", this->volume);
@@ -123,7 +124,9 @@ void Config::save()
     this->openauto_config->save();
 
     this->ia_config.sync();
-    emit save_status(false);
+
+    if (send_status)
+        emit save_status(false);
 }
 
 Config *Config::get_instance()

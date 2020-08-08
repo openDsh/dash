@@ -10,20 +10,6 @@
 
 #include "app/theme.hpp"
 
-class Overlay : public QWidget {
-    Q_OBJECT
-
-   public:
-    Overlay(QWidget *parent = nullptr) : QWidget(parent) { this->setAttribute(Qt::WA_NoSystemBackground, true); }
-
-   protected:
-    inline void paintEvent(QPaintEvent *) { QPainter(this).fillRect(this->rect(), {0, 0, 0, 108}); }
-    inline void mouseReleaseEvent(QMouseEvent *) { emit close(); }
-
-   signals:
-    void close();
-};
-
 class Dialog : public QDialog {
     Q_OBJECT
 
@@ -41,11 +27,10 @@ class Dialog : public QDialog {
     }
     inline void set_body(QWidget *widget)
     {
+        this->setMinimumSize(widget->size());
         this->body->addWidget(widget);
-        this->adjustSize();
         qApp->processEvents();
         Theme::get_instance()->update();
-        this->adjustSize();
     }
     inline void set_button(QPushButton *button)
     {
@@ -69,7 +54,6 @@ class Dialog : public QDialog {
     QHBoxLayout *buttons;
     QTimer *timer;
     bool fullscreen;
-    bool overlay_enabled = false;
 
     QWidget *content_widget();
     void set_position();

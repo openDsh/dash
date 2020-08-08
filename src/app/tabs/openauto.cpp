@@ -478,9 +478,7 @@ QWidget *OpenAutoTab::connect_msg()
     settings_button->setIcon(this->theme->make_button_icon("settings", settings_button));
     connect(settings_button, &QPushButton::clicked, [this]() {
         Dialog *dialog = new Dialog(true, this->window());
-        static OpenAutoSettingsSubTab *settings = new OpenAutoSettingsSubTab();
-        settings->setFixedWidth(this->width() * .75);
-        dialog->set_body(settings);
+        dialog->set_body(new OpenAutoSettingsSubTab());
         QPushButton *save_button = new QPushButton("save");
         dialog->set_button(save_button);
         dialog->open();

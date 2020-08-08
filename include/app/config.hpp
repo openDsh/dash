@@ -18,7 +18,7 @@ class Config : public QObject {
    public:
     Config();
 
-    void save();
+    void save(bool send_status=false);
 
     inline int get_volume() { return this->volume; }
     inline void set_volume(int volume)

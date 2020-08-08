@@ -196,7 +196,7 @@ QWidget *DashWindow::controls_bar_widget()
         Dialog *dialog = new Dialog(false, save_button);
         dialog->set_body(this->save_control_widget());
 
-        this->config->save();
+        this->config->save(true);
         dialog->open(1000);
     });
 
@@ -378,8 +378,10 @@ QWidget *DashWindow::controls_widget()
 
 QWidget *DashWindow::power_control_widget()
 {
-    QWidget *widget = new QWidget();
+    QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setSpacing(0);
 
     QPushButton *restart = new QPushButton(widget);
     restart->setFlat(true);
@@ -408,9 +410,8 @@ QWidget *DashWindow::power_control_widget()
 
 QWidget *DashWindow::save_control_widget()
 {
-    QWidget *widget = new QWidget();
-    widget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    QStackedLayout *layout = new QStackedLayout(widget);
+    QWidget *widget = new QWidget(this);
+    QHBoxLayout *layout = new QHBoxLayout(widget);
 
     QLabel *check = new QLabel("✓", widget);
     check->setFont(Theme::font_24);
@@ -419,14 +420,17 @@ QWidget *DashWindow::save_control_widget()
     ProgressIndicator *loader = new ProgressIndicator(widget);
     loader->scale(this->config->get_scale());
     connect(this->config, &Config::scale_changed, [loader](double scale) { loader->scale(scale); });
-    connect(this->config, &Config::save_status, [loader, layout](bool status) {
+    connect(this->config, &Config::save_status, [=](bool status) {
         if (status) {
             loader->start_animation();
+            check->hide();
+            loader->show();
         }
         else {
             QTimer::singleShot(1000, [=]() {
-                layout->setCurrentIndex(1);
                 loader->stop_animation();
+                loader->hide();
+                check->show();
             });
         }
     });
