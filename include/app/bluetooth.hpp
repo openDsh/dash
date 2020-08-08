@@ -54,3 +54,4 @@ class Bluetooth : public QObject {
     void media_player_track_changed(BluezQt::MediaPlayerTrack);
     void scan_status(bool);
 };
+
