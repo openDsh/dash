@@ -43,16 +43,16 @@ class DashWindow : public QMainWindow {
     void init_config();
     void init_theme();
     void init_ui();
-    QBoxLayout *body();
+    QLayout *body();
     void add_pages();
     void add_page(QString name, QWidget *page, QString icon);
 
-    QWidget *quick_view_widget();
-    QWidget *controls_bar_widget();
+    QWidget *controls_bar();
+    QLayout *quick_views();
     QWidget *volume_widget(bool skip_buttons = false);
     QWidget *brightness_widget(bool skip_buttons = false);
     QWidget *controls_widget();
-    QWidget *power_control_widget();
-    QWidget *save_control_widget();
+    QWidget *power_control();
+    QWidget *save_control();
     void update_system_volume(int position);
 };

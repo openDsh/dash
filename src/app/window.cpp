@@ -112,7 +112,7 @@ void DashWindow::init_ui()
     this->setCentralWidget(this->stack);
 }
 
-QBoxLayout *DashWindow::body()
+QLayout *DashWindow::body()
 {
     QVBoxLayout *layout = new QVBoxLayout();
     layout->setContentsMargins(0, 0, 0, 0);
@@ -121,7 +121,7 @@ QBoxLayout *DashWindow::body()
     this->pages->setContentsMargins(0, 0, 0, 0);
 
     this->bar->setContentsMargins(0, 0, 0, 0);
-    this->bar->addWidget(this->controls_bar_widget());
+    this->bar->addWidget(this->controls_bar());
 
     layout->addLayout(this->pages);
     layout->addLayout(this->bar);
@@ -133,7 +133,7 @@ void DashWindow::add_pages()
 {
     this->add_page("Android Auto", this->openauto, "android_auto");
     this->add_page("Media", new MediaTab(this), "play_circle_outline");
-    this->add_page("Data", new DataTab(this), "speed");
+    this->add_page("Vehicle", new DataTab(this), "directions_car");
     this->add_page("Camera", new CameraTab(this), "camera");
     this->add_page("Launcher", new LauncherTab(this), "widgets");
     this->add_page("Settings", new SettingsTab(this), "tune");
@@ -183,24 +183,10 @@ void DashWindow::add_page(QString name, QWidget *page, QString icon)
     button->setVisible(this->config->get_page(page));
 }
 
-QWidget *DashWindow::quick_view_widget()
+QWidget *DashWindow::controls_bar()
 {
     QWidget *widget = new QWidget(this);
-    QStackedLayout *layout = new QStackedLayout(widget);
-    layout->setContentsMargins(0, 0, 0, 0);
-
-    for (auto quick_view : this->config->get_quick_views().values())
-        layout->addWidget(quick_view);
-    layout->setCurrentWidget(this->config->get_quick_view(this->config->get_quick_view()));
-    connect(this->config, &Config::quick_view_changed,
-            [this, layout](QString quick_view) { layout->setCurrentWidget(this->config->get_quick_view(quick_view)); });
-
-    return widget;
-}
-
-QWidget *DashWindow::controls_bar_widget()
-{
-    QWidget *widget = new QWidget(this);
+    widget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     QHBoxLayout *layout = new QHBoxLayout(widget);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
@@ -211,7 +197,7 @@ QWidget *DashWindow::controls_bar_widget()
     save_button->setIcon(this->theme->make_button_icon("save_alt", save_button));
     connect(save_button, &QPushButton::clicked, [this, save_button]() {
         Dialog *dialog = new Dialog(false, save_button);
-        dialog->set_body(this->save_control_widget());
+        dialog->set_body(this->save_control());
 
         this->config->save(true);
         dialog->open(1000);
@@ -224,7 +210,7 @@ QWidget *DashWindow::controls_bar_widget()
     connect(shutdown_button, &QPushButton::clicked, [this]() {
         Dialog *dialog = new Dialog(true, this);
         dialog->set_title("power off");
-        dialog->set_body(this->power_control_widget());
+        dialog->set_body(this->power_control());
 
         dialog->open();
     });
@@ -235,21 +221,30 @@ QWidget *DashWindow::controls_bar_widget()
     exit_button->setIcon(this->theme->make_button_icon("close", exit_button));
     connect(exit_button, &QPushButton::clicked, []() { qApp->exit(); });
 
-    QWidget *quick_view = this->quick_view_widget();
-    quick_view->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-
-    layout->addWidget(quick_view);
+    layout->addLayout(this->quick_views());
     layout->addStretch();
     layout->addWidget(save_button);
     layout->addWidget(shutdown_button);
     layout->addWidget(exit_button);
 
-    if (!this->config->get_controls_bar())
-        widget->hide();
-    connect(this->config, &Config::controls_bar_changed,
-            [widget](bool controls_bar) { controls_bar ? widget->show() : widget->hide(); });
+    widget->setVisible(this->config->get_controls_bar());
+    connect(this->config, &Config::controls_bar_changed, [widget](bool controls_bar) { widget->setVisible(controls_bar); });
 
     return widget;
+}
+
+QLayout *DashWindow::quick_views()
+{
+    QStackedLayout *layout = new QStackedLayout();
+    layout->setContentsMargins(0, 0, 0, 0);
+
+    for (auto quick_view : this->config->get_quick_views().values())
+        layout->addWidget(quick_view);
+    layout->setCurrentWidget(this->config->get_quick_view(this->config->get_quick_view()));
+    connect(this->config, &Config::quick_view_changed,
+            [this, layout](QString quick_view) { layout->setCurrentWidget(this->config->get_quick_view(quick_view)); });
+
+    return layout;
 }
 
 QWidget *DashWindow::volume_widget(bool skip_buttons)
@@ -393,7 +388,7 @@ QWidget *DashWindow::controls_widget()
     return widget;
 }
 
-QWidget *DashWindow::power_control_widget()
+QWidget *DashWindow::power_control()
 {
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
@@ -425,7 +420,7 @@ QWidget *DashWindow::power_control_widget()
     return widget;
 }
 
-QWidget *DashWindow::save_control_widget()
+QWidget *DashWindow::save_control()
 {
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
