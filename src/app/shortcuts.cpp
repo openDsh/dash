@@ -2,6 +2,8 @@
 #include <QElapsedTimer>
 #include <QTimer>
 
+#include <QDebug>
+
 #include "app/shortcuts.hpp"
 
 static const QRegExp GPIOX_REGEX("gpio\\d+");
@@ -67,6 +69,12 @@ Shortcut::Shortcut(QString shortcut, QWidget *parent) : QObject(parent), gpio_va
                 emit activated();
                 QTimer::singleShot(300, [gpio = this->gpio]() { gpio->blockSignals(false); });
             }
+            else {
+                qDebug() << "[Dash][Shortcut]" << this->shortcut << ": active low != value"; // temp
+            }
+        }
+        else {
+            qDebug() << "[Dash][Shortcut]" << this->shortcut << ":" << this->gpio_value_attribute.fileName() << "is not open"; // temp
         }
     });
     connect(this->key, &QShortcut::activated, [this]() { emit activated(); });
@@ -87,6 +95,7 @@ void Shortcut::set_shortcut(QString shortcut)
 
     this->shortcut = shortcut;
     if (this->shortcut.startsWith("gpio")) {
+        qDebug() << "[Dash][Shortcut]" << this->shortcut << ": setting shortcut as gpio"; // temp
         this->gpio_value_attribute.setFileName(GPIOX_VALUE_PATH.arg(this->shortcut));
         if (this->gpio_value_attribute.open(QIODevice::ReadOnly)) {
             QFile active_low_attribute(GPIOX_ACTIVE_LOW_PATH.arg(this->shortcut));
@@ -95,9 +104,16 @@ void Shortcut::set_shortcut(QString shortcut)
                 active_low_attribute.close();
                 this->gpio->addPath(this->gpio_value_attribute.fileName());
             }
+            else {
+                qDebug() << "[Dash][Shortcut]" << this->shortcut << ": failed to open" << active_low_attribute; // temp
+            }
+        }
+        else {
+            qDebug() << "[Dash][Shortcut]" << this->shortcut << ": failed to open" << this->gpio_value_attribute.fileName(); // temp
         }
     }
-    else {
+    else if (!this->shortcut.isNull()) {
+        qDebug() << "[Dash][Shortcut]" << this->shortcut << ": setting shortcut as key"; // temp
         this->key->setKey(QKeySequence::fromString(this->shortcut));
     }
 }
