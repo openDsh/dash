@@ -529,26 +529,33 @@ QWidget *LayoutSettingsSubTab::scale_widget()
 
     QSlider *slider = new QSlider(Qt::Orientation::Horizontal, widget);
     slider->setTracking(false);
-    slider->setRange(1, 4);
+    slider->setRange(2, 6);
     slider->setValue(this->config->get_scale() * 4);
-    QLabel *value = new QLabel(QString("x%1").arg(slider->value() / 4.0), widget);
-    value->setFont(Theme::font_14);
-    connect(slider, &QSlider::valueChanged, [config = this->config, slider, value](int position) {
+    connect(slider, &QSlider::valueChanged, [config = this->config, slider](int position) {
         slider->setEnabled(false);
         double scale = position / 4.0;
-        value->setText(QString("x%1").arg(scale));
         config->set_scale(scale);
         slider->setEnabled(true);
         slider->setFocus();
     });
-    connect(slider, &QSlider::sliderMoved, [value](int position) {
-        double scale = position / 4.0;
-        value->setText(QString("x%1").arg(scale));
-    });
 
-    layout->addStretch(2);
+    QPushButton *lower_button = new QPushButton(widget);
+    lower_button->setFlat(true);
+    lower_button->setIconSize(Theme::icon_32);
+    lower_button->setIcon(this->theme->make_button_icon("remove", lower_button));
+    connect(lower_button, &QPushButton::clicked, [slider]() { slider->setValue(slider->value() - 1); });
+
+    QPushButton *raise_button = new QPushButton(widget);
+    raise_button->setFlat(true);
+    raise_button->setIconSize(Theme::icon_32);
+    raise_button->setIcon(this->theme->make_button_icon("add", raise_button));
+    connect(raise_button, &QPushButton::clicked, [slider]() { slider->setValue(slider->value() + 1); });
+
+    layout->addStretch(1);
+    layout->addWidget(lower_button);
     layout->addWidget(slider, 4);
-    layout->addWidget(value, 2);
+    layout->addWidget(raise_button);
+    layout->addStretch(1);
 
     return widget;
 }
