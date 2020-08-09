@@ -25,6 +25,7 @@ class DashWindow : public QMainWindow {
     inline QList<QAbstractButton *> get_pages() { return this->rail_group->buttons(); }
 
    protected:
+    void showEvent(QShowEvent *event);
     void keyPressEvent(QKeyEvent *event);
     void keyReleaseEvent(QKeyEvent *event);
 

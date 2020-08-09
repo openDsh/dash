@@ -59,7 +59,6 @@ Shortcut::Shortcut(QString shortcut, QWidget *parent) : QObject(parent), gpio_va
     this->key = new QShortcut(parent);
     this->gpio = new QFileSystemWatcher(parent);
 
-    this->set_shortcut(shortcut);
     connect(this->gpio, &QFileSystemWatcher::fileChanged, [this](QString) {
         if (this->gpio_value_attribute.isOpen()) {
             this->gpio_value_attribute.seek(0);
@@ -107,6 +106,12 @@ void Shortcuts::add_shortcut(QString id, QString description, Shortcut *shortcut
 {
     this->shortcuts[id] = {description, shortcut};
     emit shortcut_added(id, description, shortcut);
+}
+
+void Shortcuts::initialize_shortcuts()
+{
+    for (auto shortcut : this->shortcuts)
+        shortcut.second->initialize_shortcut();
 }
 
 Shortcuts *Shortcuts::get_instance()

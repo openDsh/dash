@@ -57,6 +57,14 @@ void DashWindow::add_widget(QWidget *widget)
     this->stack->setCurrentWidget(widget);
 }
 
+void DashWindow::showEvent(QShowEvent *event)
+{
+    QWidget::showEvent(event);
+
+    this->theme->update();
+    this->shortcuts->initialize_shortcuts();
+}
+
 void DashWindow::keyPressEvent(QKeyEvent *event)
 {
     QMainWindow::keyPressEvent(event);
