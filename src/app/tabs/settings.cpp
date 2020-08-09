@@ -183,38 +183,8 @@ QWidget *GeneralSettingsSubTab::brightness_widget()
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
-    QSlider *slider = new QSlider(Qt::Orientation::Horizontal, widget);
-    slider->setTracking(false);
-    slider->setRange(76, 255);
-    slider->setValue(this->config->get_brightness());
-    connect(slider, &QSlider::valueChanged,
-            [config = this->config](int position) { config->set_brightness(position); });
-    connect(this->config, &Config::brightness_changed,
-            [slider](int brightness) { slider->setValue(brightness); });
-
-    Shortcut *dim_shortcut = new Shortcut(this->config->get_shortcut("brightness_down"), this->window());
-    this->shortcuts->add_shortcut("brightness_down", "Decrease Brightness", dim_shortcut);
-    connect(dim_shortcut, &Shortcut::activated, [slider]() { slider->setValue(slider->value() - 4); });
-    Shortcut *brighten_shortcut = new Shortcut(this->config->get_shortcut("brightness_up"), this->window());
-    this->shortcuts->add_shortcut("brightness_up", "Increase Brightness", brighten_shortcut);
-    connect(brighten_shortcut, &Shortcut::activated, [slider]() { slider->setValue(slider->value() + 4); });
-
-    QPushButton *dim_button = new QPushButton(widget);
-    dim_button->setFlat(true);
-    dim_button->setIconSize(Theme::icon_32);
-    dim_button->setIcon(this->theme->make_button_icon("brightness_low", dim_button));
-    connect(dim_button, &QPushButton::clicked, [slider]() { slider->setValue(slider->value() - 18); });
-
-    QPushButton *brighten_button = new QPushButton(widget);
-    brighten_button->setFlat(true);
-    brighten_button->setIconSize(Theme::icon_32);
-    brighten_button->setIcon(this->theme->make_button_icon("brightness_high", brighten_button));
-    connect(brighten_button, &QPushButton::clicked, [slider]() { slider->setValue(slider->value() + 18); });
-
     layout->addStretch(1);
-    layout->addWidget(dim_button);
-    layout->addWidget(slider, 4);
-    layout->addWidget(brighten_button);
+    layout->addWidget(BrightnessModule::control_widget(true, this), 6);
     layout->addStretch(1);
 
     return widget;

@@ -82,7 +82,7 @@ void DashWindow::init_config()
     qApp->setOverrideCursor(this->config->get_mouse_active() ? Qt::ArrowCursor : Qt::BlankCursor);
 
     this->config->add_quick_view("volume", this->volume_widget());
-    this->config->add_quick_view("brightness", this->brightness_widget());
+    this->config->add_quick_view("brightness", BrightnessModule::control_widget(true, this));
     this->config->add_quick_view("controls", this->controls_widget());
     this->config->add_quick_view("none", new QFrame(this));
 
@@ -295,43 +295,6 @@ QWidget *DashWindow::volume_widget(bool skip_buttons)
     return widget;
 }
 
-QWidget *DashWindow::brightness_widget(bool skip_buttons)
-{
-    QWidget *widget = new QWidget(this);
-    QHBoxLayout *layout = new QHBoxLayout(widget);
-    layout->setContentsMargins(0, 0, 0, 0);
-    layout->setSpacing(0);
-
-    QSlider *slider = new QSlider(Qt::Orientation::Horizontal, widget);
-    slider->setTracking(false);
-    slider->setRange(76, 255);
-    slider->setValue(this->config->get_brightness());
-    connect(slider, &QSlider::valueChanged,
-            [config = this->config](int position) { config->set_brightness(position); });
-    connect(this->config, &Config::brightness_changed, [slider](int brightness) { slider->setValue(brightness); });
-
-    if (!skip_buttons) {
-        QPushButton *dim_button = new QPushButton(widget);
-        dim_button->setFlat(true);
-        dim_button->setIconSize(Theme::icon_26);
-        dim_button->setIcon(this->theme->make_button_icon("brightness_low", dim_button));
-        connect(dim_button, &QPushButton::clicked, [slider]() { slider->setValue(slider->value() - 18); });
-
-        QPushButton *brighten_button = new QPushButton(widget);
-        brighten_button->setFlat(true);
-        brighten_button->setIconSize(Theme::icon_26);
-        brighten_button->setIcon(this->theme->make_button_icon("brightness_high", brighten_button));
-        connect(brighten_button, &QPushButton::clicked, [slider]() { slider->setValue(slider->value() + 18); });
-
-        layout->addWidget(dim_button);
-        layout->addWidget(brighten_button);
-    }
-
-    layout->insertWidget(1, slider, 4);
-
-    return widget;
-}
-
 QWidget *DashWindow::controls_widget()
 {
     QWidget *widget = new QWidget(this);
@@ -366,7 +329,7 @@ QWidget *DashWindow::controls_widget()
     brightness->setIcon(this->theme->make_button_icon("brightness_high", brightness));
     connect(brightness, &QPushButton::clicked, [this, brightness]() {
         Dialog *dialog = new Dialog(false, brightness);
-        dialog->set_body(this->brightness_widget(true));
+        dialog->set_body(BrightnessModule::control_widget(false, this));
         dialog->open(2000);
     });
     QLabel *brightness_value = new QLabel(QString::number(std::ceil(this->config->get_brightness() / 2.55)), widget);

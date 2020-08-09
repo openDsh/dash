@@ -12,6 +12,8 @@ class BrightnessModule : public QObject {
     BrightnessModule() {}
 
     virtual void set_brightness(int brightness) = 0;
+
+    static QWidget *control_widget(bool buttons, QWidget *parent = nullptr);
 };
 
 class MockedBrightnessModule : public BrightnessModule {
