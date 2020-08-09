@@ -48,10 +48,6 @@ Theme::Theme() : QObject(qApp), palette(), color("azure")
 
     this->stylesheets["light"] = this->parse_stylesheet(":/stylesheets/light.qss");
     this->stylesheets["dark"] = this->parse_stylesheet(":/stylesheets/dark.qss");
-
-    qApp->setStyleSheet(this->stylesheets[this->mode ? "dark" : "light"]);
-
-    this->set_palette();
 }
 
 QString Theme::parse_stylesheet(QString file)
@@ -87,19 +83,6 @@ void Theme::set_palette()
     new_color.setAlphaF(.5);
     this->palette.setColor(QPalette::AlternateBase, new_color);
     qApp->setPalette(this->palette);
-}
-
-QPixmap Theme::create_pixmap_variant(QPixmap &base, qreal opacity)
-{
-    QPixmap image(base.size());
-    image.fill(Qt::transparent);
-
-    QPainter painter(&image);
-    painter.setOpacity(opacity);
-    painter.drawPixmap(0, 0, base);
-    painter.end();
-
-    return image;
 }
 
 QIcon Theme::themed_button_icon(QIcon icon, QAbstractButton *button)
@@ -174,12 +157,8 @@ void Theme::update()
         if ((button != nullptr) && !button->icon().isNull()) {
             button->setIcon(this->themed_button_icon(button->icon(), button));
             QVariant base_icon_size = button->property("base_icon_size");
-            if (base_icon_size.isValid()) {
-                QSize size = base_icon_size.value<QSize>();
-                size.rwidth() *= this->scale;
-                size.rheight() *= this->scale;
-                button->setIconSize(size);
-            }
+            if (base_icon_size.isValid())
+                button->setIconSize(base_icon_size.value<QSize>() * this->scale);
         }
     }
 

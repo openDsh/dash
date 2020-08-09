@@ -120,7 +120,6 @@ class Theme : public QObject {
     void set_palette();
     QString parse_stylesheet(QString file);
     QString scale_stylesheet(QString stylesheet);
-    QPixmap create_pixmap_variant(QPixmap &base, qreal opacity);
     QIcon themed_button_icon(QIcon icon, QAbstractButton *button);
 
     inline QColor get_base_color() { return this->mode ? QColor(255, 255, 255) : QColor(0, 0, 0); }
