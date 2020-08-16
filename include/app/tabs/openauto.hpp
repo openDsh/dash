@@ -27,7 +27,6 @@ class OpenAutoWorker : public QObject {
    public:
     OpenAutoWorker(std::function<void(bool)> callback, bool night_mode, QWidget *frame);
     ~OpenAutoWorker();
-    void connect_wireless(QString address);
 
     inline void start() { this->app->waitForUSBDevice(); }
     inline void update_size() { this->service_factory.resize(); }
@@ -35,14 +34,14 @@ class OpenAutoWorker : public QObject {
     inline void send_key_event(QKeyEvent *event) { this->service_factory.sendKeyEvent(event); }
 
    private:
-    const int OPENAUTO_PORT = 5277;
+    const int OPENAUTO_PORT = 5000;
 
     void create_usb_workers();
     void create_io_service_workers();
+    void connect_wireless();
 
     libusb_context *usb_context;
     boost::asio::io_service io_service;
-    boost::asio::ip::tcp::acceptor acceptor;
     boost::asio::io_service::work work;
     std::shared_ptr<openauto::configuration::Configuration> configuration;
     aasdk::tcp::TCPWrapper tcp_wrapper;
@@ -55,11 +54,8 @@ class OpenAutoWorker : public QObject {
     std::shared_ptr<aasdk::usb::ConnectedAccessoriesEnumerator> connected_accessories_enumerator;
     std::shared_ptr<openauto::App> app;
     std::shared_ptr<boost::asio::ip::tcp::socket> socket;
+    boost::asio::ip::tcp::acceptor acceptor;
     std::vector<std::thread> thread_pool;
-
-   signals:
-    void wireless_connection_success(QString address);
-    void wireless_connection_failure();
 };
 
 class OpenAutoFrame : public QWidget {
@@ -121,7 +117,6 @@ class OpenAutoTab : public QStackedWidget {
 
    private:
     QWidget *connect_msg();
-    QWidget *wireless_config();
 
     Config *config;
     Theme *theme;
