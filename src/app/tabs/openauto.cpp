@@ -9,6 +9,7 @@
 OpenAutoWorker::OpenAutoWorker(std::function<void(bool)> callback, bool night_mode, QWidget *frame)
     : QObject(qApp),
       io_service(),
+      acceptor(io_service, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), 5000)),
       work(io_service),
       configuration(Config::get_instance()->openauto_config),
       tcp_wrapper(),
@@ -38,16 +39,15 @@ OpenAutoWorker::~OpenAutoWorker()
 void OpenAutoWorker::connect_wireless(QString address)
 {
     try {
-        this->tcp_wrapper.asyncConnect(*this->socket, address.toStdString(), this->OPENAUTO_PORT,
-                                       [this, address](const boost::system::error_code &ec) {
-                                           if (!ec) {
-                                               this->app->start(this->socket);
-                                               emit wireless_connection_success(address);
-                                           }
-                                           else {
-                                               emit wireless_connection_failure();
-                                           }
-                                       });
+        this->acceptor.async_accept(*this->socket, [this, address](const boost::system::error_code &ec) {
+            if (!ec) {
+                this->app->start(this->socket);
+                emit wireless_connection_success(address);
+            }
+            else {
+                emit wireless_connection_failure();
+            }
+        });
     }
     catch (const boost::system::system_error &se) {
         emit wireless_connection_failure();

@@ -363,7 +363,12 @@ QWidget *LayoutSettingsSubTab::settings_widget()
     layout->addWidget(this->pages_widget());
     layout->addWidget(Theme::br(widget), 1);
     layout->addWidget(this->controls_bar_widget(), 1);
-    layout->addWidget(this->quick_view_row_widget(), 1);
+
+    QWidget *controls_bar_row = this->quick_view_row_widget();
+    controls_bar_row->setVisible(this->config->get_controls_bar());
+    connect(this->config, &Config::controls_bar_changed, [controls_bar_row](bool controls_bar) { controls_bar_row->setVisible(controls_bar); });
+    layout->addWidget(controls_bar_row, 1);
+
     layout->addWidget(Theme::br(widget), 1);
     layout->addWidget(this->scale_row_widget(), 1);
 

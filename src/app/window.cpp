@@ -141,7 +141,7 @@ void DashWindow::add_pages()
 {
     this->add_page("Android Auto", this->openauto, "android_auto");
     this->add_page("Media", new MediaTab(this), "play_circle_outline");
-    this->add_page("Vehicle", new DataTab(this), "directions_car");
+    this->add_page("Vehicle", new VehicleTab(this), "directions_car");
     this->add_page("Camera", new CameraTab(this), "camera");
     this->add_page("Launcher", new LauncherTab(this), "widgets");
     this->add_page("Settings", new SettingsTab(this), "tune");
@@ -194,22 +194,11 @@ void DashWindow::add_page(QString name, QWidget *page, QString icon)
 QWidget *DashWindow::controls_bar()
 {
     QWidget *widget = new QWidget(this);
+    widget->setObjectName("controls_bar");
     widget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     QHBoxLayout *layout = new QHBoxLayout(widget);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
-
-    QPushButton *save_button = new QPushButton(widget);
-    save_button->setFlat(true);
-    save_button->setIconSize(Theme::icon_26);
-    save_button->setIcon(this->theme->make_button_icon("save_alt", save_button));
-    connect(save_button, &QPushButton::clicked, [this, save_button]() {
-        Dialog *dialog = new Dialog(false, save_button);
-        dialog->set_body(this->save_control());
-
-        this->config->save(true);
-        dialog->open(1000);
-    });
 
     QPushButton *shutdown_button = new QPushButton(widget);
     shutdown_button->setFlat(true);
@@ -227,11 +216,13 @@ QWidget *DashWindow::controls_bar()
     exit_button->setFlat(true);
     exit_button->setIconSize(Theme::icon_26);
     exit_button->setIcon(this->theme->make_button_icon("close", exit_button));
-    connect(exit_button, &QPushButton::clicked, []() { qApp->exit(); });
+    connect(exit_button, &QPushButton::clicked, [this]() {
+        this->config->save();
+        qApp->exit();
+    });
 
     layout->addLayout(this->quick_views());
     layout->addStretch();
-    layout->addWidget(save_button);
     layout->addWidget(shutdown_button);
     layout->addWidget(exit_button);
 
@@ -370,7 +361,8 @@ QWidget *DashWindow::power_control()
     restart->setFlat(true);
     restart->setIconSize(Theme::icon_42);
     restart->setIcon(this->theme->make_button_icon("refresh", restart));
-    connect(restart, &QPushButton::clicked, []() {
+    connect(restart, &QPushButton::clicked, [config = this->config]() {
+        config->save();
         sync();
         if (system("shutdown -r now") < 0)
             qApp->exit();
@@ -381,47 +373,13 @@ QWidget *DashWindow::power_control()
     power_off->setFlat(true);
     power_off->setIconSize(Theme::icon_42);
     power_off->setIcon(this->theme->make_button_icon("power_settings_new", power_off));
-    connect(power_off, &QPushButton::clicked, []() {
+    connect(power_off, &QPushButton::clicked, [config = this->config]() {
+        config->save();
         sync();
         if (system("shutdown -h now") < 0)
             qApp->exit();
     });
     layout->addWidget(power_off);
-
-    return widget;
-}
-
-QWidget *DashWindow::save_control()
-{
-    QWidget *widget = new QWidget(this);
-    QHBoxLayout *layout = new QHBoxLayout(widget);
-    layout->setContentsMargins(0, 0, 0, 0);
-    layout->setSpacing(0);
-
-    QLabel *check = new QLabel("✓", widget);
-    check->setFont(Theme::font_24);
-    check->setAlignment(Qt::AlignCenter);
-
-    ProgressIndicator *loader = new ProgressIndicator(widget);
-    loader->scale(this->config->get_scale());
-    connect(this->config, &Config::scale_changed, [loader](double scale) { loader->scale(scale); });
-    connect(this->config, &Config::save_status, [=](bool status) {
-        if (status) {
-            loader->start_animation();
-            check->hide();
-            loader->show();
-        }
-        else {
-            QTimer::singleShot(1000, [=]() {
-                loader->stop_animation();
-                loader->hide();
-                check->show();
-            });
-        }
-    });
-
-    layout->addWidget(loader);
-    layout->addWidget(check);
 
     return widget;
 }

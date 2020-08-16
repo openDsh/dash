@@ -44,17 +44,10 @@ Config::Config()
     for (auto key : this->ia_config.childKeys())
         this->shortcuts[key] = this->ia_config.value(key, QString()).toString();
     this->ia_config.endGroup();
-
-    QTimer *timer = new QTimer(this);
-    connect(timer, &QTimer::timeout, [this]() { this->save(); });
-    timer->start(10000);
 }
 
-void Config::save(bool send_status)
+void Config::save()
 {
-    if (send_status)
-        emit save_status(true);
-
     if (this->volume != this->ia_config.value("volume", 50).toInt())
         this->ia_config.setValue("volume", this->volume);
     if (this->dark_mode != this->ia_config.value("dark_mode", false).toBool())
@@ -124,9 +117,6 @@ void Config::save(bool send_status)
     this->openauto_config->save();
 
     this->ia_config.sync();
-
-    if (send_status)
-        emit save_status(false);
 }
 
 Config *Config::get_instance()

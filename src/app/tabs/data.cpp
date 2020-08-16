@@ -2,6 +2,7 @@
 
 #include "app/config.hpp"
 #include "app/tabs/data.hpp"
+#include "app/tabs/climate.hpp"
 #include "app/window.hpp"
 #include "obd/conversions.hpp"
 
@@ -69,6 +70,95 @@ QString Gauge::null_value()
         null_str += '-';
 
     return null_str;
+}
+
+QWidget *VehicleTab::plugins()
+{
+    QWidget *widget = new QWidget(this);
+    QHBoxLayout *layout = new QHBoxLayout(widget);
+
+    const QStringList views = {"foo", "bar", "baz"};
+
+    QLabel *label = new QLabel("foo", widget);
+    label->setAlignment(Qt::AlignCenter);
+    label->setFont(Theme::font_16);
+
+    QPushButton *left_button = new QPushButton(widget);
+    left_button->setFlat(true);
+    left_button->setIconSize(Theme::icon_32);
+    left_button->setIcon(Theme::get_instance()->make_button_icon("arrow_left", left_button));
+    connect(left_button, &QPushButton::clicked, [this, label, views]() {
+        int total_views = views.size();
+        QString view = views[((views.indexOf(label->text()) - 1) % total_views + total_views) % total_views];
+        label->setText(view);
+    });
+
+    QPushButton *right_button = new QPushButton(widget);
+    right_button->setFlat(true);
+    right_button->setIconSize(Theme::icon_32);
+    right_button->setIcon(Theme::get_instance()->make_button_icon("arrow_right", right_button));
+    connect(right_button, &QPushButton::clicked, [this, label, views]() {
+        QString view = views[(views.indexOf(label->text()) + 1) % views.size()];
+        label->setText(view);
+    });
+
+    layout->addStretch(1);
+    layout->addWidget(left_button);
+    layout->addWidget(label, 2);
+    layout->addWidget(right_button);
+    layout->addStretch(1);
+
+    return widget;
+}
+
+VehicleTab::VehicleTab(QWidget *parent) : QTabWidget(parent)
+{
+    QPushButton *settings_button = new QPushButton(this);
+    settings_button->setFlat(true);
+    settings_button->setIconSize(Theme::icon_24);
+    settings_button->setIcon(Theme::get_instance()->make_button_icon("settings", settings_button));
+    connect(settings_button, &QPushButton::clicked, [this]() {
+        Dialog *dialog = new Dialog(true, this->window());
+        dialog->set_body(this->plugins());
+        QPushButton *save_button = new QPushButton("load");
+        dialog->set_button(save_button);
+        dialog->open();
+    });
+
+    this->tabBar()->setFont(Theme::font_18);
+    this->setCornerWidget(settings_button);
+
+    this->addTab(new DataTab(this), "Data");
+    Climate *climate = new Climate(this);
+    climate->set_max_speed(6);
+    climate->set_driver_temp(66);
+    climate->set_passenger_temp(55);
+    int idx = this->addTab(climate, "Climate");
+    this->capabilities["climate"] = idx;
+
+    this->setTabEnabled(idx, false);
+
+    // QTimer *timer = new QTimer(this);
+    // connect(timer, &QTimer::timeout, [climate]() {
+    //     // popup should be triggered anytime climate class receives new data!!!
+    //     climate->set_speed(rand() % 6);
+    //     QWidget *parent = nullptr;
+    //     for (QWidget *widget : qApp->allWidgets()) {
+    //         if (widget->objectName() == "controls_bar") {
+    //             parent = widget;
+    //             break;
+    //         }
+    //     }
+
+    //     Dialog *dialog = new Dialog(false, parent);
+    //     dialog->set_body(popup(*climate));
+    //     dialog->setFocusPolicy(Qt::NoFocus);
+    //     dialog->setAttribute(Qt::WA_TransparentForMouseEvents, true);
+    //     dialog->open(1000);
+    // });
+
+
+    // timer->start(5000);
 }
 
 DataTab::DataTab(QWidget *parent) : QWidget(parent)

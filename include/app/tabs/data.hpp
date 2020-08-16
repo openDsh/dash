@@ -33,6 +33,18 @@ class Gauge : public QWidget {
     void toggle_unit(bool si);
 };
 
+class VehicleTab : public QTabWidget {
+    Q_OBJECT
+
+   public:
+    VehicleTab(QWidget *parent = nullptr);
+
+   private:
+    QMap<QString, int> capabilities;
+
+    QWidget *plugins();
+};
+
 class DataTab : public QWidget {
     Q_OBJECT
 

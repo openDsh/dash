@@ -18,7 +18,7 @@ class Config : public QObject {
    public:
     Config();
 
-    void save(bool send_status=false);
+    void save();
 
     inline int get_volume() { return this->volume; }
     inline void set_volume(int volume)
@@ -186,5 +186,4 @@ class Config : public QObject {
     void scale_changed(double scale);
     void page_changed(QWidget *page, bool enabled);
     void cam_autoconnect_changed(bool enabled);
-    void save_status(bool status);
 };

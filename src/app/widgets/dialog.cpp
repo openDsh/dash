@@ -74,24 +74,25 @@ void Dialog::set_position()
         }
         else {
             QWidget *window = parent->window();
-            QPoint center = parent->mapToGlobal(parent->rect().center());
+            QPoint window_center = window->mapToGlobal(window->rect().center());
+            QPoint parent_center = parent->mapToGlobal(parent->rect().center());
 
             int offset = std::ceil(4 * Config::get_instance()->get_scale());
 
             QPoint pivot;
-            if (center.y() > (window->height() / 2)) {
-                pivot = (center.x() > (window->width() / 2)) ? this->rect().bottomRight() : this->rect().bottomLeft();
+            if (parent_center.y() > window_center.y()) {
+                pivot = (parent_center.x() > window_center.x()) ? this->rect().bottomRight() : this->rect().bottomLeft();
                 pivot.ry() += (parent->height() / 2) + offset;
             }
             else {
-                pivot = (center.x() > (window->width() / 2)) ? this->rect().topRight() : this->rect().topLeft();
+                pivot = (parent_center.x() > window_center.x()) ? this->rect().topRight() : this->rect().topLeft();
                 pivot.ry() -= (parent->height() / 2) + offset;
             }
-            if (center.x() > (window->width() / 2))
+            if (parent_center.x() > window_center.x())
                 pivot.rx() -= this->width() / 2;
             else
                 pivot.rx() += this->width() / 2;
-            point = this->mapFromGlobal(center) - pivot;
+            point = this->mapFromGlobal(parent_center) - pivot;
         }
         this->move(point);
     }

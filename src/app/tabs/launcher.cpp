@@ -1,4 +1,5 @@
 #include <QElapsedTimer>
+#include <unistd.h>
 
 #include "app/tabs/launcher.hpp"
 
