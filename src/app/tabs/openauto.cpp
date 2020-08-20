@@ -21,14 +21,12 @@ OpenAutoWorker::OpenAutoWorker(std::function<void(bool)> callback, bool night_mo
       connected_accessories_enumerator(
           std::make_shared<aasdk::usb::ConnectedAccessoriesEnumerator>(usb_wrapper, io_service, query_chain_factory)),
       app(std::make_shared<openauto::App>(io_service, usb_wrapper, tcp_wrapper, android_auto_entity_factory, usb_hub,
-                                          connected_accessories_enumerator)),
-      socket(std::make_shared<boost::asio::ip::tcp::socket>(io_service)),
-      acceptor(io_service, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), this->OPENAUTO_PORT))
+                                          connected_accessories_enumerator))
 {
     this->create_usb_workers();
     this->create_io_service_workers();
 
-    this->connect_wireless();
+    this->app->waitForDevice(true);
 }
 
 OpenAutoWorker::~OpenAutoWorker()
@@ -36,21 +34,6 @@ OpenAutoWorker::~OpenAutoWorker()
     std::for_each(this->thread_pool.begin(), this->thread_pool.end(),
                   std::bind(&std::thread::join, std::placeholders::_1));
     libusb_exit(this->usb_context);
-}
-
-void OpenAutoWorker::connect_wireless()
-{
-    try {
-        this->acceptor.async_accept(*this->socket, [this](const boost::system::error_code &ec) {
-            if (!ec)
-                this->app->start(this->socket);
-            else
-                qDebug() << "[Dash][OpenAutoWorker]" << QString(ec.message().c_str()); // temp
-        });
-    }
-    catch (const boost::system::system_error &se) {
-        qDebug() << "[Dash][OpenAutoWorker]" << QString(se.code().message().c_str()); // temp
-    }
 }
 
 void OpenAutoWorker::create_usb_workers()
@@ -414,7 +397,6 @@ OpenAutoTab::OpenAutoTab(QWidget *parent) : QStackedWidget(parent)
 
     std::function<void(bool)> callback = [frame = this->frame](bool active) { frame->toggle(active); };
     this->worker = new OpenAutoWorker(callback, this->theme->get_mode(), frame);
-    this->worker->start();
 
     connect(this->frame, &OpenAutoFrame::toggle, [this](bool enable) {
         if (!enable && this->frame->is_fullscreen()) {
@@ -467,6 +449,11 @@ QWidget *OpenAutoTab::connect_msg()
         Dialog *dialog = new Dialog(true, this->window());
         dialog->set_body(new OpenAutoSettingsSubTab());
         QPushButton *save_button = new QPushButton("save");
+        connect(save_button, &QPushButton::clicked, [this, dialog]() {
+            dialog->close();
+            this->config->openauto_config->setButtonCodes(this->config->openauto_button_codes);
+            this->config->openauto_config->save();
+        });
         dialog->set_button(save_button);
         dialog->open();
     });

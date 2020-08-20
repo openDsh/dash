@@ -28,17 +28,13 @@ class OpenAutoWorker : public QObject {
     OpenAutoWorker(std::function<void(bool)> callback, bool night_mode, QWidget *frame);
     ~OpenAutoWorker();
 
-    inline void start() { this->app->waitForUSBDevice(); }
     inline void update_size() { this->service_factory.resize(); }
     inline void set_night_mode(bool mode) { this->service_factory.setNightMode(mode); }
     inline void send_key_event(QKeyEvent *event) { this->service_factory.sendKeyEvent(event); }
 
    private:
-    const int OPENAUTO_PORT = 5000;
-
     void create_usb_workers();
     void create_io_service_workers();
-    void connect_wireless();
 
     libusb_context *usb_context;
     boost::asio::io_service io_service;
@@ -53,8 +49,6 @@ class OpenAutoWorker : public QObject {
     std::shared_ptr<aasdk::usb::USBHub> usb_hub;
     std::shared_ptr<aasdk::usb::ConnectedAccessoriesEnumerator> connected_accessories_enumerator;
     std::shared_ptr<openauto::App> app;
-    std::shared_ptr<boost::asio::ip::tcp::socket> socket;
-    boost::asio::ip::tcp::acceptor acceptor;
     std::vector<std::thread> thread_pool;
 };
 

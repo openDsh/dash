@@ -113,9 +113,6 @@ void Config::save()
             this->ia_config.setValue(config_key, shortcut);
     }
 
-    this->openauto_config->setButtonCodes(this->openauto_button_codes);
-    this->openauto_config->save();
-
     this->ia_config.sync();
 }
 

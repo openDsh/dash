@@ -56,7 +56,7 @@ class EmbeddedApp : public QWidget {
     void end();
 
    private:
-    QProcess *process;
+    QProcess process;
     QVBoxLayout *container;
     XWorker *worker;
 

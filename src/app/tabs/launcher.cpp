@@ -64,14 +64,13 @@ XWorker::WindowProp XWorker::get_window_prop(Window window, Atom type, const cha
     return window_prop;
 }
 
-EmbeddedApp::EmbeddedApp(QWidget *parent) : QWidget(parent)
+EmbeddedApp::EmbeddedApp(QWidget *parent) : QWidget(parent), process()
 {
     this->worker = new XWorker(this);
 
-    this->process = new QProcess();
-    process->setStandardOutputFile(QProcess::nullDevice());
-    process->setStandardErrorFile(QProcess::nullDevice());
-    connect(process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
+    this->process.setStandardOutputFile(QProcess::nullDevice());
+    this->process.setStandardErrorFile(QProcess::nullDevice());
+    connect(&this->process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
             [this](int, QProcess::ExitStatus) { this->end(); });
 
     QVBoxLayout *layout = new QVBoxLayout(this);
@@ -92,22 +91,21 @@ EmbeddedApp::EmbeddedApp(QWidget *parent) : QWidget(parent)
 
 EmbeddedApp::~EmbeddedApp()
 {
-    this->process->kill();
-    this->process->waitForFinished();
+    this->process.kill();
+    this->process.waitForFinished();
 
-    delete this->process;
     delete this->container;
     delete this->worker;
 }
 
 void EmbeddedApp::start(QString app)
 {
-    this->process->setProgram(app);
-    this->process->start();
+    this->process.setProgram(app);
+    this->process.start();
 
-    this->process->waitForStarted();
+    this->process.waitForStarted();
 
-    QWindow *window = QWindow::fromWinId(worker->get_window(this->process->processId()));
+    QWindow *window = QWindow::fromWinId(worker->get_window(this->process.processId()));
     window->setFlags(Qt::FramelessWindowHint);
     usleep(500000);
 
@@ -118,7 +116,7 @@ void EmbeddedApp::start(QString app)
 
 void EmbeddedApp::end()
 {
-    this->process->terminate();
+    this->process.terminate();
     delete this->container->takeAt(0);
     emit closed();
 }
