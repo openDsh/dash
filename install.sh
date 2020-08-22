@@ -200,7 +200,7 @@ else
     echo Aasdk install failed with code $?
     exit
   fi
-  cd ../dash
+  cd ../../dash
 fi
 
 
@@ -348,7 +348,7 @@ else
     echo Openauto make install failed with error code $?
     exit
   fi
-  cd ../dash
+  cd ../../dash
 fi
 
 
