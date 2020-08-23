@@ -39,6 +39,7 @@ class Dialog : public QDialog {
         button->setFont(Theme::font_16);
         button->setFlat(true);
         this->buttons->addWidget(button, 0, Qt::AlignRight);
+        connect(button, &QPushButton::clicked, [this]() { this->close(); });
         qApp->processEvents();
         Theme::get_instance()->update();
     }

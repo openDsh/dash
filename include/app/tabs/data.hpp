@@ -2,8 +2,11 @@
 
 #include <QPair>
 #include <QtWidgets>
+#include <QPluginLoader>
 
 #include "obd/obd.hpp"
+#include "app/widgets/selector.hpp"
+#include "app/widgets/dialog.hpp"
 
 typedef std::function<double(std::vector<double>, bool)> obd_decoder_t;
 typedef QPair<QString, QString> units_t;
@@ -40,9 +43,15 @@ class VehicleTab : public QTabWidget {
     VehicleTab(QWidget *parent = nullptr);
 
    private:
-    QMap<QString, int> capabilities;
+    static const QDir PLUGIN_DIR;
 
-    QWidget *plugins();
+    void get_plugins();
+
+    QMap<QString, int> capabilities;
+    QMap<QString, QFileInfo> plugins;
+    QPluginLoader *active_plugin;
+    Selector *selector;
+    Dialog *dialog;
 };
 
 class DataTab : public QWidget {

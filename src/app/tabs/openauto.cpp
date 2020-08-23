@@ -450,7 +450,6 @@ QWidget *OpenAutoTab::connect_msg()
         dialog->set_body(new OpenAutoSettingsSubTab());
         QPushButton *save_button = new QPushButton("save");
         connect(save_button, &QPushButton::clicked, [this, dialog]() {
-            dialog->close();
             this->config->openauto_config->setButtonCodes(this->config->openauto_button_codes);
             this->config->openauto_config->save();
         });

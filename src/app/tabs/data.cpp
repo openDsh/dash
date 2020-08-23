@@ -6,6 +6,8 @@
 #include "app/window.hpp"
 #include "obd/conversions.hpp"
 
+#include "plugins/plugin.hpp"
+
 Gauge::Gauge(units_t units, QFont value_font, QFont unit_font, Gauge::Orientation orientation, int rate,
              std::vector<Command> cmds, int precision, obd_decoder_t decoder, QWidget *parent)
     : QWidget(parent)
@@ -72,58 +74,70 @@ QString Gauge::null_value()
     return null_str;
 }
 
-QWidget *VehicleTab::plugins()
+const QDir VehicleTab::PLUGIN_DIR("/home/robert/dash/bin/plugins");
+
+void VehicleTab::get_plugins()
 {
-    QWidget *widget = new QWidget(this);
-    QHBoxLayout *layout = new QHBoxLayout(widget);
-
-    const QStringList views = {"foo", "bar", "baz"};
-
-    QLabel *label = new QLabel("foo", widget);
-    label->setAlignment(Qt::AlignCenter);
-    label->setFont(Theme::font_16);
-
-    QPushButton *left_button = new QPushButton(widget);
-    left_button->setFlat(true);
-    left_button->setIconSize(Theme::icon_32);
-    left_button->setIcon(Theme::get_instance()->make_button_icon("arrow_left", left_button));
-    connect(left_button, &QPushButton::clicked, [this, label, views]() {
-        int total_views = views.size();
-        QString view = views[((views.indexOf(label->text()) - 1) % total_views + total_views) % total_views];
-        label->setText(view);
-    });
-
-    QPushButton *right_button = new QPushButton(widget);
-    right_button->setFlat(true);
-    right_button->setIconSize(Theme::icon_32);
-    right_button->setIcon(Theme::get_instance()->make_button_icon("arrow_right", right_button));
-    connect(right_button, &QPushButton::clicked, [this, label, views]() {
-        QString view = views[(views.indexOf(label->text()) + 1) % views.size()];
-        label->setText(view);
-    });
-
-    layout->addStretch(1);
-    layout->addWidget(left_button);
-    layout->addWidget(label, 2);
-    layout->addWidget(right_button);
-    layout->addStretch(1);
-
-    return widget;
+    for (const QFileInfo &plugin : this->PLUGIN_DIR.entryInfoList(QDir::Files)) {
+        if (QLibrary::isLibrary(plugin.absoluteFilePath()))
+            this->plugins[plugin.baseName()] = plugin;
+        // if ((QObject *plugin = pluginLoader.instance()) != nullptr) {
+        //     VehicleInterface* vehicleInterface = qobject_cast<VehicleInterface *>(plugin);
+        //     if (vehicleInterface){
+        //         std::cout<<"FOUND PLUGIN"<<std::endl;
+        //         vehicleInterface->init(bus, theme);
+        //         return true;
+        //     }
+        //     pluginLoader.unload();
+        // }
+    }
 }
 
 VehicleTab::VehicleTab(QWidget *parent) : QTabWidget(parent)
 {
+    this->get_plugins();
+    this->selector = new Selector(this->plugins.keys(), Theme::font_16, this);
+    this->dialog = new Dialog(true, this->window());
+    this->dialog->set_body(this->selector);
+    this->selector->setUpdatesEnabled(true);
+    QPushButton *load_button = new QPushButton("load");
+    connect(load_button, &QPushButton::clicked, [this]() {
+        this->active_plugin = new QPluginLoader(this->plugins[this->selector->get_current()].absoluteFilePath(), this);
+        this->setTabEnabled(this->capabilities["climate"], this->active_plugin->metaData().value("MetaData").toObject().value("climate").toObject().value("tab").toBool());
+        this->setTabText(this->capabilities["climate"], this->tabText(this->capabilities["climate"]));
+
+        if (this->active_plugin->metaData().value("MetaData").toObject().value("climate").toObject().value("dialog").toBool()) {
+            QTimer *timer = new QTimer(this);
+            connect(timer, &QTimer::timeout, [this]() {
+                auto climate = qobject_cast<Climate *>(this->widget(this->capabilities["climate"]));
+                // popup should be triggered anytime climate class receives new data!!!
+                climate->set_speed(rand() % 6);
+                QWidget *parent = nullptr;
+                for (QWidget *widget : qApp->allWidgets()) {
+                    if (widget->objectName() == "controls_bar") {
+                        parent = widget;
+                        break;
+                    }
+                }
+
+                Dialog *dialog = new Dialog(false, parent);
+                dialog->set_body(popup(*climate));
+                dialog->setFocusPolicy(Qt::NoFocus);
+                dialog->setAttribute(Qt::WA_TransparentForMouseEvents, true);
+                dialog->open(1000);
+            });
+
+
+            timer->start(5000);
+        }
+    });
+    this->dialog->set_button(load_button);
+
     QPushButton *settings_button = new QPushButton(this);
     settings_button->setFlat(true);
     settings_button->setIconSize(Theme::icon_24);
     settings_button->setIcon(Theme::get_instance()->make_button_icon("settings", settings_button));
-    connect(settings_button, &QPushButton::clicked, [this]() {
-        Dialog *dialog = new Dialog(true, this->window());
-        dialog->set_body(this->plugins());
-        QPushButton *save_button = new QPushButton("load");
-        dialog->set_button(save_button);
-        dialog->open();
-    });
+    connect(settings_button, &QPushButton::clicked, [this]() { this->dialog->open(); });
 
     this->tabBar()->setFont(Theme::font_18);
     this->setCornerWidget(settings_button);
@@ -137,28 +151,6 @@ VehicleTab::VehicleTab(QWidget *parent) : QTabWidget(parent)
     this->capabilities["climate"] = idx;
 
     this->setTabEnabled(idx, false);
-
-    // QTimer *timer = new QTimer(this);
-    // connect(timer, &QTimer::timeout, [climate]() {
-    //     // popup should be triggered anytime climate class receives new data!!!
-    //     climate->set_speed(rand() % 6);
-    //     QWidget *parent = nullptr;
-    //     for (QWidget *widget : qApp->allWidgets()) {
-    //         if (widget->objectName() == "controls_bar") {
-    //             parent = widget;
-    //             break;
-    //         }
-    //     }
-
-    //     Dialog *dialog = new Dialog(false, parent);
-    //     dialog->set_body(popup(*climate));
-    //     dialog->setFocusPolicy(Qt::NoFocus);
-    //     dialog->setAttribute(Qt::WA_TransparentForMouseEvents, true);
-    //     dialog->open(1000);
-    // });
-
-
-    // timer->start(5000);
 }
 
 DataTab::DataTab(QWidget *parent) : QWidget(parent)
