@@ -159,19 +159,8 @@ else
   echo -e moving to aasdk '\n'
   cd aasdk
 
-  echo -e Making AASDK build directory '\n'
-
-  mkdir build
-  if [[ $? -eq 0 ]]; then
-    echo -e AASDK build directory made
-  else
-    echo Unable to create AASDK build directory assuming it exists...
-  fi
-
-  cd build
-
   #beginning cmake
-  cmake -DCMAKE_BUILD_TYPE=Release ../
+  cmake -DCMAKE_BUILD_TYPE=Release
   if [[ $? -eq 0 ]]; then
       echo -e Aasdk CMake completed successfully'\n'
   else
@@ -310,19 +299,10 @@ else
 
   cd openauto
 
-  echo -e Making openauto build directory '\n'
-
-  mkdir build
-  if [[ $? -eq 0 ]]; then
-    echo -e openauto build directory made
-  else
-    echo Unable to create openauto build directory assuming it exists...
-  fi
-
-  cd build
+  
 
   echo Beginning openauto cmake
-  cmake ${installArgs} -DGST_BUILD=true ../
+  cmake ${installArgs} -DGST_BUILD=true
   if [[ $? -eq 0 ]]; then
     echo -e Openauto CMake OK'\n'
   else
