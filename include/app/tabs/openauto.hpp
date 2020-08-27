@@ -26,7 +26,7 @@ class OpenAutoWorker : public QObject {
     ~OpenAutoWorker();
     void connect_wireless(QString address);
 
-    inline void start() { this->app->waitForUSBDevice(); }
+    inline void start() { this->app->waitForDevice(true); }
     inline void set_opacity(unsigned int alpha) { this->service_factory.setOpacity(alpha); }
     inline void resize() { this->service_factory.resize(); }
     inline void set_night_mode(bool mode) { this->service_factory.setNightMode(mode); }
