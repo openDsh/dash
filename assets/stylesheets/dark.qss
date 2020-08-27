@@ -22,13 +22,10 @@ QTabWidget::pane {
     border-radius: 8px;
 }
 
-QTabWidget::tab-bar[tabPosition="2"] {
-    alignment: center;
-}
-
 QTabBar::tab {
     background-color: transparent;
     color: rgba(255, 255, 255, 179);
+    margin-top: 1px;
     padding: 4px;
 }
 
@@ -240,10 +237,19 @@ Tuner::sub-page {
     background-color: rgb(224, 224, 224);
 }
 
+StepMeter {
+    qproperty-notch_color: palette(alternate-base);
+    qproperty-step_color: palette(base);
+}
+
 QDialog,
 QDialog > QFrame {
     background-color: rgb(36, 36, 36);
     border-radius: 8px;
+}
+
+QFrame {
+    border: 1px solid red;
 }
 
 *[add_hint="true"] {

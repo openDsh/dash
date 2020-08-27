@@ -131,7 +131,11 @@ QLayout *DashWindow::body()
     this->bar->setContentsMargins(0, 0, 0, 0);
     this->bar->addWidget(this->controls_bar());
 
+    QWidget *msg_ref = new QWidget(this);
+    msg_ref->setObjectName("msg_ref");
+
     layout->addLayout(this->pages);
+    layout->addWidget(msg_ref);
     layout->addLayout(this->bar);
 
     return layout;
@@ -194,7 +198,6 @@ void DashWindow::add_page(QString name, QWidget *page, QString icon)
 QWidget *DashWindow::controls_bar()
 {
     QWidget *widget = new QWidget(this);
-    widget->setObjectName("controls_bar");
     widget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     QHBoxLayout *layout = new QHBoxLayout(widget);
     layout->setContentsMargins(0, 0, 0, 0);

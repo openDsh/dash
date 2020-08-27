@@ -5,46 +5,55 @@
 
 #include "app/theme.hpp"
 #include "app/tabs/climate.hpp"
+#include "app/widgets/step_meter.hpp"
 
+// https://dribbble.com/shots/5991865-Car-Control-App
+// https://torrancehu.com/smart-ac-mobile-application/
 QWidget *popup(Climate &climate)
 {
     QWidget *widget = new QWidget(climate.parentWidget());
     QHBoxLayout *layout = new QHBoxLayout(widget);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setSpacing(0);
 
     if (climate.driver_temp > 0) {
-        QLabel *driver_temp = new QLabel(QString::number(climate.driver_temp), widget);
-        driver_temp->setFont(Theme::font_14);
-        driver_temp->setAlignment(Qt::AlignCenter);
-        layout->addWidget(driver_temp);
+        QLabel *temp = new QLabel(QString::number(climate.driver_temp), widget);
+        temp->setAlignment(Qt::AlignLeft);
+        temp->setFont(Theme::font_14);
+        temp->setAlignment(Qt::AlignCenter);
+        layout->addWidget(temp);
     }
 
-    layout->addStretch();
+    StepMeter *fan = new StepMeter(climate.max_speed, climate.speed, widget);
 
-    QPushButton *symbol = new QPushButton(widget);
-    QSizePolicy symbol_policy = symbol->sizePolicy();
-    symbol_policy.setRetainSizeWhenHidden(true);
-    symbol->setSizePolicy(symbol_policy);
-    symbol->setFocusPolicy(Qt::NoFocus);
-    symbol->setAttribute(Qt::WA_TransparentForMouseEvents, true);
-    symbol->setFlat(true);
-    symbol->setIconSize(Theme::icon_24);
-    symbol->setIcon(Theme::get_instance()->make_button_icon("play", symbol));
-    layout->addWidget(symbol);
+    layout->addSpacing(fan->width() / 2);
 
-    QProgressBar *speed = new QProgressBar(widget);
-    speed->setMaximum(climate.max_speed);
-    speed->setFormat("%v");
-    speed->setFont(Theme::font_14);
-    speed->setValue(climate.speed);
-    layout->addWidget(speed);
+    QPushButton *low = new QPushButton(widget);
+    low->setFocusPolicy(Qt::NoFocus);
+    low->setAttribute(Qt::WA_TransparentForMouseEvents, true);
+    low->setFlat(true);
+    low->setIconSize(Theme::icon_24);
+    low->setIcon(Theme::get_instance()->make_button_icon("expand_more", low));
+    layout->addWidget(low);
 
-    layout->addStretch();
+    layout->addWidget(fan);
+
+    QPushButton *high = new QPushButton(widget);
+    high->setFocusPolicy(Qt::NoFocus);
+    high->setAttribute(Qt::WA_TransparentForMouseEvents, true);
+    high->setFlat(true);
+    high->setIconSize(Theme::icon_24);
+    high->setIcon(Theme::get_instance()->make_button_icon("expand_less", high));
+    layout->addWidget(high);
+
+    layout->addSpacing(fan->width() / 2);
 
     if (climate.passenger_temp > 0) {
-        QLabel *passenger_temp = new QLabel(QString::number(climate.passenger_temp), widget);
-        passenger_temp->setFont(Theme::font_14);
-        passenger_temp->setAlignment(Qt::AlignCenter);
-        layout->addWidget(passenger_temp);
+        QLabel *temp = new QLabel(QString::number(climate.passenger_temp), widget);
+        temp->setAlignment(Qt::AlignRight);
+        temp->setFont(Theme::font_14);
+        temp->setAlignment(Qt::AlignCenter);
+        layout->addWidget(temp);
     }
 
     return widget;

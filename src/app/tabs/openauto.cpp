@@ -6,6 +6,8 @@
 #include "app/widgets/progress.hpp"
 #include "app/window.hpp"
 
+#include "app/widgets/step_meter.hpp"
+
 OpenAutoWorker::OpenAutoWorker(std::function<void(bool)> callback, bool night_mode, QWidget *frame)
     : QObject(qApp),
       io_service(),
@@ -432,6 +434,7 @@ QWidget *OpenAutoTab::connect_msg()
 {
     QWidget *widget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
+    layout->setContentsMargins(0, 0, 0, 0);
 
     QLabel *label = new QLabel("connect device to start Android Auto", widget);
     label->setFont(Theme::font_16);
@@ -463,6 +466,7 @@ QWidget *OpenAutoTab::connect_msg()
     layout->addLayout(layout2);
     layout->addStretch();
     layout->addWidget(label);
+    layout->addWidget(new StepMeter(6, 2, widget));
     layout->addStretch();
 
     return widget;
