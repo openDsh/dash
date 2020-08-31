@@ -70,3 +70,16 @@ class Dialog : public QDialog {
         this->buttons->addWidget(button, 0, Qt::AlignRight);
     }
 };
+
+class SnackBar : public Dialog {
+    Q_OBJECT
+
+   public:
+    SnackBar() : Dialog(false, get_ref()) {}
+
+   protected:
+    void resizeEvent(QResizeEvent* event);
+
+   private:
+    QWidget *get_ref();
+};

@@ -36,7 +36,8 @@ void Dialog::open(int timeout)
     }
     else {
         this->show();
-        if (timeout > 0) this->timer->start(timeout);
+        if (timeout > 0)
+            this->timer->start(timeout);
     }
 }
 
@@ -105,6 +106,8 @@ void Dialog::keyPressEvent(QKeyEvent *event)
 
 void Dialog::showEvent(QShowEvent *event)
 {
+    // set to null position
+    this->move(QPoint());
     QWidget::showEvent(event);
 
     if (this->fullscreen) {
@@ -120,7 +123,26 @@ void Dialog::showEvent(QShowEvent *event)
 
 bool Dialog::eventFilter(QObject *object, QEvent *event)
 {
-    if (this->timer->isActive()) this->timer->start(this->timer->interval());
+    // restart timer on any event
+    if (this->timer->isActive())
+        this->timer->start(this->timer->interval());
 
     return QWidget::eventFilter(object, event);
+}
+
+void SnackBar::resizeEvent(QResizeEvent* event)
+{
+    if (QWidget *parent = this->parentWidget())
+        this->setFixedWidth(parent->width() * (2 / 3.0));
+
+    Dialog::resizeEvent(event);
+}
+
+QWidget *SnackBar::get_ref()
+{
+    for (QWidget *widget : qApp->allWidgets()) {
+        if (widget->objectName() == "msg_ref")
+            return widget;
+    }
+    return nullptr;
 }

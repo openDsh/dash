@@ -5,56 +5,117 @@
 
 #include "app/theme.hpp"
 #include "app/tabs/climate.hpp"
-#include "app/widgets/step_meter.hpp"
 
-// https://dribbble.com/shots/5991865-Car-Control-App
-// https://torrancehu.com/smart-ac-mobile-application/
-QWidget *popup(Climate &climate)
+ClimateSnackBar::ClimateSnackBar() : SnackBar()
 {
-    QWidget *widget = new QWidget(climate.parentWidget());
+    this->setFocusPolicy(Qt::NoFocus);
+    this->setAttribute(Qt::WA_TransparentForMouseEvents, true);
+
+    this->set_body(this->body_widget());
+}
+
+QWidget *ClimateSnackBar::body_widget()
+{
+    QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
+    layout->setContentsMargins(0, 0, 0, 0);
+
+    this->driver_temp = new QLabel(widget);
+    this->driver_temp->setAlignment(Qt::AlignLeft);
+    this->driver_temp->setFont(Theme::font_14);
+    this->driver_temp->setAlignment(Qt::AlignCenter);
+    layout->addWidget(this->driver_temp, 2, Qt::AlignCenter);
+
+    layout->addStretch();
+    layout->addLayout(this->state(), 8);
+    layout->addStretch();
+
+    this->passenger_temp = new QLabel(widget);
+    this->passenger_temp->setAlignment(Qt::AlignRight);
+    this->passenger_temp->setFont(Theme::font_14);
+    this->passenger_temp->setAlignment(Qt::AlignCenter);
+    layout->addWidget(this->passenger_temp, 2, Qt::AlignCenter);
+
+    return widget;
+}
+
+QLayout *ClimateSnackBar::state()
+{
+    QHBoxLayout *layout = new QHBoxLayout();
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
 
-    if (climate.driver_temp > 0) {
-        QLabel *temp = new QLabel(QString::number(climate.driver_temp), widget);
-        temp->setAlignment(Qt::AlignLeft);
-        temp->setFont(Theme::font_14);
-        temp->setAlignment(Qt::AlignCenter);
-        layout->addWidget(temp);
-    }
+    this->airflow = new ClimateState();
+    layout->addWidget(this->airflow, 0, Qt::AlignRight);
 
-    StepMeter *fan = new StepMeter(climate.max_speed, climate.speed, widget);
+    this->fan_speed = new StepMeter();
+    layout->addWidget(this->fan_speed, 0, Qt::AlignLeft);
 
-    layout->addSpacing(fan->width() / 2);
+    return layout;
+}
 
-    QPushButton *low = new QPushButton(widget);
-    low->setFocusPolicy(Qt::NoFocus);
-    low->setAttribute(Qt::WA_TransparentForMouseEvents, true);
-    low->setFlat(true);
-    low->setIconSize(Theme::icon_24);
-    low->setIcon(Theme::get_instance()->make_button_icon("expand_more", low));
-    layout->addWidget(low);
+void ClimateSnackBar::set_driver_temp(int temp)
+{
+    this->driver_temp->setText(QString("%1°").arg(temp));
+    this->open(3000);
+}
 
-    layout->addWidget(fan);
+void ClimateSnackBar::set_passenger_temp(int temp)
+{
+    this->passenger_temp->setText(QString("%1°").arg(temp));
+    this->open(3000);
+}
 
-    QPushButton *high = new QPushButton(widget);
-    high->setFocusPolicy(Qt::NoFocus);
-    high->setAttribute(Qt::WA_TransparentForMouseEvents, true);
-    high->setFlat(true);
-    high->setIconSize(Theme::icon_24);
-    high->setIcon(Theme::get_instance()->make_button_icon("expand_less", high));
-    layout->addWidget(high);
+void ClimateSnackBar::set_airflow(uint8_t location)
+{
+    this->airflow->toggle_defrost(location & 0b1);
+    this->airflow->toggle_body(location & 0b010);
+    this->airflow->toggle_feet(location & 0b100);
+    this->open(3000);
+}
 
-    layout->addSpacing(fan->width() / 2);
+void ClimateSnackBar::set_max_fan_speed(int max_speed)
+{
+    this->fan_speed->set_steps(max_speed);
+}
 
-    if (climate.passenger_temp > 0) {
-        QLabel *temp = new QLabel(QString::number(climate.passenger_temp), widget);
-        temp->setAlignment(Qt::AlignRight);
-        temp->setFont(Theme::font_14);
-        temp->setAlignment(Qt::AlignCenter);
-        layout->addWidget(temp);
-    }
+void ClimateSnackBar::set_fan_speed(int speed)
+{
+    this->fan_speed->set_bars(speed);
+    this->open(3000);
+}
 
-    return widget;
+Climate::Climate(QWidget *parent) : QWidget(parent)
+{
+    this->snack_bar = new ClimateSnackBar();
+}
+
+void Climate::set_max_fan_speed(int max_speed)
+{
+    this->max_fan_speed = max_speed;
+    this->snack_bar->set_max_fan_speed(max_speed);
+}
+
+void Climate::set_fan_speed(int speed)
+{
+    this->fan_speed = speed;
+    this->snack_bar->set_fan_speed(speed);
+}
+
+void Climate::set_airflow(uint8_t location)
+{
+    this->airflow = location;
+    this->snack_bar->set_airflow(location);
+}
+
+void Climate::set_driver_temp(int temp)
+{
+    this->driver_temp = temp;
+    this->snack_bar->set_driver_temp(temp);
+}
+
+void Climate::set_passenger_temp(int temp)
+{
+    this->passenger_temp = temp;
+    this->snack_bar->set_passenger_temp(temp);
 }

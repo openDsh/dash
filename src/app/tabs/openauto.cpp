@@ -419,6 +419,15 @@ OpenAutoTab::OpenAutoTab(QWidget *parent) : QStackedWidget(parent)
     });
     connect(this->theme, &Theme::mode_updated, [this](bool mode) { this->worker->set_night_mode(mode); });
 
+    this->dialog = new Dialog(true, this->window());
+    this->dialog->set_body(new OpenAutoSettingsSubTab());
+    QPushButton *save_button = new QPushButton("save");
+    connect(save_button, &QPushButton::clicked, [this]() {
+        this->config->openauto_config->setButtonCodes(this->config->openauto_button_codes);
+        this->config->openauto_config->save();
+    });
+    this->dialog->set_button(save_button);
+
     this->addWidget(this->connect_msg());
     this->addWidget(this->frame);
 }
@@ -449,15 +458,7 @@ QWidget *OpenAutoTab::connect_msg()
     settings_button->setIconSize(Theme::icon_24);
     settings_button->setIcon(this->theme->make_button_icon("settings", settings_button));
     connect(settings_button, &QPushButton::clicked, [this]() {
-        Dialog *dialog = new Dialog(true, this->window());
-        dialog->set_body(new OpenAutoSettingsSubTab());
-        QPushButton *save_button = new QPushButton("save");
-        connect(save_button, &QPushButton::clicked, [this, dialog]() {
-            this->config->openauto_config->setButtonCodes(this->config->openauto_button_codes);
-            this->config->openauto_config->save();
-        });
-        dialog->set_button(save_button);
-        dialog->open();
+        this->dialog->open();
     });
 
     layout2->addStretch();
@@ -466,7 +467,6 @@ QWidget *OpenAutoTab::connect_msg()
     layout->addLayout(layout2);
     layout->addStretch();
     layout->addWidget(label);
-    layout->addWidget(new StepMeter(6, 2, widget));
     layout->addStretch();
 
     return widget;

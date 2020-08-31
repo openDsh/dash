@@ -3,56 +3,47 @@
 #include <QVBoxLayout>
 #include <QDebug>
 #include <QFrame>
+#include <QPainter>
 
 #include "app/widgets/step_meter.hpp"
 
-StepMeter::StepMeter(int steps, int val, QWidget *parent) : QFrame(parent)
+StepMeter::StepMeter(QWidget *parent) : QFrame(parent)
 {
-    this->steps = steps;
-    this->val = std::min(std::max(1, val), this->steps);
+    this->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 
-    QHBoxLayout *layout = new QHBoxLayout(this);
-    layout->setContentsMargins(6, 0, 6, 0);
+    this->config = Config::get_instance();
+}
 
-    for (int i = 1; i <= this->steps; i++) {
-        QLayout *block = this->make_block(i);
-        layout->addLayout(block);
+QSize StepMeter::sizeHint() const
+{
+    double scale = this->config->get_scale();
+    int width = ((12 * scale) * this->steps) + ((4 * scale) * (this->steps + 1));
+    int height = (8 * scale) * this->steps;
+    return QSize(width, height);
+}
+
+void StepMeter::paintEvent(QPaintEvent *event)
+{
+    QPainter painter(this);
+    painter.setRenderHint(QPainter::Antialiasing);
+    painter.setRenderHint(QPainter::HighQualityAntialiasing);
+
+    double scale = this->config->get_scale();
+
+    int bar_height = 8 * scale;
+    int bar_width = 12 * scale;
+    int spacing = 4 * scale;
+
+    int x_offset = std::max(0, (this->width() - (this->steps * (bar_width + spacing))) / 2);
+    int y_offset = std::max(0, (this->height() - (this->steps * bar_height)) / 2);
+    for (int i = this->steps; i > 0; i--) {
+        QPolygon bar(QRect(x_offset + ((i - 1) * (bar_width + spacing)), y_offset + (this->steps - i) * bar_height, bar_width, i * bar_height));
+        QPoint top_left = bar.point(0);
+        top_left.ry() += bar_height - (2 * scale);
+        bar.setPoint(0, top_left);
+
+        QPainterPath path;
+        path.addPolygon(bar);
+        painter.fillPath(path, (this->bars >= i) ? QBrush(this->bar_color) : QBrush(this->base_color));
     }
-
-    this->setMaximumHeight(this->width() / 2);
-}
-
-QLayout *StepMeter::make_block(int split)
-{
-    QVBoxLayout *layout = new QVBoxLayout();
-    layout->setContentsMargins(0, 0, 0, 0);
-    layout->setSpacing(0);
-
-    layout->addStretch(this->steps - split);
-
-    QWidget *block = new QWidget(this);
-    this->blocks.append(block);
-    block->setMinimumWidth(this->width() / this->steps);
-    block->setAutoFillBackground(true);
-    layout->addWidget(block, split);  
-
-    return layout;
-}
-
-void StepMeter::update_notch_colors()
-{
-    QPalette palette(this->palette());
-    palette.setColor(QPalette::Window, this->notch_color);
-
-    for (int i = val - 1; i < this->steps; i++)
-        this->blocks[i]->setPalette(palette);
-}
-
-void StepMeter::update_step_colors()
-{
-    QPalette palette(this->palette());
-    palette.setColor(QPalette::Window, this->step_color);
-
-    for (int i = 0; i < this->val; i++)
-        this->blocks[i]->setPalette(palette);
 }

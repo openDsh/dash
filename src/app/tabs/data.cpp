@@ -81,15 +81,6 @@ void VehicleTab::get_plugins()
     for (const QFileInfo &plugin : this->PLUGIN_DIR.entryInfoList(QDir::Files)) {
         if (QLibrary::isLibrary(plugin.absoluteFilePath()))
             this->plugins[plugin.baseName()] = plugin;
-        // if ((QObject *plugin = pluginLoader.instance()) != nullptr) {
-        //     VehicleInterface* vehicleInterface = qobject_cast<VehicleInterface *>(plugin);
-        //     if (vehicleInterface){
-        //         std::cout<<"FOUND PLUGIN"<<std::endl;
-        //         vehicleInterface->init(bus, theme);
-        //         return true;
-        //     }
-        //     pluginLoader.unload();
-        // }
     }
 }
 
@@ -112,23 +103,11 @@ VehicleTab::VehicleTab(QWidget *parent) : QTabWidget(parent)
             QTimer *timer = new QTimer(this);
             connect(timer, &QTimer::timeout, [this]() {
                 auto climate = qobject_cast<Climate *>(this->widget(this->capabilities["climate"]));
-                // popup should be triggered anytime climate class receives new data!!!
-                climate->set_speed(rand() % 4);
-                QWidget *parent = nullptr;
-                for (QWidget *widget : qApp->allWidgets()) {
-                    if (widget->objectName() == "msg_ref") {
-                        parent = widget;
-                        break;
-                    }
-                }
-
-                Dialog *dialog = new Dialog(false, parent);
-                dialog->set_body(popup(*climate));
-                dialog->setFocusPolicy(Qt::NoFocus);
-                dialog->setAttribute(Qt::WA_TransparentForMouseEvents, true);
-                dialog->open(3000);
+                climate->set_fan_speed(rand() % 4);
+                climate->set_airflow(rand());
+                climate->set_driver_temp((rand() % 20) + 60);
+                climate->set_passenger_temp((rand() % 20) + 60);
             });
-
 
             timer->start(5000);
         }
@@ -146,9 +125,7 @@ VehicleTab::VehicleTab(QWidget *parent) : QTabWidget(parent)
 
     this->addTab(new DataTab(this), "Data");
     Climate *climate = new Climate(this);
-    climate->set_max_speed(4);
-    climate->set_driver_temp(66);
-    climate->set_passenger_temp(55);
+    climate->set_max_fan_speed(4);
     int idx = this->addTab(climate, "Climate");
     this->capabilities["climate"] = idx;
 

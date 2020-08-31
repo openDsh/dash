@@ -238,8 +238,12 @@ Tuner::sub-page {
 }
 
 StepMeter {
-    qproperty-notch_color: palette(alternate-base);
-    qproperty-step_color: palette(base);
+    qproperty-base_color: palette(alternate-base);
+    qproperty-bar_color: palette(base);
+}
+
+ClimateState {
+    qproperty-color: rgb(0, 0, 0);
 }
 
 QDialog,
