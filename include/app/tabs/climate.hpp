@@ -25,7 +25,7 @@ class ClimateSnackBar : public SnackBar {
     StepMeter *fan_speed;
 
     QWidget *body_widget();
-    QLayout *state();
+    QWidget *state_widget();
 };
 
 class Climate : public QWidget {

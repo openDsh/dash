@@ -6,8 +6,6 @@
 #include "app/widgets/progress.hpp"
 #include "app/window.hpp"
 
-#include "app/widgets/step_meter.hpp"
-
 OpenAutoWorker::OpenAutoWorker(std::function<void(bool)> callback, bool night_mode, QWidget *frame)
     : QObject(qApp),
       io_service(),

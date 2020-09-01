@@ -21,37 +21,36 @@ QWidget *ClimateSnackBar::body_widget()
     layout->setContentsMargins(0, 0, 0, 0);
 
     this->driver_temp = new QLabel(widget);
-    this->driver_temp->setAlignment(Qt::AlignLeft);
     this->driver_temp->setFont(Theme::font_14);
     this->driver_temp->setAlignment(Qt::AlignCenter);
-    layout->addWidget(this->driver_temp, 2, Qt::AlignCenter);
+    layout->addWidget(this->driver_temp);
 
     layout->addStretch();
-    layout->addLayout(this->state(), 8);
+    layout->addWidget(this->state_widget());
     layout->addStretch();
 
     this->passenger_temp = new QLabel(widget);
-    this->passenger_temp->setAlignment(Qt::AlignRight);
     this->passenger_temp->setFont(Theme::font_14);
     this->passenger_temp->setAlignment(Qt::AlignCenter);
-    layout->addWidget(this->passenger_temp, 2, Qt::AlignCenter);
+    layout->addWidget(this->passenger_temp);
 
     return widget;
 }
 
-QLayout *ClimateSnackBar::state()
+QWidget *ClimateSnackBar::state_widget()
 {
-    QHBoxLayout *layout = new QHBoxLayout();
+    QWidget *widget = new QWidget(this);
+    QHBoxLayout *layout = new QHBoxLayout(widget);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
 
-    this->airflow = new ClimateState();
-    layout->addWidget(this->airflow, 0, Qt::AlignRight);
+    this->airflow = new ClimateState(widget);
+    layout->addWidget(this->airflow);
 
-    this->fan_speed = new StepMeter();
-    layout->addWidget(this->fan_speed, 0, Qt::AlignLeft);
+    this->fan_speed = new StepMeter(widget);
+    layout->addWidget(this->fan_speed);
 
-    return layout;
+    return widget;
 }
 
 void ClimateSnackBar::set_driver_temp(int temp)
