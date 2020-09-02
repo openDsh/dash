@@ -93,29 +93,3 @@ class ShortcutsSettingsSubTab : public QWidget {
     Config *config;
     Shortcuts *shortcuts;
 };
-
-class OpenAutoSettingsSubTab : public QWidget {
-    Q_OBJECT
-
-   public:
-    OpenAutoSettingsSubTab(QWidget *parent = nullptr);
-
-   private:
-    QWidget *settings_widget();
-    QWidget *rhd_row_widget();
-    QWidget *frame_rate_row_widget();
-    QWidget *resolution_row_widget();
-    QWidget *dpi_row_widget();
-    QWidget *dpi_widget();
-    QWidget *rt_audio_row_widget();
-    QWidget *audio_channels_row_widget();
-    QWidget *bluetooth_row_widget();
-    QWidget *touchscreen_row_widget();
-    QCheckBox *button_checkbox(QString name, QString key, aasdk::proto::enums::ButtonCode::Enum code, QWidget *parent);
-    QWidget *buttons_row_widget();
-
-    Bluetooth *bluetooth;
-    Config *config;
-    Theme *theme;
-};
-

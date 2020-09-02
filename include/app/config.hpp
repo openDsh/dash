@@ -90,10 +90,10 @@ class Config : public QObject {
     inline QWidget *get_quick_view(QString name) { return this->quick_views[name]; }
     inline void add_quick_view(QString name, QWidget *view) { this->quick_views[name] = view; }
 
-    inline QString get_brightness_module() { return this->brightness_module; }
+    inline QString get_brightness_module_name() { return this->brightness_module; }
     inline void set_brightness_module(QString brightness_module) { this->brightness_module = brightness_module; }
     inline QMap<QString, BrightnessModule *> get_brightness_modules() { return this->brightness_modules; }
-    inline BrightnessModule *get_brightness_module(QString name) { return this->brightness_modules[name]; }
+    inline BrightnessModule *get_brightness_module() { return this->brightness_modules[this->brightness_module]; }
     inline void add_brightness_module(QString name, BrightnessModule *module)
     {
         this->brightness_modules[name] = module;
@@ -135,6 +135,12 @@ class Config : public QObject {
     inline QVideoFrame::PixelFormat get_cam_local_format_override() { return this->cam_local_format_override; }
     inline void set_cam_local_format_override(QVideoFrame::PixelFormat local_format) { this->cam_local_format_override = local_format; }
 
+    inline bool get_cam_autoconnect() { return this->cam_autoconnect; }
+    inline void set_cam_autoconnect(bool enabled) { this->cam_autoconnect = enabled; }
+
+    inline int get_cam_autoconnect_time_secs() { return this->cam_autoconnect_time_secs; }
+    inline void set_cam_autoconnect_time_secs(int seconds) { this->cam_autoconnect_time_secs = seconds; }
+
     static Config *get_instance();
 
    private:
@@ -167,6 +173,8 @@ class Config : public QObject {
     QString cam_name;
     bool cam_is_network;
     QVideoFrame::PixelFormat cam_local_format_override;
+    bool cam_autoconnect;
+    int cam_autoconnect_time_secs;
     QMap<QString, bool> pages;
 
    signals:
@@ -177,6 +185,5 @@ class Config : public QObject {
     void controls_bar_changed(bool controls_bar);
     void scale_changed(double scale);
     void page_changed(QWidget *page, bool enabled);
-    void save_status(bool status);
+    void cam_autoconnect_changed(bool enabled);
 };
-

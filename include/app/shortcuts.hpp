@@ -52,6 +52,7 @@ class Shortcut : public QObject {
 
     inline QString to_str() { return this->shortcut; }
     void set_shortcut(QString shortcut);
+    inline void initialize_shortcut() { this->set_shortcut(this->shortcut); }
 
    private:
     QString shortcut;
@@ -71,6 +72,7 @@ class Shortcuts : public QObject {
     Shortcuts() : QObject(qApp) {}
 
     void add_shortcut(QString id, QString description, Shortcut *shortcut);
+    void initialize_shortcuts();
 
     inline void update_shortcut(QString id, QString shortcut) { this->shortcuts[id].second->set_shortcut(shortcut); }
     inline QMap<QString, QPair<QString, Shortcut *>> get_shortcuts() { return this->shortcuts; }
@@ -83,4 +85,3 @@ class Shortcuts : public QObject {
    signals:
     void shortcut_added(QString id, QString description, Shortcut *shortcut);
 };
-

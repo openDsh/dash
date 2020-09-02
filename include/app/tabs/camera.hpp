@@ -36,6 +36,8 @@ class CameraTab : public QWidget {
     void update_network_status(QMediaPlayer::MediaStatus media_status);
     void update_local_status(QCamera::Status status);
     void choose_video_resolution();
+    void count_down();
+    void connect_cam();
 
     Theme *theme;
     Config *config;
@@ -46,12 +48,16 @@ class CameraTab : public QWidget {
     QCameraViewfinder *local_video_widget;
     QCameraViewfinderSettings local_cam_settings;
     QCamera *local_cam;
+    QTimer *reconnect_timer;
+    int reconnect_in_secs;
+    QString reconnect_message;
     int local_index;
 
    signals:
     void connected_network();
     void connected_local();
     void disconnected();
+    void autoconnect_disabled();
     void next_cam();
     void prev_cam();
 };

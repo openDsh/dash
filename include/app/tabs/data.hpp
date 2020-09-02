@@ -2,11 +2,14 @@
 
 #include <QPair>
 #include <QtWidgets>
+#include <QPluginLoader>
 
 #include "canbus/socketcanbus.hpp"
 #include "canbus/vehicleinterface.hpp"
 #include "obd/message.hpp"
 #include "obd/command.hpp"
+#include "app/widgets/selector.hpp"
+#include "app/widgets/dialog.hpp"
 
 typedef std::function<double(double, bool)> obd_decoder_t;
 typedef QPair<QString, QString> units_t;
@@ -42,6 +45,24 @@ class Gauge : public QWidget {
 
    signals:
     void toggle_unit(bool si);
+};
+
+class VehicleTab : public QTabWidget {
+    Q_OBJECT
+
+   public:
+    VehicleTab(QWidget *parent = nullptr);
+
+   private:
+    static const QDir PLUGIN_DIR;
+
+    void get_plugins();
+
+    QMap<QString, int> capabilities;
+    QMap<QString, QFileInfo> plugins;
+    QPluginLoader *active_plugin;
+    Selector *selector;
+    Dialog *dialog;
 };
 
 class DataTab : public QWidget {

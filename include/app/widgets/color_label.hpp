@@ -22,4 +22,3 @@ class ColorLabel : public QWidget {
     QLabel *name;
     Theme *theme;
 };
-

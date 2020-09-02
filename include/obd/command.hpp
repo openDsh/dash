@@ -21,4 +21,3 @@ struct Commands {
 };
 
 extern Commands cmds;
-

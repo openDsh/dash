@@ -22,13 +22,10 @@ QTabWidget::pane {
     border-radius: 8px;
 }
 
-QTabWidget::tab-bar[tabPosition="2"] {
-    alignment: center;
-}
-
 QTabBar::tab {
     background-color: transparent;
     color: rgba(0, 0, 0, 138);
+    margin-top: 1px;
     padding: 4px;
 }
 
@@ -206,7 +203,7 @@ QLineEdit {
     padding: 12px;
     color: rgba(0, 0, 0, 222);
     background-color: rgba(0, 0, 0, 10);
-    border-bottom: 1px solid rgb(0, 0, 0, 108);
+    border-bottom: 1px solid rgba(0, 0, 0, 108);
 }
 
 QLineEdit:focus {
@@ -238,6 +235,15 @@ Tuner::handle {
 
 Tuner::sub-page {
     background-color: rgb(0, 0, 0);
+}
+
+StepMeter {
+    qproperty-base_color: palette(alternate-base);
+    qproperty-bar_color: palette(base);
+}
+
+ClimateState {
+    qproperty-color: rgb(0, 0, 0);
 }
 
 QDialog,

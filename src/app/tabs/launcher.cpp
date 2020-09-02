@@ -1,4 +1,5 @@
 #include <QElapsedTimer>
+#include <unistd.h>
 
 #include "app/tabs/launcher.hpp"
 
@@ -63,14 +64,13 @@ XWorker::WindowProp XWorker::get_window_prop(Window window, Atom type, const cha
     return window_prop;
 }
 
-EmbeddedApp::EmbeddedApp(QWidget *parent) : QWidget(parent)
+EmbeddedApp::EmbeddedApp(QWidget *parent) : QWidget(parent), process()
 {
     this->worker = new XWorker(this);
 
-    this->process = new QProcess();
-    process->setStandardOutputFile(QProcess::nullDevice());
-    process->setStandardErrorFile(QProcess::nullDevice());
-    connect(process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
+    this->process.setStandardOutputFile(QProcess::nullDevice());
+    this->process.setStandardErrorFile(QProcess::nullDevice());
+    connect(&this->process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
             [this](int, QProcess::ExitStatus) { this->end(); });
 
     QVBoxLayout *layout = new QVBoxLayout(this);
@@ -79,9 +79,10 @@ EmbeddedApp::EmbeddedApp(QWidget *parent) : QWidget(parent)
 
     QPushButton *button = new QPushButton(this);
     button->setFlat(true);
-    button->setIconSize(Theme::icon_16);
+    button->setIconSize(Theme::icon_20);
     connect(button, &QPushButton::clicked, [this]() { this->end(); });
-    Theme::get_instance()->add_button_icon("close", button);
+    button->setIcon(Theme::get_instance()->make_button_icon("close", button));
+    
     layout->addWidget(button, 0, Qt::AlignRight);
 
     this->container = new QVBoxLayout();
@@ -90,22 +91,21 @@ EmbeddedApp::EmbeddedApp(QWidget *parent) : QWidget(parent)
 
 EmbeddedApp::~EmbeddedApp()
 {
-    this->process->kill();
-    this->process->waitForFinished();
+    this->process.kill();
+    this->process.waitForFinished();
 
-    delete this->process;
     delete this->container;
     delete this->worker;
 }
 
 void EmbeddedApp::start(QString app)
 {
-    this->process->setProgram(app);
-    this->process->start();
+    this->process.setProgram(app);
+    this->process.start();
 
-    this->process->waitForStarted();
+    this->process.waitForStarted();
 
-    QWindow *window = QWindow::fromWinId(worker->get_window(this->process->processId()));
+    QWindow *window = QWindow::fromWinId(worker->get_window(this->process.processId()));
     window->setFlags(Qt::FramelessWindowHint);
     usleep(500000);
 
@@ -116,7 +116,7 @@ void EmbeddedApp::start(QString app)
 
 void EmbeddedApp::end()
 {
-    this->process->terminate();
+    this->process.terminate();
     delete this->container->takeAt(0);
     emit closed();
 }
@@ -172,7 +172,7 @@ QWidget *LauncherTab::app_select_widget()
     connect(home_button, &QPushButton::clicked, [this](bool checked = false) {
         this->config->set_launcher_home(checked ? this->path_label->text() : QDir().absolutePath());
     });
-    this->theme->add_button_icon("playlist_add_check", home_button, "playlist_add");
+    home_button->setIcon(theme->make_button_icon("playlist_add", home_button, "playlist_add_check"));
     layout->addWidget(home_button, 0, Qt::AlignTop);
 
     this->folders = new QListWidget(widget);

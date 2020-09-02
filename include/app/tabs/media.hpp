@@ -63,4 +63,3 @@ class LocalPlayerSubTab : public QWidget {
     QMediaPlayer *player;
     QLabel *path_label;
 };
-

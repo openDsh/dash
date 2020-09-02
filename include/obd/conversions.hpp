@@ -7,4 +7,3 @@ double c_to_f(double val) { return (val * 9 / 5) + 32; }
 double gps_to_gph(double val) { return val * 0.0805; }
 
 double gps_to_lph(double val) { return val * 3.6; }
-

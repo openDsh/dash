@@ -1,5 +1,6 @@
 #pragma once
-
+#include <QCanBus>
+#include <functional>
 class ICANBus {
    public:
       static ICANBus *get_instance();

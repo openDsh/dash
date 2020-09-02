@@ -42,4 +42,3 @@ struct Response : Message {
 
     Response() { this->success = false; }
 };
-

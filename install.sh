@@ -75,7 +75,7 @@ if [[ $? > 0 ]]
     echo "make error check output above"
     exit
   else
-    echo "make ok, executable can be found ../bin/ia"
+    echo "make ok, executable can be found ../bin/dash"
     echo
 
     #check if usb rules exist
@@ -104,4 +104,4 @@ fi
 #Start app
 echo "starting app"
 cd ../bin
-./ia
+./dash

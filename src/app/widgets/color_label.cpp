@@ -47,4 +47,3 @@ void ColorLabel::update(QString color)
     block.fill(this->theme->get_color(color));
     this->icon->setPixmap(block);
 }
-
