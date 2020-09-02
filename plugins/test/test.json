@@ -1,8 +1,4 @@
 {
     "name" : "test",
-    "version" : "0.1",
-    "climate": {
-        "tab": false,
-        "dialog": true
-    }
+    "version" : "1.0"
 }

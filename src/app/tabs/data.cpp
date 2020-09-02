@@ -96,20 +96,10 @@ VehicleTab::VehicleTab(QWidget *parent) : QTabWidget(parent)
     QPushButton *load_button = new QPushButton("load");
     connect(load_button, &QPushButton::clicked, [this]() {
         this->active_plugin = new QPluginLoader(this->plugins[this->selector->get_current()].absoluteFilePath(), this);
-        this->setTabEnabled(this->capabilities["climate"], this->active_plugin->metaData().value("MetaData").toObject().value("climate").toObject().value("tab").toBool());
-        this->setTabText(this->capabilities["climate"], this->tabText(this->capabilities["climate"]));
 
-        if (this->active_plugin->metaData().value("MetaData").toObject().value("climate").toObject().value("dialog").toBool()) {
-            QTimer *timer = new QTimer(this);
-            connect(timer, &QTimer::timeout, [this]() {
-                auto climate = qobject_cast<Climate *>(this->widget(this->capabilities["climate"]));
-                climate->set_fan_speed(rand() % 4);
-                climate->set_airflow(rand());
-                climate->set_driver_temp((rand() % 20) + 60);
-                climate->set_passenger_temp((rand() % 20) + 60);
-            });
-
-            timer->start(5000);
+        if (Plugin *plugin = qobject_cast<Plugin *>(this->active_plugin->instance())) {
+            for (QWidget *tab : plugin->tabs())
+                this->addTab(tab, tab->property("tab_title").toString());
         }
     });
     this->dialog->set_button(load_button);
@@ -124,12 +114,6 @@ VehicleTab::VehicleTab(QWidget *parent) : QTabWidget(parent)
     this->setCornerWidget(settings_button);
 
     this->addTab(new DataTab(this), "Data");
-    Climate *climate = new Climate(this);
-    climate->set_max_fan_speed(4);
-    int idx = this->addTab(climate, "Climate");
-    this->capabilities["climate"] = idx;
-
-    this->setTabEnabled(idx, false);
 }
 
 DataTab::DataTab(QWidget *parent) : QWidget(parent)

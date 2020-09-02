@@ -3,6 +3,7 @@
 #include <QObject>
 #include <QtPlugin>
 #include "plugins/plugin.hpp"
+#include "app/tabs/climate.hpp"
 
 class Test : public QObject, Plugin
 {
@@ -10,6 +11,10 @@ class Test : public QObject, Plugin
     Q_PLUGIN_METADATA(IID Plugin_iid FILE "test.json")
     Q_INTERFACES(Plugin)
 
-public:
-    void init(QString message) override;
+   public:
+    Test();
+    QList<QWidget *> tabs() override;
+
+   private:
+    Climate *climate;
 };
