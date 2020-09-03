@@ -23,16 +23,16 @@ QWidget *ClimateSnackBar::body_widget()
     this->driver_temp = new QLabel(widget);
     this->driver_temp->setFont(Theme::font_14);
     this->driver_temp->setAlignment(Qt::AlignCenter);
-    layout->addWidget(this->driver_temp);
+    layout->addWidget(this->driver_temp, 4);
 
-    layout->addStretch();
+    layout->addStretch(6);
     layout->addWidget(this->state_widget());
-    layout->addStretch();
+    layout->addStretch(6);
 
     this->passenger_temp = new QLabel(widget);
     this->passenger_temp->setFont(Theme::font_14);
     this->passenger_temp->setAlignment(Qt::AlignCenter);
-    layout->addWidget(this->passenger_temp);
+    layout->addWidget(this->passenger_temp, 4);
 
     return widget;
 }
