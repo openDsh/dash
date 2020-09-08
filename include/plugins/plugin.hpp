@@ -1,15 +1,15 @@
 #pragma once
 
-#include <QString>
+#include <QList>
+#include <QWidget>
 
 class Plugin
 {
-public:
+   public:
     virtual ~Plugin() = default;
 
-    virtual QList<QWidget *> tabs() = 0;
+    virtual QList<QWidget *> widgets() = 0;
 };
-
 
 #define Plugin_iid "org.dash.Plugin"
 

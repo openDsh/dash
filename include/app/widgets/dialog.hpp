@@ -22,15 +22,11 @@ class Dialog : public QDialog {
         QLabel *label = new QLabel(str, this);
         label->setFont(QFont("Montserrat", 18, QFont::Bold));
         this->title->addWidget(label);
-        qApp->processEvents();
-        Theme::get_instance()->update();
     }
     inline void set_body(QWidget *widget)
     {
         this->setMinimumSize(widget->size());
         this->body->addWidget(widget);
-        qApp->processEvents();
-        Theme::get_instance()->update();
     }
     inline void set_button(QPushButton *button)
     {
@@ -40,8 +36,6 @@ class Dialog : public QDialog {
         button->setFlat(true);
         this->buttons->addWidget(button, 0, Qt::AlignRight);
         connect(button, &QPushButton::clicked, [this]() { this->close(); });
-        qApp->processEvents();
-        Theme::get_instance()->update();
     }
 
    protected:

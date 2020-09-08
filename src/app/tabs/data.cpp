@@ -88,6 +88,8 @@ VehicleTab::VehicleTab(QWidget *parent) : QTabWidget(parent)
 {
     this->tabBar()->setFont(Theme::font_18);
 
+    this->addTab(new DataTab(this), "Data");
+
     this->get_plugins();
     this->selector = new Selector(this->plugins.keys(), Theme::font_16, this);
     this->dialog = new Dialog(true, this->window());
@@ -98,8 +100,8 @@ VehicleTab::VehicleTab(QWidget *parent) : QTabWidget(parent)
         this->active_plugin = new QPluginLoader(this->plugins[this->selector->get_current()].absoluteFilePath(), this);
 
         if (Plugin *plugin = qobject_cast<Plugin *>(this->active_plugin->instance())) {
-            for (QWidget *tab : plugin->tabs())
-                this->addTab(tab, tab->property("tab_title").toString());
+            for (QWidget *tab : plugin->widgets())
+                this->addTab(tab, tab->objectName());
         }
     });
     this->dialog->set_button(load_button);
@@ -109,11 +111,7 @@ VehicleTab::VehicleTab(QWidget *parent) : QTabWidget(parent)
     settings_button->setIconSize(Theme::icon_24);
     settings_button->setIcon(Theme::get_instance()->make_button_icon("settings", settings_button));
     connect(settings_button, &QPushButton::clicked, [this]() { this->dialog->open(); });
-
-    this->tabBar()->setFont(Theme::font_18);
     this->setCornerWidget(settings_button);
-
-    this->addTab(new DataTab(this), "Data");
 }
 
 DataTab::DataTab(QWidget *parent) : QWidget(parent)

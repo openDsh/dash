@@ -10,6 +10,7 @@ class Selector : public QWidget {
 
    public:
     Selector(QList<QString> options, QFont font, QWidget *parent = nullptr);
+    // allow widgets to be passed in as options
 
     inline QString get_current() { return this->options[this->current_idx]; }
 

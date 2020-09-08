@@ -13,7 +13,6 @@ class MediaTab : public QTabWidget {
 
    public:
     MediaTab(QWidget *parent = nullptr);
-    void fill_tabs();
 };
 
 class BluetoothPlayerSubTab : public QWidget {

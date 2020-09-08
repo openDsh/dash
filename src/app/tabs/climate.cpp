@@ -86,35 +86,37 @@ void ClimateSnackBar::set_fan_speed(int speed)
 
 Climate::Climate(QWidget *parent) : QWidget(parent)
 {
+    this->setObjectName("Climate");
+
     this->snack_bar = new ClimateSnackBar();
 }
 
-void Climate::set_max_fan_speed(int max_speed)
+void Climate::max_fan_speed(int max_fan_speed)
 {
-    this->max_fan_speed = max_speed;
-    this->snack_bar->set_max_fan_speed(max_speed);
+    this->max_fan_speed_ = max_fan_speed;
+    this->snack_bar->set_max_fan_speed(this->max_fan_speed_);
 }
 
-void Climate::set_fan_speed(int speed)
+void Climate::fan_speed(int fan_speed)
 {
-    this->fan_speed = speed;
-    this->snack_bar->set_fan_speed(speed);
+    this->fan_speed_ = fan_speed;
+    this->snack_bar->set_fan_speed(this->fan_speed_);
 }
 
-void Climate::set_airflow(uint8_t location)
+void Climate::airflow(uint8_t airflow)
 {
-    this->airflow = location;
-    this->snack_bar->set_airflow(location);
+    this->airflow_ = airflow;
+    this->snack_bar->set_airflow(this->airflow_);
 }
 
-void Climate::set_driver_temp(int temp)
+void Climate::driver_temp(int driver_temp)
 {
-    this->driver_temp = temp;
-    this->snack_bar->set_driver_temp(temp);
+    this->driver_temp_ = driver_temp;
+    this->snack_bar->set_driver_temp(this->driver_temp_);
 }
 
-void Climate::set_passenger_temp(int temp)
+void Climate::passenger_temp(int passenger_temp)
 {
-    this->passenger_temp = temp;
-    this->snack_bar->set_passenger_temp(temp);
+    this->passenger_temp_ = passenger_temp;
+    this->snack_bar->set_passenger_temp(this->passenger_temp_);
 }

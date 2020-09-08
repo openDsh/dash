@@ -14,7 +14,6 @@ class SettingsTab : public QTabWidget {
 
    public:
     SettingsTab(QWidget *parent = nullptr);
-    void fill_tabs();
 };
 
 class GeneralSettingsSubTab : public QWidget {

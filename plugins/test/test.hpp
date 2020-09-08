@@ -1,7 +1,6 @@
 #pragma once
 
 #include <QObject>
-#include <QtPlugin>
 #include "plugins/plugin.hpp"
 #include "app/tabs/climate.hpp"
 
@@ -13,7 +12,7 @@ class Test : public QObject, Plugin
 
    public:
     Test();
-    QList<QWidget *> tabs() override;
+    QList<QWidget *> widgets() override;
 
    private:
     Climate *climate;

@@ -15,6 +15,7 @@
 #include "app/tabs/settings.hpp"
 #include "app/theme.hpp"
 #include "app/widgets/color_label.hpp"
+#include "app/widgets/selector.hpp"
 #include "app/widgets/switch.hpp"
 #include "app/window.hpp"
 
@@ -22,11 +23,6 @@ SettingsTab::SettingsTab(QWidget *parent) : QTabWidget(parent)
 {
     this->tabBar()->setFont(Theme::font_18);
 
-    this->fill_tabs();
-}
-
-void SettingsTab::fill_tabs()
-{
     this->addTab(new GeneralSettingsSubTab(this), "General");
     this->addTab(new LayoutSettingsSubTab(this), "Layout");
     this->addTab(new BluetoothSettingsSubTab(this), "Bluetooth");
