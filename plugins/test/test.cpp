@@ -49,3 +49,8 @@ QList<QWidget *> Test::widgets()
     tabs.append(this->climate);
     return tabs;
 }
+
+bool Test::init()
+{
+    return true;
+}

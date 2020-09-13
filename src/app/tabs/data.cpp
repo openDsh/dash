@@ -6,7 +6,7 @@
 #include "app/window.hpp"
 #include "obd/conversions.hpp"
 
-#include "plugins/plugin.hpp"
+#include "plugins/vehicle_plugin.hpp"
 
 Gauge::Gauge(units_t units, QFont value_font, QFont unit_font, Gauge::Orientation orientation, int rate,
              std::vector<Command> cmds, int precision, obd_decoder_t decoder, QWidget *parent)
@@ -99,7 +99,8 @@ VehicleTab::VehicleTab(QWidget *parent) : QTabWidget(parent)
     connect(load_button, &QPushButton::clicked, [this]() {
         this->active_plugin = new QPluginLoader(this->plugins[this->selector->get_current()].absoluteFilePath(), this);
 
-        if (Plugin *plugin = qobject_cast<Plugin *>(this->active_plugin->instance())) {
+        if (VehiclePlugin *plugin = qobject_cast<VehiclePlugin *>(this->active_plugin->instance())) {
+            plugin->init();
             for (QWidget *tab : plugin->widgets())
                 this->addTab(tab, tab->objectName());
         }

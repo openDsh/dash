@@ -3,8 +3,7 @@
 #include <QList>
 #include <QWidget>
 
-class Plugin
-{
+class Plugin {
    public:
     virtual ~Plugin() = default;
 
