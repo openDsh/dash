@@ -11,42 +11,51 @@ Test::Test()
 
     QTimer *timer = new QTimer(this);
     connect(timer, &QTimer::timeout, [this]() {
-        this->climate->fan_speed(rand() % 5);
-        switch(rand() % 6) {
+        switch(rand() % 50) {
             case 0:
-                climate->airflow(0b101);
+                this->climate->airflow(0b101);
                 break;
             case 1:
-                climate->airflow(0b010);
+                this->climate->airflow(0b010);
                 break;
             case 2:
-                climate->airflow(0b110);
+                this->climate->airflow(0b110);
                 break;
             case 3:
-                climate->airflow(0b100);
+                this->climate->airflow(0b100);
                 break;
             case 4:
-                climate->airflow(0b001);
+                this->climate->airflow(0b001);
                 break;
-            default:
-                climate->airflow(0b000);
+            case 5:
+                this->climate->airflow(0b000);
+                break;
+            case 6:
+                this->climate->fan_speed((rand() % 4) + 1);
                 break;
         }
     });
-    timer->start(100);
+    timer->start(1000);
 
     QTimer *timer2 = new QTimer(this);
     connect(timer2, &QTimer::timeout, [this]() {
-        this->climate->driver_temp((rand() % 20) + 60);
-        this->climate->passenger_temp((rand() % 20) + 60);
+        if (rand() % 10 == 1) {
+            this->climate->driver_temp((rand() % 20) + 60);
+            this->climate->passenger_temp((rand() % 20) + 60);
+        }
     });
-    timer2->start(150);
+    timer2->start(1000);
+}
+
+Test::~Test()
+{
+    delete this->climate;
 }
 
 QList<QWidget *> Test::widgets()
 {
     QList<QWidget *> tabs;
-    tabs.append(this->climate);
+    // tabs.append(this->climate);
     return tabs;
 }
 

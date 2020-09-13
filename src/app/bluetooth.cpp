@@ -22,6 +22,7 @@ Bluetooth::Bluetooth() : QObject(qApp)
 {
     BluezQt::Manager *manager = new BluezQt::Manager();
     BluezQt::InitManagerJob *job = manager->init();
+    printf("%d %d %d\n", manager->isBluetoothOperational(), manager->isInitialized(), manager->isOperational());
     job->exec();
 
     this->adapter = manager->usableAdapter();

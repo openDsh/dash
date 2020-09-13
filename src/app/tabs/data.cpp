@@ -92,17 +92,23 @@ VehicleTab::VehicleTab(QWidget *parent) : QTabWidget(parent)
 
     this->get_plugins();
     this->selector = new Selector(this->plugins.keys(), Theme::font_16, this);
+    this->active_plugin = new QPluginLoader(this);
     this->dialog = new Dialog(true, this->window());
     this->dialog->set_body(this->selector);
     this->selector->setUpdatesEnabled(true);
     QPushButton *load_button = new QPushButton("load");
     connect(load_button, &QPushButton::clicked, [this]() {
-        this->active_plugin = new QPluginLoader(this->plugins[this->selector->get_current()].absoluteFilePath(), this);
+        QString key = this->selector->get_current();
+        if (!key.isNull()) {
+            if (this->active_plugin->isLoaded())
+                this->active_plugin->unload();
+            this->active_plugin->setFileName(this->plugins[key].absoluteFilePath());
 
-        if (VehiclePlugin *plugin = qobject_cast<VehiclePlugin *>(this->active_plugin->instance())) {
-            plugin->init();
-            for (QWidget *tab : plugin->widgets())
-                this->addTab(tab, tab->objectName());
+            if (VehiclePlugin *plugin = qobject_cast<VehiclePlugin *>(this->active_plugin->instance())) {
+                plugin->init();
+                for (QWidget *tab : plugin->widgets())
+                    this->addTab(tab, tab->objectName());
+            }
         }
     });
     this->dialog->set_button(load_button);

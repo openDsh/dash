@@ -12,7 +12,7 @@ class Selector : public QWidget {
     Selector(QList<QString> options, QFont font, QWidget *parent = nullptr);
     // allow widgets to be passed in as options
 
-    inline QString get_current() { return this->options[this->current_idx]; }
+    inline QString get_current() { return this->options.value(this->current_idx, QString()); }
 
    private:
     QFont font;

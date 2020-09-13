@@ -23,10 +23,10 @@ SettingsTab::SettingsTab(QWidget *parent) : QTabWidget(parent)
 {
     this->tabBar()->setFont(Theme::font_18);
 
-    this->addTab(new GeneralSettingsSubTab(this), "General");
+    this->addTab(new GeneralSettingsSubTab(this), "Main");
     this->addTab(new LayoutSettingsSubTab(this), "Layout");
     this->addTab(new BluetoothSettingsSubTab(this), "Bluetooth");
-    this->addTab(new ShortcutsSettingsSubTab(this), "Shortcuts");
+    this->addTab(new ShortcutsSettingsSubTab(this), "Actions");
 }
 
 GeneralSettingsSubTab::GeneralSettingsSubTab(QWidget *parent) : QWidget(parent)

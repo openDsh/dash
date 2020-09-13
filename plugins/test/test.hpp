@@ -11,6 +11,7 @@ class Test : public QObject, VehiclePlugin {
 
    public:
     Test();
+    ~Test();
     QList<QWidget *> widgets() override;
     bool init() override;
 
