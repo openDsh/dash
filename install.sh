@@ -365,10 +365,23 @@ else
       #check and add usb rules for openauto if they dont exist
       echo Checking if permissions exist
       #udev rule to be created below, change as needed
-      FILE=/etc/udev/rules.d/51-iadash.rules
+      FILE=/etc/udev/rules.d/51-dashusb.rules
       if [[ ! -f "$FILE" ]]; then
           # OPEN USB RULE, CREATE MORE SECURE RULE IF REQUIRED
           echo "SUBSYSTEM==\"usb\", ATTR{idVendor}==\"*\", ATTR{idProduct}==\"*\", MODE=\"0660\", GROUP=\"plugdev\"" | sudo tee $FILE
+        if [[ $? -eq 0 ]]; then
+            echo -e Permissions created'\n'
+          else
+            echo -e Unable to create permissions'\n'
+        fi
+        else
+          echo -e Rules exists'\n'
+      fi
+
+      FILE=/etc/udev/rules.d/52-dashbrightness.rules
+      if [[ ! -f "$FILE" ]]; then
+          # udev rules to allow write access to all users for Raspberry Pi 7" Touch Screen
+          SUBSYSTEM=="backlight",RUN+="/bin/chmod 666 /sys/class/backlight/%k/brightness" | sudo tee $FILE
         if [[ $? -eq 0 ]]; then
             echo -e Permissions created'\n'
           else
