@@ -1,7 +1,7 @@
+#!/bin/bash
+
 ###
-# Run this file to setup udev rule for controlling the brightness of a official RPI 7" touch screen
-#
-# ./brightness.sh
+# Helper script to setup udev rule for controlling the brightness of a official RPI 7" touch screen
 ###
 FILE=/etc/udev/rules.d/52-dashbrightness.rules
 if [[ ! -f "$FILE" ]]; then

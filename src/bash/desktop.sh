@@ -1,3 +1,9 @@
+#!/bin/bash
+
+###
+# Helper script to setup an desktop icon for openDash
+###
+
 #remove existing opendash desktop
 rm /home/pi/Desktop/opendash
 
