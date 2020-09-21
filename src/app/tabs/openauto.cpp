@@ -73,6 +73,7 @@ OpenAutoSettingsSubTab::OpenAutoSettingsSubTab(QWidget *parent) : QWidget(parent
     this->config = Config::get_instance();
 
     QVBoxLayout *layout = new QVBoxLayout(this);
+    layout->setContentsMargins(6, 0, 6, 0);
 
     layout->addWidget(this->settings_widget());
 }

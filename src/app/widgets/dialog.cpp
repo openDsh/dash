@@ -109,7 +109,7 @@ void Dialog::showEvent(QShowEvent *event)
 
     if (this->fullscreen) {
         if (QWidget *parent = this->parentWidget()) {
-            int margin = std::ceil(24 * Config::get_instance()->get_scale()) * 2;
+            int margin = std::ceil(64 * Config::get_instance()->get_scale()) * 2;
             this->setFixedWidth(std::min(this->width(), parent->width() - margin));
             this->setFixedHeight(std::min(this->height(), parent->height() - margin));
         }
@@ -138,7 +138,7 @@ void SnackBar::resizeEvent(QResizeEvent* event)
 QWidget *SnackBar::get_ref()
 {
     for (QWidget *widget : qApp->allWidgets()) {
-        if (widget->objectName() == "msg_ref")
+        if (widget->objectName() == "MsgRef")
             return widget;
     }
     return nullptr;

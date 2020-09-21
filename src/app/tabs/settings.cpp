@@ -36,6 +36,7 @@ GeneralSettingsSubTab::GeneralSettingsSubTab(QWidget *parent) : QWidget(parent)
     this->shortcuts = Shortcuts::get_instance();
 
     QVBoxLayout *layout = new QVBoxLayout(this);
+    layout->setContentsMargins(6, 0, 6, 0);
 
     layout->addWidget(this->settings_widget());
 }
@@ -348,6 +349,8 @@ LayoutSettingsSubTab::LayoutSettingsSubTab(QWidget *parent) : QWidget(parent)
     this->config = Config::get_instance();
 
     QVBoxLayout *layout = new QVBoxLayout(this);
+    layout->setContentsMargins(6, 0, 6, 0);
+
     layout->addWidget(this->settings_widget());
 }
 
@@ -538,6 +541,7 @@ BluetoothSettingsSubTab::BluetoothSettingsSubTab(QWidget *parent) : QWidget(pare
     this->config = Config::get_instance();
 
     QHBoxLayout *layout = new QHBoxLayout(this);
+    layout->setContentsMargins(6, 0, 6, 0);
 
     layout->addWidget(this->controls_widget(), 1);
     layout->addWidget(this->devices_widget(), 1);
@@ -575,7 +579,7 @@ QWidget *BluetoothSettingsSubTab::scanner_widget()
     button->setFont(Theme::font_14);
     button->setFlat(true);
     button->setCheckable(true);
-    button->setEnabled(this->bluetooth->has_adapter());
+    button->setEnabled(this->bluetooth->has_adapter()); // this could potentially be tricky
     button->setIconSize(Theme::icon_36);
     button->setIcon(this->theme->make_button_icon("bluetooth_searching", button));
     connect(button, &QPushButton::clicked, [bluetooth = this->bluetooth](bool checked) {
@@ -668,6 +672,8 @@ ShortcutsSettingsSubTab::ShortcutsSettingsSubTab(QWidget *parent) : QWidget(pare
     this->config = Config::get_instance();
     this->shortcuts = Shortcuts::get_instance();
     QVBoxLayout *layout = new QVBoxLayout(this);
+    layout->setContentsMargins(6, 0, 6, 0);
+
     layout->addWidget(this->settings_widget());
 }
 

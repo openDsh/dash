@@ -17,9 +17,9 @@ QLabel:disabled {
 }
 
 QTabWidget::pane {
-    background-color: rgba(255, 255, 255, 5);
-    border-top: 0px;
-    border-radius: 8px;
+    background-color: transparent;
+    border: none;
+    border-top: 2px solid rgb(33, 33, 33);
 }
 
 QTabBar::tab {
@@ -27,6 +27,7 @@ QTabBar::tab {
     color: rgba(255, 255, 255, 179);
     margin-top: 1px;
     padding: 4px;
+    border-bottom: 2px solid transparent;
 }
 
 QTabBar::tab:selected:top {
@@ -101,7 +102,7 @@ QFrame[frameShape="5"][frameShadow="16"] {
 }
 
 QListWidget {
-    background-color: rgba(255, 255, 255, 10);
+    background-color: rgb(25, 25, 25);
     color: rgb(255, 255, 255);
     border: none;
 }
@@ -178,6 +179,8 @@ QScrollBar {
 }
 
 QScrollBar:vertical {
+    padding-top: 6px;
+    padding-bottom: 6px;
     width: 8px;
 }
 
@@ -202,12 +205,12 @@ QLineEdit {
     border: none;
     padding: 12px;
     color: rgb(255, 255, 255);
-    background-color: rgba(255, 255, 255, 10);
-    border-bottom: 1px solid rgba(255, 255, 255, 136);
+    background-color: rgb(25, 25, 25);
+    border-bottom: 1px solid rgb(66, 66, 66);
 }
 
 QLineEdit:focus {
-    background-color: rgba(255, 255, 255,20);
+    background-color: rgb(29, 29, 29);
     border-bottom: 2px solid palette(base);
 }
 
@@ -248,8 +251,14 @@ ClimateState {
 
 QDialog,
 QDialog > QFrame {
-    background-color: rgb(36, 36, 36);
+    background-color: rgb(41, 41, 41);
     border-radius: 8px;
+}
+
+#ControlsBar {
+    background-color: rgb(33, 33, 33);
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
 }
 
 *[add_hint="true"] {
