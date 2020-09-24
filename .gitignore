@@ -3,6 +3,7 @@
 /bin
 /build
 /nbproject
+/cmake-build-debug
 
 # Compiled source #
 ###################

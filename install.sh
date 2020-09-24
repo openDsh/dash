@@ -365,7 +365,7 @@ else
       #check and add usb rules for openauto if they dont exist
       echo Checking if permissions exist
       #udev rule to be created below, change as needed
-      FILE=/etc/udev/rules.d/51-iadash.rules
+      FILE=/etc/udev/rules.d/51-dashusb.rules
       if [[ ! -f "$FILE" ]]; then
           # OPEN USB RULE, CREATE MORE SECURE RULE IF REQUIRED
           echo "SUBSYSTEM==\"usb\", ATTR{idVendor}==\"*\", ATTR{idProduct}==\"*\", MODE=\"0660\", GROUP=\"plugdev\"" | sudo tee $FILE
