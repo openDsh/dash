@@ -253,6 +253,7 @@ QDialog,
 QDialog > QFrame {
     background-color: rgb(255, 255, 255);
     border-radius: 8px;
+    border: 2px solid rgb(224, 224, 224);
 }
 
 #ControlsBar {
