@@ -84,7 +84,7 @@ QPushButton:disabled {
 }
 
 QPushButton:!flat {
-    background-color: rgba(255, 255, 255, 31);
+    background-color: rgb(42, 42, 42);
 }
 
 QPushButton:!flat:checked {
@@ -93,7 +93,7 @@ QPushButton:!flat:checked {
 }
 
 QPushButton:!flat:disabled {
-    background-color: rgba(255, 255, 255, 13);
+    background-color: rgb(33, 33, 33);
 }
 
 QFrame[frameShape="4"][frameShadow="16"],
@@ -246,7 +246,7 @@ StepMeter {
 }
 
 ClimateState {
-    qproperty-color: rgba(255, 255, 255, 222);
+    qproperty-color: rgb(228, 228, 228);
 }
 
 QDialog,
@@ -262,5 +262,5 @@ QDialog > QFrame {
 }
 
 *[add_hint="true"] {
-    background-color: rgba(255, 255, 255, 8);
+    background-color: rgba(255, 255, 255, 12);
 }
