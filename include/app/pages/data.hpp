@@ -36,11 +36,11 @@ class Gauge : public QWidget {
     void toggle_unit(bool si);
 };
 
-class VehicleTab : public QTabWidget {
+class VehiclePage : public QTabWidget {
     Q_OBJECT
 
    public:
-    VehicleTab(QWidget *parent = nullptr);
+    VehiclePage(QWidget *parent = nullptr);
 
    private:
     static const QDir PLUGIN_DIR;

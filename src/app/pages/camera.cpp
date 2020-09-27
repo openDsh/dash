@@ -4,17 +4,17 @@
 #include <QCameraImageCapture>
 #include <QTimer>
 
-#include "app/tabs/camera.hpp"
+#include "app/pages/camera.hpp"
 #include "app/window.hpp"
 
-CameraTab::CameraTab(QWidget *parent) : QWidget(parent)
+CameraPage::CameraPage(QWidget *parent) : QWidget(parent)
 {
     this->theme = Theme::get_instance();
     this->player = new QMediaPlayer(this);
     this->local_cam = nullptr;
     this->local_index = 0;
     this->reconnect_timer = new QTimer(this);
-    connect(this->reconnect_timer, &QTimer::timeout, this, &CameraTab::count_down);
+    connect(this->reconnect_timer, &QTimer::timeout, this, &CameraPage::count_down);
 
     this->config = Config::get_instance();
 
@@ -25,7 +25,7 @@ CameraTab::CameraTab(QWidget *parent) : QWidget(parent)
     layout->addWidget(this->local_camera_widget());
     layout->addWidget(this->network_camera_widget());
 
-    connect(this, &CameraTab::disconnected, [layout,this]() {
+    connect(this, &CameraPage::disconnected, [layout,this]() {
         layout->setCurrentIndex(0);
         if (this->config->get_cam_autoconnect()) {
             qDebug() << "Camera disconnected. Auto reconnect in" << this->config->get_cam_autoconnect_time_secs() << "seconds";
@@ -34,23 +34,23 @@ CameraTab::CameraTab(QWidget *parent) : QWidget(parent)
             this->reconnect_timer->start(1000);
         }
     });
-    connect(this, &CameraTab::connected_local, [layout]() { layout->setCurrentIndex(1); });
-    connect(this, &CameraTab::connected_network, [layout]() { layout->setCurrentIndex(2); });
+    connect(this, &CameraPage::connected_local, [layout]() { layout->setCurrentIndex(1); });
+    connect(this, &CameraPage::connected_network, [layout]() { layout->setCurrentIndex(2); });
 
     if (this->config->get_cam_autoconnect())
         this->connect_cam();
 }
 
-QWidget *CameraTab::connect_widget()
+QWidget *CameraPage::connect_widget()
 {
     QWidget *widget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
 
     QLabel *label = new QLabel("connect camera", widget);
-    label->setFont(Theme::font_16);
+    label->setFont(Theme::font_14);
 
     this->status = new QLabel(widget);
-    this->status->setFont(Theme::font_16);
+    this->status->setFont(Theme::font_14);
 
     QWidget *cam_stack_widget = new QWidget(widget);
     QStackedLayout *cam_stack = new QStackedLayout(cam_stack_widget);
@@ -64,7 +64,7 @@ QWidget *CameraTab::connect_widget()
     connect(auto_reconnect_toggle, &QCheckBox::toggled, [this](bool checked) {
         this->config->set_cam_autoconnect(checked);
         if (!checked) emit autoconnect_disabled(); });
-    connect(this, &CameraTab::autoconnect_disabled, [auto_reconnect_toggle, this]() {
+    connect(this, &CameraPage::autoconnect_disabled, [auto_reconnect_toggle, this]() {
         this->reconnect_timer->stop();
         this->config->set_cam_autoconnect(false);
         auto_reconnect_toggle->setChecked(false);
@@ -98,7 +98,7 @@ QWidget *CameraTab::connect_widget()
     return widget;
 }
 
-QWidget *CameraTab::local_camera_widget()
+QWidget *CameraPage::local_camera_widget()
 {
     QWidget *widget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
@@ -125,7 +125,7 @@ QWidget *CameraTab::local_camera_widget()
     return widget;
 }
 
-QWidget *CameraTab::network_camera_widget()
+QWidget *CameraPage::network_camera_widget()
 {
     QWidget *widget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
@@ -151,18 +151,18 @@ QWidget *CameraTab::network_camera_widget()
     return widget;
 }
 
-QPushButton *CameraTab::connect_button()
+QPushButton *CameraPage::connect_button()
 {
     QPushButton *connect_button = new QPushButton("connect", this);
     connect_button->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-    connect_button->setFont(Theme::font_16);
+    connect_button->setFont(Theme::font_14);
     connect_button->setFlat(true);
-    connect(connect_button, &QPushButton::clicked, this, &CameraTab::connect_cam);
+    connect(connect_button, &QPushButton::clicked, this, &CameraPage::connect_cam);
 
     return connect_button;
 }
 
-void CameraTab::count_down()
+void CameraPage::count_down()
 {
     this->reconnect_in_secs--;
     this->status->setText(this->reconnect_message.arg(this->reconnect_in_secs) + (this->reconnect_in_secs == 1? "second":"seconds"));
@@ -170,7 +170,7 @@ void CameraTab::count_down()
         this->connect_cam();
 }
 
-void CameraTab::connect_cam()
+void CameraPage::connect_cam()
 {
     this->reconnect_timer->stop();
     this->status->clear();
@@ -180,23 +180,23 @@ void CameraTab::connect_cam()
         this->connect_local_stream();
 }
 
-QWidget *CameraTab::local_cam_selector()
+QWidget *CameraPage::local_cam_selector()
 {
     QWidget *widget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
 
     QLabel *label = new QLabel(widget);
-    label->setFont(Theme::font_16);
+    label->setFont(Theme::font_14);
     label->setAlignment(Qt::AlignCenter);
     QWidget *selector = this->selector_widget(label);
     this->populate_local_cams();
-    connect(this, &CameraTab::prev_cam, [this, label]() {
+    connect(this, &CameraPage::prev_cam, [this, label]() {
         this->local_index = (this->local_index - 1 + this->local_cams.size()) % this->local_cams.size();
         auto cam = this->local_cams.at(local_index);
         label->setText(cam.first);
         this->config->set_cam_local_device(cam.second);
     });
-    connect(this, &CameraTab::next_cam, [this, label]() {
+    connect(this, &CameraPage::next_cam, [this, label]() {
         this->local_index = (this->local_index + 1) % this->local_cams.size();
         auto cam = this->local_cams.at(this->local_index);
         label->setText(cam.first);
@@ -223,7 +223,7 @@ QWidget *CameraTab::local_cam_selector()
     return widget;
 }
 
-QWidget *CameraTab::selector_widget(QWidget *selection)
+QWidget *CameraPage::selector_widget(QWidget *selection)
 {
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
@@ -232,13 +232,13 @@ QWidget *CameraTab::selector_widget(QWidget *selection)
     left_button->setFlat(true);
     left_button->setIconSize(Theme::icon_32);
     left_button->setIcon(this->theme->make_button_icon("arrow_left", left_button));
-    connect(left_button, &QPushButton::clicked, this, &CameraTab::prev_cam);
+    connect(left_button, &QPushButton::clicked, this, &CameraPage::prev_cam);
 
     QPushButton *right_button = new QPushButton(this);
     right_button->setFlat(true);
     right_button->setIconSize(Theme::icon_32);
     right_button->setIcon(this->theme->make_button_icon("arrow_right", right_button));
-    connect(right_button, &QPushButton::clicked, this, &CameraTab::next_cam);
+    connect(right_button, &QPushButton::clicked, this, &CameraPage::next_cam);
 
     layout->addStretch(1);
     layout->addWidget(left_button);
@@ -249,7 +249,7 @@ QWidget *CameraTab::selector_widget(QWidget *selection)
     return widget;
 }
 
-void CameraTab::populate_local_cams()
+void CameraPage::populate_local_cams()
 {
     this->local_cams.clear();
     this->local_index=0;
@@ -272,7 +272,7 @@ void CameraTab::populate_local_cams()
     }
 }
 
-QWidget *CameraTab::network_cam_selector()
+QWidget *CameraPage::network_cam_selector()
 {
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
@@ -289,7 +289,7 @@ QWidget *CameraTab::network_cam_selector()
     connect(input, &QLineEdit::cursorPositionChanged, [this](int, int) {
         this->reconnect_timer->stop();
         this->status->clear(); });
-    connect(input, &QLineEdit::returnPressed, this, &CameraTab::connect_network_stream);
+    connect(input, &QLineEdit::returnPressed, this, &CameraPage::connect_network_stream);
 
     layout->addStretch(1);
     layout->addWidget(input, 4);
@@ -298,7 +298,7 @@ QWidget *CameraTab::network_cam_selector()
     return widget;
 }
 
-void CameraTab::update_network_status(QMediaPlayer::MediaStatus media_status)
+void CameraPage::update_network_status(QMediaPlayer::MediaStatus media_status)
 {
     qInfo() << "camera status changed to: " << media_status;
 
@@ -315,7 +315,7 @@ void CameraTab::update_network_status(QMediaPlayer::MediaStatus media_status)
     }
 }
 
-void CameraTab::connect_network_stream()
+void CameraPage::connect_network_stream()
 {
     connect(this->player, &QMediaPlayer::mediaStatusChanged,
             [this](QMediaPlayer::MediaStatus media_status) { this->update_network_status(media_status); });
@@ -325,7 +325,7 @@ void CameraTab::connect_network_stream()
     this->player->play();
 }
 
-void CameraTab::connect_local_stream()
+void CameraPage::connect_local_stream()
 {
     if (this->local_cam != nullptr) {
         delete this->local_cam;
@@ -341,11 +341,11 @@ void CameraTab::connect_local_stream()
     qDebug() << "Connecting to local cam " << local;
     this->local_cam = new QCamera(local.toUtf8(), this);
     this->local_cam->setViewfinder(this->local_video_widget);
-    connect(this->local_cam, &QCamera::statusChanged, this, &CameraTab::update_local_status);
+    connect(this->local_cam, &QCamera::statusChanged, this, &CameraPage::update_local_status);
     this->local_cam->start();
 }
 
-void CameraTab::choose_video_resolution()
+void CameraPage::choose_video_resolution()
 {
     QSize window_size = this->size();
     QCameraImageCapture imageCapture(this->local_cam);
@@ -373,7 +373,7 @@ void CameraTab::choose_video_resolution()
     this->local_cam->setViewfinderSettings(this->local_cam_settings);
 }
 
-bool CameraTab::local_cam_available(const QString &device)
+bool CameraPage::local_cam_available(const QString &device)
 {
     if (device.isEmpty())
         return false;
@@ -386,7 +386,7 @@ bool CameraTab::local_cam_available(const QString &device)
     return false;
 }
 
-void CameraTab::update_local_status(QCamera::Status status)
+void CameraPage::update_local_status(QCamera::Status status)
 {
     qDebug() << "Local camera" << this->config->get_cam_local_device() << "changed status to" << status;
 

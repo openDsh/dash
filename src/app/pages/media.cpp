@@ -8,32 +8,29 @@
 #include <QListWidgetItem>
 #include <QMediaPlaylist>
 
-#include "app/tabs/media.hpp"
+#include "app/pages/media.hpp"
 #include "app/window.hpp"
 
-MediaTab::MediaTab(QWidget *parent) : QTabWidget(parent)
+MediaPage::MediaPage(QWidget *parent) : QTabWidget(parent)
 {
-    this->tabBar()->setFont(Theme::font_18);
+    this->tabBar()->setFont(Theme::font_16);
 
-    // this->addTab(new RadioPlayerSubTab(this), "Radio");
-    this->addTab(new BluetoothPlayerSubTab(this), "Bluetooth");
-    this->addTab(new LocalPlayerSubTab(this), "Local");
+    // this->addTab(new RadioPlayerTab(this), "Radio");
+    this->addTab(new BluetoothPlayerTab(this), "Bluetooth");
+    this->addTab(new LocalPlayerTab(this), "Local");
 }
 
-BluetoothPlayerSubTab::BluetoothPlayerSubTab(QWidget *parent) : QWidget(parent)
+BluetoothPlayerTab::BluetoothPlayerTab(QWidget *parent) : QWidget(parent)
 {
     this->bluetooth = Bluetooth::get_instance();
 
     QVBoxLayout *layout = new QVBoxLayout(this);
 
-    layout->addStretch();
     layout->addWidget(this->track_widget());
-    layout->addStretch();
     layout->addWidget(this->controls_widget());
-    layout->addStretch();
 }
 
-QWidget *BluetoothPlayerSubTab::track_widget()
+QWidget *BluetoothPlayerTab::track_widget()
 {
     BluezQt::MediaPlayerPtr media_player = this->bluetooth->get_media_player().second;
 
@@ -41,7 +38,7 @@ QWidget *BluetoothPlayerSubTab::track_widget()
     QVBoxLayout *layout = new QVBoxLayout(widget);
 
     QLabel *artist_hdr = new QLabel("Artist", widget);
-    artist_hdr->setFont(Theme::font_16);
+    artist_hdr->setFont(Theme::font_14);
     QLabel *artist = new QLabel((media_player != nullptr) ? media_player->track().artist() : QString(), widget);
     artist->setFont(Theme::font_14);
     artist->setIndent(16);
@@ -49,7 +46,7 @@ QWidget *BluetoothPlayerSubTab::track_widget()
     layout->addWidget(artist);
 
     QLabel *album_hdr = new QLabel("Album", widget);
-    album_hdr->setFont(Theme::font_16);
+    album_hdr->setFont(Theme::font_14);
     QLabel *album = new QLabel((media_player != nullptr) ? media_player->track().album() : QString(), widget);
     album->setFont(Theme::font_14);
     album->setIndent(16);
@@ -57,7 +54,7 @@ QWidget *BluetoothPlayerSubTab::track_widget()
     layout->addWidget(album);
 
     QLabel *title_hdr = new QLabel("Title", widget);
-    title_hdr->setFont(Theme::font_16);
+    title_hdr->setFont(Theme::font_14);
     QLabel *title = new QLabel((media_player != nullptr) ? media_player->track().title() : QString(), widget);
     title->setFont(Theme::font_14);
     title->setIndent(16);
@@ -74,7 +71,7 @@ QWidget *BluetoothPlayerSubTab::track_widget()
     return widget;
 }
 
-QWidget *BluetoothPlayerSubTab::controls_widget()
+QWidget *BluetoothPlayerTab::controls_widget()
 {
     BluezQt::MediaPlayerPtr media_player = this->bluetooth->get_media_player().second;
     Theme *theme = Theme::get_instance();
@@ -84,13 +81,12 @@ QWidget *BluetoothPlayerSubTab::controls_widget()
 
     QPushButton *previous_button = new QPushButton(widget);
     previous_button->setFlat(true);
-    previous_button->setIconSize(Theme::icon_84);
+    previous_button->setIconSize(Theme::icon_56);
     connect(previous_button, &QPushButton::clicked, [bluetooth = this->bluetooth]() {
         BluezQt::MediaPlayerPtr media_player = bluetooth->get_media_player().second;
         if (media_player != nullptr) media_player->previous()->waitForFinished();
     });
     previous_button->setIcon(theme->make_button_icon("skip_previous", previous_button));
-    layout->addStretch();
     layout->addWidget(previous_button);
 
     QPushButton *play_button = new QPushButton(widget);
@@ -98,7 +94,7 @@ QWidget *BluetoothPlayerSubTab::controls_widget()
     play_button->setCheckable(true);
     bool status = (media_player != nullptr) ? media_player->status() == BluezQt::MediaPlayer::Status::Playing : false;
     play_button->setChecked(status);
-    play_button->setIconSize(Theme::icon_84);
+    play_button->setIconSize(Theme::icon_56);
     connect(play_button, &QPushButton::clicked, [bluetooth = this->bluetooth, play_button](bool checked = false) {
         play_button->setChecked(!checked);
 
@@ -115,25 +111,22 @@ QWidget *BluetoothPlayerSubTab::controls_widget()
                 play_button->setChecked(status == BluezQt::MediaPlayer::Status::Playing);
             });
     play_button->setIcon(theme->make_button_icon("play", play_button, "pause"));
-    layout->addStretch();
     layout->addWidget(play_button);
 
     QPushButton *forward_button = new QPushButton(widget);
     forward_button->setFlat(true);
-    forward_button->setIconSize(Theme::icon_84);
+    forward_button->setIconSize(Theme::icon_56);
     connect(forward_button, &QPushButton::clicked, [bluetooth = this->bluetooth]() {
         BluezQt::MediaPlayerPtr media_player = bluetooth->get_media_player().second;
         if (media_player != nullptr) media_player->next()->waitForFinished();
     });
     forward_button->setIcon(theme->make_button_icon("skip_next", forward_button));
-    layout->addStretch();
     layout->addWidget(forward_button);
-    layout->addStretch();
 
     return widget;
 }
 
-RadioPlayerSubTab::RadioPlayerSubTab(QWidget *parent) : QWidget(parent)
+RadioPlayerTab::RadioPlayerTab(QWidget *parent) : QWidget(parent)
 {
     this->theme = Theme::get_instance();
     this->config = Config::get_instance();
@@ -148,7 +141,7 @@ RadioPlayerSubTab::RadioPlayerSubTab(QWidget *parent) : QWidget(parent)
     layout->addStretch();
 }
 
-QWidget *RadioPlayerSubTab::tuner_widget()
+QWidget *RadioPlayerTab::tuner_widget()
 {
     QWidget *widget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
@@ -168,14 +161,14 @@ QWidget *RadioPlayerSubTab::tuner_widget()
     return widget;
 }
 
-QWidget *RadioPlayerSubTab::controls_widget()
+QWidget *RadioPlayerTab::controls_widget()
 {
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
     QPushButton *scan_reverse_button = new QPushButton(widget);
     scan_reverse_button->setFlat(true);
-    scan_reverse_button->setIconSize(Theme::icon_84);
+    scan_reverse_button->setIconSize(Theme::icon_56);
     scan_reverse_button->setIcon(this->theme->make_button_icon("fast_rewind", scan_reverse_button));
     connect(scan_reverse_button, &QPushButton::clicked,
             [tuner = this->tuner]() { tuner->setSliderPosition(tuner->sliderPosition() - 5); });
@@ -184,7 +177,7 @@ QWidget *RadioPlayerSubTab::controls_widget()
 
     QPushButton *prev_station_button = new QPushButton(widget);
     prev_station_button->setFlat(true);
-    prev_station_button->setIconSize(Theme::icon_84);
+    prev_station_button->setIconSize(Theme::icon_56);
     prev_station_button->setIcon(this->theme->make_button_icon("skip_previous", prev_station_button));
     connect(prev_station_button, &QPushButton::clicked,
             [tuner = this->tuner]() { tuner->setSliderPosition(tuner->sliderPosition() - 1); });
@@ -193,7 +186,7 @@ QWidget *RadioPlayerSubTab::controls_widget()
 
     QPushButton *next_station_button = new QPushButton(widget);
     next_station_button->setFlat(true);
-    next_station_button->setIconSize(Theme::icon_84);
+    next_station_button->setIconSize(Theme::icon_56);
     next_station_button->setIcon(this->theme->make_button_icon("skip_next", next_station_button));
     connect(next_station_button, &QPushButton::clicked,
             [tuner = this->tuner]() { tuner->setSliderPosition(tuner->sliderPosition() + 1); });
@@ -202,7 +195,7 @@ QWidget *RadioPlayerSubTab::controls_widget()
 
     QPushButton *scan_forward_button = new QPushButton(widget);
     scan_forward_button->setFlat(true);
-    scan_forward_button->setIconSize(Theme::icon_84);
+    scan_forward_button->setIconSize(Theme::icon_56);
     scan_forward_button->setIcon(this->theme->make_button_icon("fast_forward", scan_forward_button));
     connect(scan_forward_button, &QPushButton::clicked,
             [tuner = this->tuner]() { tuner->setSliderPosition(tuner->sliderPosition() + 5); });
@@ -216,7 +209,7 @@ QWidget *RadioPlayerSubTab::controls_widget()
     mute_button->setFlat(true);
     mute_button->setCheckable(true);
     mute_button->setChecked(this->config->get_radio_muted());
-    mute_button->setIconSize(Theme::icon_48);
+    mute_button->setIconSize(Theme::icon_42);
     connect(mute_button, &QPushButton::clicked,
             [config = this->config](bool checked = false) { config->set_radio_muted(checked); });
     mute_button->setIcon(this->theme->make_button_icon("volume_off", mute_button));
@@ -227,7 +220,7 @@ QWidget *RadioPlayerSubTab::controls_widget()
     return widget;
 }
 
-LocalPlayerSubTab::LocalPlayerSubTab(QWidget *parent) : QWidget(parent)
+LocalPlayerTab::LocalPlayerTab(QWidget *parent) : QWidget(parent)
 {
     this->config = Config::get_instance();
 
@@ -248,7 +241,7 @@ LocalPlayerSubTab::LocalPlayerSubTab(QWidget *parent) : QWidget(parent)
     layout->addWidget(this->controls_widget());
 }
 
-QWidget *LocalPlayerSubTab::playlist_widget()
+QWidget *LocalPlayerTab::playlist_widget()
 {
     Theme *theme = Theme::get_instance();
 
@@ -269,13 +262,13 @@ QWidget *LocalPlayerSubTab::playlist_widget()
     layout->addWidget(home_button, 0, Qt::AlignTop);
 
     QListWidget *folders = new QListWidget(widget);
-    folders->setFont(Theme::font_16);
+    folders->setFont(Theme::font_14);
     Theme::to_touch_scroller(folders);
     this->populate_dirs(root_path, folders);
     layout->addWidget(folders, 1);
 
     QListWidget *tracks = new QListWidget(widget);
-    tracks->setFont(Theme::font_16);
+    tracks->setFont(Theme::font_14);
     Theme::to_touch_scroller(tracks);
     this->populate_tracks(root_path, tracks);
     connect(tracks, &QListWidget::itemClicked, [tracks, player = this->player](QListWidgetItem *item) {
@@ -303,7 +296,7 @@ QWidget *LocalPlayerSubTab::playlist_widget()
     return widget;
 }
 
-QWidget *LocalPlayerSubTab::seek_widget()
+QWidget *LocalPlayerTab::seek_widget()
 {
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
@@ -311,12 +304,12 @@ QWidget *LocalPlayerSubTab::seek_widget()
     QSlider *slider = new QSlider(Qt::Orientation::Horizontal, widget);
     slider->setTracking(false);
     slider->setRange(0, 0);
-    QLabel *value = new QLabel(LocalPlayerSubTab::durationFmt(slider->value()), widget);
+    QLabel *value = new QLabel(LocalPlayerTab::durationFmt(slider->value()), widget);
     value->setFont(Theme::font_14);
     connect(slider, &QSlider::sliderReleased,
             [player = this->player, slider]() { player->setPosition(slider->sliderPosition()); });
     connect(slider, &QSlider::sliderMoved,
-            [value](int position) { value->setText(LocalPlayerSubTab::durationFmt(position)); });
+            [value](int position) { value->setText(LocalPlayerTab::durationFmt(position)); });
     connect(this->player, &QMediaPlayer::durationChanged, [slider](qint64 duration) {
         slider->setValue(0);
         slider->setRange(0, duration);
@@ -324,7 +317,7 @@ QWidget *LocalPlayerSubTab::seek_widget()
     connect(this->player, &QMediaPlayer::positionChanged, [slider, value](qint64 position) {
         if (!slider->isSliderDown()) {
             slider->setValue(position);
-            value->setText(LocalPlayerSubTab::durationFmt(position));
+            value->setText(LocalPlayerTab::durationFmt(position));
         }
     });
 
@@ -336,7 +329,7 @@ QWidget *LocalPlayerSubTab::seek_widget()
     return widget;
 }
 
-QWidget *LocalPlayerSubTab::controls_widget()
+QWidget *LocalPlayerTab::controls_widget()
 {
     Theme *theme = Theme::get_instance();
 
@@ -345,21 +338,20 @@ QWidget *LocalPlayerSubTab::controls_widget()
 
     QPushButton *previous_button = new QPushButton(widget);
     previous_button->setFlat(true);
-    previous_button->setIconSize(Theme::icon_84);
+    previous_button->setIconSize(Theme::icon_56);
     connect(previous_button, &QPushButton::clicked, [player = this->player]() {
         if (player->playlist()->currentIndex() < 0) player->playlist()->setCurrentIndex(0);
         player->playlist()->previous();
         player->play();
     });
     previous_button->setIcon(theme->make_button_icon("skip_previous", previous_button));
-    layout->addStretch();
     layout->addWidget(previous_button);
 
     QPushButton *play_button = new QPushButton(widget);
     play_button->setFlat(true);
     play_button->setCheckable(true);
     play_button->setChecked(false);
-    play_button->setIconSize(Theme::icon_84);
+    play_button->setIconSize(Theme::icon_56);
     connect(play_button, &QPushButton::clicked, [player = this->player, play_button](bool checked = false) {
         play_button->setChecked(!checked);
         if (checked)
@@ -370,25 +362,22 @@ QWidget *LocalPlayerSubTab::controls_widget()
     connect(this->player, &QMediaPlayer::stateChanged,
             [play_button](QMediaPlayer::State state) { play_button->setChecked(state == QMediaPlayer::PlayingState); });
     play_button->setIcon(theme->make_button_icon("play", play_button, "pause"));
-    layout->addStretch();
     layout->addWidget(play_button);
 
     QPushButton *forward_button = new QPushButton(widget);
     forward_button->setFlat(true);
-    forward_button->setIconSize(Theme::icon_84);
+    forward_button->setIconSize(Theme::icon_56);
     connect(forward_button, &QPushButton::clicked, [player = this->player]() {
         player->playlist()->next();
         player->play();
     });
     forward_button->setIcon(theme->make_button_icon("skip_next", forward_button));
-    layout->addStretch();
     layout->addWidget(forward_button);
-    layout->addStretch();
 
     return widget;
 }
 
-QString LocalPlayerSubTab::durationFmt(int total_ms)
+QString LocalPlayerTab::durationFmt(int total_ms)
 {
     int mins = (total_ms / (1000 * 60)) % 60;
     int secs = (total_ms / 1000) % 60;
@@ -396,7 +385,7 @@ QString LocalPlayerSubTab::durationFmt(int total_ms)
     return QString("%1:%2").arg(mins, 2, 10, QChar('0')).arg(secs, 2, 10, QChar('0'));
 }
 
-void LocalPlayerSubTab::populate_dirs(QString path, QListWidget *dirs_widget)
+void LocalPlayerTab::populate_dirs(QString path, QListWidget *dirs_widget)
 {
     dirs_widget->clear();
     QDir current_dir(path);
@@ -417,7 +406,7 @@ void LocalPlayerSubTab::populate_dirs(QString path, QListWidget *dirs_widget)
     }
 }
 
-void LocalPlayerSubTab::populate_tracks(QString path, QListWidget *tracks_widget)
+void LocalPlayerTab::populate_tracks(QString path, QListWidget *tracks_widget)
 {
     QStringList tracks = QDir(path).entryList(QStringList() << "*.mp3", QDir::Files | QDir::Readable);
     for (QString track : tracks) {

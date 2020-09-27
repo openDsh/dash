@@ -12,7 +12,7 @@
 
 #include "app/config.hpp"
 #include "app/shortcuts.hpp"
-#include "app/tabs/openauto.hpp"
+#include "app/pages/openauto.hpp"
 #include "app/theme.hpp"
 
 class DashWindow : public QMainWindow {
@@ -34,7 +34,7 @@ class DashWindow : public QMainWindow {
     Theme *theme;
     Shortcuts *shortcuts;
 
-    OpenAutoTab *openauto;
+    OpenAutoPage *openauto;
     QStackedWidget *stack;
     QVBoxLayout *rail;
     QButtonGroup *rail_group;

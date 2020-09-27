@@ -8,11 +8,11 @@
 #include <sstream>
 
 #include "app/modules/brightness.hpp"
-#include "app/tabs/camera.hpp"
-#include "app/tabs/data.hpp"
-#include "app/tabs/launcher.hpp"
-#include "app/tabs/media.hpp"
-#include "app/tabs/settings.hpp"
+#include "app/pages/camera.hpp"
+#include "app/pages/data.hpp"
+#include "app/pages/launcher.hpp"
+#include "app/pages/media.hpp"
+#include "app/pages/settings.hpp"
 #include "app/widgets/dialog.hpp"
 
 DashWindow::DashWindow()
@@ -26,7 +26,7 @@ DashWindow::DashWindow()
     this->init_config();
     this->init_theme();
 
-    this->openauto = new OpenAutoTab(this);
+    this->openauto = new OpenAutoPage(this);
     this->stack = new QStackedWidget(this);
     this->rail = new QVBoxLayout();
     this->rail_group = new QButtonGroup(this);
@@ -35,7 +35,7 @@ DashWindow::DashWindow()
 
     connect(this->rail_group, QOverload<int, bool>::of(&QButtonGroup::buttonToggled),
             [this](int id, bool) { this->pages->setCurrentIndex(id); });
-    connect(this->openauto, &OpenAutoTab::toggle_fullscreen, [this](QWidget *widget) { this->add_widget(widget); });
+    connect(this->openauto, &OpenAutoPage::toggle_fullscreen, [this](QWidget *widget) { this->add_widget(widget); });
 
     connect(this->config, &Config::scale_changed, [theme = this->theme](double scale) { theme->set_scale(scale); });
     connect(this->config, &Config::page_changed,
@@ -148,11 +148,11 @@ QLayout *DashWindow::body()
 void DashWindow::add_pages()
 {
     this->add_page("Android Auto", this->openauto, "android_auto");
-    this->add_page("Media", new MediaTab(this), "play_circle_outline");
-    this->add_page("Vehicle", new VehicleTab(this), "directions_car");
-    this->add_page("Camera", new CameraTab(this), "camera");
-    this->add_page("Launcher", new LauncherTab(this), "widgets");
-    this->add_page("Settings", new SettingsTab(this), "tune");
+    this->add_page("Media", new MediaPage(this), "play_circle_outline");
+    this->add_page("Vehicle", new VehiclePage(this), "directions_car");
+    this->add_page("Camera", new CameraPage(this), "camera");
+    this->add_page("Launcher", new LauncherPage(this), "widgets");
+    this->add_page("Settings", new SettingsPage(this), "tune");
 
     // toggle initial page
     for (QAbstractButton *button : this->rail_group->buttons()) {

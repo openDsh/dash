@@ -73,36 +73,11 @@ class OpenAutoFrame : public QWidget {
     void toggle(bool enable);
 };
 
-class OpenAutoSettingsSubTab : public QWidget {
+class OpenAutoPage : public QStackedWidget {
     Q_OBJECT
 
    public:
-    OpenAutoSettingsSubTab(QWidget *parent = nullptr);
-
-   private:
-    QWidget *settings_widget();
-    QBoxLayout *rhd_row_widget();
-    QBoxLayout *frame_rate_row_widget();
-    QBoxLayout *resolution_row_widget();
-    QBoxLayout *dpi_row_widget();
-    QBoxLayout *dpi_widget();
-    QBoxLayout *rt_audio_row_widget();
-    QBoxLayout *audio_channels_row_widget();
-    QBoxLayout *bluetooth_row_widget();
-    QBoxLayout *touchscreen_row_widget();
-    QCheckBox *button_checkbox(QString name, QString key, aasdk::proto::enums::ButtonCode::Enum code);
-    QBoxLayout *buttons_row_widget();
-
-    Bluetooth *bluetooth;
-    Config *config;
-    Theme *theme;
-};
-
-class OpenAutoTab : public QStackedWidget {
-    Q_OBJECT
-
-   public:
-    OpenAutoTab(QWidget *parent = nullptr);
+    OpenAutoPage(QWidget *parent = nullptr);
 
     inline void pass_key_event(QKeyEvent *event) { this->worker->send_key_event(event); }
 
@@ -110,6 +85,29 @@ class OpenAutoTab : public QStackedWidget {
     void resizeEvent(QResizeEvent *event);
 
    private:
+    class Settings : public QWidget {
+       public:
+        Settings(QWidget *parent = nullptr);
+
+       private:
+        QWidget *settings_widget();
+        QBoxLayout *rhd_row_widget();
+        QBoxLayout *frame_rate_row_widget();
+        QBoxLayout *resolution_row_widget();
+        QBoxLayout *dpi_row_widget();
+        QBoxLayout *dpi_widget();
+        QBoxLayout *rt_audio_row_widget();
+        QBoxLayout *audio_channels_row_widget();
+        QBoxLayout *bluetooth_row_widget();
+        QBoxLayout *touchscreen_row_widget();
+        QCheckBox *button_checkbox(QString name, QString key, aasdk::proto::enums::ButtonCode::Enum code);
+        QBoxLayout *buttons_row_widget();
+
+        Bluetooth *bluetooth;
+        Config *config;
+        Theme *theme;
+    };
+
     QWidget *connect_msg();
 
     Config *config;

@@ -1,4 +1,4 @@
-#include "app/tabs/openauto.hpp"
+#include "app/pages/openauto.hpp"
 
 #include "app/config.hpp"
 #include "app/theme.hpp"
@@ -66,7 +66,7 @@ void OpenAutoFrame::mouseDoubleClickEvent(QMouseEvent *)
     emit double_clicked(this->fullscreen);
 }
 
-OpenAutoSettingsSubTab::OpenAutoSettingsSubTab(QWidget *parent) : QWidget(parent)
+OpenAutoPage::Settings::Settings(QWidget *parent) : QWidget(parent)
 {
     this->bluetooth = Bluetooth::get_instance();
     this->theme = Theme::get_instance();
@@ -78,7 +78,7 @@ OpenAutoSettingsSubTab::OpenAutoSettingsSubTab(QWidget *parent) : QWidget(parent
     layout->addWidget(this->settings_widget());
 }
 
-QWidget *OpenAutoSettingsSubTab::settings_widget()
+QWidget *OpenAutoPage::Settings::settings_widget()
 {
     QWidget *widget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
@@ -105,12 +105,12 @@ QWidget *OpenAutoSettingsSubTab::settings_widget()
     return scroll_area;
 }
 
-QBoxLayout *OpenAutoSettingsSubTab::rhd_row_widget()
+QBoxLayout *OpenAutoPage::Settings::rhd_row_widget()
 {
     QHBoxLayout *layout = new QHBoxLayout();
 
     QLabel *label = new QLabel("Right-Hand-Drive");
-    label->setFont(Theme::font_16);
+    label->setFont(Theme::font_14);
     layout->addWidget(label, 1);
 
     Switch *toggle = new Switch();
@@ -128,12 +128,12 @@ QBoxLayout *OpenAutoSettingsSubTab::rhd_row_widget()
     return layout;
 }
 
-QBoxLayout *OpenAutoSettingsSubTab::frame_rate_row_widget()
+QBoxLayout *OpenAutoPage::Settings::frame_rate_row_widget()
 {
     QHBoxLayout *layout = new QHBoxLayout();
 
     QLabel *label = new QLabel("Frame Rate");
-    label->setFont(Theme::font_16);
+    label->setFont(Theme::font_14);
     layout->addWidget(label, 1);
 
     QGroupBox *group = new QGroupBox();
@@ -158,12 +158,12 @@ QBoxLayout *OpenAutoSettingsSubTab::frame_rate_row_widget()
     return layout;
 }
 
-QBoxLayout *OpenAutoSettingsSubTab::resolution_row_widget()
+QBoxLayout *OpenAutoPage::Settings::resolution_row_widget()
 {
     QHBoxLayout *layout = new QHBoxLayout();
 
     QLabel *label = new QLabel("Resolution");
-    label->setFont(Theme::font_16);
+    label->setFont(Theme::font_14);
     layout->addWidget(label, 1);
 
     QGroupBox *group = new QGroupBox();
@@ -201,12 +201,12 @@ QBoxLayout *OpenAutoSettingsSubTab::resolution_row_widget()
     return layout;
 }
 
-QBoxLayout *OpenAutoSettingsSubTab::dpi_row_widget()
+QBoxLayout *OpenAutoPage::Settings::dpi_row_widget()
 {
     QHBoxLayout *layout = new QHBoxLayout();
 
     QLabel *label = new QLabel("DPI");
-    label->setFont(Theme::font_16);
+    label->setFont(Theme::font_14);
     layout->addWidget(label, 1);
 
     layout->addLayout(this->dpi_widget(), 1);
@@ -214,7 +214,7 @@ QBoxLayout *OpenAutoSettingsSubTab::dpi_row_widget()
     return layout;
 }
 
-QBoxLayout *OpenAutoSettingsSubTab::dpi_widget()
+QBoxLayout *OpenAutoPage::Settings::dpi_widget()
 {
     QHBoxLayout *layout = new QHBoxLayout();
 
@@ -239,12 +239,12 @@ QBoxLayout *OpenAutoSettingsSubTab::dpi_widget()
     return layout;
 }
 
-QBoxLayout *OpenAutoSettingsSubTab::rt_audio_row_widget()
+QBoxLayout *OpenAutoPage::Settings::rt_audio_row_widget()
 {
     QHBoxLayout *layout = new QHBoxLayout();
 
     QLabel *label = new QLabel("RtAudio");
-    label->setFont(Theme::font_16);
+    label->setFont(Theme::font_14);
     layout->addWidget(label, 1);
 
     Switch *toggle = new Switch();
@@ -262,12 +262,12 @@ QBoxLayout *OpenAutoSettingsSubTab::rt_audio_row_widget()
     return layout;
 }
 
-QBoxLayout *OpenAutoSettingsSubTab::audio_channels_row_widget()
+QBoxLayout *OpenAutoPage::Settings::audio_channels_row_widget()
 {
     QHBoxLayout *layout = new QHBoxLayout();
 
     QLabel *label = new QLabel("Audio Channels");
-    label->setFont(Theme::font_16);
+    label->setFont(Theme::font_14);
     layout->addWidget(label, 1);
 
     QGroupBox *group = new QGroupBox();
@@ -293,12 +293,12 @@ QBoxLayout *OpenAutoSettingsSubTab::audio_channels_row_widget()
     return layout;
 }
 
-QBoxLayout *OpenAutoSettingsSubTab::bluetooth_row_widget()
+QBoxLayout *OpenAutoPage::Settings::bluetooth_row_widget()
 {
     QHBoxLayout *layout = new QHBoxLayout();
 
     QLabel *label = new QLabel("Bluetooth");
-    label->setFont(Theme::font_16);
+    label->setFont(Theme::font_14);
     layout->addWidget(label, 1);
 
     Switch *toggle = new Switch();
@@ -315,12 +315,12 @@ QBoxLayout *OpenAutoSettingsSubTab::bluetooth_row_widget()
     return layout;
 }
 
-QBoxLayout *OpenAutoSettingsSubTab::touchscreen_row_widget()
+QBoxLayout *OpenAutoPage::Settings::touchscreen_row_widget()
 {
     QHBoxLayout *layout = new QHBoxLayout();
 
     QLabel *label = new QLabel("Touchscreen");
-    label->setFont(Theme::font_16);
+    label->setFont(Theme::font_14);
     layout->addWidget(label, 1);
 
     Switch *toggle = new Switch();
@@ -334,7 +334,7 @@ QBoxLayout *OpenAutoSettingsSubTab::touchscreen_row_widget()
     return layout;
 }
 
-QCheckBox *OpenAutoSettingsSubTab::button_checkbox(QString name, QString key,
+QCheckBox *OpenAutoPage::Settings::button_checkbox(QString name, QString key,
                                                    aasdk::proto::enums::ButtonCode::Enum code)
 {
     QCheckBox *checkbox = new QCheckBox(QString("%1 [%2]").arg(name).arg(key));
@@ -356,12 +356,12 @@ QCheckBox *OpenAutoSettingsSubTab::button_checkbox(QString name, QString key,
     return checkbox;
 }
 
-QBoxLayout *OpenAutoSettingsSubTab::buttons_row_widget()
+QBoxLayout *OpenAutoPage::Settings::buttons_row_widget()
 {
     QHBoxLayout *layout = new QHBoxLayout();
 
     QLabel *label = new QLabel("Buttons");
-    label->setFont(Theme::font_16);
+    label->setFont(Theme::font_14);
 
     QGroupBox *group = new QGroupBox();
     QVBoxLayout *group_layout = new QVBoxLayout(group);
@@ -389,7 +389,7 @@ QBoxLayout *OpenAutoSettingsSubTab::buttons_row_widget()
     return layout;
 }
 
-OpenAutoTab::OpenAutoTab(QWidget *parent) : QStackedWidget(parent)
+OpenAutoPage::OpenAutoPage(QWidget *parent) : QStackedWidget(parent)
 {
     this->config = Config::get_instance();
     this->theme = Theme::get_instance();
@@ -419,7 +419,7 @@ OpenAutoTab::OpenAutoTab(QWidget *parent) : QStackedWidget(parent)
     connect(this->theme, &Theme::mode_updated, [this](bool mode) { this->worker->set_night_mode(mode); });
 
     this->dialog = new Dialog(true, this->window());
-    this->dialog->set_body(new OpenAutoSettingsSubTab());
+    this->dialog->set_body(new Settings());
     QPushButton *save_button = new QPushButton("save");
     connect(save_button, &QPushButton::clicked, [this]() {
         this->config->openauto_config->setButtonCodes(this->config->openauto_button_codes);
@@ -431,21 +431,21 @@ OpenAutoTab::OpenAutoTab(QWidget *parent) : QStackedWidget(parent)
     this->addWidget(this->frame);
 }
 
-void OpenAutoTab::resizeEvent(QResizeEvent *event)
+void OpenAutoPage::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
     this->frame->resize(this->size());
     this->worker->update_size();
 }
 
-QWidget *OpenAutoTab::connect_msg()
+QWidget *OpenAutoPage::connect_msg()
 {
     QWidget *widget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
     layout->setContentsMargins(0, 0, 0, 0);
 
     QLabel *label = new QLabel("connect device to start Android Auto", widget);
-    label->setFont(Theme::font_16);
+    label->setFont(Theme::font_14);
     label->setAlignment(Qt::AlignCenter);
 
     QHBoxLayout *layout2 = new QHBoxLayout();

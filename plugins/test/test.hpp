@@ -2,7 +2,7 @@
 
 #include <QObject>
 #include "plugins/vehicle_plugin.hpp"
-#include "app/tabs/climate.hpp"
+#include "app/widgets/climate.hpp"
 
 class Test : public QObject, VehiclePlugin {
     Q_OBJECT

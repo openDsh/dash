@@ -4,7 +4,7 @@
 #include <QString>
 
 #include "app/theme.hpp"
-#include "app/tabs/climate.hpp"
+#include "app/widgets/climate.hpp"
 
 ClimateSnackBar::ClimateSnackBar() : SnackBar()
 {

@@ -1,8 +1,7 @@
 #include <QPalette>
 
 #include "app/config.hpp"
-#include "app/tabs/data.hpp"
-#include "app/tabs/climate.hpp"
+#include "app/pages/data.hpp"
 #include "app/window.hpp"
 #include "obd/conversions.hpp"
 
@@ -74,9 +73,9 @@ QString Gauge::null_value()
     return null_str;
 }
 
-const QDir VehicleTab::PLUGIN_DIR("/usr/src/dash/bin/plugins");
+const QDir VehiclePage::PLUGIN_DIR("/usr/src/dash/bin/plugins");
 
-void VehicleTab::get_plugins()
+void VehiclePage::get_plugins()
 {
     for (const QFileInfo &plugin : this->PLUGIN_DIR.entryInfoList(QDir::Files)) {
         if (QLibrary::isLibrary(plugin.absoluteFilePath()))
@@ -84,14 +83,14 @@ void VehicleTab::get_plugins()
     }
 }
 
-VehicleTab::VehicleTab(QWidget *parent) : QTabWidget(parent)
+VehiclePage::VehiclePage(QWidget *parent) : QTabWidget(parent)
 {
-    this->tabBar()->setFont(Theme::font_18);
+    this->tabBar()->setFont(Theme::font_16);
 
     this->addTab(new DataTab(this), "Data");
 
     this->get_plugins();
-    this->selector = new Selector(this->plugins.keys(), Theme::font_16, this);
+    this->selector = new Selector(this->plugins.keys(), Theme::font_14, this);
     this->active_plugin = new QPluginLoader(this);
     this->dialog = new Dialog(true, this->window());
     this->dialog->set_body(this->selector);

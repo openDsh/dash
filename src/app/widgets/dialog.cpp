@@ -109,7 +109,7 @@ void Dialog::showEvent(QShowEvent *event)
 
     if (this->fullscreen) {
         if (QWidget *parent = this->parentWidget()) {
-            int margin = std::ceil(64 * Config::get_instance()->get_scale()) * 2;
+            int margin = std::ceil(48 * Config::get_instance()->get_scale()) * 2;
             this->setFixedWidth(std::min(this->width(), parent->width() - margin));
             this->setFixedHeight(std::min(this->height(), parent->height() - margin));
         }

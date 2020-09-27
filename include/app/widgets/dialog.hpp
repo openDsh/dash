@@ -32,7 +32,7 @@ class Dialog : public QDialog {
     {
         if (this->buttons->count() == 0)
             this->add_cancel_button();
-        button->setFont(Theme::font_16);
+        button->setFont(Theme::font_14);
         button->setFlat(true);
         this->buttons->addWidget(button, 0, Qt::AlignRight);
         connect(button, &QPushButton::clicked, [this]() { this->close(); });
@@ -58,7 +58,7 @@ class Dialog : public QDialog {
         this->buttons->addStretch();
 
         QPushButton *button = new QPushButton("cancel", this);
-        button->setFont(Theme::font_16);
+        button->setFont(Theme::font_14);
         button->setFlat(true);
         connect(button, &QPushButton::clicked, [this]() { this->close(); });
         this->buttons->addWidget(button, 0, Qt::AlignRight);
