@@ -1,5 +1,6 @@
 .vscode/
 bin/
 build/
+lib/
 
 CMakeLists.txt.user

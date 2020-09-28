@@ -52,12 +52,12 @@ Test::~Test()
     delete this->climate;
 }
 
-QList<QWidget *> Test::widgets()
+/* QList<QWidget *> Test::widgets()
 {
     QList<QWidget *> tabs;
-    // tabs.append(this->climate);
+    tabs.append(this->climate);
     return tabs;
-}
+} */
 
 bool Test::init()
 {

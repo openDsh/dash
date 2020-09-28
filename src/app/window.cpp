@@ -9,7 +9,7 @@
 
 #include "app/modules/brightness.hpp"
 #include "app/pages/camera.hpp"
-#include "app/pages/data.hpp"
+#include "app/pages/vehicle.hpp"
 #include "app/pages/launcher.hpp"
 #include "app/pages/media.hpp"
 #include "app/pages/settings.hpp"

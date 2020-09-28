@@ -1,7 +1,7 @@
 #include <QPalette>
 
 #include "app/config.hpp"
-#include "app/pages/data.hpp"
+#include "app/pages/vehicle.hpp"
 #include "app/window.hpp"
 #include "obd/conversions.hpp"
 
@@ -73,7 +73,7 @@ QString Gauge::null_value()
     return null_str;
 }
 
-const QDir VehiclePage::PLUGIN_DIR("/usr/src/dash/bin/plugins");
+const QDir VehiclePage::PLUGIN_DIR("/usr/src/dash/lib/plugins/vehicle");
 
 void VehiclePage::get_plugins()
 {
