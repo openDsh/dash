@@ -8,6 +8,8 @@
 | ------------------ | ----------------- | ---------------------------- | ----------------- | -------------------- |
 | Raspberry Pi 4 4GB | USB Cable         | Official Raspberry 7" Screen | Samsung Galaxy S8 | v.1.EXAMPLE          |
 
+Installation Method: Install.sh or Image
+
 ## Description of problem:
 
 Problem
