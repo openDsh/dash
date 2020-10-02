@@ -1,24 +1,32 @@
-Make sure you are running the latest version before reporting an issue.
+# Issue
 
-**Component/platform:**
+*Make sure you are running the latest version before reporting an issue.*
 
+## Hardware
 
-**Description of problem:**
+| Device             | Connection Method | Screen                       | Mobile Device     | Android Auto Version |
+| ------------------ | ----------------- | ---------------------------- | ----------------- | -------------------- |
+| Raspberry Pi 4 4GB | USB Cable         | Official Raspberry 7" Screen | Samsung Galaxy S8 | v.1.EXAMPLE          |
 
+## Description of problem:
 
-**Expected:**
+Problem
 
+## Expected Result:
 
-**Problem-relevant steps to reproduce:**
+Result
+
+## Problem-relevant steps to reproduce:
 
 1. 
-2. 
-3. 
+1. 
+1. 
 
-**Traceback (if applicable):**
+## Traceback (if applicable):
 ```bash
 
 ```
 
-**Additional info:**
+## Additional info:
 
+Additional Info
