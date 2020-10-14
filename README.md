@@ -27,6 +27,28 @@ Main features include:
 
 ## Getting Started
 
+## Install Script
+
+Dash can be built automatically utilizing an included script.
+
+## Prerequisites
+
+Follow build instructions for OpenAuto, AASDK, and qt-gstreamer
+
+https://github.com/robert5974/openauto
+
+https://github.com/robert5974/aasdk
+
+https://github.com/robert5974/dash/wiki/Qt-gstreamer
+
+## 1. Clone the repo, Run cmake, and Compile
+```
+git clone https://github.com/openDsh/dash
+
+cd dash
+
+./install.sh
+```
 
 ## Manual Install
 
