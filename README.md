@@ -15,7 +15,7 @@ Main features include:
 *	Camera Access `Streaming/Local` `Backup` `Dash`
 *	Keyboard Shortcuts `GPIO Triggerable`
 
-![home](https://github.com/robert5974/intelligent-auto/blob/master/docs/imgs/home.png)
+![home](https://github.com/robert5974/dash/blob/develop/docs/imgs/IA_openauto_tab_USB_connectedmaps.PNG)
 
 ![openauto_maps](https://github.com/robert5974/dash/blob/develop/docs/imgs/IA_openauto_tab_USB_connectedmaps.png)
 
