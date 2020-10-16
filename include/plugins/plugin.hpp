@@ -3,9 +3,9 @@
 #include <QList>
 #include <QWidget>
 
-#include <app/theme.hpp>
-#include <app/config.hpp>
-#include <app/shortcuts.hpp>
+class Theme;
+class Config;
+class Shortcuts;
 
 class Plugin {
    public:
@@ -13,10 +13,10 @@ class Plugin {
 
     virtual QList<QWidget *> widgets() { return QList<QWidget *>{}; };
 
-   private:
-    Theme *theme = Theme::get_instance();
-    Config *config = Config::get_instance();
-    Shortcuts *shortcuts = Shortcuts::get_instance();
+   protected:
+    static const Theme *theme;
+    static const Config *config;
+    static const Shortcuts *shortcuts;
 };
 
 #define Plugin_iid "org.dash.Plugin"

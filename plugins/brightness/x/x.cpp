@@ -1,4 +1,6 @@
+#include <QGuiApplication>
 #include <QProcess>
+#include <QScreen>
 
 #include "x.hpp"
 

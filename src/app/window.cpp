@@ -43,10 +43,6 @@ DashWindow::DashWindow()
                 QAbstractButton *button = rail_group->button(pages->indexOf(page));
                 button->setVisible(enabled);
             });
-    connect(this->config, &Config::brightness_changed, [config = this->config](int position) {
-        BrightnessModule *module = config->get_brightness_module();
-        module->set_brightness(position);
-    });
 
     this->init_ui();
 }
@@ -85,13 +81,6 @@ void DashWindow::init_config()
     this->config->add_quick_view("brightness", BrightnessModule::control_widget(true, this));
     this->config->add_quick_view("controls", this->controls_widget());
     this->config->add_quick_view("none", new QFrame(this));
-
-    this->config->add_brightness_module("mocked", new MockedBrightnessModule(this));
-    this->config->add_brightness_module("x", new XBrightnessModule());
-    this->config->add_brightness_module("rpi 7\"", new RpiBrightnessModule());
-
-    BrightnessModule *module = this->config->get_brightness_module();
-    module->set_brightness(this->config->get_brightness());
 }
 
 void DashWindow::init_theme()

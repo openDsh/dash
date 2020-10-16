@@ -18,6 +18,7 @@
 #include "app/widgets/selector.hpp"
 #include "app/widgets/switch.hpp"
 #include "app/window.hpp"
+#include "app/modules/brightness.hpp"
 
 SettingsPage::SettingsPage(QWidget *parent) : QTabWidget(parent)
 {
@@ -124,9 +125,9 @@ QWidget *MainSettingsTab::brightness_module_select_widget()
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
-    const QStringList modules = this->config->get_brightness_modules().keys();
+    const QStringList plugins = this->config->get_brightness_plugins();
 
-    QLabel *label = new QLabel(this->config->get_brightness_module_name(), widget);
+    QLabel *label = new QLabel(this->config->get_brightness_plugin_name(), widget);
     label->setAlignment(Qt::AlignCenter);
     label->setFont(Theme::font_14);
 
@@ -134,22 +135,22 @@ QWidget *MainSettingsTab::brightness_module_select_widget()
     left_button->setFlat(true);
     left_button->setIconSize(Theme::icon_32);
     left_button->setIcon(this->theme->make_button_icon("arrow_left", left_button));
-    connect(left_button, &QPushButton::clicked, [this, label, modules]() {
-        int total_modules = modules.size();
-        QString module =
-            modules[((modules.indexOf(label->text()) - 1) % total_modules + total_modules) % total_modules];
-        label->setText(module);
-        this->config->set_brightness_module(module);
+    connect(left_button, &QPushButton::clicked, [this, label, plugins]() {
+        int total_plugins = plugins.size();
+        QString plugin =
+            plugins[((plugins.indexOf(label->text()) - 1) % total_plugins + total_plugins) % total_plugins];
+        label->setText(plugin);
+        this->config->set_brightness_plugin(plugin);
     });
 
     QPushButton *right_button = new QPushButton(widget);
     right_button->setFlat(true);
     right_button->setIconSize(Theme::icon_32);
     right_button->setIcon(this->theme->make_button_icon("arrow_right", right_button));
-    connect(right_button, &QPushButton::clicked, [this, label, modules]() {
-        QString module = modules[(modules.indexOf(label->text()) + 1) % modules.size()];
-        label->setText(module);
-        this->config->set_brightness_module(module);
+    connect(right_button, &QPushButton::clicked, [this, label, plugins]() {
+        QString plugin = plugins[(plugins.indexOf(label->text()) + 1) % plugins.size()];
+        label->setText(plugin);
+        this->config->set_brightness_plugin(plugin);
     });
 
     layout->addStretch(1);
