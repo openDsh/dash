@@ -7,7 +7,7 @@
 #include <cstdlib>
 #include <sstream>
 
-#include "app/modules/brightness.hpp"
+#include "app/widgets/sliders.hpp"
 #include "app/pages/camera.hpp"
 #include "app/pages/vehicle.hpp"
 #include "app/pages/launcher.hpp"
@@ -78,7 +78,7 @@ void DashWindow::init_config()
     qApp->setOverrideCursor(this->config->get_mouse_active() ? Qt::ArrowCursor : Qt::BlankCursor);
 
     this->config->add_quick_view("volume", this->volume_widget());
-    this->config->add_quick_view("brightness", BrightnessModule::control_widget(true, this));
+    this->config->add_quick_view("brightness", Slider::brightness(true, this));
     this->config->add_quick_view("controls", this->controls_widget());
     this->config->add_quick_view("none", new QFrame(this));
 }
@@ -311,7 +311,7 @@ QWidget *DashWindow::controls_widget()
     brightness->setIcon(this->theme->make_button_icon("brightness_high", brightness));
     connect(brightness, &QPushButton::clicked, [this, brightness]() {
         Dialog *dialog = new Dialog(false, brightness);
-        dialog->set_body(BrightnessModule::control_widget(false, this));
+        dialog->set_body(Slider::brightness(false, this));
         dialog->open(2000);
     });
     QLabel *brightness_value = new QLabel(QString::number(std::ceil(this->config->get_brightness() / 2.55)), widget);

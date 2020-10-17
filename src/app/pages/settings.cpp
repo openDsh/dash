@@ -18,7 +18,7 @@
 #include "app/widgets/selector.hpp"
 #include "app/widgets/switch.hpp"
 #include "app/window.hpp"
-#include "app/modules/brightness.hpp"
+#include "app/widgets/sliders.hpp"
 
 SettingsPage::SettingsPage(QWidget *parent) : QTabWidget(parent)
 {
@@ -182,7 +182,7 @@ QWidget *MainSettingsTab::brightness_widget()
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
     layout->addStretch(1);
-    layout->addWidget(BrightnessModule::control_widget(true, this), 6);
+    layout->addWidget(Slider::brightness(true, this), 6);
     layout->addStretch(1);
 
     return widget;
