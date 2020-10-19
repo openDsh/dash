@@ -182,7 +182,7 @@ QWidget *MainSettingsTab::brightness_widget()
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
     layout->addStretch(1);
-    layout->addWidget(Slider::brightness(true, this), 6);
+    layout->addWidget(brightness_slider(true, this), 6);
     layout->addStretch(1);
 
     return widget;
