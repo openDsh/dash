@@ -111,7 +111,7 @@ QWidget *MainSettingsTab::brightness_module_row_widget()
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
-    QLabel *label = new QLabel("Brightness Module", widget);
+    QLabel *label = new QLabel("Brightness Plugin", widget);
     label->setFont(Theme::font_14);
     layout->addWidget(label, 1);
 
