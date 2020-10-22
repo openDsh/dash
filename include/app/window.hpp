@@ -51,10 +51,8 @@ class DashWindow : public QMainWindow {
 
     QWidget *controls_bar();
     QLayout *quick_views();
-    QWidget *volume_widget(bool skip_buttons = false);
     QWidget *brightness_widget(bool skip_buttons = false);
     QWidget *controls_widget();
     QWidget *power_control();
     QWidget *save_control();
-    void update_system_volume(int position);
 };

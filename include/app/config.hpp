@@ -22,11 +22,7 @@ class Config : public QObject {
     void save();
 
     inline int get_volume() { return this->volume; }
-    inline void set_volume(int volume)
-    {
-        this->volume = volume;
-        emit volume_changed(this->volume);
-    }
+    void set_volume(int volume);
 
     inline bool get_dark_mode() { return this->dark_mode; }
     inline void set_dark_mode(bool dark_mode) { this->dark_mode = dark_mode; }
@@ -181,6 +177,7 @@ class Config : public QObject {
     QPluginLoader *brightness_active_plugin;
 
     void load_brightness_plugins();
+    void update_system_volume();
 
    signals:
     void volume_changed(int volume);

@@ -77,7 +77,7 @@ void DashWindow::init_config()
 {
     qApp->setOverrideCursor(this->config->get_mouse_active() ? Qt::ArrowCursor : Qt::BlankCursor);
 
-    this->config->add_quick_view("volume", this->volume_widget());
+    this->config->add_quick_view("volume", volume_slider(false, this));
     this->config->add_quick_view("brightness", brightness_slider(true, this));
     this->config->add_quick_view("controls", this->controls_widget());
     this->config->add_quick_view("none", new QFrame(this));
@@ -237,46 +237,6 @@ QLayout *DashWindow::quick_views()
     return layout;
 }
 
-QWidget *DashWindow::volume_widget(bool skip_buttons)
-{
-    QWidget *widget = new QWidget(this);
-    QHBoxLayout *layout = new QHBoxLayout(widget);
-    layout->setContentsMargins(0, 0, 0, 0);
-    layout->setSpacing(0);
-
-    QSlider *slider = new QSlider(Qt::Orientation::Horizontal, widget);
-    slider->setTracking(false);
-    slider->setRange(0, 100);
-    slider->setValue(this->config->get_volume());
-    update_system_volume(slider->value());
-    connect(slider, &QSlider::valueChanged, [this](int position) {
-        this->config->set_volume(position);
-        this->update_system_volume(position);
-    });
-    connect(this->config, &Config::volume_changed, [slider](int volume) { slider->setValue(volume); });
-
-    if (!skip_buttons) {
-        QPushButton *lower_button = new QPushButton(widget);
-        lower_button->setFlat(true);
-        lower_button->setIconSize(Theme::icon_26);
-        lower_button->setIcon(this->theme->make_button_icon("volume_down", lower_button));
-        connect(lower_button, &QPushButton::clicked, [slider]() { slider->setValue(slider->value() - 10); });
-
-        QPushButton *raise_button = new QPushButton(widget);
-        raise_button->setFlat(true);
-        raise_button->setIconSize(Theme::icon_26);
-        raise_button->setIcon(this->theme->make_button_icon("volume_up", raise_button));
-        connect(raise_button, &QPushButton::clicked, [slider]() { slider->setValue(slider->value() + 10); });
-
-        layout->addWidget(lower_button);
-        layout->addWidget(raise_button);
-    }
-
-    layout->insertWidget(1, slider, 4);
-
-    return widget;
-}
-
 QWidget *DashWindow::controls_widget()
 {
     QWidget *widget = new QWidget(this);
@@ -296,7 +256,7 @@ QWidget *DashWindow::controls_widget()
         }
         else {
             Dialog *dialog = new Dialog(false, volume);
-            dialog->set_body(this->volume_widget(true));
+            dialog->set_body(volume_slider(true, this));
             dialog->open(2000);
         }
     });
@@ -373,12 +333,4 @@ QWidget *DashWindow::power_control()
     layout->addWidget(power_off);
 
     return widget;
-}
-
-void DashWindow::update_system_volume(int position)
-{
-    QProcess *lProc = new QProcess();
-    std::string command = "amixer set Master " + std::to_string(position) + "% --quiet";
-    lProc->start(QString(command.c_str()));
-    lProc->waitForFinished();
 }

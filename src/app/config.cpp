@@ -1,6 +1,7 @@
 #include <QApplication>
 #include <QDir>
 #include <QTimer>
+#include <QProcess>
 
 #include "app/config.hpp"
 #include "plugins/brightness_plugin.hpp"
@@ -51,6 +52,8 @@ Config::Config()
     for (auto key : this->ia_config.childKeys())
         this->shortcuts[key] = this->ia_config.value(key, QString()).toString();
     this->ia_config.endGroup();
+
+    this->update_system_volume();
 
     if (this->brightness_active_plugin->isLoaded())
         this->brightness_active_plugin->unload();
@@ -141,6 +144,22 @@ void Config::load_brightness_plugins()
         if (QLibrary::isLibrary(plugin.absoluteFilePath()))
             this->brightness_plugins[plugin.baseName()] = plugin;
     }
+}
+
+void Config::update_system_volume()
+{
+    static QString command("amixer set Master %1%% --quiet");
+
+    QProcess *lProc = new QProcess();
+    lProc->start(command.arg(this->volume));
+    lProc->waitForFinished();
+}
+
+void Config::set_volume(int volume)
+{
+    this->volume = volume;
+    this->update_system_volume();
+    emit volume_changed(this->volume);
 }
 
 void Config::set_brightness(int brightness)

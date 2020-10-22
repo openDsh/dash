@@ -306,39 +306,8 @@ QWidget *MainSettingsTab::volume_widget()
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
-    QSlider *slider = new QSlider(Qt::Orientation::Horizontal, widget);
-    slider->setTracking(false);
-    slider->setRange(0, 100);
-    slider->setValue(this->config->get_volume());
-    connect(slider, &QSlider::valueChanged, [config = this->config](int position) {
-        config->set_volume(position);
-    });
-    connect(this->config, &Config::volume_changed,
-            [slider](int volume) { slider->setValue(volume); });
-
-    Shortcut *lower_shortcut = new Shortcut(this->config->get_shortcut("volume_down"), this->window());
-    this->shortcuts->add_shortcut("volume_down", "Decrease Volume", lower_shortcut);
-    connect(lower_shortcut, &Shortcut::activated, [slider]() { slider->setValue(slider->value() - 2); });
-    Shortcut *upper_shortcut = new Shortcut(this->config->get_shortcut("volume_up"), this->window());
-    this->shortcuts->add_shortcut("volume_up", "Increase Volume", upper_shortcut);
-    connect(upper_shortcut, &Shortcut::activated, [slider]() { slider->setValue(slider->value() + 2); });
-
-    QPushButton *lower_button = new QPushButton(widget);
-    lower_button->setFlat(true);
-    lower_button->setIconSize(Theme::icon_32);
-    lower_button->setIcon(this->theme->make_button_icon("volume_down", lower_button));
-    connect(lower_button, &QPushButton::clicked, [slider]() { slider->setValue(slider->value() - 10); });
-
-    QPushButton *raise_button = new QPushButton(widget);
-    raise_button->setFlat(true);
-    raise_button->setIconSize(Theme::icon_32);
-    raise_button->setIcon(this->theme->make_button_icon("volume_up", raise_button));
-    connect(raise_button, &QPushButton::clicked, [slider]() { slider->setValue(slider->value() + 10); });
-
     layout->addStretch(1);
-    layout->addWidget(lower_button);
-    layout->addWidget(slider, 4);
-    layout->addWidget(raise_button);
+    layout->addWidget(volume_slider(false, this), 6);
     layout->addStretch(1);
 
     return widget;
