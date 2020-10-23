@@ -13,24 +13,30 @@ Test::Test()
     connect(timer, &QTimer::timeout, [this]() {
         switch(rand() % 50) {
             case 0:
-                this->climate->airflow(0b101);
+                this->climate->airflow(Airflow::OFF);
                 break;
             case 1:
-                this->climate->airflow(0b010);
+                this->climate->airflow(Airflow::DEFROST);
                 break;
             case 2:
-                this->climate->airflow(0b110);
+                this->climate->airflow(Airflow::BODY);
                 break;
             case 3:
-                this->climate->airflow(0b100);
+                this->climate->airflow(Airflow::FEET);
                 break;
             case 4:
-                this->climate->airflow(0b001);
+                this->climate->airflow(Airflow::DEFROST | Airflow::BODY);
                 break;
             case 5:
-                this->climate->airflow(0b000);
+                this->climate->airflow(Airflow::DEFROST | Airflow::FEET);
                 break;
             case 6:
+                this->climate->airflow(Airflow::BODY | Airflow::FEET);
+                break;
+            case 7:
+                this->climate->airflow(Airflow::DEFROST | Airflow::BODY | Airflow::FEET);
+                break;
+            case 8:
                 this->climate->fan_speed((rand() % 4) + 1);
                 break;
         }

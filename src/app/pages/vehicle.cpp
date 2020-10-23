@@ -73,7 +73,7 @@ QString Gauge::null_value()
     return null_str;
 }
 
-const QDir VehiclePage::PLUGIN_DIR("/usr/src/dash/lib/plugins/vehicle");
+const QDir VehiclePage::PLUGIN_DIR(Config::plugin_dir("vehicle"));
 
 void VehiclePage::get_plugins()
 {

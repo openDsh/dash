@@ -65,11 +65,11 @@ void ClimateSnackBar::set_passenger_temp(int temp)
     this->open(3000);
 }
 
-void ClimateSnackBar::set_airflow(uint8_t location)
+void ClimateSnackBar::set_airflow(uint8_t airflow)
 {
-    this->airflow->toggle_defrost(location & 0b1);
-    this->airflow->toggle_body(location & 0b010);
-    this->airflow->toggle_feet(location & 0b100);
+    this->airflow->toggle_defrost(airflow & Airflow::DEFROST);
+    this->airflow->toggle_body(airflow & Airflow::BODY);
+    this->airflow->toggle_feet(airflow & Airflow::FEET);
     this->open(3000);
 }
 

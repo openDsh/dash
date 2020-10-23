@@ -6,7 +6,7 @@
 #include "app/config.hpp"
 #include "plugins/brightness_plugin.hpp"
 
-const QDir Config::BRIGHTNESS_PLUGIN_DIR("/usr/src/dash/lib/plugins/brightness");
+const QDir Config::BRIGHTNESS_PLUGIN_DIR(Config::plugin_dir("brightness"));
 
 Config::Config()
     : QObject(qApp),

@@ -2,6 +2,7 @@
 
 #include "openauto/Configuration/Configuration.hpp"
 
+#include <QCoreApplication>
 #include <QDir>
 #include <QFileInfo>
 #include <QFrame>
@@ -18,6 +19,17 @@ class Config : public QObject {
 
    public:
     Config();
+
+    static QDir plugin_dir(QString plugin)
+    {
+        QDir plugin_dir(QCoreApplication::applicationDirPath());
+        plugin_dir.cdUp();
+        plugin_dir.cd("lib");
+        plugin_dir.cd("plugins");
+        plugin_dir.cd(plugin);
+
+        return plugin_dir;
+    }
 
     void save();
 
