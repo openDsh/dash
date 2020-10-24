@@ -125,38 +125,11 @@ QWidget *MainSettingsTab::brightness_plugin_select_widget()
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
-    const QStringList plugins = this->config->get_brightness_plugins();
-
-    QLabel *label = new QLabel(this->config->get_brightness_plugin_name(), widget);
-    label->setAlignment(Qt::AlignCenter);
-    label->setFont(Theme::font_14);
-
-    QPushButton *left_button = new QPushButton(widget);
-    left_button->setFlat(true);
-    left_button->setIconSize(Theme::icon_32);
-    left_button->setIcon(this->theme->make_button_icon("arrow_left", left_button));
-    connect(left_button, &QPushButton::clicked, [this, label, plugins]() {
-        int total_plugins = plugins.size();
-        QString plugin =
-            plugins[((plugins.indexOf(label->text()) - 1) % total_plugins + total_plugins) % total_plugins];
-        label->setText(plugin);
-        this->config->set_brightness_plugin(plugin);
-    });
-
-    QPushButton *right_button = new QPushButton(widget);
-    right_button->setFlat(true);
-    right_button->setIconSize(Theme::icon_32);
-    right_button->setIcon(this->theme->make_button_icon("arrow_right", right_button));
-    connect(right_button, &QPushButton::clicked, [this, label, plugins]() {
-        QString plugin = plugins[(plugins.indexOf(label->text()) + 1) % plugins.size()];
-        label->setText(plugin);
-        this->config->set_brightness_plugin(plugin);
-    });
+    Selector *selector = new Selector(this->config->get_brightness_plugins(), Theme::font_14, widget);
+    connect(selector, &Selector::item_changed, [config = this->config](QString item) { config->set_brightness_plugin(item); });
 
     layout->addStretch(1);
-    layout->addWidget(left_button);
-    layout->addWidget(label, 2);
-    layout->addWidget(right_button);
+    layout->addWidget(selector, 10);
     layout->addStretch(1);
 
     return widget;

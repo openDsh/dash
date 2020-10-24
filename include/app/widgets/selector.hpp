@@ -20,4 +20,7 @@ class Selector : public QWidget {
     QList<QString> options;
 
     QLayout *selector();
+
+   signals:
+    void item_changed(QString item);
 };

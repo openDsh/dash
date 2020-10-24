@@ -23,7 +23,7 @@ QLayout *Selector::selector()
     QHBoxLayout *layout = new QHBoxLayout();
 
     QLabel *label = new QLabel(this);
-    label->setText(this->options.value(this->current_idx, QString()));
+    label->setText(this->get_current());
     label->setAlignment(Qt::AlignCenter);
     label->setFont(this->font);
 
@@ -34,7 +34,8 @@ QLayout *Selector::selector()
     connect(left_button, &QPushButton::clicked, [this, label]() {
         int count = this->options.size();
         this->current_idx = ((this->current_idx - 1) % count + count) % count;
-        label->setText(this->options.value(this->current_idx, QString()));
+        label->setText(this->get_current());
+        emit item_changed(this->get_current());
     });
 
     QPushButton *right_button = new QPushButton();
@@ -43,7 +44,8 @@ QLayout *Selector::selector()
     right_button->setIcon(Theme::get_instance()->make_button_icon("arrow_right", right_button));
     connect(right_button, &QPushButton::clicked, [this, label]() {
         this->current_idx = (this->current_idx + 1) % this->options.size();
-        label->setText(this->options.value(this->current_idx, QString()));
+        label->setText(this->get_current());
+        emit item_changed(this->get_current());
     });
 
     layout->addWidget(left_button);
