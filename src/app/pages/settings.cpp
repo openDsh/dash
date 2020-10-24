@@ -56,7 +56,7 @@ QWidget *MainSettingsTab::settings_widget()
     layout->addWidget(Theme::br(widget), 1);
     layout->addWidget(this->volume_row_widget(), 1);
     layout->addWidget(Theme::br(widget), 1);
-    layout->addWidget(this->brightness_module_row_widget(), 1);
+    layout->addWidget(this->brightness_plugin_row_widget(), 1);
     layout->addWidget(this->brightness_row_widget(), 1);
 
     QScrollArea *scroll_area = new QScrollArea(this);
@@ -106,7 +106,7 @@ QWidget *MainSettingsTab::dark_mode_row_widget()
     return widget;
 }
 
-QWidget *MainSettingsTab::brightness_module_row_widget()
+QWidget *MainSettingsTab::brightness_plugin_row_widget()
 {
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
@@ -115,12 +115,12 @@ QWidget *MainSettingsTab::brightness_module_row_widget()
     label->setFont(Theme::font_14);
     layout->addWidget(label, 1);
 
-    layout->addWidget(this->brightness_module_select_widget(), 1);
+    layout->addWidget(this->brightness_plugin_select_widget(), 1);
 
     return widget;
 }
 
-QWidget *MainSettingsTab::brightness_module_select_widget()
+QWidget *MainSettingsTab::brightness_plugin_select_widget()
 {
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);

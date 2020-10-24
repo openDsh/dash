@@ -25,8 +25,8 @@ class MainSettingsTab : public QWidget {
    private:
     QWidget *settings_widget();
     QWidget *dark_mode_row_widget();
-    QWidget *brightness_module_row_widget();
-    QWidget *brightness_module_select_widget();
+    QWidget *brightness_plugin_row_widget();
+    QWidget *brightness_plugin_select_widget();
     QWidget *brightness_row_widget();
     QWidget *brightness_widget();
     QWidget *si_units_row_widget();
