@@ -79,7 +79,7 @@ void VehiclePage::get_plugins()
 {
     for (const QFileInfo &plugin : this->PLUGIN_DIR.entryInfoList(QDir::Files)) {
         if (QLibrary::isLibrary(plugin.absoluteFilePath()))
-            this->plugins[plugin.baseName()] = plugin;
+            this->plugins[Config::fmt_plugin(plugin.baseName())] = plugin;
     }
 }
 

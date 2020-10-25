@@ -31,6 +31,14 @@ class Config : public QObject {
         return plugin_dir;
     }
 
+    static QString fmt_plugin(QString plugin)
+    {
+        plugin.remove(0, 3);
+        plugin.replace("_", " ");
+
+        return plugin;
+    }
+
     void save();
 
     inline int get_volume() { return this->volume; }

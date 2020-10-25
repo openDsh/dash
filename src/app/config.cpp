@@ -142,7 +142,7 @@ void Config::load_brightness_plugins()
 {
     for (const QFileInfo &plugin : this->BRIGHTNESS_PLUGIN_DIR.entryInfoList(QDir::Files)) {
         if (QLibrary::isLibrary(plugin.absoluteFilePath()))
-            this->brightness_plugins[plugin.baseName()] = plugin;
+            this->brightness_plugins[Config::fmt_plugin(plugin.baseName())] = plugin;
     }
 }
 
