@@ -389,37 +389,11 @@ QWidget *LayoutSettingsTab::quick_view_select_widget()
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
-    const QStringList views = this->config->get_quick_views().keys();
-
-    QLabel *label = new QLabel(this->config->get_quick_view(), widget);
-    label->setAlignment(Qt::AlignCenter);
-    label->setFont(Theme::font_14);
-
-    QPushButton *left_button = new QPushButton(widget);
-    left_button->setFlat(true);
-    left_button->setIconSize(Theme::icon_32);
-    left_button->setIcon(this->theme->make_button_icon("arrow_left", left_button));
-    connect(left_button, &QPushButton::clicked, [this, label, views]() {
-        int total_views = views.size();
-        QString view = views[((views.indexOf(label->text()) - 1) % total_views + total_views) % total_views];
-        label->setText(view);
-        this->config->set_quick_view(view);
-    });
-
-    QPushButton *right_button = new QPushButton(widget);
-    right_button->setFlat(true);
-    right_button->setIconSize(Theme::icon_32);
-    right_button->setIcon(this->theme->make_button_icon("arrow_right", right_button));
-    connect(right_button, &QPushButton::clicked, [this, label, views]() {
-        QString view = views[(views.indexOf(label->text()) + 1) % views.size()];
-        label->setText(view);
-        this->config->set_quick_view(view);
-    });
+    Selector *selector = new Selector(this->config->get_quick_views().keys(), Theme::font_14, widget);
+    connect(selector, &Selector::item_changed, [config = this->config](QString item) { config->set_quick_view(item); });
 
     layout->addStretch(1);
-    layout->addWidget(left_button);
-    layout->addWidget(label, 2);
-    layout->addWidget(right_button);
+    layout->addWidget(selector, 10);
     layout->addStretch(1);
 
     return widget;
