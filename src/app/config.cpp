@@ -33,8 +33,7 @@ Config::Config()
     this->launcher_auto_launch = this->ia_config.value("Launcher/auto_launch", false).toBool();
     this->launcher_app = this->ia_config.value("Launcher/app", QString()).toString();
     this->quick_view = this->ia_config.value("quick_view", "volume").toString();
-    this->brightness_module = this->ia_config.value("brightness_module", "mocked").toString();
-    this->brightness_plugin = this->ia_config.value("brightness_plugin", "libmocked").toString();
+    this->brightness_plugin = this->ia_config.value("brightness_plugin", "mocked").toString();
     this->controls_bar = this->ia_config.value("controls_bar", false).toBool();
     this->scale = this->ia_config.value("scale", 1.0).toDouble();
     this->cam_name = this->ia_config.value("Camera/name").toString();
@@ -94,9 +93,7 @@ void Config::save()
         this->ia_config.setValue("mouse_active", this->mouse_active);
     if (this->quick_view != this->ia_config.value("quick_view", "volume").toString())
         this->ia_config.setValue("quick_view", this->quick_view);
-    if (this->brightness_module != this->ia_config.value("brightness_module", "mocked").toString())
-        this->ia_config.setValue("brightness_module", this->brightness_module);
-    if (this->brightness_plugin != this->ia_config.value("brightness_plugin", "libmocked").toString())
+    if (this->brightness_plugin != this->ia_config.value("brightness_plugin", "mocked").toString())
         this->ia_config.setValue("brightness_plugin", this->brightness_plugin);
     if (this->controls_bar != this->ia_config.value("controls_bar", false).toBool())
         this->ia_config.setValue("controls_bar", this->controls_bar);
@@ -157,14 +154,14 @@ void Config::update_system_volume()
 
 void Config::set_volume(int volume)
 {
-    this->volume = volume;
+    this->volume = std::max(0, std::min(volume, 100));
     this->update_system_volume();
     emit volume_changed(this->volume);
 }
 
 void Config::set_brightness(int brightness)
 {
-    this->brightness = brightness;
+    this->brightness = std::max(76, std::min(brightness, 255));
 
     if (BrightnessPlugin *plugin = qobject_cast<BrightnessPlugin *>(this->brightness_active_plugin->instance()))
         plugin->set(this->brightness);

@@ -180,7 +180,6 @@ class Config : public QObject {
     bool mouse_active;
     QMap<QString, QString> shortcuts;
     QString quick_view;
-    QString brightness_module;
     QString brightness_plugin;
     bool controls_bar;
     double scale;

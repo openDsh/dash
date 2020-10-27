@@ -45,6 +45,7 @@ DashWindow::DashWindow()
             });
 
     this->init_ui();
+    this->init_shortcuts();
 }
 
 void DashWindow::add_widget(QWidget *widget)
@@ -111,6 +112,23 @@ void DashWindow::init_ui()
     this->power_dialog = new Dialog(true, this);
     this->power_dialog->set_title("power off");
     this->power_dialog->set_body(this->power_control());
+}
+
+void DashWindow::init_shortcuts()
+{
+    Shortcut *brightness_down = new Shortcut(this->config->get_shortcut("brightness_down"), this);
+    this->shortcuts->add_shortcut("brightness_down", "Decrease Brightness", brightness_down);
+    connect(brightness_down, &Shortcut::activated, [config = this->config]() { config->set_brightness(config->get_brightness() - 4); });
+    Shortcut *brightness_up = new Shortcut(this->config->get_shortcut("brightness_up"), this);
+    this->shortcuts->add_shortcut("brightness_up", "Increase Brightness", brightness_up);
+    connect(brightness_up, &Shortcut::activated, [config = this->config]() { config->set_brightness(config->get_brightness() + 4); });
+
+    Shortcut *volume_down = new Shortcut(this->config->get_shortcut("volume_down"), this);
+    this->shortcuts->add_shortcut("volume_down", "Decrease Volume", volume_down);
+    connect(volume_down, &Shortcut::activated, [config = this->config]() { config->set_volume(config->get_volume() - 2); });
+    Shortcut *volume_up = new Shortcut(this->config->get_shortcut("volume_up"), this);
+    this->shortcuts->add_shortcut("volume_up", "Increase Volume", volume_up);
+    connect(volume_up, &Shortcut::activated, [config = this->config]() { config->set_volume(config->get_volume() + 2); });
 }
 
 QLayout *DashWindow::body()

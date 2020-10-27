@@ -45,6 +45,7 @@ class DashWindow : public QMainWindow {
     void init_config();
     void init_theme();
     void init_ui();
+    void init_shortcuts();
     QLayout *body();
     void add_pages();
     void add_page(QString name, QWidget *page, QString icon);

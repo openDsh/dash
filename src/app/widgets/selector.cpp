@@ -6,11 +6,9 @@
 #include "app/widgets/selector.hpp"
 #include "app/theme.hpp"
 
-Selector::Selector(QList<QString> options, QFont font, QWidget *parent) : QWidget(parent), options(options)
+Selector::Selector(QList<QString> options, int current_idx, QFont font, QWidget *parent) :
+        QWidget(parent), options(options), current_idx(current_idx), font(font)
 {
-    this->font = font;
-    this->current_idx = 0;
-
     if (this->options.size() == 0)
         this->setEnabled(false);
 

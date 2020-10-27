@@ -90,7 +90,7 @@ VehiclePage::VehiclePage(QWidget *parent) : QTabWidget(parent)
     this->addTab(new DataTab(this), "Data");
 
     this->get_plugins();
-    this->selector = new Selector(this->plugins.keys(), Theme::font_14, this);
+    this->selector = new Selector(this->plugins.keys(), 0, Theme::font_14, this);
     this->active_plugin = new QPluginLoader(this);
     this->dialog = new Dialog(true, this->window());
     this->dialog->set_body(this->selector);
