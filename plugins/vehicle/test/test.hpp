@@ -3,6 +3,8 @@
 #include <QObject>
 #include "plugins/vehicle_plugin.hpp"
 #include "app/widgets/climate.hpp"
+#include "canbus/socketcanbus.hpp"
+
 
 class Test : public QObject, VehiclePlugin {
     Q_OBJECT
@@ -13,7 +15,7 @@ class Test : public QObject, VehiclePlugin {
     Test();
     ~Test();
     QList<QWidget *> widgets() override;
-    bool init() override;
+    bool init(ICANBus* canbus) override;
 
    private:
     Climate *climate;

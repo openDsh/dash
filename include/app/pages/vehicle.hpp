@@ -5,7 +5,6 @@
 #include <QPluginLoader>
 
 #include "canbus/socketcanbus.hpp"
-#include "canbus/vehicleinterface.hpp"
 #include "obd/message.hpp"
 #include "obd/command.hpp"
 #include "app/widgets/selector.hpp"

@@ -12,8 +12,6 @@
 #include <QRegularExpression>
 #include <QTextStream>
 #include <QTransform>
-#include "canbus/socketcanbus.hpp"
-#include "canbus/vehicleinterface.hpp"
 #include <iostream>
 #include <QDir>
 #include <QPluginLoader>
@@ -50,7 +48,6 @@ const QColor Theme::success_color = QColor(56, 142, 60);
 
 Theme::Theme() : QObject(qApp), palette(), color("azure")
 {
-    ICANBus *bus = SocketCANBus::get_instance();
     QFontDatabase::addApplicationFont(":/fonts/Titillium_Web/TitilliumWeb-Regular.ttf");
     QFontDatabase::addApplicationFont(":/fonts/Montserrat/Montserrat-LightItalic.ttf");
     QFontDatabase::addApplicationFont(":/fonts/Montserrat/Montserrat-Regular.ttf");

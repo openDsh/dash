@@ -9,8 +9,8 @@ bool InfinitiG37::init(ICANBus* canbus){
     this->duelClimate=false;
     this->theme = Theme::get_instance();
     this->climate = new Climate();
-    this->climate->set_max_fan_speed(7);
-    this->climate->setProperty("tab_title", "Climate");
+    this->climate->max_fan_speed(7);
+    this->climate->setObjectName("Climate");
     std::function<void(QByteArray)> headlightCallback = InfinitiG37::monitorHeadlightStatus;
     canbus->registerFrameHandler(0x60D, headlightCallback);
     std::function<void(QByteArray)> climateControlCallback = InfinitiG37::updateClimateDisplay;
@@ -21,6 +21,13 @@ bool InfinitiG37::init(ICANBus* canbus){
 
     G37_LOG(info)<<"loaded successfully";
     return true;
+}
+
+QList<QWidget *> InfinitiG37::widgets()
+{
+    QList<QWidget *> tabs;
+    tabs.append(this->climate);
+    return tabs;
 }
 
 // 60D
@@ -83,8 +90,6 @@ void InfinitiG37::monitorHeadlightStatus(QByteArray payload){
 //     34 6
 //     3C 7
 //
-int oldPassTemp = 0;
-int oldDriverTemp= 0;
 int oldAirflow = 0;
 int oldFan = 0;
 int oldStatus =0;
@@ -99,31 +104,28 @@ void InfinitiG37::updateClimateDisplay(QByteArray payload){
     if(payload.at(0) != oldStatus){
         oldStatus = payload.at(0);
         if(payload.at(0)==0x03){
-            climate->set_airflow(0);
-            climate->set_fan_speed(0);
+            climate->airflow(Airflow::OFF);
+            climate->fan_speed(0);
             G37_LOG(info)<<"Climate is off";
             return;
         }
     }
     if((unsigned char)payload.at(2)!=oldAirflow){
-        G37_LOG(info)<<"2: "<<(int)(unsigned char)payload.at(2);
-        G37_LOG(info)<<"OLD: "<<oldAirflow;
-
         switch((unsigned char)payload.at(2)){
             case(0xA0):
-                climate->set_airflow(0b101);
+                climate->airflow(Airflow::DEFROST | Airflow::FEET);
                 break;
             case(0x88):
-                climate->set_airflow(0b010);
+                climate->airflow(Airflow::BODY);
                 break;
             case(0x90):
-                climate->set_airflow(0b110);
+                climate->airflow(Airflow::BODY | Airflow::FEET);
                 break;
             case(0x98):
-                climate->set_airflow(0b100);
+                climate->airflow(Airflow::FEET);
                 break;
             case(0xA8):
-                climate->set_airflow(0b1);
+                climate->airflow(Airflow::DEFROST);
                 break;
         }
         oldAirflow = (unsigned char)payload.at(2);
@@ -131,28 +133,28 @@ void InfinitiG37::updateClimateDisplay(QByteArray payload){
     if((unsigned char)payload.at(4)!=oldFan){
         switch((unsigned char)payload.at(4)){
             case(0x04):
-                climate->set_fan_speed(0);
+                climate->fan_speed(0);
                 break;
             case(0x0C):
-                climate->set_fan_speed(1);
+                climate->fan_speed(1);
                 break;
             case(0x14):
-                climate->set_fan_speed(2);
+                climate->fan_speed(2);
                 break;
             case(0x1C):
-                climate->set_fan_speed(3);
+                climate->fan_speed(3);
                 break;
             case(0x24):
-                climate->set_fan_speed(4);
+                climate->fan_speed(4);
                 break;
             case(0x2C):
-                climate->set_fan_speed(5);
+                climate->fan_speed(5);
                 break;
             case(0x34):
-                climate->set_fan_speed(6);
+                climate->fan_speed(6);
                 break;
             case(0x3C):
-                climate->set_fan_speed(7);
+                climate->fan_speed(7);
                 break;
         }
         oldFan = (unsigned char)payload.at(4);
@@ -167,28 +169,16 @@ void InfinitiG37::updateClimateDisplay(QByteArray payload){
 // THIRD BYTE:
 //      duel climate temp goal
 void InfinitiG37::updateTemperatureDisplay(QByteArray payload){
-    if(oldDriverTemp!=(unsigned char)payload.at(1)){
-        climate->set_driver_temp((unsigned char)payload.at(1));
-        oldDriverTemp = (unsigned char)payload.at(1);
+    if(climate->driver_temp()!=(unsigned char)payload.at(1)){
+        climate->driver_temp((unsigned char)payload.at(1));
     }
     if(duelClimate){
-        if(oldPassTemp!=(unsigned char)payload.at(2)){
-            climate->set_passenger_temp((unsigned char)payload.at(2));
-            oldPassTemp = (unsigned char)payload.at(2);
+        if(climate->passenger_temp()!=(unsigned char)payload.at(2)){
+            climate->passenger_temp((unsigned char)payload.at(2));
         }
     }else{
-        if(oldPassTemp!=(unsigned char)payload.at(1)){
-            climate->set_passenger_temp((unsigned char)payload.at(1));
-            oldPassTemp=(unsigned char)payload.at(1);
-
+        if(climate->passenger_temp()!=(unsigned char)payload.at(1)){
+            climate->passenger_temp((unsigned char)payload.at(1));
         }
     }
-}
-
-
-QList<QWidget *> InfinitiG37::tabs()
-{
-    QList<QWidget *> tabs;
-    tabs.append(this->climate);
-    return tabs;
 }

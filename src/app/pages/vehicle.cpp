@@ -5,10 +5,6 @@
 #include "app/window.hpp"
 #include "obd/conversions.hpp"
 #include "canbus/elm327.hpp"
-
-
-
-
 #include "plugins/vehicle_plugin.hpp"
 
 Gauge::Gauge(units_t units, QFont value_font, QFont unit_font, Gauge::Orientation orientation, int rate,
@@ -125,7 +121,8 @@ VehiclePage::VehiclePage(QWidget *parent) : QTabWidget(parent)
             this->active_plugin->setFileName(this->plugins[key].absoluteFilePath());
 
             if (VehiclePlugin *plugin = qobject_cast<VehiclePlugin *>(this->active_plugin->instance())) {
-                plugin->init();
+                DASH_LOG(info) << "trying to load vehicle plugin";
+                plugin->init(SocketCANBus::get_instance());
                 for (QWidget *tab : plugin->widgets())
                     this->addTab(tab, tab->objectName());
             }
