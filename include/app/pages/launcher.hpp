@@ -65,11 +65,11 @@ class EmbeddedApp : public QWidget {
     void opened();
 };
 
-class LauncherTab : public QWidget {
+class LauncherPage : public QWidget {
     Q_OBJECT
 
    public:
-    LauncherTab(QWidget *parent = nullptr);
+    LauncherPage(QWidget *parent = nullptr);
 
    private:
     QWidget *launcher_widget();

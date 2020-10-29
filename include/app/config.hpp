@@ -2,15 +2,17 @@
 
 #include "openauto/Configuration/Configuration.hpp"
 
+#include <QCoreApplication>
+#include <QDir>
+#include <QFileInfo>
 #include <QFrame>
 #include <QKeySequence>
+#include <QPluginLoader>
 #include <QObject>
 #include <QSettings>
 #include <QString>
 #include <QWidget>
 #include <QVideoFrame>
-
-#include "app/modules/brightness.hpp"
 
 class Config : public QObject {
     Q_OBJECT
@@ -18,24 +20,35 @@ class Config : public QObject {
    public:
     Config();
 
+    static QDir plugin_dir(QString plugin)
+    {
+        QDir plugin_dir(QCoreApplication::applicationDirPath());
+        plugin_dir.cdUp();
+        plugin_dir.cd("lib");
+        plugin_dir.cd("plugins");
+        plugin_dir.cd(plugin);
+
+        return plugin_dir;
+    }
+
+    static QString fmt_plugin(QString plugin)
+    {
+        plugin.remove(0, 3);
+        plugin.replace("_", " ");
+
+        return plugin;
+    }
+
     void save();
 
     inline int get_volume() { return this->volume; }
-    inline void set_volume(int volume)
-    {
-        this->volume = volume;
-        emit volume_changed(this->volume);
-    }
+    void set_volume(int volume);
 
     inline bool get_dark_mode() { return this->dark_mode; }
     inline void set_dark_mode(bool dark_mode) { this->dark_mode = dark_mode; }
 
     inline int get_brightness() { return this->brightness; }
-    inline void set_brightness(int brightness)
-    {
-        this->brightness = brightness;
-        emit brightness_changed(this->brightness);
-    }
+    void set_brightness(int brightness);
 
     inline bool get_si_units() { return this->si_units; }
     inline void set_si_units(bool si_units)
@@ -90,15 +103,6 @@ class Config : public QObject {
     inline QWidget *get_quick_view(QString name) { return this->quick_views[name]; }
     inline void add_quick_view(QString name, QWidget *view) { this->quick_views[name] = view; }
 
-    inline QString get_brightness_module_name() { return this->brightness_module; }
-    inline void set_brightness_module(QString brightness_module) { this->brightness_module = brightness_module; }
-    inline QMap<QString, BrightnessModule *> get_brightness_modules() { return this->brightness_modules; }
-    inline BrightnessModule *get_brightness_module() { return this->brightness_modules[this->brightness_module]; }
-    inline void add_brightness_module(QString name, BrightnessModule *module)
-    {
-        this->brightness_modules[name] = module;
-    }
-
     inline bool get_controls_bar() { return this->controls_bar; }
     inline void set_controls_bar(bool controls_bar)
     {
@@ -141,11 +145,22 @@ class Config : public QObject {
     inline int get_cam_autoconnect_time_secs() { return this->cam_autoconnect_time_secs; }
     inline void set_cam_autoconnect_time_secs(int seconds) { this->cam_autoconnect_time_secs = seconds; }
 
+    inline QString get_brightness_plugin_name() { return this->brightness_plugin; }
+    inline QStringList get_brightness_plugins() { return this->brightness_plugins.keys(); }
+    inline void set_brightness_plugin(QString brightness_plugin)
+    {
+        this->brightness_plugin = brightness_plugin;
+        if (this->brightness_active_plugin->isLoaded())
+            this->brightness_active_plugin->unload();
+        this->brightness_active_plugin->setFileName(this->brightness_plugins[this->brightness_plugin].absoluteFilePath());
+    }
+
     static Config *get_instance();
 
    private:
+    static const QDir BRIGHTNESS_PLUGIN_DIR;
+
     QMap<QString, QWidget *> quick_views;
-    QMap<QString, BrightnessModule *> brightness_modules;
 
     QSettings ia_config;
     int volume;
@@ -165,7 +180,7 @@ class Config : public QObject {
     bool mouse_active;
     QMap<QString, QString> shortcuts;
     QString quick_view;
-    QString brightness_module;
+    QString brightness_plugin;
     bool controls_bar;
     double scale;
     QString cam_network_url;
@@ -176,6 +191,12 @@ class Config : public QObject {
     bool cam_autoconnect;
     int cam_autoconnect_time_secs;
     QMap<QString, bool> pages;
+
+    QMap<QString, QFileInfo> brightness_plugins;
+    QPluginLoader *brightness_active_plugin;
+
+    void load_brightness_plugins();
+    void update_system_volume();
 
    signals:
     void volume_changed(int volume);

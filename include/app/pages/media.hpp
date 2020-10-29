@@ -8,19 +8,18 @@
 #include "app/theme.hpp"
 #include "app/widgets/tuner.hpp"
 
-class MediaTab : public QTabWidget {
+class MediaPage : public QTabWidget {
     Q_OBJECT
 
    public:
-    MediaTab(QWidget *parent = nullptr);
-    void fill_tabs();
+    MediaPage(QWidget *parent = nullptr);
 };
 
-class BluetoothPlayerSubTab : public QWidget {
+class BluetoothPlayerTab : public QWidget {
     Q_OBJECT
 
    public:
-    BluetoothPlayerSubTab(QWidget *parent = nullptr);
+    BluetoothPlayerTab(QWidget *parent = nullptr);
 
    private:
     QWidget *track_widget();
@@ -29,11 +28,11 @@ class BluetoothPlayerSubTab : public QWidget {
     Bluetooth *bluetooth;
 };
 
-class RadioPlayerSubTab : public QWidget {
+class RadioPlayerTab : public QWidget {
     Q_OBJECT
 
    public:
-    RadioPlayerSubTab(QWidget *parent = nullptr);
+    RadioPlayerTab(QWidget *parent = nullptr);
 
    private:
     QWidget *tuner_widget();
@@ -44,11 +43,11 @@ class RadioPlayerSubTab : public QWidget {
     Tuner *tuner;
 };
 
-class LocalPlayerSubTab : public QWidget {
+class LocalPlayerTab : public QWidget {
     Q_OBJECT
 
    public:
-    LocalPlayerSubTab(QWidget *parent = nullptr);
+    LocalPlayerTab(QWidget *parent = nullptr);
 
     static QString durationFmt(int total_ms);
 

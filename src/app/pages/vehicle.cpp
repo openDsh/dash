@@ -1,8 +1,7 @@
 #include <QPalette>
 
 #include "app/config.hpp"
-#include "app/tabs/data.hpp"
-#include "app/tabs/climate.hpp"
+#include "app/pages/vehicle.hpp"
 #include "app/window.hpp"
 #include "obd/conversions.hpp"
 #include "canbus/elm327.hpp"
@@ -10,7 +9,7 @@
 
 
 
-#include "plugins/plugin.hpp"
+#include "plugins/vehicle_plugin.hpp"
 
 Gauge::Gauge(units_t units, QFont value_font, QFont unit_font, Gauge::Orientation orientation, int rate,
              std::vector<Command> cmds, int precision, obd_decoder_t decoder, QWidget *parent)
@@ -95,34 +94,41 @@ QString Gauge::null_value()
     return null_str;
 }
 
-const QDir VehicleTab::PLUGIN_DIR("/usr/src/dash/bin/plugins");
+const QDir VehiclePage::PLUGIN_DIR(Config::plugin_dir("vehicle"));
 
-void VehicleTab::get_plugins()
+void VehiclePage::get_plugins()
 {
     for (const QFileInfo &plugin : this->PLUGIN_DIR.entryInfoList(QDir::Files)) {
         if (QLibrary::isLibrary(plugin.absoluteFilePath()))
-            this->plugins[plugin.baseName()] = plugin;
+            this->plugins[Config::fmt_plugin(plugin.baseName())] = plugin;
     }
 }
 
-VehicleTab::VehicleTab(QWidget *parent) : QTabWidget(parent)
+VehiclePage::VehiclePage(QWidget *parent) : QTabWidget(parent)
 {
-    this->tabBar()->setFont(Theme::font_18);
+    this->tabBar()->setFont(Theme::font_16);
+
+    this->addTab(new DataTab(this), "Data");
 
     this->get_plugins();
-    this->selector = new Selector(this->plugins.keys(), Theme::font_16, this);
+    this->selector = new Selector(this->plugins.keys(), 0, Theme::font_14, this);
+    this->active_plugin = new QPluginLoader(this);
     this->dialog = new Dialog(true, this->window());
     this->dialog->set_body(this->selector);
     this->selector->setUpdatesEnabled(true);
     QPushButton *load_button = new QPushButton("load");
     connect(load_button, &QPushButton::clicked, [this]() {
-        this->active_plugin = new QPluginLoader(this->plugins[this->selector->get_current()].absoluteFilePath(), this);
+        QString key = this->selector->get_current();
+        if (!key.isNull()) {
+            if (this->active_plugin->isLoaded())
+                this->active_plugin->unload();
+            this->active_plugin->setFileName(this->plugins[key].absoluteFilePath());
 
-        OPENAUTO_LOG(info)<<"PLUGIN LOAD";
-        if (Plugin *plugin = qobject_cast<Plugin *>(this->active_plugin->instance())) {
-            plugin->init(SocketCANBus::get_instance());
-            for (QWidget *tab : plugin->tabs())
-                this->addTab(tab, tab->property("tab_title").toString());
+            if (VehiclePlugin *plugin = qobject_cast<VehiclePlugin *>(this->active_plugin->instance())) {
+                plugin->init();
+                for (QWidget *tab : plugin->widgets())
+                    this->addTab(tab, tab->objectName());
+            }
         }
     });
     this->dialog->set_button(load_button);
@@ -132,11 +138,7 @@ VehicleTab::VehicleTab(QWidget *parent) : QTabWidget(parent)
     settings_button->setIconSize(Theme::icon_24);
     settings_button->setIcon(Theme::get_instance()->make_button_icon("settings", settings_button));
     connect(settings_button, &QPushButton::clicked, [this]() { this->dialog->open(); });
-
-    this->tabBar()->setFont(Theme::font_18);
     this->setCornerWidget(settings_button);
-
-    this->addTab(new DataTab(this), "Data");
 }
 
 DataTab::DataTab(QWidget *parent) : QWidget(parent)

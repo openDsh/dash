@@ -12,7 +12,7 @@
 
 #include "app/config.hpp"
 #include "app/shortcuts.hpp"
-#include "app/tabs/openauto.hpp"
+#include "app/pages/openauto.hpp"
 #include "app/theme.hpp"
 
 class DashWindow : public QMainWindow {
@@ -34,26 +34,26 @@ class DashWindow : public QMainWindow {
     Theme *theme;
     Shortcuts *shortcuts;
 
-    OpenAutoTab *openauto;
+    OpenAutoPage *openauto;
     QStackedWidget *stack;
     QVBoxLayout *rail;
     QButtonGroup *rail_group;
     QStackedLayout *pages;
     QHBoxLayout *bar;
+    Dialog *power_dialog;
 
     void init_config();
     void init_theme();
     void init_ui();
+    void init_shortcuts();
     QLayout *body();
     void add_pages();
     void add_page(QString name, QWidget *page, QString icon);
 
     QWidget *controls_bar();
     QLayout *quick_views();
-    QWidget *volume_widget(bool skip_buttons = false);
     QWidget *brightness_widget(bool skip_buttons = false);
     QWidget *controls_widget();
     QWidget *power_control();
     QWidget *save_control();
-    void update_system_volume(int position);
 };

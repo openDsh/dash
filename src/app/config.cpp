@@ -1,8 +1,12 @@
 #include <QApplication>
 #include <QDir>
 #include <QTimer>
+#include <QProcess>
 
 #include "app/config.hpp"
+#include "plugins/brightness_plugin.hpp"
+
+const QDir Config::BRIGHTNESS_PLUGIN_DIR(Config::plugin_dir("brightness"));
 
 Config::Config()
     : QObject(qApp),
@@ -10,6 +14,9 @@ Config::Config()
       openauto_button_codes(openauto_config->getButtonCodes()),
       ia_config(QSettings::IniFormat, QSettings::UserScope, "dash")
 {
+    this->load_brightness_plugins();
+    this->brightness_active_plugin = new QPluginLoader(this);
+
     this->volume = this->ia_config.value("volume", 50).toInt();
     this->dark_mode = this->ia_config.value("dark_mode", false).toBool();
     this->brightness = this->ia_config.value("brightness", 255).toInt();
@@ -26,7 +33,7 @@ Config::Config()
     this->launcher_auto_launch = this->ia_config.value("Launcher/auto_launch", false).toBool();
     this->launcher_app = this->ia_config.value("Launcher/app", QString()).toString();
     this->quick_view = this->ia_config.value("quick_view", "volume").toString();
-    this->brightness_module = this->ia_config.value("brightness_module", "mocked").toString();
+    this->brightness_plugin = this->ia_config.value("brightness_plugin", "mocked").toString();
     this->controls_bar = this->ia_config.value("controls_bar", false).toBool();
     this->scale = this->ia_config.value("scale", 1.0).toDouble();
     this->cam_name = this->ia_config.value("Camera/name").toString();
@@ -44,6 +51,12 @@ Config::Config()
     for (auto key : this->ia_config.childKeys())
         this->shortcuts[key] = this->ia_config.value(key, QString()).toString();
     this->ia_config.endGroup();
+
+    this->update_system_volume();
+
+    if (this->brightness_active_plugin->isLoaded())
+        this->brightness_active_plugin->unload();
+    this->brightness_active_plugin->setFileName(this->brightness_plugins[this->brightness_plugin].absoluteFilePath());
 }
 
 void Config::save()
@@ -80,8 +93,8 @@ void Config::save()
         this->ia_config.setValue("mouse_active", this->mouse_active);
     if (this->quick_view != this->ia_config.value("quick_view", "volume").toString())
         this->ia_config.setValue("quick_view", this->quick_view);
-    if (this->brightness_module != this->ia_config.value("brightness_module", "mocked").toString())
-        this->ia_config.setValue("brightness_module", this->brightness_module);
+    if (this->brightness_plugin != this->ia_config.value("brightness_plugin", "mocked").toString())
+        this->ia_config.setValue("brightness_plugin", this->brightness_plugin);
     if (this->controls_bar != this->ia_config.value("controls_bar", false).toBool())
         this->ia_config.setValue("controls_bar", this->controls_bar);
     if (this->scale != this->ia_config.value("scale", 1.0).toDouble())
@@ -120,4 +133,38 @@ Config *Config::get_instance()
 {
     static Config config;
     return &config;
+}
+
+void Config::load_brightness_plugins()
+{
+    for (const QFileInfo &plugin : this->BRIGHTNESS_PLUGIN_DIR.entryInfoList(QDir::Files)) {
+        if (QLibrary::isLibrary(plugin.absoluteFilePath()))
+            this->brightness_plugins[Config::fmt_plugin(plugin.baseName())] = plugin;
+    }
+}
+
+void Config::update_system_volume()
+{
+    static QString command("amixer set Master %1%% --quiet");
+
+    QProcess *lProc = new QProcess();
+    lProc->start(command.arg(this->volume));
+    lProc->waitForFinished();
+}
+
+void Config::set_volume(int volume)
+{
+    this->volume = std::max(0, std::min(volume, 100));
+    this->update_system_volume();
+    emit volume_changed(this->volume);
+}
+
+void Config::set_brightness(int brightness)
+{
+    this->brightness = std::max(76, std::min(brightness, 255));
+
+    if (BrightnessPlugin *plugin = qobject_cast<BrightnessPlugin *>(this->brightness_active_plugin->instance()))
+        plugin->set(this->brightness);
+
+    emit brightness_changed(this->brightness);
 }

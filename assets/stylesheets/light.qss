@@ -17,16 +17,17 @@ QLabel:disabled {
 }
 
 QTabWidget::pane {
-    background-color: rgba(255, 255, 255, 100);
-    border-top: 0px;
-    border-radius: 8px;
+    background-color: transparent;
+    border: none;
+    border-top: 2px solid rgb(224, 224, 224);
 }
 
 QTabBar::tab {
     background-color: transparent;
     color: rgba(0, 0, 0, 138);
-    margin-top: 1px;
+    margin-top: 4px;
     padding: 4px;
+    border-bottom: 2px solid transparent;
 }
 
 QTabBar::tab:selected:top {
@@ -83,7 +84,7 @@ QPushButton:disabled {
 }
 
 QPushButton:!flat {
-    background-color: rgba(0, 0, 0, 31);
+    background-color: rgb(212, 212, 212);
 }
 
 QPushButton:!flat:checked {
@@ -92,7 +93,7 @@ QPushButton:!flat:checked {
 }
 
 QPushButton:!flat:disabled {
-    background-color: rgba(0, 0, 0, 13);
+    background-color: rgb(224, 224, 224);
 }
 
 QFrame[frameShape="4"][frameShadow="16"],
@@ -101,9 +102,9 @@ QFrame[frameShape="5"][frameShadow="16"] {
 }
 
 QListWidget {
-    background-color: rgba(255, 255, 255, 150);
+    background-color: rgb(241, 241, 241);
     color: rgba(0, 0, 0, 222);
-    border: none;
+    border: 2px solid rgb(224, 224, 224);
 }
 
 QListView {
@@ -178,6 +179,8 @@ QScrollBar {
 }
 
 QScrollBar:vertical {
+    padding-top: 6px;
+    padding-bottom: 6px;
     width: 8px;
 }
 
@@ -202,12 +205,12 @@ QLineEdit {
     border: none;
     padding: 12px;
     color: rgba(0, 0, 0, 222);
-    background-color: rgba(0, 0, 0, 10);
-    border-bottom: 1px solid rgba(0, 0, 0, 108);
+    background-color: rgb(231, 231, 231);
+    border-bottom: 1px solid rgb(189, 189, 189);
 }
 
 QLineEdit:focus {
-    background-color: rgba(0, 0, 0, 20);
+    background-color: rgb(224, 224, 224);
     border-bottom: 2px solid palette(base);
 }
 
@@ -248,10 +251,17 @@ ClimateState {
 
 QDialog,
 QDialog > QFrame {
-    background-color: rgb(252, 252, 252);
+    background-color: rgb(255, 255, 255);
     border-radius: 8px;
+    border: 2px solid rgb(224, 224, 224);
+}
+
+#ControlsBar {
+    background-color: rgb(250, 250, 250);
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
 }
 
 *[add_hint="true"] {
-    background-color: rgba(0, 0, 0, 8);
+    background-color: rgba(0, 0, 0, 12);
 }

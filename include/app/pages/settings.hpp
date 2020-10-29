@@ -9,25 +9,24 @@
 #include "app/shortcuts.hpp"
 #include "app/theme.hpp"
 
-class SettingsTab : public QTabWidget {
+class SettingsPage : public QTabWidget {
     Q_OBJECT
 
    public:
-    SettingsTab(QWidget *parent = nullptr);
-    void fill_tabs();
+    SettingsPage(QWidget *parent = nullptr);
 };
 
-class GeneralSettingsSubTab : public QWidget {
+class MainSettingsTab : public QWidget {
     Q_OBJECT
 
    public:
-    GeneralSettingsSubTab(QWidget *parent = nullptr);
+    MainSettingsTab(QWidget *parent = nullptr);
 
    private:
     QWidget *settings_widget();
     QWidget *dark_mode_row_widget();
-    QWidget *brightness_module_row_widget();
-    QWidget *brightness_module_select_widget();
+    QWidget *brightness_plugin_row_widget();
+    QWidget *brightness_plugin_select_widget();
     QWidget *brightness_row_widget();
     QWidget *brightness_widget();
     QWidget *si_units_row_widget();
@@ -42,11 +41,11 @@ class GeneralSettingsSubTab : public QWidget {
     Shortcuts *shortcuts;
 };
 
-class LayoutSettingsSubTab : public QWidget {
+class LayoutSettingsTab : public QWidget {
     Q_OBJECT
 
    public:
-    LayoutSettingsSubTab(QWidget *parent = nullptr);
+    LayoutSettingsTab(QWidget *parent = nullptr);
 
    private:
     QWidget *settings_widget();
@@ -61,11 +60,11 @@ class LayoutSettingsSubTab : public QWidget {
     Theme *theme;
 };
 
-class BluetoothSettingsSubTab : public QWidget {
+class BluetoothSettingsTab : public QWidget {
     Q_OBJECT
 
    public:
-    BluetoothSettingsSubTab(QWidget *parent = nullptr);
+    BluetoothSettingsTab(QWidget *parent = nullptr);
 
    private:
     QWidget *controls_widget();
@@ -78,11 +77,11 @@ class BluetoothSettingsSubTab : public QWidget {
     QMap<BluezQt::DevicePtr, QPushButton *> devices;
 };
 
-class ShortcutsSettingsSubTab : public QWidget {
+class ActionsSettingsTab : public QWidget {
     Q_OBJECT
 
    public:
-    ShortcutsSettingsSubTab(QWidget *parent = nullptr);
+    ActionsSettingsTab(QWidget *parent = nullptr);
 
    private:
     QWidget *settings_widget();

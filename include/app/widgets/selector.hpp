@@ -9,9 +9,10 @@ class Selector : public QWidget {
     Q_OBJECT
 
    public:
-    Selector(QList<QString> options, QFont font, QWidget *parent = nullptr);
+    Selector(QList<QString> options, int current_idx, QFont font, QWidget *parent = nullptr);
+    // allow widgets to be passed in as options
 
-    inline QString get_current() { return this->options[this->current_idx]; }
+    inline QString get_current() { return this->options.value(this->current_idx, QString()); }
 
    private:
     QFont font;
@@ -19,4 +20,7 @@ class Selector : public QWidget {
     QList<QString> options;
 
     QLayout *selector();
+
+   signals:
+    void item_changed(QString item);
 };

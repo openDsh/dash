@@ -47,3 +47,15 @@ void StepMeter::paintEvent(QPaintEvent *event)
         painter.fillPath(path, (this->bars >= i) ? QBrush(this->bar_color) : QBrush(this->base_color));
     }
 }
+
+void StepMeter::set_steps(int steps)
+{
+    this->steps = steps;
+    this->repaint();
+}
+
+void StepMeter::set_bars(int bars)
+{
+    this->bars = std::min(std::max(0, bars), this->steps);
+    this->repaint();
+}

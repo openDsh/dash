@@ -15,9 +15,9 @@ class ClimateState : public QFrame {
     QSize sizeHint() const override;
     QColor get_color() { return this->color; };
     void set_color(QColor color) { this->color = color; }
-    inline void toggle_defrost(bool enabled) { this->defrost_state = enabled; }
-    inline void toggle_body(bool enabled) { this->body_state = enabled; }
-    inline void toggle_feet(bool enabled) { this->feet_state = enabled; }
+    void toggle_defrost(bool enabled);
+    void toggle_body(bool enabled);
+    void toggle_feet(bool enabled);
 
    protected:
     void paintEvent(QPaintEvent *event) override;

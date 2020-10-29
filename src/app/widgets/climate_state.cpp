@@ -57,3 +57,21 @@ void ClimateState::paintEvent(QPaintEvent *)
         painter.drawPixmap(x_offset, state_size + y_offset, this->feet.scaled(state_size, state_size, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
     }
 }
+
+void ClimateState::toggle_defrost(bool enabled)
+{
+    this->defrost_state = enabled;
+    this->repaint();
+}
+
+void ClimateState::toggle_body(bool enabled)
+{
+    this->body_state = enabled;
+    this->repaint();
+}
+
+void ClimateState::toggle_feet(bool enabled)
+{
+    this->feet_state = enabled;
+    this->repaint();
+}

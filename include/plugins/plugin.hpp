@@ -1,16 +1,23 @@
 #pragma once
 
-#include <QString>
-#include "canbus/ICANBus.hpp"
+#include <QList>
+#include <QWidget>
 
-class Plugin
-{
-public:
+class Theme;
+class Config;
+class Shortcuts;
+
+class Plugin {
+   public:
     virtual ~Plugin() = default;
-    virtual bool init(ICANBus* canbus) = 0;
-    virtual QList<QWidget *> tabs() = 0;
-};
 
+    virtual QList<QWidget *> widgets() { return QList<QWidget *>{}; };
+
+   protected:
+    static const Theme *theme;
+    static const Config *config;
+    static const Shortcuts *shortcuts;
+};
 
 #define Plugin_iid "org.dash.Plugin"
 

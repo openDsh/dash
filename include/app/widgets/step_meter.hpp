@@ -15,8 +15,8 @@ class StepMeter : public QFrame {
 
     QSize sizeHint() const override;
 
-    inline void set_steps(int steps) { this->steps = steps; }
-    inline void set_bars(int bars) { this->bars = std::min(std::max(0, bars), this->steps); }
+    void set_steps(int steps);
+    void set_bars(int bars);
     QColor get_base_color() { return this->base_color; };
     QColor get_bar_color() { return this->bar_color; };
     void set_base_color(QColor base_color) { this->base_color = base_color; }

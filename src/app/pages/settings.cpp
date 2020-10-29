@@ -12,39 +12,37 @@
 #include "openauto/Configuration/HandednessOfTrafficType.hpp"
 
 #include "app/config.hpp"
-#include "app/tabs/settings.hpp"
+#include "app/pages/settings.hpp"
 #include "app/theme.hpp"
 #include "app/widgets/color_label.hpp"
+#include "app/widgets/selector.hpp"
 #include "app/widgets/switch.hpp"
 #include "app/window.hpp"
+#include "app/widgets/sliders.hpp"
 
-SettingsTab::SettingsTab(QWidget *parent) : QTabWidget(parent)
+SettingsPage::SettingsPage(QWidget *parent) : QTabWidget(parent)
 {
-    this->tabBar()->setFont(Theme::font_18);
+    this->tabBar()->setFont(Theme::font_16);
 
-    this->fill_tabs();
+    this->addTab(new MainSettingsTab(this), "Main");
+    this->addTab(new LayoutSettingsTab(this), "Layout");
+    this->addTab(new BluetoothSettingsTab(this), "Bluetooth");
+    this->addTab(new ActionsSettingsTab(this), "Actions");
 }
 
-void SettingsTab::fill_tabs()
-{
-    this->addTab(new GeneralSettingsSubTab(this), "General");
-    this->addTab(new LayoutSettingsSubTab(this), "Layout");
-    this->addTab(new BluetoothSettingsSubTab(this), "Bluetooth");
-    this->addTab(new ShortcutsSettingsSubTab(this), "Shortcuts");
-}
-
-GeneralSettingsSubTab::GeneralSettingsSubTab(QWidget *parent) : QWidget(parent)
+MainSettingsTab::MainSettingsTab(QWidget *parent) : QWidget(parent)
 {
     this->theme = Theme::get_instance();
     this->config = Config::get_instance();
     this->shortcuts = Shortcuts::get_instance();
 
     QVBoxLayout *layout = new QVBoxLayout(this);
+    layout->setContentsMargins(6, 0, 6, 0);
 
     layout->addWidget(this->settings_widget());
 }
 
-QWidget *GeneralSettingsSubTab::settings_widget()
+QWidget *MainSettingsTab::settings_widget()
 {
     QWidget *widget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
@@ -58,7 +56,7 @@ QWidget *GeneralSettingsSubTab::settings_widget()
     layout->addWidget(Theme::br(widget), 1);
     layout->addWidget(this->volume_row_widget(), 1);
     layout->addWidget(Theme::br(widget), 1);
-    layout->addWidget(this->brightness_module_row_widget(), 1);
+    layout->addWidget(this->brightness_plugin_row_widget(), 1);
     layout->addWidget(this->brightness_row_widget(), 1);
 
     QScrollArea *scroll_area = new QScrollArea(this);
@@ -69,13 +67,13 @@ QWidget *GeneralSettingsSubTab::settings_widget()
     return scroll_area;
 }
 
-QWidget *GeneralSettingsSubTab::dark_mode_row_widget()
+QWidget *MainSettingsTab::dark_mode_row_widget()
 {
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
     QLabel *label = new QLabel("Dark Mode", widget);
-    label->setFont(Theme::font_16);
+    label->setFont(Theme::font_14);
     layout->addWidget(label, 1);
 
     Switch *toggle = new Switch(widget);
@@ -108,69 +106,43 @@ QWidget *GeneralSettingsSubTab::dark_mode_row_widget()
     return widget;
 }
 
-QWidget *GeneralSettingsSubTab::brightness_module_row_widget()
+QWidget *MainSettingsTab::brightness_plugin_row_widget()
 {
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
-    QLabel *label = new QLabel("Brightness Module", widget);
-    label->setFont(Theme::font_16);
+    QLabel *label = new QLabel("Brightness Plugin", widget);
+    label->setFont(Theme::font_14);
     layout->addWidget(label, 1);
 
-    layout->addWidget(this->brightness_module_select_widget(), 1);
+    layout->addWidget(this->brightness_plugin_select_widget(), 1);
 
     return widget;
 }
 
-QWidget *GeneralSettingsSubTab::brightness_module_select_widget()
+QWidget *MainSettingsTab::brightness_plugin_select_widget()
 {
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
-    const QStringList modules = this->config->get_brightness_modules().keys();
-
-    QLabel *label = new QLabel(this->config->get_brightness_module_name(), widget);
-    label->setAlignment(Qt::AlignCenter);
-    label->setFont(Theme::font_16);
-
-    QPushButton *left_button = new QPushButton(widget);
-    left_button->setFlat(true);
-    left_button->setIconSize(Theme::icon_32);
-    left_button->setIcon(this->theme->make_button_icon("arrow_left", left_button));
-    connect(left_button, &QPushButton::clicked, [this, label, modules]() {
-        int total_modules = modules.size();
-        QString module =
-            modules[((modules.indexOf(label->text()) - 1) % total_modules + total_modules) % total_modules];
-        label->setText(module);
-        this->config->set_brightness_module(module);
-    });
-
-    QPushButton *right_button = new QPushButton(widget);
-    right_button->setFlat(true);
-    right_button->setIconSize(Theme::icon_32);
-    right_button->setIcon(this->theme->make_button_icon("arrow_right", right_button));
-    connect(right_button, &QPushButton::clicked, [this, label, modules]() {
-        QString module = modules[(modules.indexOf(label->text()) + 1) % modules.size()];
-        label->setText(module);
-        this->config->set_brightness_module(module);
-    });
+    auto plugins = this->config->get_brightness_plugins();
+    Selector *selector = new Selector(plugins, plugins.indexOf(this->config->get_brightness_plugin_name()), Theme::font_14, widget);
+    connect(selector, &Selector::item_changed, [config = this->config](QString item) { config->set_brightness_plugin(item); });
 
     layout->addStretch(1);
-    layout->addWidget(left_button);
-    layout->addWidget(label, 2);
-    layout->addWidget(right_button);
+    layout->addWidget(selector, 10);
     layout->addStretch(1);
 
     return widget;
 }
 
-QWidget *GeneralSettingsSubTab::brightness_row_widget()
+QWidget *MainSettingsTab::brightness_row_widget()
 {
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
     QLabel *label = new QLabel("Brightness", widget);
-    label->setFont(Theme::font_16);
+    label->setFont(Theme::font_14);
     layout->addWidget(label, 1);
 
     layout->addWidget(this->brightness_widget(), 1);
@@ -178,25 +150,25 @@ QWidget *GeneralSettingsSubTab::brightness_row_widget()
     return widget;
 }
 
-QWidget *GeneralSettingsSubTab::brightness_widget()
+QWidget *MainSettingsTab::brightness_widget()
 {
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
     layout->addStretch(1);
-    layout->addWidget(BrightnessModule::control_widget(true, this), 6);
+    layout->addWidget(brightness_slider(true, this), 6);
     layout->addStretch(1);
 
     return widget;
 }
 
-QWidget *GeneralSettingsSubTab::si_units_row_widget()
+QWidget *MainSettingsTab::si_units_row_widget()
 {
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
     QLabel *label = new QLabel("SI Units", widget);
-    label->setFont(Theme::font_16);
+    label->setFont(Theme::font_14);
     layout->addWidget(label, 1);
 
     Switch *toggle = new Switch(widget);
@@ -209,13 +181,13 @@ QWidget *GeneralSettingsSubTab::si_units_row_widget()
     return widget;
 }
 
-QWidget *GeneralSettingsSubTab::color_row_widget()
+QWidget *MainSettingsTab::color_row_widget()
 {
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
     QLabel *label = new QLabel("Color", widget);
-    label->setFont(Theme::font_16);
+    label->setFont(Theme::font_14);
     layout->addWidget(label, 1);
 
     layout->addWidget(this->color_select_widget(), 1);
@@ -223,7 +195,7 @@ QWidget *GeneralSettingsSubTab::color_row_widget()
     return widget;
 }
 
-QWidget *GeneralSettingsSubTab::color_select_widget()
+QWidget *MainSettingsTab::color_select_widget()
 {
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
@@ -232,7 +204,7 @@ QWidget *GeneralSettingsSubTab::color_select_widget()
 
     ColorLabel *label = new ColorLabel(Theme::icon_16, widget);
     label->scale(this->config->get_scale());
-    label->setFont(Theme::font_16);
+    label->setFont(Theme::font_14);
     connect(this->config, &Config::scale_changed, [label](double scale) { label->scale(scale); });
 
     QPushButton *left_button = new QPushButton(widget);
@@ -267,13 +239,13 @@ QWidget *GeneralSettingsSubTab::color_select_widget()
     return widget;
 }
 
-QWidget *GeneralSettingsSubTab::mouse_row_widget()
+QWidget *MainSettingsTab::mouse_row_widget()
 {
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
     QLabel *label = new QLabel("Mouse", widget);
-    label->setFont(Theme::font_16);
+    label->setFont(Theme::font_14);
     layout->addWidget(label, 1);
 
     Switch *toggle = new Switch(widget);
@@ -289,13 +261,13 @@ QWidget *GeneralSettingsSubTab::mouse_row_widget()
     return widget;
 }
 
-QWidget *GeneralSettingsSubTab::volume_row_widget()
+QWidget *MainSettingsTab::volume_row_widget()
 {
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
     QLabel *label = new QLabel("Volume", widget);
-    label->setFont(Theme::font_16);
+    label->setFont(Theme::font_14);
     layout->addWidget(label, 1);
 
     layout->addWidget(this->volume_widget(), 1);
@@ -303,59 +275,30 @@ QWidget *GeneralSettingsSubTab::volume_row_widget()
     return widget;
 }
 
-QWidget *GeneralSettingsSubTab::volume_widget()
+QWidget *MainSettingsTab::volume_widget()
 {
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
-    QSlider *slider = new QSlider(Qt::Orientation::Horizontal, widget);
-    slider->setTracking(false);
-    slider->setRange(0, 100);
-    slider->setValue(this->config->get_volume());
-    connect(slider, &QSlider::valueChanged, [config = this->config](int position) {
-        config->set_volume(position);
-    });
-    connect(this->config, &Config::volume_changed,
-            [slider](int volume) { slider->setValue(volume); });
-
-    Shortcut *lower_shortcut = new Shortcut(this->config->get_shortcut("volume_down"), this->window());
-    this->shortcuts->add_shortcut("volume_down", "Decrease Volume", lower_shortcut);
-    connect(lower_shortcut, &Shortcut::activated, [slider]() { slider->setValue(slider->value() - 2); });
-    Shortcut *upper_shortcut = new Shortcut(this->config->get_shortcut("volume_up"), this->window());
-    this->shortcuts->add_shortcut("volume_up", "Increase Volume", upper_shortcut);
-    connect(upper_shortcut, &Shortcut::activated, [slider]() { slider->setValue(slider->value() + 2); });
-
-    QPushButton *lower_button = new QPushButton(widget);
-    lower_button->setFlat(true);
-    lower_button->setIconSize(Theme::icon_32);
-    lower_button->setIcon(this->theme->make_button_icon("volume_down", lower_button));
-    connect(lower_button, &QPushButton::clicked, [slider]() { slider->setValue(slider->value() - 10); });
-
-    QPushButton *raise_button = new QPushButton(widget);
-    raise_button->setFlat(true);
-    raise_button->setIconSize(Theme::icon_32);
-    raise_button->setIcon(this->theme->make_button_icon("volume_up", raise_button));
-    connect(raise_button, &QPushButton::clicked, [slider]() { slider->setValue(slider->value() + 10); });
-
     layout->addStretch(1);
-    layout->addWidget(lower_button);
-    layout->addWidget(slider, 4);
-    layout->addWidget(raise_button);
+    layout->addWidget(volume_slider(false, this), 6);
     layout->addStretch(1);
 
     return widget;
 }
 
-LayoutSettingsSubTab::LayoutSettingsSubTab(QWidget *parent) : QWidget(parent)
+LayoutSettingsTab::LayoutSettingsTab(QWidget *parent) : QWidget(parent)
 {
     this->theme = Theme::get_instance();
     this->config = Config::get_instance();
 
     QVBoxLayout *layout = new QVBoxLayout(this);
+    layout->setContentsMargins(6, 0, 6, 0);
+
     layout->addWidget(this->settings_widget());
 }
 
-QWidget *LayoutSettingsSubTab::settings_widget()
+QWidget *LayoutSettingsTab::settings_widget()
 {
     QWidget *widget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
@@ -380,13 +323,13 @@ QWidget *LayoutSettingsSubTab::settings_widget()
     return scroll_area;
 }
 
-QWidget *LayoutSettingsSubTab::pages_widget()
+QWidget *LayoutSettingsTab::pages_widget()
 {
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
     QLabel *label = new QLabel("Pages", widget);
-    label->setFont(Theme::font_16);
+    label->setFont(Theme::font_14);
     layout->addWidget(label, 1);
 
     QGroupBox *group = new QGroupBox(widget);
@@ -409,13 +352,13 @@ QWidget *LayoutSettingsSubTab::pages_widget()
     return widget;
 }
 
-QWidget *LayoutSettingsSubTab::controls_bar_widget()
+QWidget *LayoutSettingsTab::controls_bar_widget()
 {
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
     QLabel *label = new QLabel("Controls Bar", widget);
-    label->setFont(Theme::font_16);
+    label->setFont(Theme::font_14);
     layout->addWidget(label, 1);
 
     Switch *toggle = new Switch(widget);
@@ -428,13 +371,13 @@ QWidget *LayoutSettingsSubTab::controls_bar_widget()
     return widget;
 }
 
-QWidget *LayoutSettingsSubTab::quick_view_row_widget()
+QWidget *LayoutSettingsTab::quick_view_row_widget()
 {
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
     QLabel *label = new QLabel("Quick View", widget);
-    label->setFont(Theme::font_16);
+    label->setFont(Theme::font_14);
     layout->addWidget(label, 1);
 
     layout->addWidget(this->quick_view_select_widget(), 1);
@@ -442,54 +385,29 @@ QWidget *LayoutSettingsSubTab::quick_view_row_widget()
     return widget;
 }
 
-QWidget *LayoutSettingsSubTab::quick_view_select_widget()
+QWidget *LayoutSettingsTab::quick_view_select_widget()
 {
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
-    const QStringList views = this->config->get_quick_views().keys();
-
-    QLabel *label = new QLabel(this->config->get_quick_view(), widget);
-    label->setAlignment(Qt::AlignCenter);
-    label->setFont(Theme::font_16);
-
-    QPushButton *left_button = new QPushButton(widget);
-    left_button->setFlat(true);
-    left_button->setIconSize(Theme::icon_32);
-    left_button->setIcon(this->theme->make_button_icon("arrow_left", left_button));
-    connect(left_button, &QPushButton::clicked, [this, label, views]() {
-        int total_views = views.size();
-        QString view = views[((views.indexOf(label->text()) - 1) % total_views + total_views) % total_views];
-        label->setText(view);
-        this->config->set_quick_view(view);
-    });
-
-    QPushButton *right_button = new QPushButton(widget);
-    right_button->setFlat(true);
-    right_button->setIconSize(Theme::icon_32);
-    right_button->setIcon(this->theme->make_button_icon("arrow_right", right_button));
-    connect(right_button, &QPushButton::clicked, [this, label, views]() {
-        QString view = views[(views.indexOf(label->text()) + 1) % views.size()];
-        label->setText(view);
-        this->config->set_quick_view(view);
-    });
+    auto plugins = this->config->get_quick_views().keys();
+    Selector *selector = new Selector(plugins, plugins.indexOf(this->config->get_quick_view()), Theme::font_14, widget);
+    connect(selector, &Selector::item_changed, [config = this->config](QString item) { config->set_quick_view(item); });
 
     layout->addStretch(1);
-    layout->addWidget(left_button);
-    layout->addWidget(label, 2);
-    layout->addWidget(right_button);
+    layout->addWidget(selector, 10);
     layout->addStretch(1);
 
     return widget;
 }
 
-QWidget *LayoutSettingsSubTab::scale_row_widget()
+QWidget *LayoutSettingsTab::scale_row_widget()
 {
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
     QLabel *label = new QLabel("Scale", widget);
-    label->setFont(Theme::font_16);
+    label->setFont(Theme::font_14);
     layout->addWidget(label, 1);
 
     layout->addWidget(this->scale_widget(), 1);
@@ -497,7 +415,7 @@ QWidget *LayoutSettingsSubTab::scale_row_widget()
     return widget;
 }
 
-QWidget *LayoutSettingsSubTab::scale_widget()
+QWidget *LayoutSettingsTab::scale_widget()
 {
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
@@ -535,25 +453,26 @@ QWidget *LayoutSettingsSubTab::scale_widget()
     return widget;
 }
 
-BluetoothSettingsSubTab::BluetoothSettingsSubTab(QWidget *parent) : QWidget(parent)
+BluetoothSettingsTab::BluetoothSettingsTab(QWidget *parent) : QWidget(parent)
 {
     this->bluetooth = Bluetooth::get_instance();
     this->theme = Theme::get_instance();
     this->config = Config::get_instance();
 
     QHBoxLayout *layout = new QHBoxLayout(this);
+    layout->setContentsMargins(6, 0, 6, 0);
 
     layout->addWidget(this->controls_widget(), 1);
     layout->addWidget(this->devices_widget(), 1);
 }
 
-QWidget *BluetoothSettingsSubTab::controls_widget()
+QWidget *BluetoothSettingsTab::controls_widget()
 {
     QWidget *widget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
 
     QLabel *label = new QLabel("Media Player", widget);
-    label->setFont(Theme::font_16);
+    label->setFont(Theme::font_14);
     layout->addStretch();
     layout->addWidget(label);
 
@@ -570,7 +489,7 @@ QWidget *BluetoothSettingsSubTab::controls_widget()
     return widget;
 }
 
-QWidget *BluetoothSettingsSubTab::scanner_widget()
+QWidget *BluetoothSettingsTab::scanner_widget()
 {
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
@@ -579,7 +498,7 @@ QWidget *BluetoothSettingsSubTab::scanner_widget()
     button->setFont(Theme::font_14);
     button->setFlat(true);
     button->setCheckable(true);
-    button->setEnabled(this->bluetooth->has_adapter());
+    button->setEnabled(this->bluetooth->has_adapter()); // this could potentially be tricky
     button->setIconSize(Theme::icon_36);
     button->setIcon(this->theme->make_button_icon("bluetooth_searching", button));
     connect(button, &QPushButton::clicked, [bluetooth = this->bluetooth](bool checked) {
@@ -605,7 +524,7 @@ QWidget *BluetoothSettingsSubTab::scanner_widget()
     return widget;
 }
 
-QWidget *BluetoothSettingsSubTab::devices_widget()
+QWidget *BluetoothSettingsTab::devices_widget()
 {
     QWidget *widget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
@@ -613,7 +532,7 @@ QWidget *BluetoothSettingsSubTab::devices_widget()
     for (BluezQt::DevicePtr device : this->bluetooth->get_devices()) {
         if (device->address() == this->config->get_bluetooth_device()) device->connectToDevice();
         QPushButton *button = new QPushButton(device->name(), widget);
-        button->setFont(Theme::font_16);
+        button->setFont(Theme::font_14);
         button->setCheckable(true);
         if (device->isConnected()) button->setChecked(true);
         connect(button, &QPushButton::clicked, [config = this->config, button, device](bool checked = false) {
@@ -633,7 +552,7 @@ QWidget *BluetoothSettingsSubTab::devices_widget()
     }
     connect(this->bluetooth, &Bluetooth::device_added, [this, layout, widget](BluezQt::DevicePtr device) {
         QPushButton *button = new QPushButton(device->name(), widget);
-        button->setFont(Theme::font_16);
+        button->setFont(Theme::font_14);
         button->setCheckable(true);
         if (device->isConnected()) button->setChecked(true);
         connect(button, &QPushButton::clicked, [button, device](bool checked = false) {
@@ -666,16 +585,18 @@ QWidget *BluetoothSettingsSubTab::devices_widget()
     return scroll_area;
 }
 
-ShortcutsSettingsSubTab::ShortcutsSettingsSubTab(QWidget *parent) : QWidget(parent)
+ActionsSettingsTab::ActionsSettingsTab(QWidget *parent) : QWidget(parent)
 {
     this->theme = Theme::get_instance();
     this->config = Config::get_instance();
     this->shortcuts = Shortcuts::get_instance();
     QVBoxLayout *layout = new QVBoxLayout(this);
+    layout->setContentsMargins(6, 0, 6, 0);
+
     layout->addWidget(this->settings_widget());
 }
 
-QWidget *ShortcutsSettingsSubTab::settings_widget()
+QWidget *ActionsSettingsTab::settings_widget()
 {
     QWidget *widget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
@@ -698,13 +619,13 @@ QWidget *ShortcutsSettingsSubTab::settings_widget()
     return scroll_area;
 }
 
-QWidget *ShortcutsSettingsSubTab::shortcut_row_widget(QString id, QString description, Shortcut *shortcut)
+QWidget *ActionsSettingsTab::shortcut_row_widget(QString id, QString description, Shortcut *shortcut)
 {
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
     QLabel *label = new QLabel(description, widget);
-    label->setFont(Theme::font_16);
+    label->setFont(Theme::font_14);
 
     layout->addWidget(label, 1);
     layout->addWidget(this->shortcut_input_widget(id, shortcut), 1);
@@ -712,7 +633,7 @@ QWidget *ShortcutsSettingsSubTab::shortcut_row_widget(QString id, QString descri
     return widget;
 }
 
-QWidget *ShortcutsSettingsSubTab::shortcut_input_widget(QString id, Shortcut *shortcut)
+QWidget *ActionsSettingsTab::shortcut_input_widget(QString id, Shortcut *shortcut)
 {
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);

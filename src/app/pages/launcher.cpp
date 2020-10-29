@@ -1,7 +1,7 @@
 #include <QElapsedTimer>
 #include <unistd.h>
 
-#include "app/tabs/launcher.hpp"
+#include "app/pages/launcher.hpp"
 
 XWorker::WindowProp::WindowProp(char *prop, unsigned long size)
 {
@@ -121,7 +121,7 @@ void EmbeddedApp::end()
     emit closed();
 }
 
-LauncherTab::LauncherTab(QWidget *parent) : QWidget(parent)
+LauncherPage::LauncherPage(QWidget *parent) : QWidget(parent)
 {
     this->theme = Theme::get_instance();
     this->config = Config::get_instance();
@@ -140,7 +140,7 @@ LauncherTab::LauncherTab(QWidget *parent) : QWidget(parent)
         this->app->start(this->config->get_launcher_app());
 }
 
-QWidget *LauncherTab::launcher_widget()
+QWidget *LauncherPage::launcher_widget()
 {
     QWidget *widget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
@@ -157,7 +157,7 @@ QWidget *LauncherTab::launcher_widget()
     return widget;
 }
 
-QWidget *LauncherTab::app_select_widget()
+QWidget *LauncherPage::app_select_widget()
 {
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
@@ -176,13 +176,13 @@ QWidget *LauncherTab::app_select_widget()
     layout->addWidget(home_button, 0, Qt::AlignTop);
 
     this->folders = new QListWidget(widget);
-    this->folders->setFont(Theme::font_16);
+    this->folders->setFont(Theme::font_14);
     Theme::to_touch_scroller(this->folders);
     this->populate_dirs(root_path);
     layout->addWidget(this->folders, 4);
 
     this->apps = new QListWidget(widget);
-    this->apps->setFont(Theme::font_16);
+    this->apps->setFont(Theme::font_14);
     Theme::to_touch_scroller(this->apps);
     this->populate_apps(root_path);
     connect(this->apps, &QListWidget::itemClicked, [this](QListWidgetItem *item) {
@@ -206,7 +206,7 @@ QWidget *LauncherTab::app_select_widget()
     return widget;
 }
 
-QWidget *LauncherTab::config_widget()
+QWidget *LauncherPage::config_widget()
 {
     QWidget *widget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
@@ -237,7 +237,7 @@ QWidget *LauncherTab::config_widget()
     return widget;
 }
 
-void LauncherTab::populate_dirs(QString path)
+void LauncherPage::populate_dirs(QString path)
 {
     this->folders->clear();
     QDir current_dir(path);
@@ -257,7 +257,7 @@ void LauncherTab::populate_dirs(QString path)
     }
 }
 
-void LauncherTab::populate_apps(QString path)
+void LauncherPage::populate_apps(QString path)
 {
     for (QString app : QDir(path).entryList(QDir::Files | QDir::Executable)) new QListWidgetItem(app, this->apps);
 }
