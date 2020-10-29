@@ -4,11 +4,11 @@
 #include <QDebug>
 
 #include "app/widgets/climate_state.hpp"
+#include "OpenautoLog.hpp"
 
 ClimateState::ClimateState(QWidget *parent) : QFrame(parent), climate_ref(QIcon(":/icons/climate_ref.svg").pixmap(512, 512)), defrost(QIcon(":/icons/defrost.svg").pixmap(512, 512)), body(QIcon(":/icons/chevron_right.svg").pixmap(512, 512)), feet(QIcon(":/icons/expand_more.svg").pixmap(512, 512))
 {
     this->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-
     this->config = Config::get_instance();
 }
 

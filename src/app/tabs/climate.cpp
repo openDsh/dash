@@ -5,6 +5,7 @@
 
 #include "app/theme.hpp"
 #include "app/tabs/climate.hpp"
+#include "OpenautoLog.hpp"
 
 ClimateSnackBar::ClimateSnackBar() : SnackBar()
 {
@@ -49,7 +50,6 @@ QWidget *ClimateSnackBar::state_widget()
 
     this->fan_speed = new StepMeter(widget);
     layout->addWidget(this->fan_speed);
-
     return widget;
 }
 
@@ -67,6 +67,7 @@ void ClimateSnackBar::set_passenger_temp(int temp)
 
 void ClimateSnackBar::set_airflow(uint8_t location)
 {
+    this->repaint();
     this->airflow->toggle_defrost(location & 0b1);
     this->airflow->toggle_body(location & 0b010);
     this->airflow->toggle_feet(location & 0b100);
@@ -80,6 +81,8 @@ void ClimateSnackBar::set_max_fan_speed(int max_speed)
 
 void ClimateSnackBar::set_fan_speed(int speed)
 {
+    this->repaint();
+
     this->fan_speed->set_bars(speed);
     this->open(3000);
 }
@@ -97,6 +100,7 @@ void Climate::set_max_fan_speed(int max_speed)
 
 void Climate::set_fan_speed(int speed)
 {
+    
     this->fan_speed = speed;
     this->snack_bar->set_fan_speed(speed);
 }

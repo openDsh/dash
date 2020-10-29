@@ -101,11 +101,15 @@ void InfinitiG37::updateClimateDisplay(QByteArray payload){
         if(payload.at(0)==0x03){
             climate->set_airflow(0);
             climate->set_fan_speed(0);
+            G37_LOG(info)<<"Climate is off";
             return;
         }
     }
-    if(int(payload.at(2))!=oldAirflow){
-        switch(int(payload.at(2))){
+    if((unsigned char)payload.at(2)!=oldAirflow){
+        G37_LOG(info)<<"2: "<<(int)(unsigned char)payload.at(2);
+        G37_LOG(info)<<"OLD: "<<oldAirflow;
+
+        switch((unsigned char)payload.at(2)){
             case(0xA0):
                 climate->set_airflow(0b101);
                 break;
@@ -122,10 +126,10 @@ void InfinitiG37::updateClimateDisplay(QByteArray payload){
                 climate->set_airflow(0b1);
                 break;
         }
-        oldAirflow = payload.at(2);
+        oldAirflow = (unsigned char)payload.at(2);
     }
-    if(payload.at(4)!=oldFan){
-        switch(int(payload[4])){
+    if((unsigned char)payload.at(4)!=oldFan){
+        switch((unsigned char)payload.at(4)){
             case(0x04):
                 climate->set_fan_speed(0);
                 break;
@@ -151,7 +155,7 @@ void InfinitiG37::updateClimateDisplay(QByteArray payload){
                 climate->set_fan_speed(7);
                 break;
         }
-        oldFan = payload.at(4);
+        oldFan = (unsigned char)payload.at(4);
     }
 }
 
@@ -163,20 +167,19 @@ void InfinitiG37::updateClimateDisplay(QByteArray payload){
 // THIRD BYTE:
 //      duel climate temp goal
 void InfinitiG37::updateTemperatureDisplay(QByteArray payload){
-    if(oldDriverTemp!=payload.at(1)){
-        climate->set_driver_temp(payload.at(1));
-        oldDriverTemp = payload.at(1);
+    if(oldDriverTemp!=(unsigned char)payload.at(1)){
+        climate->set_driver_temp((unsigned char)payload.at(1));
+        oldDriverTemp = (unsigned char)payload.at(1);
     }
-    if(!duelClimate){
-        if(oldPassTemp!=payload.at(2)){
-
-            climate->set_passenger_temp(payload.at(2));
-            oldPassTemp = payload.at(2);
+    if(duelClimate){
+        if(oldPassTemp!=(unsigned char)payload.at(2)){
+            climate->set_passenger_temp((unsigned char)payload.at(2));
+            oldPassTemp = (unsigned char)payload.at(2);
         }
     }else{
-        if(oldPassTemp!=payload.at(1)){
-        climate->set_passenger_temp(payload.at(1));
-        oldPassTemp=payload.at(1);
+        if(oldPassTemp!=(unsigned char)payload.at(1)){
+            climate->set_passenger_temp((unsigned char)payload.at(1));
+            oldPassTemp=(unsigned char)payload.at(1);
 
         }
     }

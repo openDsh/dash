@@ -4,6 +4,7 @@
 #include <QtPlugin>
 #include "plugins/plugin.hpp"
 #include "app/tabs/climate.hpp"
+#include "canbus/ICANBus.hpp"
 
 class Test : public QObject, Plugin
 {

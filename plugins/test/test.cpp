@@ -17,10 +17,10 @@ Test::Test()
         this->climate->set_passenger_temp((rand() % 20) + 60);
     });
 
-    timer->start(5000);
+    timer->start(1000);
 }
-bool init(ICANBus* canbus){
-    
+bool Test::init(ICANBus* canbus){
+    return false;
 }
 
 QList<QWidget *> Test::tabs()
