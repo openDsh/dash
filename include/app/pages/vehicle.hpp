@@ -43,8 +43,6 @@ class VehiclePage : public QTabWidget {
     VehiclePage(QWidget *parent = nullptr);
 
    private:
-    static const QDir PLUGIN_DIR;
-
     void get_plugins();
 
     QMap<QString, int> capabilities;

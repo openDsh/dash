@@ -6,8 +6,6 @@
 #include "app/config.hpp"
 #include "plugins/brightness_plugin.hpp"
 
-const QDir Config::BRIGHTNESS_PLUGIN_DIR(Config::plugin_dir("brightness"));
-
 Config::Config()
     : QObject(qApp),
       openauto_config(std::make_shared<openauto::configuration::Configuration>()),
@@ -140,7 +138,7 @@ Config *Config::get_instance()
 
 void Config::load_brightness_plugins()
 {
-    for (const QFileInfo &plugin : this->BRIGHTNESS_PLUGIN_DIR.entryInfoList(QDir::Files)) {
+    for (const QFileInfo &plugin : Config::plugin_dir("brightness").entryInfoList(QDir::Files)) {
         if (QLibrary::isLibrary(plugin.absoluteFilePath()))
             this->brightness_plugins[Config::fmt_plugin(plugin.baseName())] = plugin;
     }

@@ -170,8 +170,6 @@ class Config : public QObject {
     static Config *get_instance();
 
    private:
-    static const QDir BRIGHTNESS_PLUGIN_DIR;
-
     QMap<QString, QWidget *> quick_views;
 
     QSettings ia_config;
