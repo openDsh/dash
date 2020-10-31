@@ -6,8 +6,6 @@
 #include "app/config.hpp"
 #include "plugins/brightness_plugin.hpp"
 
-const QDir Config::BRIGHTNESS_PLUGIN_DIR(Config::plugin_dir("brightness"));
-
 Config::Config()
     : QObject(qApp),
       openauto_config(std::make_shared<openauto::configuration::Configuration>()),
@@ -21,7 +19,8 @@ Config::Config()
     this->dark_mode = this->ia_config.value("dark_mode", false).toBool();
     this->brightness = this->ia_config.value("brightness", 255).toInt();
     this->si_units = this->ia_config.value("si_units", false).toBool();
-    this->color = this->ia_config.value("color", "azure").toString();
+    this->color_light = this->ia_config.value("color_light", "#000000").toString();
+    this->color_dark = this->ia_config.value("color_dark", "#ffffff").toString();
     this->bluetooth_device = this->ia_config.value("Bluetooth/device", QString()).toString();
     this->radio_station = this->ia_config.value("Radio/station", 98.0).toDouble();
     this->radio_muted = this->ia_config.value("Radio/muted", true).toBool();
@@ -69,8 +68,10 @@ void Config::save()
         this->ia_config.setValue("brightness", this->brightness);
     if (this->si_units != this->ia_config.value("si_units", false).toBool())
         this->ia_config.setValue("si_units", this->si_units);
-    if (this->color != this->ia_config.value("color", "azure").toString())
-        this->ia_config.setValue("color", this->color);
+    if (this->color_light != this->ia_config.value("color_light", "#000000").toString())
+        this->ia_config.setValue("color_light", this->color_light);
+    if (this->color_dark != this->ia_config.value("color_dark", "#ffffff").toString())
+        this->ia_config.setValue("color_dark", this->color_dark);
     if (this->bluetooth_device != this->ia_config.value("Bluetooth/device", QString()).toString())
         this->ia_config.setValue("Bluetooth/device", this->bluetooth_device);
     if (this->radio_station != this->ia_config.value("Radio/station", 98.0).toDouble())
@@ -137,7 +138,7 @@ Config *Config::get_instance()
 
 void Config::load_brightness_plugins()
 {
-    for (const QFileInfo &plugin : this->BRIGHTNESS_PLUGIN_DIR.entryInfoList(QDir::Files)) {
+    for (const QFileInfo &plugin : Config::plugin_dir("brightness").entryInfoList(QDir::Files)) {
         if (QLibrary::isLibrary(plugin.absoluteFilePath()))
             this->brightness_plugins[Config::fmt_plugin(plugin.baseName())] = plugin;
     }

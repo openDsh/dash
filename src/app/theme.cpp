@@ -18,6 +18,7 @@
 #include <QDebug>
 
 #include "app/theme.hpp"
+#include "app/config.hpp"
 
 const QFont Theme::font_10 = QFont("Montserrat", 10);
 const QFont Theme::font_12 = QFont("Montserrat", 12);
@@ -44,9 +45,7 @@ const QSize Theme::icon_96 = QSize(96, 96);
 const QColor Theme::danger_color = QColor(211, 47, 47);
 const QColor Theme::success_color = QColor(56, 142, 60);
 
-
-
-Theme::Theme() : QObject(qApp), palette(), color("azure")
+Theme::Theme() : QObject(qApp), palette()
 {
     QFontDatabase::addApplicationFont(":/fonts/Titillium_Web/TitilliumWeb-Regular.ttf");
     QFontDatabase::addApplicationFont(":/fonts/Montserrat/Montserrat-LightItalic.ttf");
@@ -84,10 +83,10 @@ QString Theme::scale_stylesheet(QString stylesheet)
 
 void Theme::set_palette()
 {
-    QColor new_color(this->colors[this->mode ? "dark" : "light"][this->color]);
-    this->palette.setColor(QPalette::Base, new_color);
-    new_color.setAlphaF(.5);
-    this->palette.setColor(QPalette::AlternateBase, new_color);
+    QColor color(Config::get_instance()->get_color());
+    this->palette.setColor(QPalette::Base, color);
+    color.setAlphaF(.5);
+    this->palette.setColor(QPalette::AlternateBase, color);
     qApp->setPalette(this->palette);
 }
 
@@ -104,7 +103,7 @@ QIcon Theme::themed_button_icon(QIcon icon, QAbstractButton *button)
 
     QColor base_color(this->get_base_color());
     base_color.setAlpha(this->mode ? 222 : 255);
-    QColor accent_color(this->get_color(this->color));
+    QColor accent_color(Config::get_instance()->get_color());
     accent_color.setAlpha(this->mode ? 222 : 255);
 
     QPixmap normal_on(size);
@@ -169,7 +168,6 @@ void Theme::update()
     }
 
     emit mode_updated(this->mode);
-    emit color_updated();
 }
 
 Theme *Theme::get_instance()

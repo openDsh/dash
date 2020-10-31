@@ -90,11 +90,9 @@ QString Gauge::null_value()
     return null_str;
 }
 
-const QDir VehiclePage::PLUGIN_DIR(Config::plugin_dir("vehicle"));
-
 void VehiclePage::get_plugins()
 {
-    for (const QFileInfo &plugin : this->PLUGIN_DIR.entryInfoList(QDir::Files)) {
+    for (const QFileInfo &plugin : Config::plugin_dir("vehicle").entryInfoList(QDir::Files)) {
         if (QLibrary::isLibrary(plugin.absoluteFilePath()))
             this->plugins[Config::fmt_plugin(plugin.baseName())] = plugin;
     }

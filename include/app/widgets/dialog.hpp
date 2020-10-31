@@ -23,9 +23,10 @@ class Dialog : public QDialog {
         label->setFont(QFont("Montserrat", 18, QFont::Bold));
         this->title->addWidget(label);
     }
-    inline void set_body(QWidget *widget)
+    inline void set_body(QWidget *widget, bool tight = false)
     {
-        this->setMinimumSize(widget->size());
+        if (!tight)
+            this->setMinimumSize(widget->size());
         this->body->addWidget(widget);
     }
     inline void set_button(QPushButton *button)

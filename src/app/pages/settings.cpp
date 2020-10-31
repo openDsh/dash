@@ -83,8 +83,8 @@ QWidget *MainSettingsTab::dark_mode_row_widget()
     connect(this->theme, &Theme::mode_updated,
             [toggle, config = this->config](bool mode) { toggle->setChecked(mode); });
     connect(toggle, &Switch::stateChanged, [theme = this->theme, config = this->config](bool state) {
-        theme->set_mode(state);
         config->set_dark_mode(state);
+        theme->set_mode(state);
     });
     Shortcut *shortcut = new Shortcut(this->config->get_shortcut("dark_mode_toggle"), this->window());
     this->shortcuts->add_shortcut("dark_mode_toggle", "Toggle Dark Mode", shortcut);
@@ -200,41 +200,17 @@ QWidget *MainSettingsTab::color_select_widget()
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
-    const QStringList colors = this->theme->get_colors().keys();
-
-    ColorLabel *label = new ColorLabel(Theme::icon_16, widget);
+    ColorLabel *label = new ColorLabel(Theme::icon_16, Theme::font_14, widget);
     label->scale(this->config->get_scale());
-    label->setFont(Theme::font_14);
     connect(this->config, &Config::scale_changed, [label](double scale) { label->scale(scale); });
-
-    QPushButton *left_button = new QPushButton(widget);
-    left_button->setFlat(true);
-    left_button->setIconSize(Theme::icon_32);
-    left_button->setIcon(this->theme->make_button_icon("arrow_left", left_button));
-    connect(left_button, &QPushButton::clicked, [this, colors, label]() {
-        int total_colors = colors.size();
-        QString color = colors[((colors.indexOf(label->text()) - 1) % total_colors + total_colors) % total_colors];
-        label->update(color);
-        this->theme->set_color(color);
-        this->config->set_color(color);
+    connect(label, &ColorLabel::color_changed, [this](QColor color) {
+        this->config->set_color(color.name());
+        this->theme->update();
     });
+    connect(this->theme, &Theme::mode_updated,
+            [label, config = this->config](bool) { label->update(config->get_color()); });
 
-    QPushButton *right_button = new QPushButton(widget);
-    right_button->setFlat(true);
-    right_button->setIconSize(Theme::icon_32);
-    right_button->setIcon(this->theme->make_button_icon("arrow_right", right_button));
-    connect(right_button, &QPushButton::clicked, [this, colors, label]() {
-        QString color = colors[(colors.indexOf(label->text()) + 1) % colors.size()];
-        label->update(color);
-        this->theme->set_color(color);
-        this->config->set_color(color);
-    });
-
-    layout->addStretch(1);
-    layout->addWidget(left_button);
-    layout->addWidget(label, 2);
-    layout->addWidget(right_button);
-    layout->addStretch(1);
+    layout->addWidget(label);
 
     return widget;
 }

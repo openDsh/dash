@@ -55,13 +55,6 @@ class Theme : public QObject {
         this->mode = mode;
         this->update();
     }
-    inline const QMap<QString, QColor> get_colors() { return this->colors[this->mode ? "dark" : "light"]; }
-    inline const QColor get_color(QString color) { return this->colors[this->mode ? "dark" : "light"][color]; }
-    inline void set_color(QString color)
-    {
-        this->color = color;
-        this->update();
-    }
 
     inline void set_scale(double scale)
     {
@@ -96,23 +89,7 @@ class Theme : public QObject {
     static Theme *get_instance();
 
    private:
-    QMap<QString, QMap<QString, QColor>> colors = {{"light",
-                                                    {{"azure", QColor(33, 150, 243)},
-                                                     {"rose", QColor(244, 67, 54)},
-                                                     {"jade", QColor(76, 175, 80)},
-                                                     {"fire", QColor(255, 152, 0)},
-                                                     {"steel", QColor(96, 125, 139)},
-                                                     {"lilac", QColor(103, 58, 183)}}},
-                                                   {"dark",
-                                                    {{"azure", QColor(144, 202, 249)},
-                                                     {"rose", QColor(239, 154, 154)},
-                                                     {"jade", QColor(165, 214, 167)},
-                                                     {"fire", QColor(255, 204, 128)},
-                                                     {"steel", QColor(176, 190, 197)},
-                                                     {"lilac", QColor(179, 157, 219)}}}};
-
     QPalette palette;
-    QString color;
     QMap<QString, QString> stylesheets;
     bool mode = false;
     double scale = 1.0;
@@ -126,5 +103,4 @@ class Theme : public QObject {
 
    signals:
     void mode_updated(bool mode);
-    void color_updated();
 };

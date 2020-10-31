@@ -57,8 +57,20 @@ class Config : public QObject {
         emit si_units_changed(this->si_units);
     }
 
-    inline QString get_color() { return this->color; }
-    inline void set_color(QString color) { this->color = color; }
+    inline QString get_color_light() { return this->color_light; }
+    inline void set_color_light(QString color) { this->color_light = color; }
+
+    inline QString get_color_dark() { return this->color_dark; }
+    inline void set_color_dark(QString color) { this->color_dark = color; }
+
+    inline QColor get_color() { return QColor(this->dark_mode ? this->color_dark : this->color_light); }
+    inline void set_color(QColor color)
+    {
+        if(this->dark_mode)
+            this->color_dark = color.name();
+        else
+            this->color_light = color.name();
+    }
 
     inline QString get_bluetooth_device() { return this->bluetooth_device; }
     inline void set_bluetooth_device(QString bluetooth_device) { this->bluetooth_device = bluetooth_device; }
@@ -158,8 +170,6 @@ class Config : public QObject {
     static Config *get_instance();
 
    private:
-    static const QDir BRIGHTNESS_PLUGIN_DIR;
-
     QMap<QString, QWidget *> quick_views;
 
     QSettings ia_config;
@@ -167,7 +177,8 @@ class Config : public QObject {
     bool dark_mode;
     int brightness;
     bool si_units;
-    QString color;
+    QString color_light;
+    QString color_dark;
     QString bluetooth_device;
     double radio_station;
     bool radio_muted;
