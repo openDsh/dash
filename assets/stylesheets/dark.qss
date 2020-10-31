@@ -52,6 +52,10 @@ QSlider::groove {
     border-radius: 2px;
 }
 
+QSlider::groove[neutral="true"] {
+    background-color: rgba(224, 224, 224, 128);
+}
+
 QSlider::handle {
     background-color: palette(base);
     width: 25px;
@@ -62,10 +66,18 @@ QSlider::handle {
     border-radius: 12px;
 }
 
+QSlider::handle[neutral="true"] {
+    background-color: rgb(224, 224, 224);
+}
+
 QSlider::sub-page {
     background-color: palette(base);
     height: 5px;
     border-radius: 2px;
+}
+
+QSlider::sub-page[neutral="true"] {
+    background-color: rgb(224, 224, 224);
 }
 
 QPushButton {

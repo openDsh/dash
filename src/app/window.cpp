@@ -87,7 +87,6 @@ void DashWindow::init_config()
 void DashWindow::init_theme()
 {
     this->theme->set_mode(this->config->get_dark_mode());
-    this->theme->set_color(this->config->get_color());
     this->theme->set_scale(this->config->get_scale());
 }
 
@@ -304,8 +303,8 @@ QWidget *DashWindow::controls_widget()
     dark_mode->setIcon(this->theme->make_button_icon("dark_mode", dark_mode));
     connect(dark_mode, &QPushButton::clicked, [this]() {
         bool mode = !theme->get_mode();
-        this->theme->set_mode(mode);
         this->config->set_dark_mode(mode);
+        this->theme->set_mode(mode);
     });
 
     layout->addWidget(volume, 1);
