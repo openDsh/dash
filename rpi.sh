@@ -3,7 +3,7 @@
 #location of OS details for linux
 OS_RELEASE_FILE="/etc/os-release"
 
-#check if Raspian OS is active, otherwise kill script
+## check if Raspian OS is active, otherwise kill script
 #if grep -q "Raspbian" ${OS_RELEASE_FILE};
 #then
 #  echo "Great this script works for RaspberryPI OS"
@@ -13,7 +13,7 @@ OS_RELEASE_FILE="/etc/os-release"
 #fi
 
 display_version(){
-    echo "Version 0.1 RaspberryPI Dash additional install helpers"
+    echo "Version 0.2 RaspberryPI Dash additional install helpers"
 }
 
 #########################
@@ -24,6 +24,7 @@ display_help() {
     echo
     echo "   -arb, --addrulebrightness        Add udev rules for brightness"
     echo "   -adi, --adddesktopicon           Add desktop icon"
+    echo "   -asd, --autostartdaemon          Add autostart daemon"
     echo "   -v, --version                    Show version of script"
     echo "   -h, --help                       Show help of script"
     echo
@@ -33,6 +34,9 @@ display_help() {
     echo
     echo "Example: Add an desktop icon on your RPI."
     echo "   rpi -adi"
+    echo
+    echo "Example: Add autostart daemon on your RPI."
+    echo "   rpi -asd"
     echo
     exit 1
 }
@@ -52,6 +56,12 @@ do
         -adi | --adddesktopicon)
             /bin/bash src/bash/desktop.sh
             exit 0
+          ;;
+        -asd | --autostartdaemon)
+            if [ $# -ne 0 ]; then
+              /bin/bash src/bash/autostartdaemon.sh $2
+              exit 0
+            fi
           ;;
         -h | --help)
             display_help  # Call your function
