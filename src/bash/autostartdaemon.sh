@@ -15,14 +15,6 @@ sudo systemctl disable dash.service
 
 #remove existing opendash service
 sudo systemctl unmask dash.service
-#sudo rm /etc/systemd/system/dash.service #>/dev/null 2>&1
-
-#copy executable to /usr/local/bin
-#sudo cp bin/ia /usr/local/bin/ia
-
-#create autostart daemon file
-#sudo touch /etc/systemd/system/dash.service
-#sudo chmod 744 /etc/systemd/system/dash.service
 
 sudo bash -c "echo '[Unit]
 Description=Dash
