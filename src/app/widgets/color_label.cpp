@@ -53,7 +53,6 @@ void ColorLabel::scale(double scale)
     this->icon->setPixmap(this->icon->pixmap()->scaled(size));
 
     this->color_hint->setFixedHeight(8 * scale);
-    this->color_hint->setPalette(this->hint_palette);
 }
 
 void ColorLabel::update(QColor color)
