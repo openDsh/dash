@@ -146,7 +146,7 @@ void Config::load_brightness_plugins()
 
 void Config::update_system_volume()
 {
-    static QString command("amixer -D pulse set Master %1% --quiet");
+    static QString command("amixer set Master %1% --quiet");
 
     QProcess *lProc = new QProcess();
     lProc->start(command.arg(this->volume));
