@@ -42,6 +42,9 @@ Config::Config()
     this->cam_local_format_override = this->ia_config.value("Camera/local_format_override").value<QVideoFrame::PixelFormat>();
     this->cam_autoconnect = this->ia_config.value("Camera/automatically_reconnect").toBool();
     this->cam_autoconnect_time_secs = this->ia_config.value("Camera/auto_reconnect_time_secs", 6).toInt();
+    this->vehicle_plugin = this->ia_config.value("Vehicle/plugin", QString()).toString();
+    this->vehicle_can_bus = this->ia_config.value("Vehicle/can_bus", false).toBool();
+    this->vehicle_interface = this->ia_config.value("Vehicle/interface", QString()).toString();
     this->ia_config.beginGroup("Pages");
     for (auto key : this->ia_config.childKeys())
         this->pages[key] = this->ia_config.value(key, true).toBool();
@@ -114,6 +117,12 @@ void Config::save()
         this->ia_config.setValue("Camera/automatically_reconnect", this->cam_autoconnect);
     if (this->cam_autoconnect_time_secs != this->ia_config.value("Camera/auto_reconnect_time_secs").toInt())
         this->ia_config.setValue("Camera/auto_reconnect_time_secs", this->cam_autoconnect_time_secs);
+    if (this->vehicle_plugin != this->ia_config.value("Vehicle/plugin").toString())
+        this->ia_config.setValue("Vehicle/plugin", this->vehicle_plugin);
+    if (this->vehicle_can_bus != this->ia_config.value("Vehicle/can_bus").toBool())
+        this->ia_config.setValue("Vehicle/can_bus", this->vehicle_can_bus);
+    if (this->vehicle_interface != this->ia_config.value("Vehicle/interface").toString())
+        this->ia_config.setValue("Vehicle/interface", this->vehicle_interface);
     for (auto id : this->pages.keys()) {
         QString config_key = QString("Pages/%1").arg(id);
         bool page_enabled = this->pages[id];
