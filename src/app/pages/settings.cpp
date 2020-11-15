@@ -126,7 +126,7 @@ QWidget *MainSettingsTab::brightness_plugin_select_widget()
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
     auto plugins = this->config->get_brightness_plugins();
-    Selector *selector = new Selector(plugins, plugins.indexOf(this->config->get_brightness_plugin_name()), Theme::font_14, widget);
+    Selector *selector = new Selector(plugins, this->config->get_brightness_plugin_name(), Theme::font_14, widget);
     connect(selector, &Selector::item_changed, [config = this->config](QString item) { config->set_brightness_plugin(item); });
 
     layout->addStretch(1);
@@ -367,7 +367,7 @@ QWidget *LayoutSettingsTab::quick_view_select_widget()
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
     auto plugins = this->config->get_quick_views().keys();
-    Selector *selector = new Selector(plugins, plugins.indexOf(this->config->get_quick_view()), Theme::font_14, widget);
+    Selector *selector = new Selector(plugins, this->config->get_quick_view(), Theme::font_14, widget);
     connect(selector, &Selector::item_changed, [config = this->config](QString item) { config->set_quick_view(item); });
 
     layout->addStretch(1);

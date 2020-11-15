@@ -5,9 +5,9 @@
 #include <QVector>
 #include <QByteArray>
 #include <QVariant>
-
 #include "DashLog.hpp"
 #include "canbus/ICANBus.hpp"
+#include "app/config.hpp"
 
 class SocketCANBus : public QObject, public ICANBus
 {

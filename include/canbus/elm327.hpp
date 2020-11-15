@@ -19,6 +19,7 @@
 
 #include "DashLog.hpp"
 #include "canbus/ICANBus.hpp"
+#include "app/config.hpp"
 
 class elm327 : public QObject, public ICANBus
 {

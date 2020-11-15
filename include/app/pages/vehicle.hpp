@@ -54,12 +54,19 @@ class VehiclePage : public QTabWidget {
 
    private:
     void get_plugins();
+    void load_plugin();
+    QWidget *dialog_body();
+    QWidget *can_bus_toggle_row();
+    QWidget *interface_selector_row();
 
     QMap<QString, int> capabilities;
     QMap<QString, QFileInfo> plugins;
+    QStringList can_devices;
+    QStringList serial_devices;
     QPluginLoader *active_plugin;
-    Selector *selector;
+    Selector *plugin_selector;
     Dialog *dialog;
+    Config *config;
 };
 
 class DataTab : public QWidget {
