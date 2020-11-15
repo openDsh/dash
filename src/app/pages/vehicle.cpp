@@ -101,7 +101,7 @@ VehiclePage::VehiclePage(QWidget *parent) : QTabWidget(parent)
         this->can_devices.append(device.name());
 
     for (auto port : QSerialPortInfo::availablePorts())
-        this->serial_devices.append(port.portName());
+        this->serial_devices.append(port.systemLocation());
 
     this->get_plugins();
     this->active_plugin = new QPluginLoader(this);
