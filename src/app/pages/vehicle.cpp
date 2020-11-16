@@ -109,7 +109,7 @@ QWidget *VehiclePage::dialog_body()
     QVBoxLayout *layout = new QVBoxLayout(widget);
 
     QStringList plugins = this->plugins.keys();
-    this->plugin_selector = new Selector(plugins, this->config->get_vehicle_plugin(), Theme::font_14, widget, true);
+    this->plugin_selector = new Selector(plugins, this->config->get_vehicle_plugin(), Theme::font_14, widget, "unloader");
 
     layout->addWidget(this->can_bus_toggle_row(), 1);
     layout->addWidget(this->interface_selector_row(), 1);

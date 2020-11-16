@@ -261,21 +261,22 @@ QWidget *DashWindow::controls_widget()
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
 
+
     QPushButton *volume = new QPushButton(widget);
     volume->setFlat(true);
     volume->setIconSize(Theme::icon_26);
     volume->setIcon(this->theme->make_button_icon("volume_up", volume));
+
+    Dialog *volume_dialog = new Dialog(false, volume);
+    volume_dialog->set_body(volume_slider(true, this));
+
     QElapsedTimer *volume_timer = new QElapsedTimer();
     connect(volume, &QPushButton::pressed, [volume_timer]() { volume_timer->start(); });
-    connect(volume, &QPushButton::released, [this, volume, volume_timer]() {
-        if (volume_timer->hasExpired(1000)) {
+    connect(volume, &QPushButton::released, [config = this->config, volume_timer, volume_dialog]() {
+        if (volume_timer->hasExpired(1000))
             config->set_volume(0);
-        }
-        else {
-            Dialog *dialog = new Dialog(false, volume);
-            dialog->set_body(volume_slider(true, this));
-            dialog->open(2000);
-        }
+        else
+            volume_dialog->open(2000);
     });
     QLabel *volume_value = new QLabel(QString::number(this->config->get_volume()), widget);
     volume_value->setFont(Theme::font_10);
@@ -286,10 +287,12 @@ QWidget *DashWindow::controls_widget()
     brightness->setFlat(true);
     brightness->setIconSize(Theme::icon_26);
     brightness->setIcon(this->theme->make_button_icon("brightness_high", brightness));
-    connect(brightness, &QPushButton::clicked, [this, brightness]() {
-        Dialog *dialog = new Dialog(false, brightness);
-        dialog->set_body(brightness_slider(false, this));
-        dialog->open(2000);
+
+    Dialog *brightness_dialog = new Dialog(false, brightness);
+    brightness_dialog->set_body(brightness_slider(false, this));
+
+    connect(brightness, &QPushButton::clicked, [brightness_dialog]() {
+        brightness_dialog->open(2000);
     });
     QLabel *brightness_value = new QLabel(QString::number(std::ceil(this->config->get_brightness() / 2.55)), widget);
     brightness_value->setFont(Theme::font_10);
