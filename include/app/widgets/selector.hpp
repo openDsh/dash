@@ -11,13 +11,11 @@ class Selector : public QWidget {
    public:
     Selector(QList<QString> options, QString current, QFont font, QWidget *parent = nullptr, QString placeholder = QString());
 
-    inline QString get_current() { return this->options.value(this->current_idx, this->placeholder); }
+    inline QString get_current() { return (this->options.size() > 0) ? this->options.value(this->current_idx, this->placeholder) : QString(); }
     inline void set_options(QList<QString> options)
     {
         this->options = options;
-        if (!this->placeholder.isNull())
-            this->options.insert(0, this->placeholder);
-        this->setEnabled(this->options.size() > 0);
+        this->set_state();
         this->current_idx = 0;
         this->update_label();
         emit item_changed(this->get_current());
@@ -32,6 +30,8 @@ class Selector : public QWidget {
     QLabel *label;
 
     QLayout *selector();
+    void set_state();
+
     inline void update_label()
     {
         QFont italicized(this->font);

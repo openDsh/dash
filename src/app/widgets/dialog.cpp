@@ -33,6 +33,8 @@ void Dialog::open(int timeout)
     }
     else {
         this->show();
+        this->raise();
+        this->activateWindow();
         if (timeout > 0)
             this->timer->start(timeout);
     }

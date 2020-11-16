@@ -9,11 +9,8 @@
 Selector::Selector(QList<QString> options, QString current, QFont font, QWidget *parent, QString placeholder) :
         QWidget(parent), options(options), font(font), placeholder(placeholder)
 {
-    if (!this->placeholder.isNull())
-        this->options.insert(0, this->placeholder);
-    if (this->options.size() == 0)
-        this->setEnabled(false);
-    this->current_idx = this->options.indexOf(current);
+    this->set_state();
+    this->current_idx = std::max(0, this->options.indexOf(current));
 
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->addLayout(this->selector());
@@ -53,4 +50,16 @@ QLayout *Selector::selector()
     layout->addWidget(right_button);
 
     return layout;
+}
+
+void Selector::set_state()
+{
+    if (this->options.size() == 0) {
+        this->setEnabled(false);
+    }
+    else {
+        this->setEnabled(true);
+        if (!this->placeholder.isNull())
+            this->options.insert(0, this->placeholder);
+    }
 }
