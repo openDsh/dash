@@ -418,15 +418,6 @@ OpenAutoPage::OpenAutoPage(QWidget *parent) : QStackedWidget(parent)
     });
     connect(this->theme, &Theme::mode_updated, [this](bool mode) { this->worker->set_night_mode(mode); });
 
-    this->dialog = new Dialog(true, this->window());
-    this->dialog->set_body(new Settings());
-    QPushButton *save_button = new QPushButton("save");
-    connect(save_button, &QPushButton::clicked, [this]() {
-        this->config->openauto_config->setButtonCodes(this->config->openauto_button_codes);
-        this->config->openauto_config->save();
-    });
-    this->dialog->set_button(save_button);
-
     this->addWidget(this->connect_msg());
     this->addWidget(this->frame);
 }
@@ -452,13 +443,20 @@ QWidget *OpenAutoPage::connect_msg()
     layout2->setContentsMargins(0, 0, 0, 0);
     layout2->setSpacing(0);
 
+    Dialog *dialog = new Dialog(true, this->window());
+    dialog->set_body(new Settings());
+    QPushButton *save_button = new QPushButton("save");
+    connect(save_button, &QPushButton::clicked, [this]() {
+        this->config->openauto_config->setButtonCodes(this->config->openauto_button_codes);
+        this->config->openauto_config->save();
+    });
+    dialog->set_button(save_button);
+
     QPushButton *settings_button = new QPushButton(widget);
     settings_button->setFlat(true);
     settings_button->setIconSize(Theme::icon_24);
     settings_button->setIcon(this->theme->make_button_icon("settings", settings_button));
-    connect(settings_button, &QPushButton::clicked, [this]() {
-        this->dialog->open();
-    });
+    connect(settings_button, &QPushButton::clicked, [dialog]() { dialog->open(); });
 
     layout2->addStretch();
     layout2->addWidget(settings_button);

@@ -14,7 +14,7 @@
 #include "app/config.hpp"
 #include "app/pages/settings.hpp"
 #include "app/theme.hpp"
-#include "app/widgets/color_label.hpp"
+#include "app/widgets/color_picker.hpp"
 #include "app/widgets/selector.hpp"
 #include "app/widgets/switch.hpp"
 #include "app/window.hpp"
@@ -200,10 +200,10 @@ QWidget *MainSettingsTab::color_select_widget()
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
-    ColorLabel *label = new ColorLabel(Theme::icon_16, Theme::font_14, widget);
+    ColorPicker *label = new ColorPicker(Theme::icon_16, Theme::font_14, widget);
     label->scale(this->config->get_scale());
     connect(this->config, &Config::scale_changed, [label](double scale) { label->scale(scale); });
-    connect(label, &ColorLabel::color_changed, [this](QColor color) {
+    connect(label, &ColorPicker::color_changed, [this](QColor color) {
         this->config->set_color(color.name());
         this->theme->update();
     });

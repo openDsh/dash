@@ -114,7 +114,6 @@ class OpenAutoPage : public QStackedWidget {
     Theme *theme;
     OpenAutoFrame *frame;
     OpenAutoWorker *worker;
-    Dialog *dialog;
 
    signals:
     void toggle_fullscreen(QWidget *widget);

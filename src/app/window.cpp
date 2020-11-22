@@ -107,10 +107,6 @@ void DashWindow::init_ui()
 
     this->stack->addWidget(widget);
     this->setCentralWidget(this->stack);
-
-    this->power_dialog = new Dialog(true, this);
-    this->power_dialog->set_title("power off");
-    this->power_dialog->set_body(this->power_control());
 }
 
 void DashWindow::init_shortcuts()
@@ -214,11 +210,15 @@ QWidget *DashWindow::controls_bar()
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
 
+    Dialog *power_dialog = new Dialog(true, this);
+    power_dialog->set_title("power off");
+    power_dialog->set_body(this->power_control());
+
     QPushButton *shutdown_button = new QPushButton(widget);
     shutdown_button->setFlat(true);
     shutdown_button->setIconSize(Theme::icon_26);
     shutdown_button->setIcon(this->theme->make_button_icon("power_settings_new", shutdown_button));
-    connect(shutdown_button, &QPushButton::clicked, [this]() { this->power_dialog->open(); });
+    connect(shutdown_button, &QPushButton::clicked, [power_dialog]() { power_dialog->open(); });
 
     QPushButton *exit_button = new QPushButton(widget);
     exit_button->setFlat(true);

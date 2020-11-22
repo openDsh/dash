@@ -87,17 +87,17 @@ VehiclePage::VehiclePage(QWidget *parent) : QTabWidget(parent)
 
     this->get_plugins();
     this->active_plugin = new QPluginLoader(this);
-    this->dialog = new Dialog(true, this->window());
-    this->dialog->set_body(this->dialog_body());
+    Dialog *dialog = new Dialog(true, this->window());
+    dialog->set_body(this->dialog_body());
     QPushButton *load_button = new QPushButton("load");
     connect(load_button, &QPushButton::clicked, [this]() { this->load_plugin(); });
-    this->dialog->set_button(load_button);
+    dialog->set_button(load_button);
 
     QPushButton *settings_button = new QPushButton(this);
     settings_button->setFlat(true);
     settings_button->setIconSize(Theme::icon_24);
     settings_button->setIcon(Theme::get_instance()->make_button_icon("settings", settings_button));
-    connect(settings_button, &QPushButton::clicked, [this]() { this->dialog->open(); });
+    connect(settings_button, &QPushButton::clicked, [dialog]() { dialog->open(); });
     this->setCornerWidget(settings_button);
 
     this->load_plugin();
