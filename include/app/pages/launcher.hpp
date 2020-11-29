@@ -18,7 +18,7 @@ class LauncherPlugins : public QTabWidget {
     void get_plugins();
 
     QMap<QString, QFileInfo> plugins;
-    QSet<QPluginLoader *> active_plugins; // keep track of widgets not plugins
+    QList<QPluginLoader *> active_plugins; // keep track of widgets not plugins (only one instance of the plugin actually gets created anyway)
     QListWidget *active_plugins_list;
     Selector *selector;
     Dialog *dialog;

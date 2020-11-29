@@ -145,6 +145,11 @@ Launcher::Launcher(QWidget *parent) : QWidget(parent)
         this->app->start(this->config->get_launcher_app());
 }
 
+Launcher::~Launcher()
+{
+    delete this->app;
+}
+
 QWidget *Launcher::launcher_widget()
 {
     QWidget *widget = new QWidget(this);
@@ -267,10 +272,15 @@ void Launcher::populate_apps(QString path)
     for (QString app : QDir(path).entryList(QDir::Files | QDir::Executable)) new QListWidgetItem(app, this->apps);
 }
 
+App::~App()
+{
+    for (auto widget : this->loaded_widgets)
+        delete widget;
+}
+
 QList<QWidget *> App::widgets()
 {
-    QList<QWidget *> tabs;
-    auto launcher = new Launcher();
-    tabs.append(launcher);
-    return tabs;
+    int size = this->loaded_widgets.size();
+    this->loaded_widgets.append(new Launcher());
+    return this->loaded_widgets.mid(size);
 }

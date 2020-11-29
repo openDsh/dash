@@ -72,6 +72,7 @@ class Launcher : public QWidget {
 
    public:
     Launcher(QWidget *parent = nullptr);
+    ~Launcher();
 
    private:
     QWidget *launcher_widget();
@@ -95,5 +96,9 @@ class App : public QObject, LauncherPlugin {
 
    public:
     App() {}
+    ~App();
     QList<QWidget *> widgets() override;
+
+   private:
+    QList<QWidget *> loaded_widgets;
 };

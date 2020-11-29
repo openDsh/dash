@@ -73,6 +73,95 @@ QString Gauge::null_value()
     return null_str;
 }
 
+VehiclePage::VehiclePage(QWidget *parent) : QTabWidget(parent)
+{
+    this->tabBar()->setFont(Theme::font_16);
+    this->addTab(new DataTab(this), "Data");
+    this->config = Config::get_instance();
+
+    // for (auto device : QCanBus::instance()->availableDevices("socketcan"))
+    //     this->can_devices.append(device.name());
+
+    // for (auto port : QSerialPortInfo::availablePorts())
+    //     this->serial_devices.append(port.portName());
+
+    this->get_plugins();
+    this->active_plugin = new QPluginLoader(this);
+    Dialog *dialog = new Dialog(true, this->window());
+    dialog->set_body(this->dialog_body());
+    QPushButton *load_button = new QPushButton("load");
+    connect(load_button, &QPushButton::clicked, [this]() { this->load_plugin(); });
+    dialog->set_button(load_button);
+
+    QPushButton *settings_button = new QPushButton(this);
+    settings_button->setFlat(true);
+    settings_button->setIconSize(Theme::icon_24);
+    settings_button->setIcon(Theme::get_instance()->make_button_icon("settings", settings_button));
+    connect(settings_button, &QPushButton::clicked, [dialog]() { dialog->open(); });
+    this->setCornerWidget(settings_button);
+
+    this->load_plugin();
+}
+
+QWidget *VehiclePage::dialog_body()
+{
+    QWidget *widget = new QWidget(this);
+    QVBoxLayout *layout = new QVBoxLayout(widget);
+
+    QStringList plugins = this->plugins.keys();
+    this->plugin_selector = new Selector(plugins, this->config->get_vehicle_plugin(), Theme::font_14, widget, "unloader");
+
+    layout->addWidget(this->can_bus_toggle_row(), 1);
+    layout->addWidget(this->interface_selector_row(), 1);
+    layout->addWidget(Theme::br(widget), 1);
+    layout->addWidget(this->plugin_selector, 1);
+
+    return widget;
+}
+
+QWidget *VehiclePage::can_bus_toggle_row()
+{
+    QWidget *widget = new QWidget(this);
+    QHBoxLayout *layout = new QHBoxLayout(widget);
+
+    QLabel *label = new QLabel("CAN Bus", widget);
+    label->setFont(Theme::font_14);
+    layout->addWidget(label, 1);
+
+    Switch *toggle = new Switch(widget);
+    toggle->scale(this->config->get_scale());
+    toggle->setChecked(this->config->get_vehicle_can_bus());
+    connect(this->config, &Config::scale_changed, [toggle](double scale) { toggle->scale(scale); });
+    connect(toggle, &Switch::stateChanged, [this](bool state) {
+        this->config->set_vehicle_can_bus(state);
+    });
+    layout->addWidget(toggle, 1, Qt::AlignHCenter);
+
+    return widget;
+}
+
+QWidget *VehiclePage::interface_selector_row()
+{
+    QWidget *widget = new QWidget(this);
+    QHBoxLayout *layout = new QHBoxLayout(widget);
+
+    QLabel *label = new QLabel("Interface", widget);
+    label->setFont(Theme::font_14);
+    layout->addWidget(label, 1);
+
+    QStringList devices = this->config->get_vehicle_can_bus() ? this->can_devices : this->serial_devices;
+    Selector *selector = new Selector(devices, this->config->get_vehicle_interface(), Theme::font_14, widget);
+    connect(selector, &Selector::item_changed, [config = this->config](QString item) {
+        config->set_vehicle_interface(item);
+    });
+    connect(this->config, &Config::vehicle_can_bus_changed, [this, selector](bool state) {
+        selector->set_options(state ? this->can_devices : this->serial_devices);
+    });
+    layout->addWidget(selector, 1);
+
+    return widget;
+}
+
 void VehiclePage::get_plugins()
 {
     for (const QFileInfo &plugin : Config::plugin_dir("vehicle").entryInfoList(QDir::Files)) {
@@ -81,41 +170,22 @@ void VehiclePage::get_plugins()
     }
 }
 
-VehiclePage::VehiclePage(QWidget *parent) : QTabWidget(parent)
+void VehiclePage::load_plugin()
 {
-    this->tabBar()->setFont(Theme::font_16);
+    if (this->active_plugin->isLoaded())
+        this->active_plugin->unload();
 
-    this->addTab(new DataTab(this), "Data");
+    QString key = this->plugin_selector->get_current();
+    if (!key.isNull()) {
+        this->active_plugin->setFileName(this->plugins[key].absoluteFilePath());
 
-    this->get_plugins();
-    this->selector = new Selector(this->plugins.keys(), 0, Theme::font_14, this);
-    this->active_plugin = new QPluginLoader(this);
-    this->dialog = new Dialog(true, this->window());
-    this->dialog->set_body(this->selector);
-    this->selector->setUpdatesEnabled(true);
-    QPushButton *load_button = new QPushButton("load");
-    connect(load_button, &QPushButton::clicked, [this]() {
-        QString key = this->selector->get_current();
-        if (!key.isNull()) {
-            if (this->active_plugin->isLoaded())
-                this->active_plugin->unload();
-            this->active_plugin->setFileName(this->plugins[key].absoluteFilePath());
-
-            if (VehiclePlugin *plugin = qobject_cast<VehiclePlugin *>(this->active_plugin->instance())) {
-                plugin->init();
-                for (QWidget *tab : plugin->widgets())
-                    this->addTab(tab, tab->objectName());
-            }
+        if (VehiclePlugin *plugin = qobject_cast<VehiclePlugin *>(this->active_plugin->instance())) {
+            plugin->init();
+            for (QWidget *tab : plugin->widgets())
+                this->addTab(tab, tab->objectName());
         }
-    });
-    this->dialog->set_button(load_button);
-
-    QPushButton *settings_button = new QPushButton(this);
-    settings_button->setFlat(true);
-    settings_button->setIconSize(Theme::icon_24);
-    settings_button->setIcon(Theme::get_instance()->make_button_icon("settings", settings_button));
-    connect(settings_button, &QPushButton::clicked, [this]() { this->dialog->open(); });
-    this->setCornerWidget(settings_button);
+    }
+    this->config->set_vehicle_plugin(key);
 }
 
 DataTab::DataTab(QWidget *parent) : QWidget(parent)

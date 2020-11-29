@@ -14,7 +14,7 @@
 #include "app/config.hpp"
 #include "app/pages/settings.hpp"
 #include "app/theme.hpp"
-#include "app/widgets/color_label.hpp"
+#include "app/widgets/color_picker.hpp"
 #include "app/widgets/selector.hpp"
 #include "app/widgets/switch.hpp"
 #include "app/window.hpp"
@@ -126,7 +126,7 @@ QWidget *MainSettingsTab::brightness_plugin_select_widget()
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
     auto plugins = this->config->get_brightness_plugins();
-    Selector *selector = new Selector(plugins, plugins.indexOf(this->config->get_brightness_plugin_name()), Theme::font_14, widget);
+    Selector *selector = new Selector(plugins, this->config->get_brightness_plugin_name(), Theme::font_14, widget);
     connect(selector, &Selector::item_changed, [config = this->config](QString item) { config->set_brightness_plugin(item); });
 
     layout->addStretch(1);
@@ -200,10 +200,10 @@ QWidget *MainSettingsTab::color_select_widget()
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
-    ColorLabel *label = new ColorLabel(Theme::icon_16, Theme::font_14, widget);
+    ColorPicker *label = new ColorPicker(Theme::icon_16, Theme::font_14, widget);
     label->scale(this->config->get_scale());
     connect(this->config, &Config::scale_changed, [label](double scale) { label->scale(scale); });
-    connect(label, &ColorLabel::color_changed, [this](QColor color) {
+    connect(label, &ColorPicker::color_changed, [this](QColor color) {
         this->config->set_color(color.name());
         this->theme->update();
     });
@@ -367,7 +367,7 @@ QWidget *LayoutSettingsTab::quick_view_select_widget()
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
     auto plugins = this->config->get_quick_views().keys();
-    Selector *selector = new Selector(plugins, plugins.indexOf(this->config->get_quick_view()), Theme::font_14, widget);
+    Selector *selector = new Selector(plugins, this->config->get_quick_view(), Theme::font_14, widget);
     connect(selector, &Selector::item_changed, [config = this->config](QString item) { config->set_quick_view(item); });
 
     layout->addStretch(1);

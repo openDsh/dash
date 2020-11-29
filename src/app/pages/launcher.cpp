@@ -29,7 +29,7 @@ LauncherPlugins::LauncherPlugins(QWidget *parent) : QTabWidget(parent)
             if (LauncherPlugin *plugin = qobject_cast<LauncherPlugin *>(plugin_loader->instance())) {
                 for (QWidget *tab : plugin->widgets())
                     this->addTab(tab, tab->objectName());
-                this->active_plugins.insert(plugin_loader);
+                this->active_plugins.append(plugin_loader);
                 this->active_plugins_list->addItem(key);
             }
             else {
@@ -64,6 +64,19 @@ QWidget *LauncherPlugins::dialog_body()
     layout->addWidget(label);
 
     this->active_plugins_list = new QListWidget(widget);
+    this->active_plugins_list->setFont(Theme::font_14);
+    Theme::to_touch_scroller(this->active_plugins_list);
+    connect(this->active_plugins_list, &QListWidget::itemClicked, [this](QListWidgetItem *item) {
+        int idx = this->active_plugins_list->row(item);
+        QWidget *tab = this->widget(idx);
+        this->removeTab(idx);
+        delete tab;
+
+        delete this->active_plugins_list->takeItem(idx);
+
+        delete this->active_plugins[idx];
+        this->active_plugins.removeAt(idx);
+    });
     layout->addWidget(this->active_plugins_list);
 
     return widget;
@@ -74,6 +87,7 @@ LauncherPage::LauncherPage(QWidget *parent) : QStackedWidget(parent)
     this->theme = Theme::get_instance();
 
     this->plugin_tabs = new LauncherPlugins(this);
+    connect(this->plugin_tabs, &QTabWidget::currentChanged, [this](int idx) { this->setCurrentIndex((idx == -1) ? 0 : 1); });
 
     this->addWidget(this->load_msg());
     this->addWidget(this->plugin_tabs);
@@ -97,11 +111,7 @@ QWidget *LauncherPage::load_msg()
     settings_button->setFlat(true);
     settings_button->setIconSize(Theme::icon_24);
     settings_button->setIcon(this->theme->make_button_icon("settings", settings_button));
-    connect(settings_button, &QPushButton::clicked, [this]() {
-        this->plugin_tabs->dialog->open();
-        if (this->plugin_tabs->active_plugins.size() > 0)
-            this->setCurrentWidget(this->plugin_tabs);
-    });
+    connect(settings_button, &QPushButton::clicked, [this]() { this->plugin_tabs->dialog->open(); });
 
     layout2->addStretch();
     layout2->addWidget(settings_button);
