@@ -126,7 +126,7 @@ class Config : public QObject {
     inline void set_scale(double scale)
     {
         this->scale = scale;
-        emit scale_changed(this->scale);
+        // emit scale_changed(this->scale);
     }
 
     inline bool get_page(QWidget *page) { return this->pages.value(page->objectName(), true); }

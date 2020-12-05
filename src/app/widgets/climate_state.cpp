@@ -9,12 +9,12 @@ ClimateState::ClimateState(QWidget *parent) : QFrame(parent), climate_ref(QIcon(
 {
     this->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 
-    this->config = Config::get_instance();
+    this->scale = Config::get_instance()->get_scale();
 }
 
 QSize ClimateState::sizeHint() const
 {
-    int size = 52 * this->config->get_scale();
+    int size = 52 * this->scale;
     return QSize(size, size);
 }
 
@@ -22,9 +22,7 @@ void ClimateState::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
 
-    double scale = this->config->get_scale();
-
-    int ref_size = 52 * scale;
+    int ref_size = 52 * this->scale;
     int state_size = ref_size / 3;
 
     int x_offset = std::max(0, (this->width() - ref_size) / 2);

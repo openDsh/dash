@@ -2,6 +2,7 @@
 
 OfficialRPi::OfficialRPi() : brightness_attribute(this->PATH)
 {
+    this->brightness_attribute.open(QIODevice::WriteOnly);
 }
 
 OfficialRPi::~OfficialRPi()
