@@ -38,11 +38,19 @@ SocketCANBus *SocketCANBus::get_instance()
     return &bus;
 }
 
+QVector<QCanBusFrame> SocketCANBus::readAllFrames(int numFrames){
+    QVector<QCanBusFrame> frames = QVector<QCanBusFrame>();
+    for(int i = 0; i<numFrames; i++){
+        frames.append(bus->readFrame());
+    }
+    return frames;
+}
+
 void SocketCANBus::framesAvailable()
 {
     int numFrames = bus->framesAvailable();
     if(numFrames>0){
-        QVector<QCanBusFrame> frames =  bus->readAllFrames();
+        QVector<QCanBusFrame> frames =  readAllFrames(numFrames);
         for(int i = 0; i<frames.length(); i++){
             QCanBusFrame frame = frames.at(i);
             if (callbacks.find(frame.frameId()) != callbacks.end())
