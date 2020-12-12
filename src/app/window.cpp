@@ -308,6 +308,7 @@ QWidget *DashWindow::controls_widget()
         bool mode = !theme->get_mode();
         this->config->set_dark_mode(mode);
         this->theme->set_mode(mode);
+        this->theme->update();
     });
 
     layout->addWidget(volume, 1);

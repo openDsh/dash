@@ -88,8 +88,6 @@ void Theme::set_palette()
 
 QIcon Theme::themed_button_icon(QIcon icon, QAbstractButton *button)
 {
-    button->setProperty("themed_icon", true);
-
     QSize size(512, 512);
     QBitmap icon_mask(icon.pixmap(size).createMaskFromColor(Qt::transparent));
     QBitmap alt_icon_mask;
@@ -143,7 +141,8 @@ QIcon Theme::make_button_icon(QString name, QPushButton *button, QString alt_nam
     if (!alt_name.isNull())
         button->setProperty("alt_icon", QVariant::fromValue(QIcon(QString(":/icons/%1.svg").arg(alt_name))));
 
-    return this->themed_button_icon(QIcon(QString(":/icons/%1.svg").arg(name)), button);
+    button->setProperty("themed_icon", true);
+    return QIcon(QString(":/icons/%1.svg").arg(name));
 }
 
 void Theme::update()

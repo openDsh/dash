@@ -85,6 +85,7 @@ QWidget *MainSettingsTab::dark_mode_row_widget()
     connect(toggle, &Switch::stateChanged, [theme = this->theme, config = this->config](bool state) {
         config->set_dark_mode(state);
         theme->set_mode(state);
+        theme->update();
     });
     Shortcut *shortcut = new Shortcut(this->config->get_shortcut("dark_mode_toggle"), this->window());
     this->shortcuts->add_shortcut("dark_mode_toggle", "Toggle Dark Mode", shortcut);
@@ -540,8 +541,6 @@ QWidget *BluetoothSettingsTab::devices_widget()
         });
         this->devices[device] = button;
         layout->addWidget(button);
-        qApp->processEvents();
-        this->theme->update();
     });
     connect(this->bluetooth, &Bluetooth::device_changed, [this](BluezQt::DevicePtr device) {
         this->devices[device]->setText(device->name());
