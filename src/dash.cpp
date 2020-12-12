@@ -1,32 +1,35 @@
 #include <QApplication>
-#include <StringList>
+#include <QStringList>
 #include <QWindow>
 
 #include "app/window.hpp"
 
 int main(int argc, char *argv[])
 {
-    QApplication dash(argc, argv);
-    QPixmap pixmap(":/splash.png");
-    QSplashScreen *splash = new QSplashScreen(pixmap);
-    splash.show();
-    splash->showFullScreen();
-    QStringList args = dash.arguments();
+     QApplication dash(argc, argv);
+     QSplashScreen splash;
 
-    DashWindow window;
-    window.setWindowIcon(QIcon(":/logo.png"));
-    window.setWindowFlags(Qt::FramelessWindowHint);
+     QStringList args = dash.arguments();
+     bool use_fixed_size = (args.size() > 2);
 
-    QSize size = dash.primaryScreen()->size();
-    if (args.size() > 2)
-        size = QSize(args.at(1).toInt(), args.at(2).toInt());
-    else
-        window.setWindowState(Qt::WindowFullScreen);
+     QSize size = dash.primaryScreen()->size();
+     if (use_fixed_size)
+         size = QSize(args.at(1).toInt(), args.at(2).toInt());
 
-    // force to either screen or custom size
-    window.setFixedSize(size);
-    window.show();
-    delete splash;
+     splash.setPixmap(QPixmap(":/splash.png").scaled(size, Qt::KeepAspectRatio));
+     splash.show();
+     dash.processEvents();
 
-    return dash.exec();
+     DashWindow window;
+     window.setWindowIcon(QIcon(":/logo.png"));
+     window.setWindowFlags(Qt::FramelessWindowHint);
+     if (!use_fixed_size)
+         window.setWindowState(Qt::WindowFullScreen);
+
+     // force to either screen or custom size
+     window.setFixedSize(size);
+     window.show();
+     splash.finish(&window);
+
+     return dash.exec();
 }
