@@ -13,6 +13,10 @@ Dialog::Dialog(bool fullscreen, QWidget *parent) : QDialog(parent, Qt::Frameless
     this->setAttribute(Qt::WA_TranslucentBackground, true);
 
     this->fullscreen = fullscreen;
+    if (this->fullscreen)
+        this->setModal(true);
+
+    this->scale = Config::get_instance()->get_scale();
 
     QHBoxLayout *layout = new QHBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
@@ -28,14 +32,11 @@ Dialog::Dialog(bool fullscreen, QWidget *parent) : QDialog(parent, Qt::Frameless
 
 void Dialog::open(int timeout)
 {
-    if (this->fullscreen) {
-        this->exec();
-    }
-    else {
-        this->show();
-        if (timeout > 0)
-            this->timer->start(timeout);
-    }
+    this->show();
+    this->raise();
+    this->activateWindow();
+    if (timeout > 0)
+        this->timer->start(timeout);
 }
 
 QWidget *Dialog::content_widget()
@@ -72,83 +73,51 @@ void Dialog::set_position()
         }
         else {
             QWidget *window = parent->window();
-            QPoint center = parent->mapToGlobal(parent->rect().center());
+            QPoint window_center = window->mapToGlobal(window->rect().center());
+            QPoint parent_center = parent->mapToGlobal(parent->rect().center());
 
-            int offset = std::ceil(4 * Config::get_instance()->get_scale());
+            int offset = std::ceil(4 * this->scale);
 
             QPoint pivot;
-            if (center.y() > (window->height() / 2)) {
-                pivot = (center.x() > (window->width() / 2)) ? this->rect().bottomRight() : this->rect().bottomLeft();
+            if (parent_center.y() > window_center.y()) {
+                pivot = (parent_center.x() > window_center.x()) ? this->rect().bottomRight() : this->rect().bottomLeft();
                 pivot.ry() += (parent->height() / 2) + offset;
             }
             else {
-                pivot = (center.x() > (window->width() / 2)) ? this->rect().topRight() : this->rect().topLeft();
+                pivot = (parent_center.x() > window_center.x()) ? this->rect().topRight() : this->rect().topLeft();
                 pivot.ry() -= (parent->height() / 2) + offset;
             }
-            if (center.x() > (window->width() / 2))
+            if (parent_center.x() > window_center.x())
                 pivot.rx() -= this->width() / 2;
             else
                 pivot.rx() += this->width() / 2;
-            point = this->mapFromGlobal(center) - pivot;
+            point = this->mapFromGlobal(parent_center) - pivot;
         }
         this->move(point);
     }
-    this->position_set = true;
 }
-
-// void Dialog::set_position()
-// {
-//     if (QWidget *parent = this->parentWidget()) {
-//         QPoint point;
-//         if (this->fullscreen) {
-//             point = parent->geometry().center() - this->rect().center();
-//         }
-//         else {
-//             QWidget *window = parent->window();
-//             QPoint window_center = window->mapToGlobal(window->rect().center());
-//             QPoint parent_center = parent->mapToGlobal(parent->rect().center());
-
-//             int offset = std::ceil(4 * Config::get_instance()->get_scale());
-
-//             QPoint pivot;
-//             if (parent_center.y() > window_center.y()) {
-//                 pivot = (parent_center.x() > window_center.x()) ? this->rect().bottomRight() : this->rect().bottomLeft();
-//                 pivot.ry() += (parent->height() / 2) + offset;
-//             }
-//             else {
-//                 pivot = (parent_center.x() > window_center.x()) ? this->rect().topRight() : this->rect().topLeft();
-//                 pivot.ry() -= (parent->height() / 2) + offset;
-//             }
-//             if (parent_center.x() > window_center.x())
-//                 pivot.rx() -= this->width() / 2;
-//             else
-//                 pivot.rx() += this->width() / 2;
-//             point = this->mapFromGlobal(parent_center) - pivot;
-//         }
-//         this->move(point);
-//     }
-// }
 
 void Dialog::keyPressEvent(QKeyEvent *event)
 {
-    if (event->key() != Qt::Key_Escape || this->fullscreen) QDialog::keyPressEvent(event);
+    if (event->key() != Qt::Key_Escape || this->fullscreen)
+        QDialog::keyPressEvent(event);
 }
 
 void Dialog::showEvent(QShowEvent *event)
 {
+    // set to null position
+    this->move(QPoint());
     QWidget::showEvent(event);
 
-    if (!this->position_set) {
-        if (this->fullscreen) {
-            if (QWidget *parent = this->parentWidget()) {
-                int margin = std::ceil(48 * Config::get_instance()->get_scale()) * 2;
-                this->setFixedWidth(std::min(this->width(), parent->width() - margin));
-                this->setFixedHeight(std::min(this->height(), parent->height() - margin));
-            }
+    if (this->fullscreen) {
+        if (QWidget *parent = this->parentWidget()) {
+            int margin = std::ceil(48 * this->scale) * 2;
+            this->setFixedWidth(std::min(this->width(), parent->width() - margin));
+            this->setFixedHeight(std::min(this->height(), parent->height() - margin));
         }
-
-        this->set_position();
     }
+
+    this->set_position();
 }
 
 bool Dialog::eventFilter(QObject *object, QEvent *event)
