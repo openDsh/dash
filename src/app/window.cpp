@@ -336,8 +336,7 @@ QWidget *DashWindow::power_control()
     connect(restart, &QPushButton::clicked, [config = this->config]() {
         config->save();
         sync();
-        if (system("shutdown -r now") < 0)
-            qApp->exit();
+        system("sudo shutdown -r now");
     });
     layout->addWidget(restart);
 
@@ -348,8 +347,7 @@ QWidget *DashWindow::power_control()
     connect(power_off, &QPushButton::clicked, [config = this->config]() {
         config->save();
         sync();
-        if (system("shutdown -h now") < 0)
-            qApp->exit();
+        system("sudo shutdown -h now");
     });
     layout->addWidget(power_off);
 
