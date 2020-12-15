@@ -96,7 +96,7 @@ QPushButton:disabled {
 }
 
 QPushButton:!flat {
-    background-color: rgb(48, 48, 48);
+    background-color: rgb(50, 50, 50);
 }
 
 QPushButton:!flat:checked {
@@ -275,5 +275,5 @@ QDialog > QFrame {
 }
 
 *[add_hint="true"] {
-    background-color: rgba(255, 255, 255, 28);
+    background-color: rgba(255, 255, 255, 31);
 }
