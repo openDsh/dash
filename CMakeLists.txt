@@ -134,3 +134,5 @@ target_link_libraries(dash
     ${TAGLIB_LIBRARIES}
     ${X11_LIBRARIES}
     )
+
+install(TARGETS dash DESTINATION bin)
