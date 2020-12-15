@@ -110,7 +110,7 @@ QIcon Theme::themed_button_icon(QIcon icon, QAbstractButton *button)
     {
         QColor color(base_color);
         if (!button->property("page").isNull())
-            color.setAlpha(this->mode ? 102 : 178);
+            color.setAlpha(this->mode ? 134 : 162);
         normal_off.fill(color);
         normal_off.setMask(icon_mask);
     }
