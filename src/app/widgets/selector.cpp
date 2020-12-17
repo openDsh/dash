@@ -7,8 +7,10 @@
 #include "app/theme.hpp"
 
 Selector::Selector(QList<QString> options, QString current, QFont font, QWidget *parent, QString placeholder) :
-        QWidget(parent), options(options), font(font), placeholder(placeholder)
+        QWidget(parent), options(options), placeholder(placeholder)
 {
+    this->setFont(font);
+
     this->set_state();
     this->current_idx = std::max(0, this->options.indexOf(current));
 

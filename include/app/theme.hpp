@@ -11,10 +11,6 @@
 #include <QScrollerProperties>
 #include <QString>
 #include <QVariant>
-#include <tuple>
-
-typedef QPair<QWidget *, QIcon> tab_icon_t;
-typedef std::tuple<QPushButton *, QIcon, QSize> button_icon_t;
 
 class Theme : public QObject {
     Q_OBJECT

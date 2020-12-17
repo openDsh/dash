@@ -75,7 +75,7 @@ QString Gauge::null_value()
 
 VehiclePage::VehiclePage(QWidget *parent) : QTabWidget(parent)
 {
-    this->tabBar()->setFont(Theme::font_16);
+    this->tabBar()->setFont(Theme::font_14);
     this->addTab(new DataTab(this), "Data");
     this->config = Config::get_instance();
 

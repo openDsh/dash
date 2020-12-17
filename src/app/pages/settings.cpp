@@ -22,7 +22,7 @@
 
 SettingsPage::SettingsPage(QWidget *parent) : QTabWidget(parent)
 {
-    this->tabBar()->setFont(Theme::font_16);
+    this->tabBar()->setFont(Theme::font_14);
 
     this->addTab(new MainSettingsTab(this), "Main");
     this->addTab(new LayoutSettingsTab(this), "Layout");

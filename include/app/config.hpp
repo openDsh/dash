@@ -189,7 +189,7 @@ class Config : public QObject {
    private:
     QMap<QString, QWidget *> quick_views;
 
-    QSettings ia_config;
+    QSettings settings;
     int volume;
     bool dark_mode;
     int brightness;

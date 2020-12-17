@@ -13,7 +13,7 @@
 
 MediaPage::MediaPage(QWidget *parent) : QTabWidget(parent)
 {
-    this->tabBar()->setFont(Theme::font_16);
+    this->tabBar()->setFont(Theme::font_14);
 
     // this->addTab(new RadioPlayerTab(this), "Radio");
     this->addTab(new BluetoothPlayerTab(this), "Bluetooth");

@@ -23,7 +23,6 @@ class Selector : public QWidget {
 
    private:
     QList<QString> options;
-    QFont font;
     int current_idx;
     QString placeholder;
 
@@ -34,10 +33,10 @@ class Selector : public QWidget {
 
     inline void update_label()
     {
-        QFont italicized(this->font);
-        italicized.setItalic(true);
+        QFont styled_font(this->label->font());
+        styled_font.setItalic(this->placeholder == this->get_current());
 
-        this->label->setFont((this->placeholder == this->get_current()) ? italicized : this->font);
+        this->label->setFont(styled_font);
         this->label->setText(this->get_current());
     }
 
