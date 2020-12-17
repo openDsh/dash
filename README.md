@@ -1,7 +1,9 @@
 # OpenDash
 
 OpenDash is a Qt-based infotainment center for your Linux OpenAuto installation!
-Main features include:
+The OpenDash project includes OpenAuto, AASDK, and Dash.
+
+Main features of Dash include:
 
 *	Embedded OpenAuto `Windowed/Fullscreen`
 *	Wireless OpenAuto Capability
