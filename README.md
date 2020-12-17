@@ -5,11 +5,11 @@ Main features include:
 
 *	Embedded OpenAuto `Windowed/Fullscreen`
 *	Wireless OpenAuto Capability
-*	On-screen Volume Control
+*	On-screen Volume, Brightness, & Theme Control
 *	Responsive Scalable UI `Adjustable for screen size`
 *	Bluetooth Media Control
-*	Real-Time Vehicle OBD-II Data `Read-Only`
-*	Theming `Dark/Light mode` `Selectable Accent Colors (Fire, Azure, Lilac, Jade, Rose, Steel)`
+*	Real-Time Vehicle OBD-II Data & SocketCAN Capabilities
+*	Theming `Dark/Light mode` `Customizable RGB Accent Color`
 *	True Raspberry Pi 7” Official Touchscreen Brightness Control
 *	App-Launcher built in
 *	Camera Access `Streaming/Local` `Backup` `Dash`
