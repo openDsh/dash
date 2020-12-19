@@ -49,6 +49,8 @@ class LayoutSettingsTab : public QWidget {
 
    private:
     QWidget *settings_widget();
+    QWidget *default_page_widget();
+    QWidget *default_page_select_widget();
     QWidget *pages_widget();
     QWidget *controls_bar_widget();
     QWidget *quick_view_row_widget();

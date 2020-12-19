@@ -157,8 +157,9 @@ void DashWindow::add_pages()
     this->add_page("Settings", new SettingsPage(this), "tune");
 
     // toggle initial page
+    QString default_page = this->config->get_default_page();
     for (QAbstractButton *button : this->rail_group->buttons()) {
-        if (!button->isHidden()) {
+        if (!button->isHidden() && default_page == button->property("page").value<QWidget *>()->objectName()) {
             button->setChecked(true);
             break;
         }

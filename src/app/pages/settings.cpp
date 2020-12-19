@@ -278,6 +278,8 @@ QWidget *LayoutSettingsTab::settings_widget()
     QWidget *widget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
 
+    layout->addWidget(this->default_page_widget());
+    layout->addWidget(Theme::br(widget), 1);
     layout->addWidget(this->pages_widget());
     layout->addWidget(Theme::br(widget), 1);
     layout->addWidget(this->controls_bar_widget(), 1);
@@ -296,6 +298,41 @@ QWidget *LayoutSettingsTab::settings_widget()
     scroll_area->setWidget(widget);
 
     return scroll_area;
+}
+
+QWidget *LayoutSettingsTab::default_page_widget()
+{
+    QWidget *widget = new QWidget(this);
+    QHBoxLayout *layout = new QHBoxLayout(widget);
+
+    QLabel *label = new QLabel("Default Page", widget);
+    label->setFont(Theme::font_14);
+    layout->addWidget(label, 1);
+
+    layout->addWidget(this->default_page_select_widget(), 1);
+
+    return widget;
+}
+
+QWidget *LayoutSettingsTab::default_page_select_widget()
+{
+    QWidget *widget = new QWidget(this);
+    QHBoxLayout *layout = new QHBoxLayout(widget);
+
+    DashWindow *window = qobject_cast<DashWindow *>(this->window());
+
+    QList<QString> pages;
+    for (QAbstractButton *page : window->get_pages()) {
+        pages.append(page->property("page").value<QWidget *>()->objectName());
+    }
+    Selector *selector = new Selector(pages, this->config->get_default_page(), Theme::font_14, widget);
+    connect(selector, &Selector::item_changed, [config = this->config](QString item) { config->set_default_page(item); });
+
+    layout->addStretch(1);
+    layout->addWidget(selector, 10);
+    layout->addStretch(1);
+
+    return widget;
 }
 
 QWidget *LayoutSettingsTab::pages_widget()

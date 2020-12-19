@@ -45,6 +45,7 @@ Config::Config()
     this->vehicle_plugin = this->settings.value("Vehicle/plugin", QString()).toString();
     this->vehicle_can_bus = this->settings.value("Vehicle/can_bus", false).toBool();
     this->vehicle_interface = this->settings.value("Vehicle/interface", QString()).toString();
+    this->default_page = this->settings.value("default_page", "Android Auto").toString();
     this->settings.beginGroup("Pages");
     for (auto key : this->settings.childKeys())
         this->pages[key] = this->settings.value(key, true).toBool();
@@ -128,6 +129,8 @@ void Config::save()
         this->settings.setValue("Vehicle/can_bus", this->vehicle_can_bus);
     if (this->vehicle_interface != this->settings.value("Vehicle/interface").toString())
         this->settings.setValue("Vehicle/interface", this->vehicle_interface);
+    if (this->default_page != this->settings.value("default_page").toString())
+        this->settings.setValue("default_page", this->default_page);
     for (auto id : this->pages.keys()) {
         QString config_key = QString("Pages/%1").arg(id);
         bool page_enabled = this->pages[id];
