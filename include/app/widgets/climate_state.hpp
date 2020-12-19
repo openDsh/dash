@@ -29,7 +29,7 @@ class ClimateState : public QFrame {
     bool body_state = false;
     bool feet_state = false;
 
-    Config *config;
+    double scale;
 
     QPixmap climate_ref;
     QPixmap defrost;

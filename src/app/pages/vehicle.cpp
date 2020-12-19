@@ -93,7 +93,7 @@ QString Gauge::null_value()
 
 VehiclePage::VehiclePage(QWidget *parent) : QTabWidget(parent)
 {
-    this->tabBar()->setFont(Theme::font_16);
+    this->tabBar()->setFont(Theme::font_14);
     this->addTab(new DataTab(this), "Data");
     this->config = Config::get_instance();
 
@@ -105,17 +105,17 @@ VehiclePage::VehiclePage(QWidget *parent) : QTabWidget(parent)
 
     this->get_plugins();
     this->active_plugin = new QPluginLoader(this);
-    this->dialog = new Dialog(true, this->window());
-    this->dialog->set_body(this->dialog_body());
+    Dialog *dialog = new Dialog(true, this->window());
+    dialog->set_body(this->dialog_body());
     QPushButton *load_button = new QPushButton("load");
     connect(load_button, &QPushButton::clicked, [this]() { this->load_plugin(); });
-    this->dialog->set_button(load_button);
+    dialog->set_button(load_button);
 
     QPushButton *settings_button = new QPushButton(this);
     settings_button->setFlat(true);
     settings_button->setIconSize(Theme::icon_24);
     settings_button->setIcon(Theme::get_instance()->make_button_icon("settings", settings_button));
-    connect(settings_button, &QPushButton::clicked, [this]() { this->dialog->open(); });
+    connect(settings_button, &QPushButton::clicked, [dialog]() { dialog->open(); });
     this->setCornerWidget(settings_button);
 
     this->load_plugin();
@@ -127,7 +127,7 @@ QWidget *VehiclePage::dialog_body()
     QVBoxLayout *layout = new QVBoxLayout(widget);
 
     QStringList plugins = this->plugins.keys();
-    this->plugin_selector = new Selector(plugins, this->config->get_vehicle_plugin(), Theme::font_14, widget, true);
+    this->plugin_selector = new Selector(plugins, this->config->get_vehicle_plugin(), Theme::font_14, widget, "unloader");
 
     layout->addWidget(this->can_bus_toggle_row(), 1);
     layout->addWidget(this->interface_selector_row(), 1);

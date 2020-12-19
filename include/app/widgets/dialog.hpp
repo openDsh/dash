@@ -50,6 +50,7 @@ class Dialog : public QDialog {
     QHBoxLayout *buttons;
     QTimer *timer;
     bool fullscreen;
+    double scale;
 
     QWidget *content_widget();
     void set_position();

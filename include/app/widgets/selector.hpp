@@ -9,28 +9,36 @@ class Selector : public QWidget {
     Q_OBJECT
 
    public:
-    Selector(QList<QString> options, QString current, QFont font, QWidget *parent = nullptr, bool add_null = false);
+    Selector(QList<QString> options, QString current, QFont font, QWidget *parent = nullptr, QString placeholder = QString());
 
-    inline QString get_current() { return this->options.value(this->current_idx, QString()); }
-    inline void set_options(QList<QString> options, bool add_null = false)
+    inline QString get_current() { return (this->options.size() > 0) ? this->options.value(this->current_idx, this->placeholder) : QString(); }
+    inline void set_options(QList<QString> options)
     {
         this->options = options;
-        if (add_null)
-            this->options.insert(0, QString());
-        this->setEnabled(this->options.size() > 0);
+        this->set_state();
         this->current_idx = 0;
-        this->label->setText(this->get_current());
+        this->update_label();
         emit item_changed(this->get_current());
     }
 
    private:
     QList<QString> options;
-    QFont font;
     int current_idx;
+    QString placeholder;
 
     QLabel *label;
 
     QLayout *selector();
+    void set_state();
+
+    inline void update_label()
+    {
+        QFont styled_font(this->label->font());
+        styled_font.setItalic(this->placeholder == this->get_current());
+
+        this->label->setFont(styled_font);
+        this->label->setText(this->get_current());
+    }
 
    signals:
     void item_changed(QString item);

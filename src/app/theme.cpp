@@ -51,6 +51,8 @@ Theme::Theme() : QObject(qApp), palette()
     QFontDatabase::addApplicationFont(":/fonts/Montserrat/Montserrat-LightItalic.ttf");
     QFontDatabase::addApplicationFont(":/fonts/Montserrat/Montserrat-Regular.ttf");
 
+    qApp->setFont(Theme::font_14);
+
     this->stylesheets["light"] = this->parse_stylesheet(":/stylesheets/light.qss");
     this->stylesheets["dark"] = this->parse_stylesheet(":/stylesheets/dark.qss");
 }
@@ -114,7 +116,7 @@ QIcon Theme::themed_button_icon(QIcon icon, QAbstractButton *button)
     {
         QColor color(base_color);
         if (!button->property("page").isNull())
-            color.setAlpha(this->mode ? 102 : 178);
+            color.setAlpha(this->mode ? 134 : 162);
         normal_off.fill(color);
         normal_off.setMask(icon_mask);
     }
@@ -145,7 +147,8 @@ QIcon Theme::make_button_icon(QString name, QPushButton *button, QString alt_nam
     if (!alt_name.isNull())
         button->setProperty("alt_icon", QVariant::fromValue(QIcon(QString(":/icons/%1.svg").arg(alt_name))));
 
-    return this->themed_button_icon(QIcon(QString(":/icons/%1.svg").arg(name)), button);
+    button->setProperty("themed_icon", true);
+    return QIcon(QString(":/icons/%1.svg").arg(name));
 }
 
 void Theme::update()
@@ -160,10 +163,12 @@ void Theme::update()
 
         QAbstractButton *button = qobject_cast<QAbstractButton*>(widget);
         if ((button != nullptr) && !button->icon().isNull()) {
-            button->setIcon(this->themed_button_icon(button->icon(), button));
             QVariant base_icon_size = button->property("base_icon_size");
-            if (base_icon_size.isValid())
+            if (base_icon_size.isValid()) {
                 button->setIconSize(base_icon_size.value<QSize>() * this->scale);
+                if (!button->property("themed_icon").isNull())
+                    button->setIcon(this->themed_button_icon(button->icon(), button));
+            }
         }
     }
 

@@ -11,10 +11,6 @@
 #include <QScrollerProperties>
 #include <QString>
 #include <QVariant>
-#include <tuple>
-
-typedef QPair<QWidget *, QIcon> tab_icon_t;
-typedef std::tuple<QPushButton *, QIcon, QSize> button_icon_t;
 
 class Theme : public QObject {
     Q_OBJECT
@@ -50,17 +46,9 @@ class Theme : public QObject {
     Theme();
 
     inline bool get_mode() { return this->mode; }
-    inline void set_mode(bool mode)
-    {
-        this->mode = mode;
-        this->update();
-    }
+    inline void set_mode(bool mode) { this->mode = mode; }
 
-    inline void set_scale(double scale)
-    {
-        this->scale = scale;
-        this->update();
-    }
+    inline void set_scale(double scale) { this->scale = scale; }
 
     QIcon make_button_icon(QString name, QPushButton *button, QString alt_name = QString());
     void update();

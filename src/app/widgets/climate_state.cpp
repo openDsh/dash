@@ -9,12 +9,13 @@
 ClimateState::ClimateState(QWidget *parent) : QFrame(parent), climate_ref(QIcon(":/icons/climate_ref.svg").pixmap(512, 512)), defrost(QIcon(":/icons/defrost.svg").pixmap(512, 512)), body(QIcon(":/icons/chevron_right.svg").pixmap(512, 512)), feet(QIcon(":/icons/expand_more.svg").pixmap(512, 512))
 {
     this->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-    this->config = Config::get_instance();
+
+    this->scale = Config::get_instance()->get_scale();
 }
 
 QSize ClimateState::sizeHint() const
 {
-    int size = 52 * this->config->get_scale();
+    int size = 52 * this->scale;
     return QSize(size, size);
 }
 
@@ -22,9 +23,7 @@ void ClimateState::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
 
-    double scale = this->config->get_scale();
-
-    int ref_size = 52 * scale;
+    int ref_size = 52 * this->scale;
     int state_size = ref_size / 3;
 
     int x_offset = std::max(0, (this->width() - ref_size) / 2);

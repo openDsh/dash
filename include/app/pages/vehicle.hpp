@@ -65,7 +65,6 @@ class VehiclePage : public QTabWidget {
     QStringList serial_devices;
     QPluginLoader *active_plugin;
     Selector *plugin_selector;
-    Dialog *dialog;
     Config *config;
 };
 

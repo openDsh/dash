@@ -14,7 +14,7 @@
 #include "app/config.hpp"
 #include "app/pages/settings.hpp"
 #include "app/theme.hpp"
-#include "app/widgets/color_label.hpp"
+#include "app/widgets/color_picker.hpp"
 #include "app/widgets/selector.hpp"
 #include "app/widgets/switch.hpp"
 #include "app/window.hpp"
@@ -22,7 +22,7 @@
 
 SettingsPage::SettingsPage(QWidget *parent) : QTabWidget(parent)
 {
-    this->tabBar()->setFont(Theme::font_16);
+    this->tabBar()->setFont(Theme::font_14);
 
     this->addTab(new MainSettingsTab(this), "Main");
     this->addTab(new LayoutSettingsTab(this), "Layout");
@@ -85,6 +85,7 @@ QWidget *MainSettingsTab::dark_mode_row_widget()
     connect(toggle, &Switch::stateChanged, [theme = this->theme, config = this->config](bool state) {
         config->set_dark_mode(state);
         theme->set_mode(state);
+        theme->update();
     });
     Shortcut *shortcut = new Shortcut(this->config->get_shortcut("dark_mode_toggle"), this->window());
     this->shortcuts->add_shortcut("dark_mode_toggle", "Toggle Dark Mode", shortcut);
@@ -200,10 +201,10 @@ QWidget *MainSettingsTab::color_select_widget()
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
-    ColorLabel *label = new ColorLabel(Theme::icon_16, Theme::font_14, widget);
+    ColorPicker *label = new ColorPicker(Theme::icon_16, Theme::font_14, widget);
     label->scale(this->config->get_scale());
     connect(this->config, &Config::scale_changed, [label](double scale) { label->scale(scale); });
-    connect(label, &ColorLabel::color_changed, [this](QColor color) {
+    connect(label, &ColorPicker::color_changed, [this](QColor color) {
         this->config->set_color(color.name());
         this->theme->update();
     });
@@ -540,8 +541,6 @@ QWidget *BluetoothSettingsTab::devices_widget()
         });
         this->devices[device] = button;
         layout->addWidget(button);
-        qApp->processEvents();
-        this->theme->update();
     });
     connect(this->bluetooth, &Bluetooth::device_changed, [this](BluezQt::DevicePtr device) {
         this->devices[device]->setText(device->name());

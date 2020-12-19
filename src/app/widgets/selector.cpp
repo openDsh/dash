@@ -6,14 +6,15 @@
 #include "app/widgets/selector.hpp"
 #include "app/theme.hpp"
 
-Selector::Selector(QList<QString> options, QString current, QFont font, QWidget *parent, bool add_null) :
-        QWidget(parent), options(options), font(font)
+Selector::Selector(QList<QString> options, QString current, QFont font, QWidget *parent, QString placeholder) :
+        QWidget(parent), options(options), placeholder(placeholder)
 {
-    if (this->options.size() == 0)
-        this->setEnabled(false);
-    if (add_null)
-        this->options.insert(0, QString());
-    this->current_idx = this->options.indexOf(current);
+    this->label = new QLabel(this);
+    this->label->setAlignment(Qt::AlignCenter);
+    this->label->setFont(font);
+
+    this->set_state();
+    this->current_idx = std::max(0, this->options.indexOf(current));
 
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->addLayout(this->selector());
@@ -23,10 +24,7 @@ QLayout *Selector::selector()
 {
     QHBoxLayout *layout = new QHBoxLayout();
 
-    this->label = new QLabel(this);
-    this->label->setText(this->get_current());
-    this->label->setAlignment(Qt::AlignCenter);
-    this->label->setFont(this->font);
+    this->update_label();
 
     QPushButton *left_button = new QPushButton();
     left_button->setFlat(true);
@@ -35,7 +33,7 @@ QLayout *Selector::selector()
     connect(left_button, &QPushButton::clicked, [this]() {
         int count = this->options.size();
         this->current_idx = ((this->current_idx - 1) % count + count) % count;
-        this->label->setText(this->get_current());
+        this->update_label();
         emit item_changed(this->get_current());
     });
 
@@ -45,7 +43,7 @@ QLayout *Selector::selector()
     right_button->setIcon(Theme::get_instance()->make_button_icon("arrow_right", right_button));
     connect(right_button, &QPushButton::clicked, [this]() {
         this->current_idx = (this->current_idx + 1) % this->options.size();
-        this->label->setText(this->get_current());
+        this->update_label();
         emit item_changed(this->get_current());
     });
 
@@ -54,4 +52,16 @@ QLayout *Selector::selector()
     layout->addWidget(right_button);
 
     return layout;
+}
+
+void Selector::set_state()
+{
+    if (this->options.size() == 0) {
+        this->setEnabled(false);
+    }
+    else {
+        this->setEnabled(true);
+        if (!this->placeholder.isNull())
+            this->options.insert(0, this->placeholder);
+    }
 }

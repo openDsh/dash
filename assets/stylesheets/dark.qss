@@ -19,7 +19,7 @@ QLabel:disabled {
 QTabWidget::pane {
     background-color: transparent;
     border: none;
-    border-top: 2px solid rgb(33, 33, 33);
+    border-top: 2px solid rgb(66, 66, 66);
 }
 
 QTabBar::tab {
@@ -96,7 +96,7 @@ QPushButton:disabled {
 }
 
 QPushButton:!flat {
-    background-color: rgb(42, 42, 42);
+    background-color: rgb(50, 50, 50);
 }
 
 QPushButton:!flat:checked {
@@ -110,13 +110,13 @@ QPushButton:!flat:disabled {
 
 QFrame[frameShape="4"][frameShadow="16"],
 QFrame[frameShape="5"][frameShadow="16"] {
-    color: rgba(255, 255, 255, 31);
+    color: rgba(255, 255, 255, 66);
 }
 
 QListWidget {
-    background-color: rgb(25, 25, 25);
+    background-color: rgb(46, 46, 46); 
     color: rgb(255, 255, 255);
-    border: none;
+    border: 2px solid rgb(66, 66, 66);
 }
 
 QListView {
@@ -263,17 +263,17 @@ ClimateState {
 
 QDialog,
 QDialog > QFrame {
-    background-color: rgb(41, 41, 41);
+    background-color: rgb(56, 56, 56);
     border-radius: 8px;
-    border: 2px solid rgb(48, 48, 48);
+    border: 2px solid rgb(66, 66, 66);
 }
 
 #ControlsBar {
-    background-color: rgb(33, 33, 33);
+    background-color: rgb(48, 48, 48);
     border-top-left-radius: 6px;
     border-top-right-radius: 6px;
 }
 
 *[add_hint="true"] {
-    background-color: rgba(255, 255, 255, 12);
+    background-color: rgba(255, 255, 255, 31);
 }

@@ -7,37 +7,30 @@
 #include "app/widgets/dialog.hpp"
 #include "app/theme.hpp"
 
-class ColorLabel : public QWidget {
+class ColorPicker : public QWidget {
     Q_OBJECT
 
    public:
-    ColorLabel(QSize block_size, QFont font, QWidget *parent = nullptr);
+    ColorPicker(QSize block_size, QFont font, QWidget *parent = nullptr);
 
     void scale(double scale);
     void update(QColor color);
-
-   protected:
-    void mouseReleaseEvent(QMouseEvent *) override { this->dialog->open(); }
 
    private:
     QSlider *r_slider;
     QSlider *g_slider;
     QSlider *b_slider;
 
-    Dialog *dialog;
-
-    QSize block_size;
     QFont font;
-    QLabel *icon;
     QFrame *color_hint;
-    QLabel *name;
+    QPushButton *button;
     QPalette hint_palette;
 
-    inline void set_pixmap(QLabel *icon)
+    inline void set_icon()
     {
-        QPixmap block(this->block_size);
+        QPixmap block(this->button->iconSize());
         block.fill(this->color());
-        icon->setPixmap(block);
+        this->button->setIcon(block);
     }
     inline QLayout *component_slider(QSlider *slider)
     {

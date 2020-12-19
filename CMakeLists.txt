@@ -140,4 +140,4 @@ target_link_libraries(dash
     ${X11_LIBRARIES}
     )
 
-
+install(TARGETS dash DESTINATION bin)

@@ -13,6 +13,10 @@ Dialog::Dialog(bool fullscreen, QWidget *parent) : QDialog(parent, Qt::Frameless
     this->setAttribute(Qt::WA_TranslucentBackground, true);
 
     this->fullscreen = fullscreen;
+    if (this->fullscreen)
+        this->setModal(true);
+
+    this->scale = Config::get_instance()->get_scale();
 
     QHBoxLayout *layout = new QHBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
@@ -28,14 +32,11 @@ Dialog::Dialog(bool fullscreen, QWidget *parent) : QDialog(parent, Qt::Frameless
 
 void Dialog::open(int timeout)
 {
-    if (this->fullscreen) {
-        this->exec();
-    }
-    else {
-        this->show();
-        if (timeout > 0)
-            this->timer->start(timeout);
-    }
+    this->show();
+    this->raise();
+    this->activateWindow();
+    if (timeout > 0)
+        this->timer->start(timeout);
 }
 
 QWidget *Dialog::content_widget()
@@ -75,7 +76,7 @@ void Dialog::set_position()
             QPoint window_center = window->mapToGlobal(window->rect().center());
             QPoint parent_center = parent->mapToGlobal(parent->rect().center());
 
-            int offset = std::ceil(4 * Config::get_instance()->get_scale());
+            int offset = std::ceil(4 * this->scale);
 
             QPoint pivot;
             if (parent_center.y() > window_center.y()) {
@@ -98,7 +99,8 @@ void Dialog::set_position()
 
 void Dialog::keyPressEvent(QKeyEvent *event)
 {
-    if (event->key() != Qt::Key_Escape || this->fullscreen) QDialog::keyPressEvent(event);
+    if (event->key() != Qt::Key_Escape || this->fullscreen)
+        QDialog::keyPressEvent(event);
 }
 
 void Dialog::showEvent(QShowEvent *event)
@@ -109,7 +111,7 @@ void Dialog::showEvent(QShowEvent *event)
 
     if (this->fullscreen) {
         if (QWidget *parent = this->parentWidget()) {
-            int margin = std::ceil(48 * Config::get_instance()->get_scale()) * 2;
+            int margin = std::ceil(48 * this->scale) * 2;
             this->setFixedWidth(std::min(this->width(), parent->width() - margin));
             this->setFixedHeight(std::min(this->height(), parent->height() - margin));
         }
