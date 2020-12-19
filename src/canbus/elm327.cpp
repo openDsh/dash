@@ -92,7 +92,7 @@ bool elm327::writeFrame(QCanBusFrame frame)
         }
         if(this->_write(ss.str())>=0){
             QCanBusFrame retFrame = this->receive();
-            if(retFrame.frameType()!=2){
+            if(retFrame.frameType()!=QCanBusFrame::ErrorFrame){
                 handleFrame(retFrame);
             }
         }

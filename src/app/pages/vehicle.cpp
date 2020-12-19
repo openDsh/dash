@@ -260,6 +260,13 @@ QWidget *DataTab::speedo_tach_widget()
     return widget;
 }
 
+/*  socketcan/elm327 rewrite right now only has support for one PID per gauge, so we can't calculate milage at this point.
+    This is because gauges act more as event handlers now for each PID. 
+    Multi-PID gauges could feasibly be reimplemented if there was a helper method that stored received values, and only calls
+    the gauge update once all values have been updated since last gauge update.
+
+*/
+
 // QWidget *DataTab::mileage_data_widget()
 // {
 //     QWidget *widget = new QWidget(this);

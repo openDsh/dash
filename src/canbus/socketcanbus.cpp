@@ -38,6 +38,7 @@ SocketCANBus *SocketCANBus::get_instance()
     return &bus;
 }
 
+// QSerialBus readAllFrames introduced in 5.12 - Pi OS is stuck on 5.11, so implement our own
 QVector<QCanBusFrame> SocketCANBus::readAllFrames(int numFrames){
     QVector<QCanBusFrame> frames = QVector<QCanBusFrame>();
     for(int i = 0; i<numFrames; i++){
