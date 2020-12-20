@@ -26,6 +26,13 @@ SettingsPage::SettingsPage(QWidget *parent) : QTabWidget(parent)
     this->addTab(new LayoutSettingsTab(this), "Layout");
     this->addTab(new BluetoothSettingsTab(this), "Bluetooth");
     this->addTab(new ActionsSettingsTab(this), "Actions");
+
+    QPushButton *save_button = new QPushButton(this);
+    save_button->setFlat(true);
+    save_button->setIconSize(Theme::icon_24);
+    save_button->setIcon(Theme::get_instance()->make_button_icon("save_alt", save_button));
+    connect(save_button, &QPushButton::clicked, []() { Config::get_instance()->save(); });
+    this->setCornerWidget(save_button);
 }
 
 MainSettingsTab::MainSettingsTab(QWidget *parent) : QWidget(parent)
