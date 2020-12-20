@@ -22,8 +22,6 @@
 
 SettingsPage::SettingsPage(QWidget *parent) : QTabWidget(parent)
 {
-    this->tabBar()->setFont(Theme::font_14);
-
     this->addTab(new MainSettingsTab(this), "Main");
     this->addTab(new LayoutSettingsTab(this), "Layout");
     this->addTab(new BluetoothSettingsTab(this), "Bluetooth");
@@ -73,7 +71,6 @@ QWidget *MainSettingsTab::dark_mode_row_widget()
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
     QLabel *label = new QLabel("Dark Mode", widget);
-    label->setFont(Theme::font_14);
     layout->addWidget(label, 1);
 
     Switch *toggle = new Switch(widget);
@@ -113,7 +110,6 @@ QWidget *MainSettingsTab::brightness_plugin_row_widget()
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
     QLabel *label = new QLabel("Brightness Plugin", widget);
-    label->setFont(Theme::font_14);
     layout->addWidget(label, 1);
 
     layout->addWidget(this->brightness_plugin_select_widget(), 1);
@@ -143,7 +139,6 @@ QWidget *MainSettingsTab::brightness_row_widget()
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
     QLabel *label = new QLabel("Brightness", widget);
-    label->setFont(Theme::font_14);
     layout->addWidget(label, 1);
 
     layout->addWidget(this->brightness_widget(), 1);
@@ -169,7 +164,6 @@ QWidget *MainSettingsTab::si_units_row_widget()
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
     QLabel *label = new QLabel("SI Units", widget);
-    label->setFont(Theme::font_14);
     layout->addWidget(label, 1);
 
     Switch *toggle = new Switch(widget);
@@ -188,7 +182,6 @@ QWidget *MainSettingsTab::color_row_widget()
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
     QLabel *label = new QLabel("Color", widget);
-    label->setFont(Theme::font_14);
     layout->addWidget(label, 1);
 
     layout->addWidget(this->color_select_widget(), 1);
@@ -222,7 +215,6 @@ QWidget *MainSettingsTab::mouse_row_widget()
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
     QLabel *label = new QLabel("Mouse", widget);
-    label->setFont(Theme::font_14);
     layout->addWidget(label, 1);
 
     Switch *toggle = new Switch(widget);
@@ -244,7 +236,6 @@ QWidget *MainSettingsTab::volume_row_widget()
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
     QLabel *label = new QLabel("Volume", widget);
-    label->setFont(Theme::font_14);
     layout->addWidget(label, 1);
 
     layout->addWidget(this->volume_widget(), 1);
@@ -306,7 +297,6 @@ QWidget *LayoutSettingsTab::pages_widget()
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
     QLabel *label = new QLabel("Pages", widget);
-    label->setFont(Theme::font_14);
     layout->addWidget(label, 1);
 
     QGroupBox *group = new QGroupBox(widget);
@@ -316,7 +306,6 @@ QWidget *LayoutSettingsTab::pages_widget()
 
     for (QAbstractButton *page : window->get_pages()) {
         QCheckBox *button = new QCheckBox(page->property("page").value<QWidget *>()->objectName(), group);
-        button->setFont(Theme::font_14);
         button->setChecked(!page->isHidden());
         connect(button, &QCheckBox::toggled, [page, config = this->config](bool checked) {
             config->set_page(page->property("page").value<QWidget *>(), checked);
@@ -335,7 +324,6 @@ QWidget *LayoutSettingsTab::controls_bar_widget()
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
     QLabel *label = new QLabel("Controls Bar", widget);
-    label->setFont(Theme::font_14);
     layout->addWidget(label, 1);
 
     Switch *toggle = new Switch(widget);
@@ -354,7 +342,6 @@ QWidget *LayoutSettingsTab::quick_view_row_widget()
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
     QLabel *label = new QLabel("Quick View", widget);
-    label->setFont(Theme::font_14);
     layout->addWidget(label, 1);
 
     layout->addWidget(this->quick_view_select_widget(), 1);
@@ -384,7 +371,6 @@ QWidget *LayoutSettingsTab::scale_row_widget()
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
     QLabel *label = new QLabel("Scale", widget);
-    label->setFont(Theme::font_14);
     layout->addWidget(label, 1);
 
     layout->addWidget(this->scale_widget(), 1);
@@ -449,13 +435,11 @@ QWidget *BluetoothSettingsTab::controls_widget()
     QVBoxLayout *layout = new QVBoxLayout(widget);
 
     QLabel *label = new QLabel("Media Player", widget);
-    label->setFont(Theme::font_14);
     layout->addStretch();
     layout->addWidget(label);
 
     QLabel *connected_device = new QLabel(this->bluetooth->get_media_player().first, widget);
     connected_device->setIndent(16);
-    connected_device->setFont(Theme::font_14);
     connect(this->bluetooth, &Bluetooth::media_player_changed,
             [connected_device](QString name, BluezQt::MediaPlayerPtr) { connected_device->setText(name); });
     layout->addWidget(connected_device);
@@ -472,7 +456,6 @@ QWidget *BluetoothSettingsTab::scanner_widget()
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
     QPushButton *button = new QPushButton("scan", widget);
-    button->setFont(Theme::font_14);
     button->setFlat(true);
     button->setCheckable(true);
     button->setEnabled(this->bluetooth->has_adapter()); // this could potentially be tricky
@@ -509,7 +492,6 @@ QWidget *BluetoothSettingsTab::devices_widget()
     for (BluezQt::DevicePtr device : this->bluetooth->get_devices()) {
         if (device->address() == this->config->get_bluetooth_device()) device->connectToDevice();
         QPushButton *button = new QPushButton(device->name(), widget);
-        button->setFont(Theme::font_14);
         button->setCheckable(true);
         if (device->isConnected()) button->setChecked(true);
         connect(button, &QPushButton::clicked, [config = this->config, button, device](bool checked = false) {
@@ -529,7 +511,6 @@ QWidget *BluetoothSettingsTab::devices_widget()
     }
     connect(this->bluetooth, &Bluetooth::device_added, [this, layout, widget](BluezQt::DevicePtr device) {
         QPushButton *button = new QPushButton(device->name(), widget);
-        button->setFont(Theme::font_14);
         button->setCheckable(true);
         if (device->isConnected()) button->setChecked(true);
         connect(button, &QPushButton::clicked, [button, device](bool checked = false) {
@@ -600,7 +581,6 @@ QWidget *ActionsSettingsTab::shortcut_row_widget(QString id, QString description
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
     QLabel *label = new QLabel(description, widget);
-    label->setFont(Theme::font_14);
 
     layout->addWidget(label, 1);
     layout->addWidget(this->shortcut_input_widget(id, shortcut), 1);
@@ -631,7 +611,9 @@ QWidget *ActionsSettingsTab::shortcut_input_widget(QString id, Shortcut *shortcu
     ShortcutInput *input = new ShortcutInput(shortcut->to_str(), widget);
     input->setProperty("add_hint", true);
     input->setFlat(true);
-    input->setFont(QFont("Titillium Web", 18));
+    QFont font(Theme::font_18);
+    font.setFamily("Titillium Web");
+    input->setFont(font);
     connect(input, &ShortcutInput::shortcut_updated, [this, id, symbol](QString shortcut) {
         if (shortcut.isEmpty()) {
             symbol->hide();

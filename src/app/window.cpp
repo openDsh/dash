@@ -23,8 +23,8 @@ DashWindow::DashWindow()
     this->theme = Theme::get_instance();
     this->shortcuts = Shortcuts::get_instance();
 
-    this->init_config();
     this->init_theme();
+    this->init_config();
 
     this->openauto = new OpenAutoPage(this);
     this->stack = new QStackedWidget(this);
@@ -224,10 +224,7 @@ QWidget *DashWindow::controls_bar()
     exit_button->setFlat(true);
     exit_button->setIconSize(Theme::icon_26);
     exit_button->setIcon(this->theme->make_button_icon("close", exit_button));
-    connect(exit_button, &QPushButton::clicked, [this]() {
-        this->config->save();
-        qApp->exit();
-    });
+    connect(exit_button, &QPushButton::clicked, []() { qApp->exit(); });
 
     layout->addLayout(this->quick_views());
     layout->addStretch();
