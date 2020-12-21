@@ -3,8 +3,10 @@
 #include <iomanip>
 #include <sstream>
 #include <string>
+#include <QByteArray>
 
 struct Message {
+    unsigned char length;
     unsigned char mode;
     unsigned char PID;
 };
@@ -27,19 +29,15 @@ struct Request : Message {
 
 struct Response : Message {
     bool success = true;
-    unsigned char A;
-    unsigned char B;
-    unsigned char C;
-    unsigned char D;
+    QByteArray data;
 
-    Response(std::string resp_str)
+    Response(QByteArray payload)
     {
-        this->mode = std::stoi(resp_str.substr(0, 2), nullptr, 16);
-        this->PID = std::stoi(resp_str.substr(2, 2), nullptr, 16);
-        this->A = std::stoi(resp_str.substr(4, 2), nullptr, 16);
-        if (resp_str.length() >= 8) this->B = std::stoi(resp_str.substr(6, 2), nullptr, 16);
-        if (resp_str.length() >= 10) this->C = std::stoi(resp_str.substr(8, 2), nullptr, 16);
-        if (resp_str.length() == 12) this->D = std::stoi(resp_str.substr(10, 2), nullptr, 16);
+        this->length = payload.at(0);
+        if(length > 0) this->mode = payload.at(1)-0x40;
+        if(length > 1) this->PID = payload.at(2);
+        if(length > 2) data = payload.mid(3);
+        
     }
 
     Response() { this->success = false; }
