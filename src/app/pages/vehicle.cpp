@@ -35,7 +35,7 @@ Gauge::Gauge(units_t units, QFont value_font, QFont unit_font, Gauge::Orientatio
     else
         layout = new QHBoxLayout(this);
 
-    value_label = new QLabel(this->null_value(), this);
+    QLabel *value_label = new QLabel(this->null_value(), this);
     value_label->setFont(value_font);
     value_label->setAlignment(Qt::AlignCenter);
 
@@ -52,10 +52,10 @@ Gauge::Gauge(units_t units, QFont value_font, QFont unit_font, Gauge::Orientatio
 
 
 
-    connect(config, &Config::si_units_changed, [this, units, unit_label](bool si) {
+    connect(config, &Config::si_units_changed, [this, units, unit_label, value_label](bool si) {
         this->si = si;
         unit_label->setText(this->si ? units.second : units.first);
-        this->value_label->setText(this->null_value());
+        value_label->setText(this->null_value());
     });
 
     layout->addStretch();
@@ -93,7 +93,6 @@ QString Gauge::null_value()
 
 VehiclePage::VehiclePage(QWidget *parent) : QTabWidget(parent)
 {
-    this->tabBar()->setFont(Theme::font_14);
     this->addTab(new DataTab(this), "Data");
     this->config = Config::get_instance();
 
@@ -243,14 +242,21 @@ QWidget *DataTab::speedo_tach_widget()
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
-    Gauge *speed = new Gauge({"mph", "km/h"}, QFont("Titillium Web", 72), QFont("Montserrat", 16, QFont::Light, true),
+    QFont value_font(Theme::font_72);	
+    value_font.setFamily("Titillium Web");	
+
+    QFont unit_font(Theme::font_16);	
+    unit_font.setWeight(QFont::Light);	
+    unit_font.setItalic(true);
+
+    Gauge *speed = new Gauge({"mph", "km/h"}, value_font, unit_font,
                              Gauge::BOTTOM, 100, {cmds.SPEED}, 0,
                              [](double x, bool si) { return si ? x : kph_to_mph(x); }, widget);
     layout->addWidget(speed);
     this->gauges.push_back(speed);
 
-    Gauge *rpm = new Gauge({"x1000rpm", "x1000rpm"}, QFont("Titillium Web", 72),
-                           QFont("Montserrat", 16, QFont::Light, true), Gauge::BOTTOM, 100, {cmds.RPM}, 1,
+    Gauge *rpm = new Gauge({"x1000rpm", "x1000rpm"}, value_font,
+                           unit_font, Gauge::BOTTOM, 100, {cmds.RPM}, 1,
                            [](double x, bool _) { return x / 1000.0; }, widget);
     layout->addWidget(rpm);
     this->gauges.push_back(rpm);
@@ -267,10 +273,17 @@ QWidget *DataTab::speedo_tach_widget()
 
 // QWidget *DataTab::mileage_data_widget()
 // {
-//     QWidget *widget = new QWidget(this);
-//     QHBoxLayout *layout = new QHBoxLayout(widget);
-
-//     Gauge *mileage = new Gauge({"mpg", "km/L"}, QFont("Titillium Web", 36), QFont("Montserrat", 14, QFont::Light, true),
+//     QWidget *widget = new QWidget(this);	
+//	   QHBoxLayout *layout = new QHBoxLayout(widget);	
+//		
+//	   QFont value_font(Theme::font_36);	
+//	   value_font.setFamily("Titillium Web");	
+//		
+//	   QFont unit_font(Theme::font_14);	
+//	   unit_font.setWeight(QFont::Light);	
+//	   unit_font.setItalic(true);
+//
+//     Gauge *mileage = new Gauge({"mpg", "km/L"}, value_font, unit_font,
 //                                Gauge::BOTTOM, 100, {cmds.SPEED, cmds.MAF}, 1,
 //                                [](std::vector<double> x, bool si) {
 //                                    return (si ? x[0] : kph_to_mph(x[0])) / (si ? gps_to_lph(x[1]) : gps_to_gph(x[1]));

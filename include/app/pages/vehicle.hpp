@@ -33,7 +33,6 @@ class Gauge : public QWidget {
 
     obd_decoder_t decoder;
     std::vector<Command> cmds;
-    std::map<int, double> dataMap;
 
 
     bool si;
