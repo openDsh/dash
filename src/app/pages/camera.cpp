@@ -27,19 +27,55 @@ CameraPage::CameraPage(QWidget *parent) : QWidget(parent)
 
     connect(this, &CameraPage::disconnected, [layout,this]() {
         layout->setCurrentIndex(0);
-        if (this->config->get_cam_autoconnect()) {
-            qDebug() << "Camera disconnected. Auto reconnect in" << this->config->get_cam_autoconnect_time_secs() << "seconds";
-            this->reconnect_message = this->status->text() + ". reconnecting in %1 ";
-            this->reconnect_in_secs = this->config->get_cam_autoconnect_time_secs();
-            this->reconnect_timer->start(1000);
-        }
+        this->disconnect_local_stream();
     });
     connect(this, &CameraPage::connected_local, [layout]() { layout->setCurrentIndex(1); });
     connect(this, &CameraPage::connected_network, [layout]() { layout->setCurrentIndex(2); });
 
     if (this->config->get_cam_autoconnect())
         this->connect_cam();
+
+    videoContainer_ = this->local_video_widget;
+
+    // videoContainer_ = nullptr;
+    
+
+    
+
 }
+
+void CameraPage::init_gstreamer_pipeline(std::string vidLaunchStr_)
+{
+    videoWidget_ = new QQuickWidget(videoContainer_);
+
+    surface_ = new QGst::Quick::VideoSurface;
+    videoWidget_->rootContext()->setContextProperty(QLatin1String("videoSurface"), surface_);
+    videoWidget_->setSource(QUrl("qrc:/camera_video.qml"));
+    videoWidget_->setResizeMode(QQuickWidget::SizeRootObjectToView); 
+
+    videoSink_ = surface_->videoSink();
+
+    GError* error = nullptr;
+    std::string vidLaunchStr = vidLaunchStr_+"! capsfilter caps=video/x-raw name=mycapsfilter";
+    OPENAUTO_LOG(info) << "[CameraPage] Created GStreamer Pipeline of `"<<vidLaunchStr<<"`";
+    vidPipeline_ = gst_parse_launch(vidLaunchStr.c_str(), &error);
+    GstBus* bus = gst_pipeline_get_bus(GST_PIPELINE(vidPipeline_));
+    gst_bus_add_watch(bus, (GstBusFunc)&CameraPage::busCallback, this);
+    gst_object_unref(bus);
+
+    GstElement* sink = QGlib::RefPointer<QGst::Element>(videoSink_);
+    g_object_set(sink, "force-aspect-ratio", false, nullptr);
+    g_object_set(sink, "sync", false, nullptr);
+    g_object_set(sink, "async", false, nullptr);
+
+    GstElement* capsFilter = gst_bin_get_by_name(GST_BIN(vidPipeline_), "mycapsfilter");
+    gst_bin_add(GST_BIN(vidPipeline_), GST_ELEMENT(sink));
+    gst_element_link(capsFilter, GST_ELEMENT(sink));
+
+    vidSrc_ = GST_APP_SRC(gst_bin_get_by_name(GST_BIN(vidPipeline_), "mysrc"));
+    gst_app_src_set_stream_type(vidSrc_, GST_APP_STREAM_TYPE_STREAM);
+}
+
 
 QWidget *CameraPage::connect_widget()
 {
@@ -100,6 +136,8 @@ QWidget *CameraPage::connect_widget()
 
 QWidget *CameraPage::local_camera_widget()
 {
+    videoContainer_ = this->local_video_widget;
+
     QWidget *widget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
     layout->setContentsMargins(0, 0, 0, 0);
@@ -111,15 +149,17 @@ QWidget *CameraPage::local_camera_widget()
     connect(disconnect, &QPushButton::clicked, [this]() {
         this->status->setText(QString());
         emit autoconnect_disabled();
-        this->local_cam->stop();
-        this->local_cam->unload();
-        this->local_cam->deleteLater();
+        emit disconnected();
+        // this->local_cam->stop();
+        // this->local_cam->unload();
+        // this->local_cam->deleteLater();
         this->local_cam = nullptr;
     });
     disconnect->setIcon(this->theme->make_button_icon("close", disconnect));
     layout->addWidget(disconnect, 0, Qt::AlignRight);
 
-    this->local_video_widget = new QCameraViewfinder(widget);
+    this->local_video_widget = new QWidget(widget);
+
     layout->addWidget(this->local_video_widget);
 
     return widget;
@@ -144,9 +184,8 @@ QWidget *CameraPage::network_camera_widget()
     disconnect->setIcon(this->theme->make_button_icon("close", disconnect));
     layout->addWidget(disconnect, 0, Qt::AlignRight);
 
-    QVideoWidget *video = new QVideoWidget(widget);
-    this->player->setVideoOutput(video);
-    layout->addWidget(video);
+    this->remote_video_widget = new QWidget(widget);
+    layout->addWidget(this->remote_video_widget);
 
     return widget;
 }
@@ -317,12 +356,98 @@ void CameraPage::update_network_status(QMediaPlayer::MediaStatus media_status)
 
 void CameraPage::connect_network_stream()
 {
+    videoContainer_ = this->remote_video_widget;
+
     connect(this->player, &QMediaPlayer::mediaStatusChanged,
             [this](QMediaPlayer::MediaStatus media_status) { this->update_network_status(media_status); });
     connect(this->player, QOverload<>::of(&QMediaPlayer::metaDataChanged), [this]() { emit connected_network(); });
     qInfo() << "playing stream: " << this->config->get_cam_network_url();
-    this->player->setMedia(QUrl(this->config->get_cam_network_url()));
-    this->player->play();
+
+    emit connected_network();
+
+    OPENAUTO_LOG(info) << "[CameraPage] Creating GStreamer pipeline with "<<this->config->get_cam_network_url().toStdString();
+    std::string pipeline = "rtspsrc location="+this->config->get_cam_network_url().toStdString() + " latency=100" +
+                           " ! queue " +
+                           " ! rtph264depay" +
+                           " ! h264parse" +
+                           #ifdef RPI
+                               #ifdef PI4
+                                               " ! v4l2h264dec"
+                               #else
+                                               " ! omxh264dec"
+                               #endif
+                           #else
+                                               " ! avdec_h264"
+                           #endif
+                           + " ! videoconvert ";
+    init_gstreamer_pipeline(pipeline);
+    //emit the connected signal before we resize anything, so that videoContainer has had time to resize to the proper dimensions
+    emit connected_network();
+    if(videoContainer_ == nullptr)
+    {
+        OPENAUTO_LOG(info) << "[CameraPage] No video container, setting projection fullscreen";
+        videoWidget_->setFocus();
+        videoWidget_->setWindowFlags(Qt::WindowStaysOnTopHint | Qt::FramelessWindowHint);
+        videoWidget_->showFullScreen();
+    }
+    else
+    {
+        OPENAUTO_LOG(info) << "[CameraPage] Resizing to video container";
+        videoWidget_->resize(videoContainer_->size());
+        OPENAUTO_LOG(info) << "[CameraPage] Size: "<< videoContainer_->width() << "x" << videoContainer_->height();
+
+    }
+    videoWidget_->show();
+
+    GstElement* capsFilter = gst_bin_get_by_name(GST_BIN(vidPipeline_), "mycapsfilter");
+    GstPad* convertPad = gst_element_get_static_pad(capsFilter, "sink");
+    gst_pad_add_probe(convertPad, GST_PAD_PROBE_TYPE_EVENT_DOWNSTREAM, &CameraPage::convertProbe, this, nullptr);
+    gst_element_set_state(vidPipeline_, GST_STATE_PLAYING);
+
+
+
+
+
+
+}
+
+GstPadProbeReturn CameraPage::convertProbe(GstPad* pad, GstPadProbeInfo* info, void*)
+{
+    GstEvent* event = GST_PAD_PROBE_INFO_EVENT(info);
+    if(GST_PAD_PROBE_INFO_TYPE(info) & GST_PAD_PROBE_TYPE_EVENT_DOWNSTREAM)
+    {
+        if(GST_EVENT_TYPE(event) == GST_EVENT_SEGMENT)
+        {
+            GstCaps* caps  = gst_pad_get_current_caps(pad);
+            if(caps != nullptr)
+            {
+                GstVideoInfo* vinfo = gst_video_info_new();
+                gst_video_info_from_caps(vinfo, caps);
+                OPENAUTO_LOG(info) << "[CameraPage] Video Width: " << vinfo->width;
+                OPENAUTO_LOG(info) << "[CameraPage] Video Height: " << vinfo->height;
+            }
+
+            return GST_PAD_PROBE_REMOVE;
+        }
+    }
+
+    return GST_PAD_PROBE_OK;
+}
+
+void CameraPage::disconnect_local_stream()
+{
+    OPENAUTO_LOG(info) << "[CameraPage] Disconnecting camera and destroying gstreamer pipeline";
+    GstElement* capsFilter = gst_bin_get_by_name(GST_BIN(vidPipeline_), "mycapsfilter");
+    GstPad* convertPad = gst_element_get_static_pad(capsFilter, "sink");
+    gst_pad_add_probe(convertPad, GST_PAD_PROBE_TYPE_EVENT_DOWNSTREAM, &CameraPage::convertProbe, this, nullptr);
+    gst_element_set_state(vidPipeline_, GST_STATE_NULL);
+    g_object_unref(vidPipeline_);
+    if (this->config->get_cam_autoconnect()) {
+            qDebug() << "Camera disconnected. Auto reconnect in" << this->config->get_cam_autoconnect_time_secs() << "seconds";
+            this->reconnect_message = this->status->text() + ". reconnecting in %1 ";
+            this->reconnect_in_secs = this->config->get_cam_autoconnect_time_secs();
+            this->reconnect_timer->start(1000);
+    }
 }
 
 void CameraPage::connect_local_stream()
@@ -331,26 +456,118 @@ void CameraPage::connect_local_stream()
         delete this->local_cam;
         this->local_cam = nullptr;
     }
-
     const QString &local = this->config->get_cam_local_device();
     if (!this->local_cam_available(local)) {
         this->status->setText("Camera unavailable");
         return;
     }
-
-    qDebug() << "Connecting to local cam " << local;
     this->local_cam = new QCamera(local.toUtf8(), this);
-    this->local_cam->setViewfinder(this->local_video_widget);
-    connect(this->local_cam, &QCamera::statusChanged, this, &CameraPage::update_local_status);
-    this->local_cam->start();
+    this->local_cam->load();
+    qDebug() << "Camera status: " << this->local_cam->status();
+
+    QSize res = this->choose_video_resolution();
+
+
+
+    OPENAUTO_LOG(info) << "[CameraPage] Creating GStreamer pipeline with "<<this->config->get_cam_local_device().toStdString();
+    std::string pipeline = "v4l2src device="+this->config->get_cam_local_device().toStdString() + 
+                           " ! jpegdec ! capsfilter caps=\"width=" + std::to_string(res.width()) + ", height="+std::to_string(res.height())+"\"" +
+                           " ! videoconvert ";
+    init_gstreamer_pipeline(pipeline);
+    //emit the connected signal before we resize anything, so that videoContainer has had time to resize to the proper dimensions
+    emit connected_local();
+    if(videoContainer_ == nullptr)
+    {
+        OPENAUTO_LOG(info) << "[CameraPage] No video container, setting projection fullscreen";
+        videoWidget_->setFocus();
+        videoWidget_->setWindowFlags(Qt::WindowStaysOnTopHint | Qt::FramelessWindowHint);
+        videoWidget_->showFullScreen();
+    }
+    else
+    {
+        OPENAUTO_LOG(info) << "[CameraPage] Resizing to video container";
+        videoWidget_->resize(videoContainer_->size());
+        OPENAUTO_LOG(info) << "[CameraPage] Size: "<< videoContainer_->width() << "x" << videoContainer_->height();
+
+    }
+    videoWidget_->show();
+
+    GstElement* capsFilter = gst_bin_get_by_name(GST_BIN(vidPipeline_), "mycapsfilter");
+    GstPad* convertPad = gst_element_get_static_pad(capsFilter, "sink");
+    gst_pad_add_probe(convertPad, GST_PAD_PROBE_TYPE_EVENT_DOWNSTREAM, &CameraPage::convertProbe, this, nullptr);
+    gst_element_set_state(vidPipeline_, GST_STATE_PLAYING);
+
+
+    // connect(this, &GSTVideoOutput::startPlayback, this, &GSTVideoOutput::onStartPlayback, Qt::QueuedConnection);
+    // connect(this, &GSTVideoOutput::stopPlayback, this, &GSTVideoOutput::onStopPlayback, Qt::QueuedConnection);
+
+
+    // if (this->local_cam != nullptr) {
+    //     delete this->local_cam;
+    //     this->local_cam = nullptr;
+    // }
+
+    // const QString &local = this->config->get_cam_local_device();
+    // if (!this->local_cam_available(local)) {
+    //     this->status->setText("Camera unavailable");
+    //     return;
+    // }
+
+    // qDebug() << "Connecting to local cam " << local;
+    // this->local_cam = new QCamera(local.toUtf8(), this);
+    // this->local_cam->setViewfinder(this->local_video_widget);
+    // QCameraViewfinderSettings viewfinderSettings;
+    // viewfinderSettings.setResolution(640, 480);
+    // viewfinderSettings.setMinimumFrameRate(15.0);
+    // viewfinderSettings.setMaximumFrameRate(30.0);
+
+    // local_cam->setViewfinderSettings(viewfinderSettings);
+    // connect(this->local_cam, &QCamera::statusChanged, this, &CameraPage::update_local_status);
+    // this->local_cam->start();
 }
 
-void CameraPage::choose_video_resolution()
+gboolean CameraPage::busCallback(GstBus*, GstMessage* message, gpointer*)
+{
+    gchar* debug;
+    GError* err;
+    gchar* name;
+
+    switch(GST_MESSAGE_TYPE(message))
+    {
+    case GST_MESSAGE_ERROR:
+        gst_message_parse_error(message, &err, &debug);
+        OPENAUTO_LOG(info) << "[CameraPage] Error " << err->message;
+        g_error_free(err);
+        g_free(debug);
+        break;
+    case GST_MESSAGE_WARNING:
+        gst_message_parse_warning(message, &err, &debug);
+        OPENAUTO_LOG(info) << "[CameraPage] Warning " << err->message << " | Debug " << debug;
+        name = (gchar*)GST_MESSAGE_SRC_NAME(message);
+        OPENAUTO_LOG(info) << "[CameraPage] Name of src " << (name ? name : "nil");
+        g_error_free(err);
+        g_free(debug);
+        break;
+    case GST_MESSAGE_EOS:
+        OPENAUTO_LOG(info) << "[CameraPage] End of stream";
+        break;
+    case GST_MESSAGE_STATE_CHANGED:
+    default:
+        break;
+    }
+
+    return TRUE;
+}
+
+QSize CameraPage::choose_video_resolution()
 {
     QSize window_size = this->size();
     QCameraImageCapture imageCapture(this->local_cam);
     int min_gap = 10000, xgap, ygap;
     QSize max_fit;
+    qDebug() <<"camera: "<<this->local_cam;
+
+    qDebug() <<"resolutions: "<<imageCapture.supportedResolutions();
     for (auto const &resolution : imageCapture.supportedResolutions()) {
         xgap = window_size.width() - resolution.width();
         ygap = window_size.height() - resolution.height();
@@ -358,6 +575,7 @@ void CameraPage::choose_video_resolution()
             min_gap = xgap + ygap;
             max_fit = resolution;
         }
+        qDebug() << "max fit: "<<max_fit;
     }
     if (max_fit.isValid()) {
         qDebug() << "Local cam auto resolution" << max_fit << "to fit in" << window_size;
@@ -371,6 +589,7 @@ void CameraPage::choose_video_resolution()
       qDebug() << "Overriding local cam format to" << this->config->get_cam_local_format_override();
     }
     this->local_cam->setViewfinderSettings(this->local_cam_settings);
+    return max_fit;
 }
 
 bool CameraPage::local_cam_available(const QString &device)
