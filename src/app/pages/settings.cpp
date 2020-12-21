@@ -2,6 +2,8 @@
 #include <BluezQt/PendingCall>
 #include <QLabel>
 #include <QScrollArea>
+#include <QSizePolicy>
+#include <QSpacerItem>
 
 #include <aasdk_proto/ButtonCodeEnum.pb.h>
 #include <aasdk_proto/VideoFPSEnum.pb.h>
@@ -278,8 +280,6 @@ QWidget *LayoutSettingsTab::settings_widget()
     QWidget *widget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
 
-    layout->addWidget(this->default_page_widget());
-    layout->addWidget(Theme::br(widget), 1);
     layout->addWidget(this->pages_widget());
     layout->addWidget(Theme::br(widget), 1);
     layout->addWidget(this->controls_bar_widget(), 1);
@@ -300,64 +300,180 @@ QWidget *LayoutSettingsTab::settings_widget()
     return scroll_area;
 }
 
-QWidget *LayoutSettingsTab::default_page_widget()
-{
-    QWidget *widget = new QWidget(this);
-    QHBoxLayout *layout = new QHBoxLayout(widget);
-
-    QLabel *label = new QLabel("Default Page", widget);
-    label->setFont(Theme::font_14);
-    layout->addWidget(label, 1);
-
-    layout->addWidget(this->default_page_select_widget(), 1);
-
-    return widget;
-}
-
-QWidget *LayoutSettingsTab::default_page_select_widget()
-{
-    QWidget *widget = new QWidget(this);
-    QHBoxLayout *layout = new QHBoxLayout(widget);
-
-    DashWindow *window = qobject_cast<DashWindow *>(this->window());
-
-    QList<QString> pages;
-    for (QAbstractButton *page : window->get_pages()) {
-        pages.append(page->property("page").value<QWidget *>()->objectName());
-    }
-    Selector *selector = new Selector(pages, this->config->get_default_page(), Theme::font_14, widget);
-    connect(selector, &Selector::item_changed, [config = this->config](QString item) { config->set_default_page(item); });
-
-    layout->addStretch(1);
-    layout->addWidget(selector, 10);
-    layout->addStretch(1);
-
-    return widget;
-}
-
 QWidget *LayoutSettingsTab::pages_widget()
 {
     QWidget *widget = new QWidget(this);
-    QHBoxLayout *layout = new QHBoxLayout(widget);
+    QVBoxLayout *layout = new QVBoxLayout(widget);
 
-    QLabel *label = new QLabel("Pages", widget);
-    layout->addWidget(label, 1);
+    QLabel *pages_label = new QLabel("Pages", widget);
+    pages_label->setFont(Theme::font_14);
+    layout->addWidget(pages_label, 1);
 
-    QGroupBox *group = new QGroupBox(widget);
-    QVBoxLayout *group_layout = new QVBoxLayout(group);
+    QWidget *horizontal_widget = new QWidget(widget);
+    QHBoxLayout *horizontal_layout = new QHBoxLayout(horizontal_widget);
+    layout->addWidget(horizontal_widget, 1);
 
-    DashWindow *window = qobject_cast<DashWindow *>(this->window());
+    // Left: Disabled pages list view
+    QListWidget *disabled_pages;
+    {
+        QWidget *container = new QWidget(horizontal_widget);
+        QVBoxLayout *container_layout = new QVBoxLayout(container);
+        horizontal_layout->addWidget(container, 1);
 
-    for (QAbstractButton *page : window->get_pages()) {
-        QCheckBox *button = new QCheckBox(page->property("page").value<QWidget *>()->objectName(), group);
-        button->setChecked(!page->isHidden());
-        connect(button, &QCheckBox::toggled, [page, config = this->config](bool checked) {
-            config->set_page(page->property("page").value<QWidget *>(), checked);
-        });
-        group_layout->addWidget(button);
+        QLabel *label = new QLabel("Disabled", container);
+        label->setFont(Theme::font_14);
+        container_layout->addWidget(label, 1);
+
+        disabled_pages = new QListWidget(container);
+        disabled_pages->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::MinimumExpanding);
+        container_layout->addWidget(disabled_pages, 1);
     }
 
-    layout->addWidget(group, 1, Qt::AlignHCenter);
+    // Middle: control buttons
+    QPushButton *enable_button;
+    QPushButton *set_home_button;
+    QPushButton *disable_button;
+    {
+        QWidget *container = new QWidget(horizontal_widget);
+        QVBoxLayout *container_layout = new QVBoxLayout(container);
+        horizontal_layout->addWidget(container);
+
+        // Add a spacer at the top with the same hiehgt as the labels so the buttons align with the list views
+        QFontMetrics font_metrics(Theme::font_14);
+        container_layout->addSpacerItem(new QSpacerItem(0, font_metrics.height()));
+
+        enable_button = new QPushButton(">", container);
+        enable_button->setEnabled(false);
+        container_layout->addWidget(enable_button);
+
+        set_home_button = new QPushButton("", container);
+        set_home_button->setEnabled(false);
+        set_home_button->setIcon(this->theme->make_button_icon("home", set_home_button));
+        container_layout->addWidget(set_home_button, 1);
+
+        disable_button = new QPushButton("<", container);
+        disable_button->setEnabled(false);
+        container_layout->addWidget(disable_button);
+    }
+
+    // Right: Enabled pages list view
+    QListWidget *enabled_pages;
+    {
+        QWidget *container = new QWidget(horizontal_widget);
+        QVBoxLayout *container_layout = new QVBoxLayout(container);
+        horizontal_layout->addWidget(container, 1);
+
+        QLabel *label = new QLabel("Enabled", container);
+        label->setFont(Theme::font_14);
+        container_layout->addWidget(label, 1);
+
+        enabled_pages = new QListWidget(container);
+        enabled_pages->setItemDelegate(new PageItemStyledDelegate());
+        enabled_pages->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::MinimumExpanding);
+        container_layout->addWidget(enabled_pages, 1);
+    }
+
+    // Connect signals
+
+    // Only allow one selected between both disabled and enabled list views.
+    // Enable and disable buttons depnding on what list the item is in.
+    connect(disabled_pages, &QListWidget::itemSelectionChanged,
+            [enabled_pages, disabled_pages, enable_button, set_home_button, disable_button]() {
+                QList<QListWidgetItem *> selected = disabled_pages->selectedItems();
+                if (!selected.isEmpty()) {
+                    enabled_pages->clearSelection();
+                    enable_button->setEnabled(true);
+                    set_home_button->setEnabled(false);
+                    disable_button->setEnabled(false);
+                }
+            });
+    connect(enabled_pages, &QListWidget::itemSelectionChanged,
+            [enabled_pages, disabled_pages, enable_button, set_home_button, disable_button, this]() {
+                QList<QListWidgetItem *> selected = enabled_pages->selectedItems();
+                if (!selected.isEmpty()) {
+                    disabled_pages->clearSelection();
+                    enable_button->setEnabled(false);
+                    disable_button->setEnabled(true);
+                }
+
+                // Only have the set home button enabled when only one item in the enabled pages is selected
+                // and that selected item isn't already the setup page.
+                set_home_button->setEnabled(selected.size() == 1 && selected[0]->text() != this->config->get_home_page());
+            });
+
+    // Enable and disable pages
+    connect(enable_button, &QPushButton::pressed, [disabled_pages, config = this->config]() {
+        QListWidgetItem *current = disabled_pages->currentItem();
+        if (current != nullptr) {
+            config->set_page(current->text(), true);
+        }
+    });
+    connect(disable_button, &QPushButton::pressed, [enabled_pages, this]() {
+        QListWidgetItem *current = enabled_pages->currentItem();
+        if (current != nullptr) {
+            QString page_name = current->text();
+
+            // If the page was disabled and that page is the current home page,
+            // then replace the home page with the first enabled.
+            if (this->config->get_home_page() == page_name) {
+                DashWindow *window = qobject_cast<DashWindow *>(this->window());
+
+                for (QAbstractButton *page : window->get_pages()) {
+                    if (!page->isHidden() && page->property("can_disable").value<bool>()) {
+                        QString page_name = page->property("page").value<QWidget *>()->objectName();
+                        config->set_home_page(page_name);
+                        break;
+                    }
+                }
+            }
+
+            this->config->set_page(page_name, false);
+        }
+    });
+
+    QIcon startup_icon = this->theme->make_icon("home");
+
+    // Update the items in the disabled and enabled list views
+    std::function<void()> update_lists = [disabled_pages, enabled_pages, enable_button, set_home_button, disable_button, startup_icon, this]() {
+        disabled_pages->clear();
+        enabled_pages->clear();
+
+        DashWindow *window = qobject_cast<DashWindow *>(this->window());
+
+        for (QAbstractButton *page : window->get_pages()) {
+            if (page->property("can_disable").value<bool>()) {
+                bool enabled = !page->isHidden();
+                QString page_name = page->property("page").value<QWidget *>()->objectName();
+
+                QListWidgetItem *item = new QListWidgetItem(page_name, enabled ? enabled_pages : disabled_pages);
+
+                if (enabled && this->config->get_home_page() == page_name) {
+                    item->setIcon(startup_icon);
+                }
+            }
+        }
+
+        enable_button->setEnabled(false);
+        set_home_button->setEnabled(false);
+        disable_button->setEnabled(false);
+    };
+
+    connect(set_home_button, &QPushButton::pressed, [enabled_pages, disabled_pages, this, update_lists]() {
+        QListWidgetItem *disabled_current = disabled_pages->currentItem();
+        if (disabled_current != nullptr) {
+            this->config->set_home_page(disabled_current->text());
+            update_lists();
+        }
+
+        QListWidgetItem *enabled_current = enabled_pages->currentItem();
+        if (enabled_current != nullptr) {
+            this->config->set_home_page(enabled_current->text());
+            update_lists();
+        }
+    });
+
+    connect(this->config, &Config::page_changed, update_lists);
+    update_lists();
 
     return widget;
 }

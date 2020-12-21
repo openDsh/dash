@@ -47,7 +47,7 @@ class DashWindow : public QMainWindow {
     void init_shortcuts();
     QLayout *body();
     void add_pages();
-    void add_page(QString name, QWidget *page, QString icon);
+    void add_page(QString name, QWidget *page, QString icon, bool can_disable = true);
 
     QWidget *controls_bar();
     QLayout *quick_views();

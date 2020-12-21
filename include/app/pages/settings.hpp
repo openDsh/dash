@@ -2,6 +2,7 @@
 
 #include <QMap>
 #include <QtWidgets>
+#include <QStyledItemDelegate>
 #include "openauto/Configuration/Configuration.hpp"
 
 #include "app/bluetooth.hpp"
@@ -41,6 +42,19 @@ class MainSettingsTab : public QWidget {
     Shortcuts *shortcuts;
 };
 
+class PageItemStyledDelegate: public QStyledItemDelegate {
+    Q_OBJECT
+
+public:
+    using QStyledItemDelegate::QStyledItemDelegate;
+
+    void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override {
+        QStyleOptionViewItem myOpt(option);
+        myOpt.decorationPosition = QStyleOptionViewItem::Right;
+        QStyledItemDelegate::paint(painter, myOpt, index);
+    }
+};
+
 class LayoutSettingsTab : public QWidget {
     Q_OBJECT
 
@@ -49,8 +63,6 @@ class LayoutSettingsTab : public QWidget {
 
    private:
     QWidget *settings_widget();
-    QWidget *default_page_widget();
-    QWidget *default_page_select_widget();
     QWidget *pages_widget();
     QWidget *controls_bar_widget();
     QWidget *quick_view_row_widget();

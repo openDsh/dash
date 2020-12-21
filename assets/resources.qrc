@@ -41,6 +41,7 @@
         <file>icons/climate_ref.svg</file>
         <file>icons/chevron_right.svg</file>
         <file>icons/defrost.svg</file>
+        <file>icons/home.svg</file>
         <file>icons/light/check.svg</file>
         <file>icons/dark/check.svg</file>
         <file>stylesheets/light.qss</file>
