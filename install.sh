@@ -159,8 +159,20 @@ else
   echo -e moving to aasdk '\n'
   cd aasdk
 
+  #create build directory
+  echo Creating aasdk build directory
+  mkdir build
+
+  if [[ $? -eq 0 ]]; then
+    echo -e aasdk build directory made
+  else
+    echo Unable to create aasdk build directory assuming it exists...
+  fi
+
+  cd build
+
   #beginning cmake
-  cmake -DCMAKE_BUILD_TYPE=Release
+  cmake -DCMAKE_BUILD_TYPE=Release ../
   if [[ $? -eq 0 ]]; then
       echo -e Aasdk CMake completed successfully'\n'
   else
@@ -189,7 +201,7 @@ else
     echo Aasdk install failed with code $?
     exit
   fi
-  cd ../dash
+  cd ../../dash
 fi
 
 
@@ -222,7 +234,7 @@ if [ $gstreamer = true ]; then
   cd qt-gstreamer
 
   #create build directory
-  echo creating Gstreamer build directory
+  echo Creating Gstreamer build directory
   mkdir build
 
   if [[ $? -eq 0 ]]; then
@@ -299,10 +311,20 @@ else
 
   cd openauto
 
+  #create build directory
+  echo Creating openauto build directory
+  mkdir build
   
+  if [[ $? -eq 0 ]]; then
+    echo -e openauto build directory made
+  else
+    echo Unable to create openauto build directory assuming it exists...
+  fi
+
+  cd build
 
   echo Beginning openauto cmake
-  cmake ${installArgs} -DGST_BUILD=true
+  cmake ${installArgs} -DGST_BUILD=true ../
   if [[ $? -eq 0 ]]; then
     echo -e Openauto CMake OK'\n'
   else
@@ -328,7 +350,7 @@ else
     echo Openauto make install failed with error code $?
     exit
   fi
-  cd ../dash
+  cd ../../dash
 fi
 
 
@@ -337,7 +359,10 @@ if [ $dash = false ]; then
 	echo -e Skipping dash'\n'
 else
 
+  #create build directory
+  echo Creating dash build directory
   mkdir build
+
   if [[ $? -eq 0 ]]; then
     echo -e dash build directory made
   else

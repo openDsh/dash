@@ -13,8 +13,6 @@ void LauncherPlugins::get_plugins()
 
 LauncherPlugins::LauncherPlugins(QWidget *parent) : QTabWidget(parent)
 {
-    this->tabBar()->setFont(Theme::font_16);
-
     this->get_plugins();
     this->dialog = new Dialog(true, this->window());
     this->dialog->set_body(this->dialog_body());
@@ -60,11 +58,9 @@ QWidget *LauncherPlugins::dialog_body()
 
     QLabel *label = new QLabel("active plugins", widget);
     label->setAlignment(Qt::AlignCenter);
-    label->setFont(Theme::font_14);
     layout->addWidget(label);
 
     this->active_plugins_list = new QListWidget(widget);
-    this->active_plugins_list->setFont(Theme::font_14);
     Theme::to_touch_scroller(this->active_plugins_list);
     connect(this->active_plugins_list, &QListWidget::itemClicked, [this](QListWidgetItem *item) {
         int idx = this->active_plugins_list->row(item);
@@ -100,7 +96,6 @@ QWidget *LauncherPage::load_msg()
     layout->setContentsMargins(0, 0, 0, 0);
 
     QLabel *label = new QLabel("load launcher plugin", widget);
-    label->setFont(Theme::font_14);
     label->setAlignment(Qt::AlignCenter);
 
     QHBoxLayout *layout2 = new QHBoxLayout();

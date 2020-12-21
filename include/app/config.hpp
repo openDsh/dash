@@ -19,6 +19,7 @@ class Config : public QObject {
 
    public:
     Config();
+    ~Config();
 
     static QDir plugin_dir(QString plugin)
     {
@@ -126,7 +127,7 @@ class Config : public QObject {
     inline void set_scale(double scale)
     {
         this->scale = scale;
-        emit scale_changed(this->scale);
+        // emit scale_changed(this->scale);
     }
 
     inline bool get_page(QWidget *page) { return this->pages.value(page->objectName(), true); }
@@ -189,7 +190,7 @@ class Config : public QObject {
    private:
     QMap<QString, QWidget *> quick_views;
 
-    QSettings ia_config;
+    QSettings settings;
     int volume;
     bool dark_mode;
     int brightness;

@@ -13,8 +13,6 @@
 
 MediaPage::MediaPage(QWidget *parent) : QTabWidget(parent)
 {
-    this->tabBar()->setFont(Theme::font_16);
-
     // this->addTab(new RadioPlayerTab(this), "Radio");
     this->addTab(new BluetoothPlayerTab(this), "Bluetooth");
     this->addTab(new LocalPlayerTab(this), "Local");
@@ -38,25 +36,19 @@ QWidget *BluetoothPlayerTab::track_widget()
     QVBoxLayout *layout = new QVBoxLayout(widget);
 
     QLabel *artist_hdr = new QLabel("Artist", widget);
-    artist_hdr->setFont(Theme::font_14);
     QLabel *artist = new QLabel((media_player != nullptr) ? media_player->track().artist() : QString(), widget);
-    artist->setFont(Theme::font_14);
     artist->setIndent(16);
     layout->addWidget(artist_hdr);
     layout->addWidget(artist);
 
     QLabel *album_hdr = new QLabel("Album", widget);
-    album_hdr->setFont(Theme::font_14);
     QLabel *album = new QLabel((media_player != nullptr) ? media_player->track().album() : QString(), widget);
-    album->setFont(Theme::font_14);
     album->setIndent(16);
     layout->addWidget(album_hdr);
     layout->addWidget(album);
 
     QLabel *title_hdr = new QLabel("Title", widget);
-    title_hdr->setFont(Theme::font_14);
     QLabel *title = new QLabel((media_player != nullptr) ? media_player->track().title() : QString(), widget);
-    title->setFont(Theme::font_14);
     title->setIndent(16);
     layout->addWidget(title_hdr);
     layout->addWidget(title);
@@ -147,7 +139,6 @@ QWidget *RadioPlayerTab::tuner_widget()
     QVBoxLayout *layout = new QVBoxLayout(widget);
 
     this->tuner->setParent(widget);
-    this->tuner->setFont(Theme::font_14);
 
     QLabel *station = new QLabel(QString::number(this->tuner->sliderPosition() / 10.0, 'f', 1), widget);
     station->setAlignment(Qt::AlignCenter);
@@ -231,7 +222,6 @@ LocalPlayerTab::LocalPlayerTab(QWidget *parent) : QWidget(parent)
     this->player->setPlaylist(playlist);
 
     this->path_label = new QLabel(this->config->get_media_home(), this);
-    this->path_label->setFont(Theme::font_14);
 
     QVBoxLayout *layout = new QVBoxLayout(this);
 
@@ -262,13 +252,11 @@ QWidget *LocalPlayerTab::playlist_widget()
     layout->addWidget(home_button, 0, Qt::AlignTop);
 
     QListWidget *folders = new QListWidget(widget);
-    folders->setFont(Theme::font_14);
     Theme::to_touch_scroller(folders);
     this->populate_dirs(root_path, folders);
     layout->addWidget(folders, 1);
 
     QListWidget *tracks = new QListWidget(widget);
-    tracks->setFont(Theme::font_14);
     Theme::to_touch_scroller(tracks);
     this->populate_tracks(root_path, tracks);
     connect(tracks, &QListWidget::itemClicked, [tracks, player = this->player](QListWidgetItem *item) {
@@ -305,7 +293,6 @@ QWidget *LocalPlayerTab::seek_widget()
     slider->setTracking(false);
     slider->setRange(0, 0);
     QLabel *value = new QLabel(LocalPlayerTab::durationFmt(slider->value()), widget);
-    value->setFont(Theme::font_14);
     connect(slider, &QSlider::sliderReleased,
             [player = this->player, slider]() { player->setPosition(slider->sliderPosition()); });
     connect(slider, &QSlider::sliderMoved,

@@ -23,8 +23,8 @@ DashWindow::DashWindow()
     this->theme = Theme::get_instance();
     this->shortcuts = Shortcuts::get_instance();
 
-    this->init_config();
     this->init_theme();
+    this->init_config();
 
     this->openauto = new OpenAutoPage(this);
     this->stack = new QStackedWidget(this);
@@ -224,10 +224,7 @@ QWidget *DashWindow::controls_bar()
     exit_button->setFlat(true);
     exit_button->setIconSize(Theme::icon_26);
     exit_button->setIcon(this->theme->make_button_icon("close", exit_button));
-    connect(exit_button, &QPushButton::clicked, [this]() {
-        this->config->save();
-        qApp->exit();
-    });
+    connect(exit_button, &QPushButton::clicked, []() { qApp->exit(); });
 
     layout->addLayout(this->quick_views());
     layout->addStretch();
@@ -308,6 +305,7 @@ QWidget *DashWindow::controls_widget()
         bool mode = !theme->get_mode();
         this->config->set_dark_mode(mode);
         this->theme->set_mode(mode);
+        this->theme->update();
     });
 
     layout->addWidget(volume, 1);
@@ -335,8 +333,7 @@ QWidget *DashWindow::power_control()
     connect(restart, &QPushButton::clicked, [config = this->config]() {
         config->save();
         sync();
-        if (system("shutdown -r now") < 0)
-            qApp->exit();
+        system("sudo shutdown -r now");
     });
     layout->addWidget(restart);
 
@@ -347,8 +344,7 @@ QWidget *DashWindow::power_control()
     connect(power_off, &QPushButton::clicked, [config = this->config]() {
         config->save();
         sync();
-        if (system("shutdown -h now") < 0)
-            qApp->exit();
+        system("sudo shutdown -h now");
     });
     layout->addWidget(power_off);
 

@@ -44,6 +44,7 @@ ColorPicker::ColorPicker(QSize block_size, QFont font, QWidget *parent) : QWidge
 void ColorPicker::scale(double scale)
 {
     this->color_hint->setFixedHeight(8 * scale);
+    this->color_hint->setPalette(this->hint_palette);
 }
 
 void ColorPicker::update(QColor color)

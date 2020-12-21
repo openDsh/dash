@@ -32,7 +32,7 @@ class StepMeter : public QFrame {
     int steps = 0;
     int bars = 0;
 
-    Config *config;
+    double scale;
 
     QColor base_color = Qt::transparent;
     QColor bar_color = Qt::transparent;

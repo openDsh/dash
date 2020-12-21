@@ -7,8 +7,12 @@
 #include "app/theme.hpp"
 
 Selector::Selector(QList<QString> options, QString current, QFont font, QWidget *parent, QString placeholder) :
-        QWidget(parent), options(options), font(font), placeholder(placeholder)
+        QWidget(parent), options(options), placeholder(placeholder)
 {
+    this->label = new QLabel(this);
+    this->label->setAlignment(Qt::AlignCenter);
+    this->label->setFont(font);
+
     this->set_state();
     this->current_idx = std::max(0, this->options.indexOf(current));
 
@@ -20,8 +24,6 @@ QLayout *Selector::selector()
 {
     QHBoxLayout *layout = new QHBoxLayout();
 
-    this->label = new QLabel(this);
-    this->label->setAlignment(Qt::AlignCenter);
     this->update_label();
 
     QPushButton *left_button = new QPushButton();
