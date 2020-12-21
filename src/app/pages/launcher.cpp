@@ -146,7 +146,6 @@ QWidget *LauncherPage::launcher_widget()
     QVBoxLayout *layout = new QVBoxLayout(widget);
 
     this->path_label = new QLabel(this->config->get_launcher_home(), this);
-    this->path_label->setFont(Theme::font_14);
 
     layout->addStretch(1);
     layout->addWidget(this->path_label, 1);
@@ -176,13 +175,11 @@ QWidget *LauncherPage::app_select_widget()
     layout->addWidget(home_button, 0, Qt::AlignTop);
 
     this->folders = new QListWidget(widget);
-    this->folders->setFont(Theme::font_14);
     Theme::to_touch_scroller(this->folders);
     this->populate_dirs(root_path);
     layout->addWidget(this->folders, 4);
 
     this->apps = new QListWidget(widget);
-    this->apps->setFont(Theme::font_14);
     Theme::to_touch_scroller(this->apps);
     this->populate_apps(root_path);
     connect(this->apps, &QListWidget::itemClicked, [this](QListWidgetItem *item) {
@@ -212,7 +209,6 @@ QWidget *LauncherPage::config_widget()
     QVBoxLayout *layout = new QVBoxLayout(widget);
 
     QCheckBox *checkbox = new QCheckBox("launch at startup", widget);
-    checkbox->setFont(Theme::font_14);
     checkbox->setChecked(this->config->get_launcher_auto_launch());
     connect(checkbox, &QCheckBox::toggled, [this, checkbox](bool checked) {
         this->config->set_launcher_auto_launch(checked);

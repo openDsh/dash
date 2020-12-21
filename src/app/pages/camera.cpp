@@ -47,10 +47,8 @@ QWidget *CameraPage::connect_widget()
     QVBoxLayout *layout = new QVBoxLayout(widget);
 
     QLabel *label = new QLabel("connect camera", widget);
-    label->setFont(Theme::font_14);
 
     this->status = new QLabel(widget);
-    this->status->setFont(Theme::font_14);
 
     QWidget *cam_stack_widget = new QWidget(widget);
     QStackedLayout *cam_stack = new QStackedLayout(cam_stack_widget);
@@ -58,7 +56,6 @@ QWidget *CameraPage::connect_widget()
     cam_stack->addWidget(this->network_cam_selector());
 
     QCheckBox *auto_reconnect_toggle = new QCheckBox("Automatically reconnect", this);
-    auto_reconnect_toggle->setFont(Theme::font_14);
     auto_reconnect_toggle->setLayoutDirection(Qt::RightToLeft);
     auto_reconnect_toggle->setChecked(this->config->get_cam_autoconnect());
     connect(auto_reconnect_toggle, &QCheckBox::toggled, [this](bool checked) {
@@ -71,7 +68,6 @@ QWidget *CameraPage::connect_widget()
     });
 
     QCheckBox *network_toggle = new QCheckBox("Network", this);
-    network_toggle->setFont(Theme::font_14);
     connect(network_toggle, &QCheckBox::toggled, [this, cam_stack](bool checked) {
         cam_stack->setCurrentIndex(checked? 1 : 0);
         this->status->clear();
@@ -155,7 +151,6 @@ QPushButton *CameraPage::connect_button()
 {
     QPushButton *connect_button = new QPushButton("connect", this);
     connect_button->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-    connect_button->setFont(Theme::font_14);
     connect_button->setFlat(true);
     connect(connect_button, &QPushButton::clicked, this, &CameraPage::connect_cam);
 
@@ -186,7 +181,6 @@ QWidget *CameraPage::local_cam_selector()
     QVBoxLayout *layout = new QVBoxLayout(widget);
 
     QLabel *label = new QLabel(widget);
-    label->setFont(Theme::font_14);
     label->setAlignment(Qt::AlignCenter);
     QWidget *selector = this->selector_widget(label);
     this->populate_local_cams();
@@ -207,7 +201,6 @@ QWidget *CameraPage::local_cam_selector()
 
     QHBoxLayout *refresh_row = new QHBoxLayout();
     QPushButton *refresh_button = new QPushButton(widget);
-    refresh_button->setFont(Theme::font_14);
     refresh_button->setFlat(true);
     refresh_button->setIcon(this->theme->make_button_icon("refresh", refresh_button));
 

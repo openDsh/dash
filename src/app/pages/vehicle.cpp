@@ -143,7 +143,6 @@ QWidget *VehiclePage::can_bus_toggle_row()
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
     QLabel *label = new QLabel("CAN Bus", widget);
-    label->setFont(Theme::font_14);
     layout->addWidget(label, 1);
 
     Switch *toggle = new Switch(widget);
@@ -164,7 +163,6 @@ QWidget *VehiclePage::interface_selector_row()
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
     QLabel *label = new QLabel("Interface", widget);
-    label->setFont(Theme::font_14);
     layout->addWidget(label, 1);
 
     QStringList devices = this->config->get_vehicle_can_bus() ? this->can_devices : this->serial_devices;
@@ -234,7 +232,7 @@ QWidget *DataTab::driving_data_widget()
     layout->addStretch();
     layout->addWidget(this->speedo_tach_widget());
     layout->addStretch();
-    layout->addWidget(Theme::br(widget));
+    // layout->addWidget(Theme::br(widget));
     // layout->addWidget(this->mileage_data_widget());
 
     return widget;
@@ -305,14 +303,25 @@ QWidget *DataTab::coolant_temp_widget()
     QWidget *widget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
 
+    QFont value_font(Theme::font_36);
+    value_font.setFamily("Titillium Web");
+
+    QFont unit_font(Theme::font_14);
+    unit_font.setWeight(QFont::Light);
+    unit_font.setItalic(true);
+
     Gauge *coolant_temp = new Gauge(
-        {"°F", "°C"}, QFont("Titillium Web", 36), QFont("Montserrat", 14, QFont::Light, true), Gauge::RIGHT, 5000,
+        {"°F", "°C"}, value_font, unit_font, Gauge::RIGHT, 5000,
         {cmds.COOLANT_TEMP}, 1, [](double x, bool si) { return si ? x : c_to_f(x); }, widget);
     layout->addWidget(coolant_temp);
     this->gauges.push_back(coolant_temp);
 
+    QFont label_font(Theme::font_14);
+    label_font.setWeight(QFont::Light);
+    label_font.setItalic(true);
+
     QLabel *coolant_temp_label = new QLabel("coolant", widget);
-    coolant_temp_label->setFont(QFont("Montserrat", 14, QFont::Light));
+    coolant_temp_label->setFont(label_font);
     coolant_temp_label->setAlignment(Qt::AlignHCenter);
     layout->addWidget(coolant_temp_label);
 
@@ -324,14 +333,24 @@ QWidget *DataTab::engine_load_widget()
     QWidget *widget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
 
+    QFont value_font(Theme::font_36);
+    value_font.setFamily("Titillium Web");
+
+    QFont unit_font(Theme::font_14);
+    unit_font.setWeight(QFont::Light);
+    unit_font.setItalic(true);
+
     Gauge *engine_load =
-        new Gauge({"%", "%"}, QFont("Titillium Web", 36), QFont("Montserrat", 14, QFont::Light, true), Gauge::RIGHT,
+        new Gauge({"%", "%"}, value_font, unit_font, Gauge::RIGHT,
                   500, {cmds.LOAD}, 1, [](double x, bool _) { return x; }, widget);
     layout->addWidget(engine_load);
     this->gauges.push_back(engine_load);
 
+    QFont label_font(Theme::font_14);
+    label_font.setWeight(QFont::Light);
+
     QLabel *engine_load_label = new QLabel("load", widget);
-    engine_load_label->setFont(QFont("Montserrat", 14, QFont::Light));
+    engine_load_label->setFont(label_font);
     engine_load_label->setAlignment(Qt::AlignHCenter);
     layout->addWidget(engine_load_label);
     return widget;

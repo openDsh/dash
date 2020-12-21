@@ -19,6 +19,7 @@ class Config : public QObject {
 
    public:
     Config();
+    ~Config();
 
     static QDir plugin_dir(QString plugin)
     {
