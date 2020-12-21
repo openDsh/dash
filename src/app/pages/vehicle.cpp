@@ -35,7 +35,7 @@ Gauge::Gauge(units_t units, QFont value_font, QFont unit_font, Gauge::Orientatio
     else
         layout = new QHBoxLayout(this);
 
-    QLabel *value_label = new QLabel(this->null_value(), this);
+    value_label = new QLabel(this->null_value(), this);
     value_label->setFont(value_font);
     value_label->setAlignment(Qt::AlignCenter);
 
@@ -52,7 +52,7 @@ Gauge::Gauge(units_t units, QFont value_font, QFont unit_font, Gauge::Orientatio
 
 
 
-    connect(config, &Config::si_units_changed, [this, units, unit_label, value_label](bool si) {
+    connect(config, &Config::si_units_changed, [this, units, unit_label](bool si) {
         this->si = si;
         unit_label->setText(this->si ? units.second : units.first);
         value_label->setText(this->null_value());
