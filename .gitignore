@@ -2,6 +2,7 @@
 ###############
 /bin
 /build
+/lib
 /nbproject
 /cmake-build-debug
 

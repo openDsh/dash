@@ -384,7 +384,7 @@ else
   echo Running Dash make
   make
   if [[ $? -eq 0 ]]; then
-      echo -e Dash make ok, executable can be found ../bin/ia
+      echo -e Dash make ok, executable can be found ../bin/dash
       echo
 
       #check and add usb rules for openauto if they dont exist
@@ -431,5 +431,5 @@ else
   #Start app
   echo Starting app
   cd ../bin
-  ./ia
+  ./dash
 fi

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5.1)
-project(ia CXX)
+project(dash CXX)
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
@@ -8,8 +8,10 @@ set(base_directory ${CMAKE_CURRENT_SOURCE_DIR})
 set(resources_directory ${base_directory}/assets)
 set(sources_directory ${base_directory}/src)
 set(include_directory ${base_directory}/include)
+set(plugins_directory ${base_directory}/plugins)
 include(${base_directory}/cmake_modules/functions.cmake)
 
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${base_directory}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${base_directory}/bin)
 set(EXECUTABLE_OUTPUT_PATH ${base_directory}/bin)
 
@@ -19,6 +21,7 @@ set(Boost_USE_STATIC_RUNTIME OFF)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake_modules/")
 SET(CMAKE_CXX_STANDARD 14)
+set(CMAKE_EXE_LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS} -rdynamic)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_INIT} -Wall -pedantic -fPIC")
 set(CMAKE_CXX_FLAGS_DEBUG "-g -O0")
 set(CMAKE_CXX_FLAGS_RELEASE "-g -O3")
@@ -78,13 +81,15 @@ link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
 
 file(GLOB_RECURSE source_files ${sources_directory}/*.cpp ${include_directory}/*.hpp ${resources_directory}/*.qrc)
 
-add_executable(ia ${source_files})
+add_subdirectory(plugins)
 
-target_include_directories(ia PRIVATE
+add_executable(dash ${source_files})
+
+target_include_directories(dash PRIVATE
     ${CMAKE_CURRENT_BINARY_DIR}
     )
 
-target_include_directories(ia SYSTEM PRIVATE
+target_include_directories(dash SYSTEM PRIVATE
     ${Qt5Multimedia_INCLUDE_DIRS}
     ${Qt5MultimediaWidgets_INCLUDE_DIRS}
     ${Qt5Widgets_INCLUDE_DIRS}
@@ -106,7 +111,7 @@ target_include_directories(ia SYSTEM PRIVATE
     ${include_directory}
     )
 
-target_link_libraries(ia
+target_link_libraries(dash
     aasdk_proto
     aasdk
     openauto
@@ -134,3 +139,5 @@ target_link_libraries(ia
     ${TAGLIB_LIBRARIES}
     ${X11_LIBRARIES}
     )
+
+install(TARGETS dash DESTINATION bin)

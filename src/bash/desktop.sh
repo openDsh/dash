@@ -11,7 +11,7 @@ rm /home/pi/Desktop/opendash
 sudo cp assets/icons/opendash.xpm /usr/share/pixmaps/opendash.xpm
 
 #copy executable to /usr/local/bin
-sudo cp bin/ia /usr/local/bin/ia
+sudo cp bin/dash /usr/local/bin/dash
 
 #create shortcut on dashboard
 echo "
@@ -19,7 +19,7 @@ echo "
 Name=OpenDash
 Comment=Open OpenDash
 Icon=/usr/share/pixmaps/opendash.xpm
-Exec=/usr/local/bin/ia
+Exec=/usr/local/bin/dash
 Type=Application
 Encoding=UTF-8
 Terminal=true

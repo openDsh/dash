@@ -26,4 +26,3 @@ class Tuner : public QSlider {
     Config *config;
     QColor color;
 };
-

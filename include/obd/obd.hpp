@@ -34,4 +34,3 @@ class OBD {
 
     bool connected = false;
 };
-

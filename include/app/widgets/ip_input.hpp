@@ -34,4 +34,3 @@ class IpInput : public QWidget {
     QElapsedTimer *reset_timer;
     Theme *theme;
 };
-
