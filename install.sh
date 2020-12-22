@@ -14,7 +14,6 @@ display_help() {
     echo "   --gstreamer      install and build gstreamer "
     echo "   --dash           install and build dash "
     echo
-    exit 1
 }
 
 #location of OS details for linux
