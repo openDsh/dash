@@ -17,15 +17,8 @@ Main features of Dash include:
 *	Camera Access `Streaming/Local` `Backup` `Dash`
 *	Keyboard Shortcuts `GPIO Triggerable`
 
-![home](https://github.com/robert5974/dash/blob/develop/docs/imgs/IA_openauto_tab_USB_connectedmaps.PNG)
+![home](https://github.com/robert5974/dash/blob/develop/docs/imgs/opendash-ui.gif)
 
-![openauto_music](https://github.com/robert5974/dash/blob/develop/docs/imgs/IA_openauto_tab_USB_connectedmusic.PNG)
-
-![media](https://github.com/robert5974/intelligent-auto/blob/master/docs/imgs/media.png)
-
-![data](https://github.com/robert5974/intelligent-auto/blob/master/docs/imgs/data.png)
-
-![settings](https://github.com/robert5974/intelligent-auto/blob/master/docs/imgs/settings.png)
 
 # Getting Started
 
