@@ -134,11 +134,11 @@ class Config : public QObject {
     inline void set_home_page(QString home_page) { this->home_page = home_page; }
 
     inline QMap<QString, bool> get_pages() { return this->pages; }
-    inline bool get_page(QString page_name) { return this->pages.value(page_name, true); }
-    inline void set_page(QString page_name, bool enabled)
+    inline bool get_page(QWidget *page) { return this->pages.value(page->objectName(), true); }
+    inline void set_page(QWidget *page, bool enabled)
     {
-        this->pages[page_name] = enabled;
-        emit page_changed(page_name, enabled);
+        this->pages[page->objectName()] = enabled;
+        emit page_changed(page, enabled);
     }
 
     inline QString get_cam_network_url() { return this->cam_network_url; }
@@ -242,7 +242,7 @@ class Config : public QObject {
     void quick_view_changed(QString quick_view);
     void controls_bar_changed(bool controls_bar);
     void scale_changed(double scale);
-    void page_changed(QString page_name, bool enabled);
+    void page_changed(QWidget *page, bool enabled);
     void cam_autoconnect_changed(bool enabled);
     void vehicle_can_bus_changed(bool state);
     void vehicle_interface_changed(QString interface);

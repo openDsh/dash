@@ -38,14 +38,11 @@ DashWindow::DashWindow()
     connect(this->openauto, &OpenAutoPage::toggle_fullscreen, [this](QWidget *widget) { this->add_widget(widget); });
 
     connect(this->config, &Config::scale_changed, [theme = this->theme](double scale) { theme->set_scale(scale); });
-    connect(this->config, &Config::page_changed, [rail_group = this->rail_group](QString page_name, bool enabled) {
-        for (QAbstractButton *button : rail_group->buttons()) {
-            if (button->property("page").value<QWidget *>()->objectName() == page_name) {
+    connect(this->config, &Config::page_changed,
+            [rail_group = this->rail_group, pages = this->pages](QWidget *page, bool enabled) {
+                QAbstractButton *button = rail_group->button(pages->indexOf(page));
                 button->setVisible(enabled);
-                break;
-            }
-        }
-    });
+            });
 
     this->init_ui();
     this->init_shortcuts();
@@ -157,7 +154,7 @@ void DashWindow::add_pages()
     this->add_page("Vehicle", new VehiclePage(this), "directions_car");
     this->add_page("Camera", new CameraPage(this), "camera");
     this->add_page("Launcher", new LauncherPage(this), "widgets");
-    this->add_page("Settings", new SettingsPage(this), "tune", false);
+    this->add_page("Settings", new SettingsPage(this), "tune");
 
     // Toggle home page
     QString home_page = this->config->get_home_page();
@@ -180,13 +177,12 @@ void DashWindow::add_pages()
     });
 }
 
-void DashWindow::add_page(QString name, QWidget *page, QString icon, bool can_disable)
+void DashWindow::add_page(QString name, QWidget *page, QString icon)
 {
     page->setObjectName(name);
 
     QPushButton *button = new QPushButton();
     button->setProperty("page", QVariant::fromValue(page));
-    button->setProperty("can_disable", QVariant::fromValue(can_disable));
     button->setCheckable(true);
     button->setFlat(true);
     button->setIconSize(Theme::icon_32);
@@ -203,7 +199,7 @@ void DashWindow::add_page(QString name, QWidget *page, QString icon, bool can_di
     this->rail_group->addButton(button, idx);
     this->rail->addWidget(button);
 
-    button->setVisible(this->config->get_page(name));
+    button->setVisible(this->config->get_page(page));
 }
 
 QWidget *DashWindow::controls_bar()
