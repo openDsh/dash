@@ -17,7 +17,7 @@ Main features of Dash include:
 *	Camera Access `Streaming/Local` `Backup` `Dash`
 *	Keyboard Shortcuts `GPIO Triggerable`
 
-![](https://github.com/robert5974/dash/blob/develop/docs/imgs/opendash-ui.gif)
+![](docs/imgs/opendash-ui.gif)
 
 
 # Getting Started
