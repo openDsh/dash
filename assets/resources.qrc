@@ -1,7 +1,7 @@
 <RCC>
     <qresource prefix="/">
         <file>aa_video.qml</file>
-		<file>splash.png</file>
+	    	<file>splash.png</file>
         <file>icons/play.svg</file>
         <file>icons/pause.svg</file>
         <file>icons/brightness_low.svg</file>

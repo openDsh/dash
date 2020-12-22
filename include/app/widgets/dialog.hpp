@@ -10,20 +10,6 @@
 
 #include "app/theme.hpp"
 
-class Overlay : public QWidget {
-    Q_OBJECT
-
-   public:
-    Overlay(QWidget *parent = nullptr) : QWidget(parent) { this->setAttribute(Qt::WA_NoSystemBackground, true); }
-
-   protected:
-    inline void paintEvent(QPaintEvent *) { QPainter(this).fillRect(this->rect(), {0, 0, 0, 108}); }
-    inline void mouseReleaseEvent(QMouseEvent *) { emit close(); }
-
-   signals:
-    void close();
-};
-
 class Dialog : public QDialog {
     Q_OBJECT
 
@@ -34,25 +20,24 @@ class Dialog : public QDialog {
     inline void set_title(QString str)
     {
         QLabel *label = new QLabel(str, this);
-        label->setFont(QFont("Montserrat", 18, QFont::Bold));
+        QFont font(Theme::font_18);
+        font.setBold(true);
+        label->setFont(font);
         this->title->addWidget(label);
-        qApp->processEvents();
-        Theme::get_instance()->update();
     }
-    inline void set_body(QWidget *widget)
+    inline void set_body(QWidget *widget, bool tight = false)
     {
+        if (!tight)
+            this->setMinimumSize(widget->size());
         this->body->addWidget(widget);
-        qApp->processEvents();
-        Theme::get_instance()->update();
     }
     inline void set_button(QPushButton *button)
     {
-        if (!this->overlay_enabled && this->fullscreen) this->add_cancel_button();
-        button->setFont(Theme::font_16);
+        if (this->buttons->count() == 0)
+            this->add_cancel_button();
         button->setFlat(true);
         this->buttons->addWidget(button, 0, Qt::AlignRight);
-        qApp->processEvents();
-        Theme::get_instance()->update();
+        connect(button, &QPushButton::clicked, [this]() { this->close(); });
     }
 
    protected:
@@ -66,18 +51,31 @@ class Dialog : public QDialog {
     QHBoxLayout *buttons;
     QTimer *timer;
     bool fullscreen;
-    bool overlay_enabled = false;
+    double scale;
 
     QWidget *content_widget();
     void set_position();
 
     inline void add_cancel_button()
     {
+        this->buttons->addStretch();
+
         QPushButton *button = new QPushButton("cancel", this);
-        button->setFont(Theme::font_16);
         button->setFlat(true);
         connect(button, &QPushButton::clicked, [this]() { this->close(); });
         this->buttons->addWidget(button, 0, Qt::AlignRight);
     }
 };
 
+class SnackBar : public Dialog {
+    Q_OBJECT
+
+   public:
+    SnackBar() : Dialog(false, get_ref()) {}
+
+   protected:
+    void resizeEvent(QResizeEvent* event);
+
+   private:
+    QWidget *get_ref();
+};

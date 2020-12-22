@@ -2,39 +2,54 @@
 
 #include "openauto/Configuration/Configuration.hpp"
 
+#include <QCoreApplication>
+#include <QDir>
+#include <QFileInfo>
 #include <QFrame>
 #include <QKeySequence>
+#include <QPluginLoader>
 #include <QObject>
 #include <QSettings>
 #include <QString>
 #include <QWidget>
-
-#include "app/modules/brightness.hpp"
+#include <QVideoFrame>
 
 class Config : public QObject {
     Q_OBJECT
 
    public:
     Config();
+    ~Config();
+
+    static QDir plugin_dir(QString plugin)
+    {
+        QDir plugin_dir(QCoreApplication::applicationDirPath());
+        plugin_dir.cdUp();
+        plugin_dir.cd("lib");
+        plugin_dir.cd("plugins");
+        plugin_dir.cd(plugin);
+
+        return plugin_dir;
+    }
+
+    static QString fmt_plugin(QString plugin)
+    {
+        plugin.remove(0, 3);
+        plugin.replace("_", " ");
+
+        return plugin;
+    }
 
     void save();
 
     inline int get_volume() { return this->volume; }
-    inline void set_volume(int volume)
-    {
-        this->volume = volume;
-        emit volume_changed(this->volume);
-    }
+    void set_volume(int volume);
 
     inline bool get_dark_mode() { return this->dark_mode; }
     inline void set_dark_mode(bool dark_mode) { this->dark_mode = dark_mode; }
 
     inline int get_brightness() { return this->brightness; }
-    inline void set_brightness(int brightness)
-    {
-        this->brightness = brightness;
-        emit brightness_changed(this->brightness);
-    }
+    void set_brightness(int brightness);
 
     inline bool get_si_units() { return this->si_units; }
     inline void set_si_units(bool si_units)
@@ -43,8 +58,20 @@ class Config : public QObject {
         emit si_units_changed(this->si_units);
     }
 
-    inline QString get_color() { return this->color; }
-    inline void set_color(QString color) { this->color = color; }
+    inline QString get_color_light() { return this->color_light; }
+    inline void set_color_light(QString color) { this->color_light = color; }
+
+    inline QString get_color_dark() { return this->color_dark; }
+    inline void set_color_dark(QString color) { this->color_dark = color; }
+
+    inline QColor get_color() { return QColor(this->dark_mode ? this->color_dark : this->color_light); }
+    inline void set_color(QColor color)
+    {
+        if(this->dark_mode)
+            this->color_dark = color.name();
+        else
+            this->color_light = color.name();
+    }
 
     inline QString get_bluetooth_device() { return this->bluetooth_device; }
     inline void set_bluetooth_device(QString bluetooth_device) { this->bluetooth_device = bluetooth_device; }
@@ -89,15 +116,6 @@ class Config : public QObject {
     inline QWidget *get_quick_view(QString name) { return this->quick_views[name]; }
     inline void add_quick_view(QString name, QWidget *view) { this->quick_views[name] = view; }
 
-    inline QString get_brightness_module() { return this->brightness_module; }
-    inline void set_brightness_module(QString brightness_module) { this->brightness_module = brightness_module; }
-    inline QMap<QString, BrightnessModule *> get_brightness_modules() { return this->brightness_modules; }
-    inline BrightnessModule *get_brightness_module(QString name) { return this->brightness_modules[name]; }
-    inline void add_brightness_module(QString name, BrightnessModule *module)
-    {
-        this->brightness_modules[name] = module;
-    }
-
     inline bool get_controls_bar() { return this->controls_bar; }
     inline void set_controls_bar(bool controls_bar)
     {
@@ -109,7 +127,7 @@ class Config : public QObject {
     inline void set_scale(double scale)
     {
         this->scale = scale;
-        emit scale_changed(this->scale);
+        // emit scale_changed(this->scale);
     }
 
     inline bool get_page(QWidget *page) { return this->pages.value(page->objectName(), true); }
@@ -119,24 +137,66 @@ class Config : public QObject {
         emit page_changed(page, enabled);
     }
 
-    inline QString get_cam_stream_url() { return cam_stream_url; }
-    inline void set_cam_stream_url(QString stream_url) { this->cam_stream_url = stream_url; }
+    inline QString get_cam_network_url() { return this->cam_network_url; }
+    inline void set_cam_network_url(QString network_url) { this->cam_network_url = network_url; }
+
+    inline const QString& get_cam_local_device() { return this->cam_local_device; }
+    inline void set_cam_local_device(QString local_device) { this->cam_local_device = local_device; }
+
+    inline bool get_cam_is_network() { return this->cam_is_network; }
+    inline void set_cam_is_network(bool is_network) { this->cam_is_network = is_network; }
 
     std::shared_ptr<openauto::configuration::Configuration> openauto_config;
     openauto::configuration::Configuration::ButtonCodes openauto_button_codes;
+
+    inline QVideoFrame::PixelFormat get_cam_local_format_override() { return this->cam_local_format_override; }
+    inline void set_cam_local_format_override(QVideoFrame::PixelFormat local_format) { this->cam_local_format_override = local_format; }
+
+    inline bool get_cam_autoconnect() { return this->cam_autoconnect; }
+    inline void set_cam_autoconnect(bool enabled) { this->cam_autoconnect = enabled; }
+
+    inline int get_cam_autoconnect_time_secs() { return this->cam_autoconnect_time_secs; }
+    inline void set_cam_autoconnect_time_secs(int seconds) { this->cam_autoconnect_time_secs = seconds; }
+
+    inline QString get_brightness_plugin_name() { return this->brightness_plugin; }
+    inline QStringList get_brightness_plugins() { return this->brightness_plugins.keys(); }
+    inline void set_brightness_plugin(QString brightness_plugin)
+    {
+        this->brightness_plugin = brightness_plugin;
+        if (this->brightness_active_plugin->isLoaded())
+            this->brightness_active_plugin->unload();
+        this->brightness_active_plugin->setFileName(this->brightness_plugins[this->brightness_plugin].absoluteFilePath());
+    }
+
+    inline bool get_vehicle_can_bus() { return this->vehicle_can_bus; }
+    inline void set_vehicle_can_bus(bool vehicle_can_bus)
+    {
+        this->vehicle_can_bus = vehicle_can_bus;
+        emit vehicle_can_bus_changed(this->vehicle_can_bus);
+    }
+
+    inline QString get_vehicle_plugin() { return this->vehicle_plugin; }
+    inline void set_vehicle_plugin(QString vehicle_plugin) { this->vehicle_plugin = vehicle_plugin; }
+
+    inline QString get_vehicle_interface() { return this->vehicle_interface; }
+    inline void set_vehicle_interface(QString vehicle_interface)
+    {
+        this->vehicle_interface = vehicle_interface;
+        emit vehicle_interface_changed(this->vehicle_interface);
+    }
 
     static Config *get_instance();
 
    private:
     QMap<QString, QWidget *> quick_views;
-    QMap<QString, BrightnessModule *> brightness_modules;
 
-    QSettings ia_config;
+    QSettings settings;
     int volume;
     bool dark_mode;
     int brightness;
     bool si_units;
-    QString color;
+    QString color_light;
+    QString color_dark;
     QString bluetooth_device;
     double radio_station;
     bool radio_muted;
@@ -149,12 +209,26 @@ class Config : public QObject {
     bool mouse_active;
     QMap<QString, QString> shortcuts;
     QString quick_view;
-    QString brightness_module;
+    QString brightness_plugin;
     bool controls_bar;
     double scale;
+    QString cam_network_url;
+    QString cam_local_device;
     QString cam_name;
-    QString cam_stream_url;
+    bool cam_is_network;
+    QVideoFrame::PixelFormat cam_local_format_override;
+    bool cam_autoconnect;
+    int cam_autoconnect_time_secs;
     QMap<QString, bool> pages;
+    QString vehicle_plugin;
+    bool vehicle_can_bus;
+    QString vehicle_interface;
+
+    QMap<QString, QFileInfo> brightness_plugins;
+    QPluginLoader *brightness_active_plugin;
+
+    void load_brightness_plugins();
+    void update_system_volume();
 
    signals:
     void volume_changed(int volume);
@@ -164,6 +238,7 @@ class Config : public QObject {
     void controls_bar_changed(bool controls_bar);
     void scale_changed(double scale);
     void page_changed(QWidget *page, bool enabled);
-    void save_status(bool status);
+    void cam_autoconnect_changed(bool enabled);
+    void vehicle_can_bus_changed(bool state);
+    void vehicle_interface_changed(QString interface);
 };
-
