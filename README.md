@@ -22,6 +22,11 @@ Main features of Dash include:
 
 # Getting Started
 
+###Video walk through (steps may be slightly different):
+
+https://youtu.be/CIdEN2JNAzw
+
+
 ## Install Script
 
 Dash can be built automatically utilizing an included script.
