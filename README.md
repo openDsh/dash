@@ -22,7 +22,8 @@ Main features of Dash include:
 
 # Getting Started
 
-###Video walk through (steps may be slightly different):
+###Video walk through: 
+(steps may be slightly different such as ia (intelligent-auto) has been renamed to dash, the UI has changed, etc...)
 
 https://youtu.be/CIdEN2JNAzw
 
