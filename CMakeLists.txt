@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5.1)
-project(ia CXX)
+project(dash CXX)
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
@@ -8,8 +8,10 @@ set(base_directory ${CMAKE_CURRENT_SOURCE_DIR})
 set(resources_directory ${base_directory}/assets)
 set(sources_directory ${base_directory}/src)
 set(include_directory ${base_directory}/include)
+set(plugins_directory ${base_directory}/plugins)
 include(${base_directory}/cmake_modules/functions.cmake)
 
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${base_directory}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${base_directory}/bin)
 set(EXECUTABLE_OUTPUT_PATH ${base_directory}/bin)
 
@@ -19,6 +21,7 @@ set(Boost_USE_STATIC_RUNTIME OFF)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake_modules/")
 SET(CMAKE_CXX_STANDARD 14)
+set(CMAKE_EXE_LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS} -rdynamic)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_INIT} -Wall -pedantic -fPIC")
 set(CMAKE_CXX_FLAGS_DEBUG "-g -O0")
 set(CMAKE_CXX_FLAGS_RELEASE "-g -O3")
@@ -31,7 +34,7 @@ add_definitions(-DBOOST_ALL_DYN_LINK)
 
 find_package(Boost REQUIRED COMPONENTS system log OPTIONAL_COMPONENTS unit_test_framework)
 find_package(libusb-1.0 REQUIRED)
-find_package(Qt5 COMPONENTS Multimedia MultimediaWidgets Bluetooth Qml Quick QuickWidgets REQUIRED)
+find_package(Qt5 COMPONENTS Multimedia MultimediaWidgets Bluetooth Qml Quick QuickWidgets SerialBus SerialPort REQUIRED)
 find_package(KF5BluezQt REQUIRED)
 find_package(Protobuf REQUIRED)
 find_package(OpenSSL REQUIRED)
@@ -59,11 +62,17 @@ if(GST_BUILD)
     add_definitions(-DUSE_GST)
     if(RPI_BUILD)
         add_definitions(-DRPI)
+        include(${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules/functions.cmake)
         findRpiRevision( RPI_REVISION )
-        if(RPI_REVISION MATCHES "a03111" OR RPI_REVISION MATCHES "b03111" OR RPI_REVISION MATCHES "a03111")
+        # https://www.raspberrypi.org/documentation/hardware/raspberrypi/revision-codes/README.md
+        # Decodes the 'Type' from revision code
+        math(EXPR RPI_MODEL "(0x${RPI_REVISION}>>4)&0xFF")
+        message( "-- Raspberry Pi Model: ${RPI_MODEL}" )
+        # Type 17 (0x11) is the RPI 4B
+        if(RPI_MODEL EQUAL 17)
             message("Raspberry Pi 4 Found")
             add_definitions(-DPI4)
-        endif(RPI_REVISION MATCHES "a03111" OR RPI_REVISION MATCHES "b03111" OR RPI_REVISION MATCHES "a03111")
+        endif(RPI_REVISION EQUAL 17)
     endif(RPI_BUILD)
 endif(GST_BUILD)
 message(INFO "${GST_LIBRARIES}")
@@ -72,13 +81,17 @@ link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
 
 file(GLOB_RECURSE source_files ${sources_directory}/*.cpp ${include_directory}/*.hpp ${resources_directory}/*.qrc)
 
-add_executable(ia ${source_files})
+add_subdirectory(plugins)
 
-target_include_directories(ia PRIVATE
+add_executable(dash ${source_files})
+
+target_include_directories(dash PRIVATE
     ${CMAKE_CURRENT_BINARY_DIR}
     )
 
-target_include_directories(ia SYSTEM PRIVATE
+target_include_directories(dash SYSTEM PRIVATE
+    ${Qt5SerialBus_INCLUDE_DIRS}
+    ${Qt5SerialPort_INCLUDE_DIRS}
     ${Qt5Multimedia_INCLUDE_DIRS}
     ${Qt5MultimediaWidgets_INCLUDE_DIRS}
     ${Qt5Widgets_INCLUDE_DIRS}
@@ -100,11 +113,13 @@ target_include_directories(ia SYSTEM PRIVATE
     ${include_directory}
     )
 
-target_link_libraries(ia
+target_link_libraries(dash
     aasdk_proto
     aasdk
     openauto
     ${Boost_LIBRARIES}
+    ${Qt5SerialBus_LIBRARIES}
+    ${Qt5SerialPort_LIBRARIES}
     ${Qt5Multimedia_LIBRARIES}
     ${Qt5MultimediaWidgets_LIBRARIES}
     ${Qt5Bluetooth_LIBRARIES}
@@ -128,3 +143,5 @@ target_link_libraries(ia
     ${TAGLIB_LIBRARIES}
     ${X11_LIBRARIES}
     )
+
+install(TARGETS dash DESTINATION bin)

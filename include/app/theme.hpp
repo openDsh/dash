@@ -11,10 +11,6 @@
 #include <QScrollerProperties>
 #include <QString>
 #include <QVariant>
-#include <tuple>
-
-typedef QPair<QWidget *, QIcon> tab_icon_t;
-typedef std::tuple<QPushButton *, QIcon, QSize> button_icon_t;
 
 class Theme : public QObject {
     Q_OBJECT
@@ -22,22 +18,29 @@ class Theme : public QObject {
    public:
     enum Orientation { BOTTOM, RIGHT };
 
-    static const QFont font_12;
-    static const QFont font_14;
-    static const QFont font_16;
-    static const QFont font_18;
-    static const QFont font_24;
-    static const QFont font_36;
+    // pls dont abuse this... this is temporary and will be removed soon
+    static QFont font_10;
+    static QFont font_12;
+    static QFont font_14;
+    static QFont font_16;
+    static QFont font_18;
+    static QFont font_24;
+    static QFont font_36;
+    static QFont font_72;
 
-    static const QSize icon_16;
-    static const QSize icon_24;
-    static const QSize icon_32;
-    static const QSize icon_36;
-    static const QSize icon_42;
-    static const QSize icon_48;
-    static const QSize icon_56;
-    static const QSize icon_84;
-    static const QSize icon_96;
+    static QSize icon_16;
+    static QSize icon_20;
+    static QSize icon_22;
+    static QSize icon_24;
+    static QSize icon_26;
+    static QSize icon_28;
+    static QSize icon_32;
+    static QSize icon_36;
+    static QSize icon_42;
+    static QSize icon_48;
+    static QSize icon_56;
+    static QSize icon_84;
+    static QSize icon_96;
 
     static const QColor danger_color;
     static const QColor success_color;
@@ -45,29 +48,11 @@ class Theme : public QObject {
     Theme();
 
     inline bool get_mode() { return this->mode; }
-    inline void set_mode(bool mode)
-    {
-        this->mode = mode;
-        this->update();
-    }
-    inline const QMap<QString, QColor> get_colors() { return this->colors[this->mode ? "dark" : "light"]; }
-    inline const QColor get_color(QString color) { return this->colors[this->mode ? "dark" : "light"][color]; }
-    inline void set_color(QString color)
-    {
-        this->color = color;
-        this->update();
-    }
+    inline void set_mode(bool mode) { this->mode = mode; }
 
-    inline void set_scale(double scale)
-    {
-        this->scale = scale;
-        this->update();
-    }
+    void set_scale(double scale);
 
-    void add_tab_icon(QString name, QWidget *widget, Qt::Orientation orientation = Qt::Orientation::Horizontal);
-    inline QIcon get_tab_icon(int idx) { return this->tab_icons[this->mode ? "dark" : "light"][idx].second; }
-    inline QList<tab_icon_t> get_tab_icons() { return this->tab_icons[this->mode ? "dark" : "light"]; }
-    void add_button_icon(QString name, QPushButton *button, QString active_name = QString());
+    QIcon make_button_icon(QString name, QPushButton *button, QString alt_name = QString());
     void update();
 
     inline static QFrame *br(QWidget *parent = nullptr, bool vertical = false)
@@ -94,25 +79,7 @@ class Theme : public QObject {
     static Theme *get_instance();
 
    private:
-    QMap<QString, QMap<QString, QColor>> colors = {{"light",
-                                                    {{"azure", QColor(33, 150, 243)},
-                                                     {"rose", QColor(244, 67, 54)},
-                                                     {"jade", QColor(76, 175, 80)},
-                                                     {"fire", QColor(255, 152, 0)},
-                                                     {"steel", QColor(96, 125, 139)},
-                                                     {"lilac", QColor(103, 58, 183)}}},
-                                                   {"dark",
-                                                    {{"azure", QColor(144, 202, 249)},
-                                                     {"rose", QColor(239, 154, 154)},
-                                                     {"jade", QColor(165, 214, 167)},
-                                                     {"fire", QColor(255, 204, 128)},
-                                                     {"steel", QColor(176, 190, 197)},
-                                                     {"lilac", QColor(179, 157, 219)}}}};
-
     QPalette palette;
-    QString color;
-    QMap<QString, QList<tab_icon_t>> tab_icons;
-    QMap<QString, QList<button_icon_t>> button_icons;
     QMap<QString, QString> stylesheets;
     bool mode = false;
     double scale = 1.0;
@@ -120,11 +87,10 @@ class Theme : public QObject {
     void set_palette();
     QString parse_stylesheet(QString file);
     QString scale_stylesheet(QString stylesheet);
-    QPixmap create_pixmap_variant(QPixmap &base, qreal opacity);
+    QIcon themed_button_icon(QIcon icon, QAbstractButton *button);
+
+    inline QColor get_base_color() { return this->mode ? QColor(255, 255, 255) : QColor(0, 0, 0); }
 
    signals:
     void mode_updated(bool mode);
-    void icons_updated(QList<tab_icon_t> &tab_icons, QList<button_icon_t> &button_icons, double scale);
-    void color_updated();
 };
-

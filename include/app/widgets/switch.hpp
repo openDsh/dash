@@ -53,4 +53,3 @@ class Switch : public QAbstractButton {
    signals:
     void stateChanged(bool state);
 };
-

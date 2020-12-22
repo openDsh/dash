@@ -52,4 +52,3 @@ class ProgressIndicator : public QFrame {
     int pen_width;
     int ellipse_point;
 };
-
