@@ -35,7 +35,7 @@ Once installed it will start up, to run afterwards, navigate to bin folder and r
 
 `./dash`
 
-Video walk through: 
+Video walk through:
 
 https://youtu.be/CIdEN2JNAzw
 

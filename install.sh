@@ -13,6 +13,7 @@ display_help() {
     echo "   --openauto       install and build openauto "
     echo "   --gstreamer      install and build gstreamer "
     echo "   --dash           install and build dash "
+    echo "   --debug          create a debug build "
     echo
     exit 1
 }
@@ -28,6 +29,8 @@ else
   installArgs=""
   isRpi=false
 fi
+
+BUILD_TYPE="Release"
 
 #check to see if there are any arguments supplied, if none are supplied run full install
 if [ $# -gt 0 ]; then
@@ -50,6 +53,8 @@ if [ $# -gt 0 ]; then
                                     ;;
             --dash )           dash=true
                                     ;;
+            --debug )          BUILD_TYPE="Debug"
+                                    ;;
             -h | --help )           display_help
                                     exit
                                     ;;
@@ -66,6 +71,8 @@ else
     openauto=true
     dash=true
 fi
+
+installArgs="-DCMAKE_BUILD_TYPE=${BUILD_TYPE} $installArgs"
 
 #Array of dependencies any new dependencies can be added here
 dependencies=(
@@ -314,7 +321,7 @@ else
   #create build directory
   echo Creating openauto build directory
   mkdir build
-  
+
   if [[ $? -eq 0 ]]; then
     echo -e openauto build directory made
   else
