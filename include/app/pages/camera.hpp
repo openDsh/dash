@@ -73,7 +73,7 @@ class CameraPage : public QWidget {
     QString reconnect_message;
     int local_index;
 
-    void init_gstreamer_pipeline(std::string vidLaunchStr_);
+    void init_gstreamer_pipeline(std::string vidLaunchStr_, bool sync = false);
     void disconnect_local_stream();
 
     static GstPadProbeReturn convertProbe(GstPad* pad, GstPadProbeInfo* info, void*);

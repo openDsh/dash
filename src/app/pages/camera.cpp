@@ -44,7 +44,7 @@ CameraPage::CameraPage(QWidget *parent) : QWidget(parent)
 
 }
 
-void CameraPage::init_gstreamer_pipeline(std::string vidLaunchStr_)
+void CameraPage::init_gstreamer_pipeline(std::string vidLaunchStr_, bool sync)
 {
     videoWidget_ = new QQuickWidget(videoContainer_);
 
@@ -65,15 +65,14 @@ void CameraPage::init_gstreamer_pipeline(std::string vidLaunchStr_)
 
     GstElement* sink = QGlib::RefPointer<QGst::Element>(videoSink_);
     g_object_set(sink, "force-aspect-ratio", false, nullptr);
-    g_object_set(sink, "sync", false, nullptr);
+    g_object_set(sink, "sync", sync, nullptr);
+    // g_object_set(sink, "max-lateness", 200, nullptr);
+
     g_object_set(sink, "async", false, nullptr);
 
     GstElement* capsFilter = gst_bin_get_by_name(GST_BIN(vidPipeline_), "mycapsfilter");
     gst_bin_add(GST_BIN(vidPipeline_), GST_ELEMENT(sink));
     gst_element_link(capsFilter, GST_ELEMENT(sink));
-
-    vidSrc_ = GST_APP_SRC(gst_bin_get_by_name(GST_BIN(vidPipeline_), "mysrc"));
-    gst_app_src_set_stream_type(vidSrc_, GST_APP_STREAM_TYPE_STREAM);
 }
 
 
@@ -368,6 +367,7 @@ void CameraPage::connect_network_stream()
     OPENAUTO_LOG(info) << "[CameraPage] Creating GStreamer pipeline with "<<this->config->get_cam_network_url().toStdString();
     std::string pipeline = "rtspsrc location="+this->config->get_cam_network_url().toStdString() + " latency=100" +
                            " ! queue " +
+                           " ! rtpjitterbuffer" +
                            " ! rtph264depay" +
                            " ! h264parse" +
                            #ifdef RPI
@@ -379,8 +379,9 @@ void CameraPage::connect_network_stream()
                            #else
                                                " ! avdec_h264"
                            #endif
-                           + " ! videoconvert ";
-    init_gstreamer_pipeline(pipeline);
+                           + " ! gdkpixbufoverlay location=/home/icecube45/mainlineDash/bg_overlay.png overlay-width=240 overlay-height=160"    
+                           + "";
+    init_gstreamer_pipeline(pipeline, true);
     //emit the connected signal before we resize anything, so that videoContainer has had time to resize to the proper dimensions
     emit connected_network();
     if(videoContainer_ == nullptr)
@@ -472,6 +473,7 @@ void CameraPage::connect_local_stream()
     OPENAUTO_LOG(info) << "[CameraPage] Creating GStreamer pipeline with "<<this->config->get_cam_local_device().toStdString();
     std::string pipeline = "v4l2src device="+this->config->get_cam_local_device().toStdString() + 
                            " ! jpegdec ! capsfilter caps=\"width=" + std::to_string(res.width()) + ", height="+std::to_string(res.height())+"\"" +
+                           " ! gdkpixbufoverlay location=/home/icecube45/mainlineDash/bg_overlay.png relative-x=.25" +
                            " ! videoconvert ";
     init_gstreamer_pipeline(pipeline);
     //emit the connected signal before we resize anything, so that videoContainer has had time to resize to the proper dimensions
