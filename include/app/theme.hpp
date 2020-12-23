@@ -18,27 +18,29 @@ class Theme : public QObject {
    public:
     enum Orientation { BOTTOM, RIGHT };
 
-    static const QFont font_10;
-    static const QFont font_12;
-    static const QFont font_14;
-    static const QFont font_16;
-    static const QFont font_18;
-    static const QFont font_24;
-    static const QFont font_36;
+    // pls dont abuse this... this is temporary and will be removed soon
+    static QFont font_10;
+    static QFont font_12;
+    static QFont font_14;
+    static QFont font_16;
+    static QFont font_18;
+    static QFont font_24;
+    static QFont font_36;
+    static QFont font_72;
 
-    static const QSize icon_16;
-    static const QSize icon_20;
-    static const QSize icon_22;
-    static const QSize icon_24;
-    static const QSize icon_26;
-    static const QSize icon_28;
-    static const QSize icon_32;
-    static const QSize icon_36;
-    static const QSize icon_42;
-    static const QSize icon_48;
-    static const QSize icon_56;
-    static const QSize icon_84;
-    static const QSize icon_96;
+    static QSize icon_16;
+    static QSize icon_20;
+    static QSize icon_22;
+    static QSize icon_24;
+    static QSize icon_26;
+    static QSize icon_28;
+    static QSize icon_32;
+    static QSize icon_36;
+    static QSize icon_42;
+    static QSize icon_48;
+    static QSize icon_56;
+    static QSize icon_84;
+    static QSize icon_96;
 
     static const QColor danger_color;
     static const QColor success_color;
@@ -48,7 +50,7 @@ class Theme : public QObject {
     inline bool get_mode() { return this->mode; }
     inline void set_mode(bool mode) { this->mode = mode; }
 
-    inline void set_scale(double scale) { this->scale = scale; }
+    void set_scale(double scale);
 
     QIcon make_button_icon(QString name, QPushButton *button, QString alt_name = QString());
     void update();

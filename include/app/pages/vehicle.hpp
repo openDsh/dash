@@ -4,11 +4,13 @@
 #include <QtWidgets>
 #include <QPluginLoader>
 
-#include "obd/obd.hpp"
+#include "canbus/socketcanbus.hpp"
+#include "obd/message.hpp"
+#include "obd/command.hpp"
 #include "app/widgets/selector.hpp"
 #include "app/widgets/dialog.hpp"
 
-typedef std::function<double(std::vector<double>, bool)> obd_decoder_t;
+typedef std::function<double(double, bool)> obd_decoder_t;
 typedef QPair<QString, QString> units_t;
 
 class Gauge : public QWidget {
@@ -22,15 +24,22 @@ class Gauge : public QWidget {
 
     inline void start() { this->timer->start(this->rate); }
     inline void stop() { this->timer->stop(); }
+    void can_callback(QByteArray payload);
 
    private:
     QString format_value(double value);
     QString null_value();
+    QLabel *value_label;
+
+    obd_decoder_t decoder;
+    std::vector<Command> cmds;
+
 
     bool si;
     int rate;
     int precision;
     QTimer *timer;
+
 
    signals:
     void toggle_unit(bool si);

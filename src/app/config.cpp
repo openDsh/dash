@@ -61,6 +61,11 @@ Config::Config()
     this->brightness_active_plugin->setFileName(this->brightness_plugins[this->brightness_plugin].absoluteFilePath());
 }
 
+Config::~Config()
+{
+    this->save();
+}
+
 void Config::save()
 {
     if (this->volume != this->settings.value("volume", 50).toInt())

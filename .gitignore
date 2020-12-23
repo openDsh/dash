@@ -55,3 +55,8 @@ Thumbs.db
 # Custom #
 ##########
 CMakeLists.txt.user
+CMakeFiles/*
+CMakeFiles/
+CMakeCache.txt
+Makefile
+*_autogen/

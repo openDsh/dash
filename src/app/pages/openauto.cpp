@@ -110,7 +110,6 @@ QBoxLayout *OpenAutoPage::Settings::rhd_row_widget()
     QHBoxLayout *layout = new QHBoxLayout();
 
     QLabel *label = new QLabel("Right-Hand-Drive");
-    label->setFont(Theme::font_14);
     layout->addWidget(label, 1);
 
     Switch *toggle = new Switch();
@@ -133,21 +132,18 @@ QBoxLayout *OpenAutoPage::Settings::frame_rate_row_widget()
     QHBoxLayout *layout = new QHBoxLayout();
 
     QLabel *label = new QLabel("Frame Rate");
-    label->setFont(Theme::font_14);
     layout->addWidget(label, 1);
 
     QGroupBox *group = new QGroupBox();
     QVBoxLayout *group_layout = new QVBoxLayout(group);
 
     QRadioButton *fps_30_button = new QRadioButton("30fps", group);
-    fps_30_button->setFont(Theme::font_14);
     fps_30_button->setChecked(this->config->openauto_config->getVideoFPS() == aasdk::proto::enums::VideoFPS::_30);
     connect(fps_30_button, &QRadioButton::clicked,
             [config = this->config]() { config->openauto_config->setVideoFPS(aasdk::proto::enums::VideoFPS::_30); });
     group_layout->addWidget(fps_30_button);
 
     QRadioButton *fps_60_button = new QRadioButton("60fps", group);
-    fps_60_button->setFont(Theme::font_14);
     fps_60_button->setChecked(this->config->openauto_config->getVideoFPS() == aasdk::proto::enums::VideoFPS::_60);
     connect(fps_60_button, &QRadioButton::clicked,
             [config = this->config]() { config->openauto_config->setVideoFPS(aasdk::proto::enums::VideoFPS::_60); });
@@ -163,14 +159,12 @@ QBoxLayout *OpenAutoPage::Settings::resolution_row_widget()
     QHBoxLayout *layout = new QHBoxLayout();
 
     QLabel *label = new QLabel("Resolution");
-    label->setFont(Theme::font_14);
     layout->addWidget(label, 1);
 
     QGroupBox *group = new QGroupBox();
     QVBoxLayout *group_layout = new QVBoxLayout(group);
 
     QRadioButton *res_480_button = new QRadioButton("480p", group);
-    res_480_button->setFont(Theme::font_14);
     res_480_button->setChecked(this->config->openauto_config->getVideoResolution() ==
                                aasdk::proto::enums::VideoResolution::_480p);
     connect(res_480_button, &QRadioButton::clicked, [config = this->config]() {
@@ -179,7 +173,6 @@ QBoxLayout *OpenAutoPage::Settings::resolution_row_widget()
     group_layout->addWidget(res_480_button);
 
     QRadioButton *res_720_button = new QRadioButton("720p", group);
-    res_720_button->setFont(Theme::font_14);
     res_720_button->setChecked(this->config->openauto_config->getVideoResolution() ==
                                aasdk::proto::enums::VideoResolution::_720p);
     connect(res_720_button, &QRadioButton::clicked, [config = this->config]() {
@@ -188,7 +181,6 @@ QBoxLayout *OpenAutoPage::Settings::resolution_row_widget()
     group_layout->addWidget(res_720_button);
 
     QRadioButton *res_1080_button = new QRadioButton("1080p", group);
-    res_1080_button->setFont(Theme::font_14);
     res_1080_button->setChecked(this->config->openauto_config->getVideoResolution() ==
                                 aasdk::proto::enums::VideoResolution::_1080p);
     connect(res_1080_button, &QRadioButton::clicked, [config = this->config]() {
@@ -206,7 +198,6 @@ QBoxLayout *OpenAutoPage::Settings::dpi_row_widget()
     QHBoxLayout *layout = new QHBoxLayout();
 
     QLabel *label = new QLabel("DPI");
-    label->setFont(Theme::font_14);
     layout->addWidget(label, 1);
 
     layout->addLayout(this->dpi_widget(), 1);
@@ -223,7 +214,6 @@ QBoxLayout *OpenAutoPage::Settings::dpi_widget()
     slider->setRange(0, 512);
     slider->setValue(this->config->openauto_config->getScreenDPI());
     QLabel *value = new QLabel(QString::number(slider->value()));
-    value->setFont(Theme::font_14);
     connect(slider, &QSlider::valueChanged, [config = this->config, value](int position) {
         config->openauto_config->setScreenDPI(position);
         value->setText(QString::number(position));
@@ -244,7 +234,6 @@ QBoxLayout *OpenAutoPage::Settings::rt_audio_row_widget()
     QHBoxLayout *layout = new QHBoxLayout();
 
     QLabel *label = new QLabel("RtAudio");
-    label->setFont(Theme::font_14);
     layout->addWidget(label, 1);
 
     Switch *toggle = new Switch();
@@ -267,14 +256,12 @@ QBoxLayout *OpenAutoPage::Settings::audio_channels_row_widget()
     QHBoxLayout *layout = new QHBoxLayout();
 
     QLabel *label = new QLabel("Audio Channels");
-    label->setFont(Theme::font_14);
     layout->addWidget(label, 1);
 
     QGroupBox *group = new QGroupBox();
     QVBoxLayout *group_layout = new QVBoxLayout(group);
 
     QCheckBox *music_button = new QCheckBox("Music", group);
-    music_button->setFont(Theme::font_14);
     music_button->setChecked(this->config->openauto_config->musicAudioChannelEnabled());
     connect(music_button, &QCheckBox::toggled,
             [config = this->config](bool checked) { config->openauto_config->setMusicAudioChannelEnabled(checked); });
@@ -282,7 +269,6 @@ QBoxLayout *OpenAutoPage::Settings::audio_channels_row_widget()
     group_layout->addStretch(2);
 
     QCheckBox *speech_button = new QCheckBox("Speech", group);
-    speech_button->setFont(Theme::font_14);
     speech_button->setChecked(this->config->openauto_config->speechAudioChannelEnabled());
     connect(speech_button, &QCheckBox::toggled,
             [config = this->config](bool checked) { config->openauto_config->setSpeechAudioChannelEnabled(checked); });
@@ -298,7 +284,6 @@ QBoxLayout *OpenAutoPage::Settings::bluetooth_row_widget()
     QHBoxLayout *layout = new QHBoxLayout();
 
     QLabel *label = new QLabel("Bluetooth");
-    label->setFont(Theme::font_14);
     layout->addWidget(label, 1);
 
     Switch *toggle = new Switch();
@@ -320,7 +305,6 @@ QBoxLayout *OpenAutoPage::Settings::touchscreen_row_widget()
     QHBoxLayout *layout = new QHBoxLayout();
 
     QLabel *label = new QLabel("Touchscreen");
-    label->setFont(Theme::font_14);
     layout->addWidget(label, 1);
 
     Switch *toggle = new Switch();
@@ -338,7 +322,6 @@ QCheckBox *OpenAutoPage::Settings::button_checkbox(QString name, QString key,
                                                    aasdk::proto::enums::ButtonCode::Enum code)
 {
     QCheckBox *checkbox = new QCheckBox(QString("%1 [%2]").arg(name).arg(key));
-    checkbox->setFont(Theme::font_14);
     checkbox->setChecked(std::find(this->config->openauto_button_codes.begin(),
                                    this->config->openauto_button_codes.end(),
                                    code) != this->config->openauto_button_codes.end());
@@ -361,7 +344,6 @@ QBoxLayout *OpenAutoPage::Settings::buttons_row_widget()
     QHBoxLayout *layout = new QHBoxLayout();
 
     QLabel *label = new QLabel("Buttons");
-    label->setFont(Theme::font_14);
 
     QGroupBox *group = new QGroupBox();
     QVBoxLayout *group_layout = new QVBoxLayout(group);
@@ -436,7 +418,6 @@ QWidget *OpenAutoPage::connect_msg()
     layout->setContentsMargins(0, 0, 0, 0);
 
     QLabel *label = new QLabel("connect device to start Android Auto", widget);
-    label->setFont(Theme::font_14);
     label->setAlignment(Qt::AlignCenter);
 
     QHBoxLayout *layout2 = new QHBoxLayout();

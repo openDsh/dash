@@ -21,7 +21,6 @@ QWidget *ClimateSnackBar::body_widget()
     layout->setContentsMargins(0, 0, 0, 0);
 
     this->driver_temp = new QLabel(widget);
-    this->driver_temp->setFont(Theme::font_14);
     this->driver_temp->setAlignment(Qt::AlignCenter);
     layout->addWidget(this->driver_temp, 4);
 
@@ -30,7 +29,6 @@ QWidget *ClimateSnackBar::body_widget()
     layout->addStretch(6);
 
     this->passenger_temp = new QLabel(widget);
-    this->passenger_temp->setFont(Theme::font_14);
     this->passenger_temp->setAlignment(Qt::AlignCenter);
     layout->addWidget(this->passenger_temp, 4);
 
@@ -49,7 +47,6 @@ QWidget *ClimateSnackBar::state_widget()
 
     this->fan_speed = new StepMeter(widget);
     layout->addWidget(this->fan_speed);
-
     return widget;
 }
 
