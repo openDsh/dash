@@ -19,14 +19,12 @@ Main features of Dash include:
 
 ![](docs/imgs/opendash-ui.gif)
 
-
 # Getting Started
 
-###Video walk through: 
-(steps may be slightly different such as ia (intelligent-auto) has been renamed to dash, the UI has changed, etc...)
+## Video walk through
+_steps may be slightly different such as ia (intelligent-auto) has been renamed to dash, the UI has changed, etc..._
 
 https://youtu.be/CIdEN2JNAzw
-
 
 ## Install Script
 
@@ -42,6 +40,3 @@ cd dash
 
 ./install.sh
 ```
-
-
-
