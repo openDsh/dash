@@ -32,3 +32,4 @@ int main(int argc, char *argv[])
      splash.finish(&window);
 
      return dash.exec();
+}
