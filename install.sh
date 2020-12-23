@@ -15,7 +15,6 @@ display_help() {
     echo "   --dash           install and build dash "
     echo "   --debug          create a debug build "
     echo
-    exit 1
 }
 
 #location of OS details for linux
@@ -134,7 +133,7 @@ if [ $deps = false ]
         echo -e All dependencies Installed ok '\n'
     else
         echo Package failed to install with error code $?, quitting check logs above
-        exit
+        exit 1
     fi
 fi
 
@@ -158,7 +157,7 @@ else
       cd ..
     else
       echo Aasdk clone/pull error
-      exit
+      exit 1
     fi
   fi
 
@@ -184,7 +183,7 @@ else
       echo -e Aasdk CMake completed successfully'\n'
   else
     echo Aasdk CMake failed with code $?
-    exit
+    exit 1
   fi
 
   #beginning make
@@ -194,7 +193,7 @@ else
     echo -e Aasdk Make completed successfully '\n'
   else
     echo Aasdk Make failed with code $?
-    exit
+    exit 1
   fi
 
   #begin make install
@@ -206,7 +205,7 @@ else
     echo
   else
     echo Aasdk install failed with code $?
-    exit
+    exit 1
   fi
   cd ../../dash
 fi
@@ -232,8 +231,8 @@ if [ $gstreamer = true ]; then
         echo -e cloned OK '\n'
         cd ..
       else
-          echo Gstreamer clone/pull error
-        exit
+        echo Gstreamer clone/pull error
+        exit 1
       fi
   fi
 
@@ -260,7 +259,7 @@ if [ $gstreamer = true ]; then
     echo -e Make ok'\n'
   else
     echo Gstreamer CMake failed
-    exit
+    exit 1
   fi
 
   echo Making Gstreamer
@@ -270,7 +269,7 @@ if [ $gstreamer = true ]; then
     echo -e Gstreamer make ok'\n'
   else
     echo Make failed with error code $?
-    exit
+    exit 1
   fi
 
   #run make install
@@ -281,7 +280,7 @@ if [ $gstreamer = true ]; then
     echo -e Gstreamer installed ok'\n'
   else
     echo Gstreamer make install failed with error code $?
-    exit
+    exit 1
   fi
 
   sudo ldconfig
@@ -312,7 +311,7 @@ else
       cd ..
     else
       echo Openauto clone/pull error
-      exit
+      exit 1
     fi
   fi
 
@@ -336,7 +335,7 @@ else
     echo -e Openauto CMake OK'\n'
   else
     echo Openauto CMake failed with error code $?
-    exit
+    exit 1
   fi
 
   echo Beginning openauto make
@@ -345,7 +344,7 @@ else
     echo -e Openauto make OK'\n'
   else
     echo Openauto make failed with error code $?
-    exit
+    exit 1
   fi
 
   #run make install
@@ -355,7 +354,7 @@ else
     echo -e Openauto installed ok'\n'
   else
     echo Openauto make install failed with error code $?
-    exit
+    exit 1
   fi
   cd ../../dash
 fi
@@ -385,7 +384,7 @@ else
     echo -e Dash CMake OK'\n'
   else
     echo Dash CMake failed with error code $?
-    exit
+    exit 1
   fi
 
   echo Running Dash make
@@ -411,7 +410,7 @@ else
       fi
     else
       echo Dash make failed with error code $?
-      exit
+      exit 1
   fi
 
   #Setting openGL driver and GPU memory to 256mb
@@ -421,7 +420,7 @@ else
       echo -e Memory set to 256mb'\n'
     else
       echo Setting memory failed with error code $? please set manually
-      exit
+      exit 1
     fi
 
     sudo raspi-config nonint do_gldriver G2
@@ -429,7 +428,7 @@ else
       echo -e OpenGL set ok'\n'
     else
       echo Setting openGL failed with error code $? please set manually
-      exit
+      exit 1
     fi
 
   fi
