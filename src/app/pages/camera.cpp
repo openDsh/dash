@@ -27,7 +27,7 @@ CameraPage::CameraPage(QWidget *parent) : QWidget(parent)
 
     connect(this, &CameraPage::disconnected, [layout,this]() {
         layout->setCurrentIndex(0);
-        this->disconnect_local_stream();
+        this->disconnect_stream();
     });
     connect(this, &CameraPage::connected_local, [layout]() { layout->setCurrentIndex(1); });
     connect(this, &CameraPage::connected_network, [layout]() { layout->setCurrentIndex(2); });
@@ -145,9 +145,6 @@ QWidget *CameraPage::local_camera_widget()
         this->status->setText(QString());
         emit autoconnect_disabled();
         emit disconnected();
-        // this->local_cam->stop();
-        // this->local_cam->unload();
-        // this->local_cam->deleteLater();
         this->local_cam = nullptr;
     });
     disconnect->setIcon(this->theme->make_button_icon("close", disconnect));
@@ -172,9 +169,7 @@ QWidget *CameraPage::network_camera_widget()
     disconnect->setIconSize(Theme::icon_16);
     connect(disconnect, &QPushButton::clicked, [this]() {
         emit autoconnect_disabled();
-        this->player->setMedia(QUrl());
-        this->status->setText(QString());
-        this->player->stop();
+        emit disconnected();
     });
     disconnect->setIcon(this->theme->make_button_icon("close", disconnect));
     layout->addWidget(disconnect, 0, Qt::AlignRight);
@@ -372,7 +367,7 @@ void CameraPage::connect_network_stream()
                            #else
                                                " ! avdec_h264"
                            #endif
-                           + " ! gdkpixbufoverlay location=/home/icecube45/mainlineDash/bg_overlay.png overlay-width=240 overlay-height=160"    
+                        //    + " ! gdkpixbufoverlay location=/home/icecube45/mainlineDash/bg_overlay.png overlay-width=240 overlay-height=160"    
                            + "";
     init_gstreamer_pipeline(pipeline, true);
     //emit the connected signal before we resize anything, so that videoContainer has had time to resize to the proper dimensions
@@ -428,7 +423,7 @@ GstPadProbeReturn CameraPage::convertProbe(GstPad* pad, GstPadProbeInfo* info, v
     return GST_PAD_PROBE_OK;
 }
 
-void CameraPage::disconnect_local_stream()
+void CameraPage::disconnect_stream()
 {
     OPENAUTO_LOG(info) << "[CameraPage] Disconnecting camera and destroying gstreamer pipeline";
     GstElement* capsFilter = gst_bin_get_by_name(GST_BIN(vidPipeline_), "mycapsfilter");
@@ -465,8 +460,9 @@ void CameraPage::connect_local_stream()
 
     OPENAUTO_LOG(info) << "[CameraPage] Creating GStreamer pipeline with "<<this->config->get_cam_local_device().toStdString();
     std::string pipeline = "v4l2src device="+this->config->get_cam_local_device().toStdString() + 
-                           " ! jpegdec ! capsfilter caps=\"width=" + std::to_string(res.width()) + ", height="+std::to_string(res.height())+"\"" +
-                           " ! gdkpixbufoverlay location=/home/icecube45/mainlineDash/bg_overlay.png relative-x=.25" +
+                           " ! capsfilter caps=\"video/x-raw,width="+std::to_string(res.width())+",height="+std::to_string(res.height())+";image/jpeg,width="+std::to_string(res.width())+",height="+std::to_string(res.height())+"\"" +
+                           " ! decodebin"
+                        //    " ! gdkpixbufoverlay location=/home/icecube45/mainlineDash/bg_overlay.png relative-x=.25" +
                            " ! videoconvert ";
     init_gstreamer_pipeline(pipeline);
     //emit the connected signal before we resize anything, so that videoContainer has had time to resize to the proper dimensions

@@ -74,7 +74,7 @@ class CameraPage : public QWidget {
     int local_index;
 
     void init_gstreamer_pipeline(std::string vidLaunchStr_, bool sync = false);
-    void disconnect_local_stream();
+    void disconnect_stream();
 
     static GstPadProbeReturn convertProbe(GstPad* pad, GstPadProbeInfo* info, void*);
     static gboolean busCallback(GstBus*, GstMessage* message, gpointer*);
