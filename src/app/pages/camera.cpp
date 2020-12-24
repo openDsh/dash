@@ -333,19 +333,12 @@ void CameraPage::connect_network_stream()
     videoContainer_ = this->remote_video_widget;
 
     DASH_LOG(info) << "[CameraPage] Creating GStreamer pipeline with "<<this->config->get_cam_network_url().toStdString();
-    std::string pipeline = "rtspsrc location="+this->config->get_cam_network_url().toStdString() + " latency=100" +
+    std::string pipeline = "rtspsrc location="+this->config->get_cam_network_url().toStdString() + " latency=300" +
                            " ! queue " +
-                           " ! rtph264depay" +
-                           " ! h264parse" +
-                           #ifdef RPI
-                               #ifdef PI4e
-                                               " ! v4l2h264dec"
-                               #else
-                                               " ! omxh264dec"
-                               #endif
-                           #else
-                                               " ! avdec_h264"
-                           #endif
+                           // decodebin does some absolute magic on selecting proper plugins
+                           // more importantly, it knows just the right settings to apply to these plugins
+                           // I can recreate the exact same pipeline as it ends up using, and it will be much slower because of the lack of setting tuning.
+                           " ! decodebin"
                            + "";
     init_gstreamer_pipeline(pipeline, true);
     //emit the connected signal before we resize anything, so that videoContainer has had time to resize to the proper dimensions
