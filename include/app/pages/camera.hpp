@@ -33,6 +33,8 @@
 
 #include "app/config.hpp"
 #include "app/theme.hpp"
+#include "DashLog.hpp"
+
 
 class CameraPage : public QWidget {
     Q_OBJECT

@@ -55,7 +55,7 @@ void CameraPage::init_gstreamer_pipeline(std::string vidLaunchStr_, bool sync)
                             // " ! gdkpixbufoverlay location=bg_overlay.png relative-x=.25" +
                             " ! videoconvert " +
                             " ! capsfilter caps=video/x-raw name=mycapsfilter";
-    OPENAUTO_LOG(info) << "[CameraPage] Created GStreamer Pipeline of `"<<vidLaunchStr<<"`";
+    DASH_LOG(info) << "[CameraPage] Created GStreamer Pipeline of `"<<vidLaunchStr<<"`";
     vidPipeline_ = gst_parse_launch(vidLaunchStr.c_str(), &error);
     GstBus* bus = gst_pipeline_get_bus(GST_PIPELINE(vidPipeline_));
     gst_bus_add_watch(bus, (GstBusFunc)&CameraPage::busCallback, this);
@@ -349,14 +349,13 @@ void CameraPage::connect_network_stream()
 
     emit connected_network();
 
-    OPENAUTO_LOG(info) << "[CameraPage] Creating GStreamer pipeline with "<<this->config->get_cam_network_url().toStdString();
+    DASH_LOG(info) << "[CameraPage] Creating GStreamer pipeline with "<<this->config->get_cam_network_url().toStdString();
     std::string pipeline = "rtspsrc location="+this->config->get_cam_network_url().toStdString() + " latency=100" +
                            " ! queue " +
-                           " ! rtpjitterbuffer" +
                            " ! rtph264depay" +
                            " ! h264parse" +
                            #ifdef RPI
-                               #ifdef PI4
+                               #ifdef PI4e
                                                " ! v4l2h264dec"
                                #else
                                                " ! omxh264dec"
@@ -364,23 +363,22 @@ void CameraPage::connect_network_stream()
                            #else
                                                " ! avdec_h264"
                            #endif
-                        //    + " ! gdkpixbufoverlay location=/home/icecube45/mainlineDash/bg_overlay.png overlay-width=240 overlay-height=160"    
                            + "";
     init_gstreamer_pipeline(pipeline, true);
     //emit the connected signal before we resize anything, so that videoContainer has had time to resize to the proper dimensions
     emit connected_network();
     if(videoContainer_ == nullptr)
     {
-        OPENAUTO_LOG(info) << "[CameraPage] No video container, setting projection fullscreen";
+        DASH_LOG(info) << "[CameraPage] No video container, setting projection fullscreen";
         videoWidget_->setFocus();
         videoWidget_->setWindowFlags(Qt::WindowStaysOnTopHint | Qt::FramelessWindowHint);
         videoWidget_->showFullScreen();
     }
     else
     {
-        OPENAUTO_LOG(info) << "[CameraPage] Resizing to video container";
+        DASH_LOG(info) << "[CameraPage] Resizing to video container";
         videoWidget_->resize(videoContainer_->size());
-        OPENAUTO_LOG(info) << "[CameraPage] Size: "<< videoContainer_->width() << "x" << videoContainer_->height();
+        DASH_LOG(info) << "[CameraPage] Size: "<< videoContainer_->width() << "x" << videoContainer_->height();
 
     }
     videoWidget_->show();
@@ -409,8 +407,8 @@ GstPadProbeReturn CameraPage::convertProbe(GstPad* pad, GstPadProbeInfo* info, v
             {
                 GstVideoInfo* vinfo = gst_video_info_new();
                 gst_video_info_from_caps(vinfo, caps);
-                OPENAUTO_LOG(info) << "[CameraPage] Video Width: " << vinfo->width;
-                OPENAUTO_LOG(info) << "[CameraPage] Video Height: " << vinfo->height;
+                DASH_LOG(info) << "[CameraPage] Video Width: " << vinfo->width;
+                DASH_LOG(info) << "[CameraPage] Video Height: " << vinfo->height;
             }
 
             return GST_PAD_PROBE_REMOVE;
@@ -422,7 +420,7 @@ GstPadProbeReturn CameraPage::convertProbe(GstPad* pad, GstPadProbeInfo* info, v
 
 void CameraPage::disconnect_stream()
 {
-    OPENAUTO_LOG(info) << "[CameraPage] Disconnecting camera and destroying gstreamer pipeline";
+    DASH_LOG(info) << "[CameraPage] Disconnecting camera and destroying gstreamer pipeline";
     GstElement* capsFilter = gst_bin_get_by_name(GST_BIN(vidPipeline_), "mycapsfilter");
     GstPad* convertPad = gst_element_get_static_pad(capsFilter, "sink");
     gst_pad_add_probe(convertPad, GST_PAD_PROBE_TYPE_EVENT_DOWNSTREAM, &CameraPage::convertProbe, this, nullptr);
@@ -456,7 +454,7 @@ void CameraPage::connect_local_stream()
 
 
 
-    OPENAUTO_LOG(info) << "[CameraPage] Creating GStreamer pipeline with "<<this->config->get_cam_local_device().toStdString();
+    DASH_LOG(info) << "[CameraPage] Creating GStreamer pipeline with "<<this->config->get_cam_local_device().toStdString();
     std::string pipeline = "v4l2src device="+this->config->get_cam_local_device().toStdString() + 
                            " ! capsfilter caps=\"video/x-raw,width="+std::to_string(res.width())+",height="+std::to_string(res.height())+";image/jpeg,width="+std::to_string(res.width())+",height="+std::to_string(res.height())+"\"" +
                            " ! decodebin";
@@ -465,16 +463,16 @@ void CameraPage::connect_local_stream()
     emit connected_local();
     if(videoContainer_ == nullptr)
     {
-        OPENAUTO_LOG(info) << "[CameraPage] No video container, setting projection fullscreen";
+        DASH_LOG(info) << "[CameraPage] No video container, setting projection fullscreen";
         videoWidget_->setFocus();
         videoWidget_->setWindowFlags(Qt::WindowStaysOnTopHint | Qt::FramelessWindowHint);
         videoWidget_->showFullScreen();
     }
     else
     {
-        OPENAUTO_LOG(info) << "[CameraPage] Resizing to video container";
+        DASH_LOG(info) << "[CameraPage] Resizing to video container";
         videoWidget_->resize(videoContainer_->size());
-        OPENAUTO_LOG(info) << "[CameraPage] Size: "<< videoContainer_->width() << "x" << videoContainer_->height();
+        DASH_LOG(info) << "[CameraPage] Size: "<< videoContainer_->width() << "x" << videoContainer_->height();
 
     }
     videoWidget_->show();
@@ -523,20 +521,20 @@ gboolean CameraPage::busCallback(GstBus*, GstMessage* message, gpointer*)
     {
     case GST_MESSAGE_ERROR:
         gst_message_parse_error(message, &err, &debug);
-        OPENAUTO_LOG(info) << "[CameraPage] Error " << err->message;
+        DASH_LOG(info) << "[CameraPage] Error " << err->message;
         g_error_free(err);
         g_free(debug);
         break;
     case GST_MESSAGE_WARNING:
         gst_message_parse_warning(message, &err, &debug);
-        OPENAUTO_LOG(info) << "[CameraPage] Warning " << err->message << " | Debug " << debug;
+        DASH_LOG(info) << "[CameraPage] Warning " << err->message << " | Debug " << debug;
         name = (gchar*)GST_MESSAGE_SRC_NAME(message);
-        OPENAUTO_LOG(info) << "[CameraPage] Name of src " << (name ? name : "nil");
+        DASH_LOG(info) << "[CameraPage] Name of src " << (name ? name : "nil");
         g_error_free(err);
         g_free(debug);
         break;
     case GST_MESSAGE_EOS:
-        OPENAUTO_LOG(info) << "[CameraPage] End of stream";
+        DASH_LOG(info) << "[CameraPage] End of stream";
         break;
     case GST_MESSAGE_STATE_CHANGED:
     default:
