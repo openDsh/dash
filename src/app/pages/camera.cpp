@@ -35,7 +35,15 @@ CameraPage::CameraPage(QWidget *parent) : QWidget(parent)
     if (this->config->get_cam_autoconnect())
         this->connect_cam();
 
-    videoContainer_ = nullptr;    
+    videoContainer_ = nullptr;
+
+    // Write camera_overlay to /tmp so that we can later point gstreamer to it
+    if (QFile::exists("/tmp/dash_camera_overlay.svg"))
+    {
+        QFile::remove("/tmp/dash_camera_overlay.svg");
+    }
+    QFile::copy(":/camera_overlay.svg", "/tmp/dash_camera_overlay.svg");
+
 }
 
 void CameraPage::init_gstreamer_pipeline(std::string vidLaunchStr_, bool sync)
@@ -46,13 +54,12 @@ void CameraPage::init_gstreamer_pipeline(std::string vidLaunchStr_, bool sync)
     videoWidget_->rootContext()->setContextProperty(QLatin1String("videoSurface"), surface_);
     videoWidget_->setSource(QUrl("qrc:/camera_video.qml"));
     videoWidget_->setResizeMode(QQuickWidget::SizeRootObjectToView); 
-    qDebug()<<"test "<<QUrl("qrc:/camera_video.qml").path();
 
     videoSink_ = surface_->videoSink();
 
     GError* error = nullptr;
     std::string vidLaunchStr = vidLaunchStr_ + 
-                            // " ! gdkpixbufoverlay location=bg_overlay.png relative-x=.25" +
+                            " ! videoconvert ! rsvgoverlay location=/tmp/dash_camera_overlay.svg fit-to-frame=true" +
                             " ! videoconvert " +
                             " ! capsfilter caps=video/x-raw name=mycapsfilter";
     DASH_LOG(info) << "[CameraPage] Created GStreamer Pipeline of `"<<vidLaunchStr<<"`";
@@ -321,33 +328,9 @@ QWidget *CameraPage::network_cam_selector()
     return widget;
 }
 
-void CameraPage::update_network_status(QMediaPlayer::MediaStatus media_status)
-{
-    qInfo() << "camera status changed to: " << media_status;
-
-    switch (media_status) {
-        case QMediaPlayer::LoadingMedia:
-        case QMediaPlayer::LoadedMedia:
-        case QMediaPlayer::BufferedMedia:
-            this->status->setText("connecting...");
-            break;
-        default:
-            this->status->setText("connection failed");
-            emit disconnected();
-            break;
-    }
-}
-
 void CameraPage::connect_network_stream()
 {
     videoContainer_ = this->remote_video_widget;
-
-    connect(this->player, &QMediaPlayer::mediaStatusChanged,
-            [this](QMediaPlayer::MediaStatus media_status) { this->update_network_status(media_status); });
-    connect(this->player, QOverload<>::of(&QMediaPlayer::metaDataChanged), [this]() { emit connected_network(); });
-    qInfo() << "playing stream: " << this->config->get_cam_network_url();
-
-    emit connected_network();
 
     DASH_LOG(info) << "[CameraPage] Creating GStreamer pipeline with "<<this->config->get_cam_network_url().toStdString();
     std::string pipeline = "rtspsrc location="+this->config->get_cam_network_url().toStdString() + " latency=100" +
@@ -387,12 +370,6 @@ void CameraPage::connect_network_stream()
     GstPad* convertPad = gst_element_get_static_pad(capsFilter, "sink");
     gst_pad_add_probe(convertPad, GST_PAD_PROBE_TYPE_EVENT_DOWNSTREAM, &CameraPage::convertProbe, this, nullptr);
     gst_element_set_state(vidPipeline_, GST_STATE_PLAYING);
-
-
-
-
-
-
 }
 
 GstPadProbeReturn CameraPage::convertProbe(GstPad* pad, GstPadProbeInfo* info, void*)
@@ -481,34 +458,6 @@ void CameraPage::connect_local_stream()
     GstPad* convertPad = gst_element_get_static_pad(capsFilter, "sink");
     gst_pad_add_probe(convertPad, GST_PAD_PROBE_TYPE_EVENT_DOWNSTREAM, &CameraPage::convertProbe, this, nullptr);
     gst_element_set_state(vidPipeline_, GST_STATE_PLAYING);
-
-
-    // connect(this, &GSTVideoOutput::startPlayback, this, &GSTVideoOutput::onStartPlayback, Qt::QueuedConnection);
-    // connect(this, &GSTVideoOutput::stopPlayback, this, &GSTVideoOutput::onStopPlayback, Qt::QueuedConnection);
-
-
-    // if (this->local_cam != nullptr) {
-    //     delete this->local_cam;
-    //     this->local_cam = nullptr;
-    // }
-
-    // const QString &local = this->config->get_cam_local_device();
-    // if (!this->local_cam_available(local)) {
-    //     this->status->setText("Camera unavailable");
-    //     return;
-    // }
-
-    // qDebug() << "Connecting to local cam " << local;
-    // this->local_cam = new QCamera(local.toUtf8(), this);
-    // this->local_cam->setViewfinder(this->local_video_widget);
-    // QCameraViewfinderSettings viewfinderSettings;
-    // viewfinderSettings.setResolution(640, 480);
-    // viewfinderSettings.setMinimumFrameRate(15.0);
-    // viewfinderSettings.setMaximumFrameRate(30.0);
-
-    // local_cam->setViewfinderSettings(viewfinderSettings);
-    // connect(this->local_cam, &QCamera::statusChanged, this, &CameraPage::update_local_status);
-    // this->local_cam->start();
 }
 
 gboolean CameraPage::busCallback(GstBus*, GstMessage* message, gpointer*)
@@ -589,31 +538,3 @@ bool CameraPage::local_cam_available(const QString &device)
     return false;
 }
 
-void CameraPage::update_local_status(QCamera::Status status)
-{
-    qDebug() << "Local camera" << this->config->get_cam_local_device() << "changed status to" << status;
-
-    switch (status) {
-      case QCamera::ActiveStatus:
-        qDebug() << "Local camera format:" << this->local_cam->viewfinderSettings().pixelFormat();
-        emit connected_local();
-        break;
-      case QCamera::LoadedStatus:
-        this->choose_video_resolution();
-        // fall-through
-      case QCamera::LoadingStatus:
-      case QCamera::StartingStatus:
-        this->status->setText("connecting..."); 
-        break;
-      case QCamera::UnloadedStatus:
-        emit disconnected();
-        break;
-      default:
-        break;
-    }
-
-    if (this->local_cam != nullptr && !this->local_cam->error() == QCamera::NoError) {
-        qCritical() << "Local camera" << this->local_cam << "got error" << this->local_cam->error();
-        this->status->setText("Error connecting to local camera at '" + this->config->get_cam_local_device() + "'");
-    }
-}

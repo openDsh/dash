@@ -54,8 +54,6 @@ class CameraPage : public QWidget {
     void connect_network_stream();
     void connect_local_stream();
     bool local_cam_available(const QString &device);
-    void update_network_status(QMediaPlayer::MediaStatus media_status);
-    void update_local_status(QCamera::Status status);
     QSize choose_video_resolution();
     void count_down();
     void connect_cam();
