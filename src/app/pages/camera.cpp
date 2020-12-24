@@ -35,13 +35,7 @@ CameraPage::CameraPage(QWidget *parent) : QWidget(parent)
     if (this->config->get_cam_autoconnect())
         this->connect_cam();
 
-    videoContainer_ = this->local_video_widget;
-
-    // videoContainer_ = nullptr;
-    
-
-    
-
+    videoContainer_ = nullptr;    
 }
 
 void CameraPage::init_gstreamer_pipeline(std::string vidLaunchStr_, bool sync)
@@ -52,11 +46,15 @@ void CameraPage::init_gstreamer_pipeline(std::string vidLaunchStr_, bool sync)
     videoWidget_->rootContext()->setContextProperty(QLatin1String("videoSurface"), surface_);
     videoWidget_->setSource(QUrl("qrc:/camera_video.qml"));
     videoWidget_->setResizeMode(QQuickWidget::SizeRootObjectToView); 
+    qDebug()<<"test "<<QUrl("qrc:/camera_video.qml").path();
 
     videoSink_ = surface_->videoSink();
 
     GError* error = nullptr;
-    std::string vidLaunchStr = vidLaunchStr_+"! capsfilter caps=video/x-raw name=mycapsfilter";
+    std::string vidLaunchStr = vidLaunchStr_ + 
+                            // " ! gdkpixbufoverlay location=bg_overlay.png relative-x=.25" +
+                            " ! videoconvert " +
+                            " ! capsfilter caps=video/x-raw name=mycapsfilter";
     OPENAUTO_LOG(info) << "[CameraPage] Created GStreamer Pipeline of `"<<vidLaunchStr<<"`";
     vidPipeline_ = gst_parse_launch(vidLaunchStr.c_str(), &error);
     GstBus* bus = gst_pipeline_get_bus(GST_PIPELINE(vidPipeline_));
@@ -131,7 +129,6 @@ QWidget *CameraPage::connect_widget()
 
 QWidget *CameraPage::local_camera_widget()
 {
-    videoContainer_ = this->local_video_widget;
 
     QWidget *widget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
@@ -441,6 +438,7 @@ void CameraPage::disconnect_stream()
 
 void CameraPage::connect_local_stream()
 {
+    this->videoContainer_ = this->local_video_widget;
     if (this->local_cam != nullptr) {
         delete this->local_cam;
         this->local_cam = nullptr;
@@ -461,9 +459,7 @@ void CameraPage::connect_local_stream()
     OPENAUTO_LOG(info) << "[CameraPage] Creating GStreamer pipeline with "<<this->config->get_cam_local_device().toStdString();
     std::string pipeline = "v4l2src device="+this->config->get_cam_local_device().toStdString() + 
                            " ! capsfilter caps=\"video/x-raw,width="+std::to_string(res.width())+",height="+std::to_string(res.height())+";image/jpeg,width="+std::to_string(res.width())+",height="+std::to_string(res.height())+"\"" +
-                           " ! decodebin"
-                        //    " ! gdkpixbufoverlay location=/home/icecube45/mainlineDash/bg_overlay.png relative-x=.25" +
-                           " ! videoconvert ";
+                           " ! decodebin";
     init_gstreamer_pipeline(pipeline);
     //emit the connected signal before we resize anything, so that videoContainer has had time to resize to the proper dimensions
     emit connected_local();
@@ -566,7 +562,6 @@ QSize CameraPage::choose_video_resolution()
             min_gap = xgap + ygap;
             max_fit = resolution;
         }
-        qDebug() << "max fit: "<<max_fit;
     }
     if (max_fit.isValid()) {
         qDebug() << "Local cam auto resolution" << max_fit << "to fit in" << window_size;
