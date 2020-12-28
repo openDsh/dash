@@ -13,10 +13,11 @@ void LauncherPlugins::get_plugins()
 
 LauncherPlugins::LauncherPlugins(QWidget *parent) : QTabWidget(parent)
 {
+    this->config = Config::get_instance();
+    
     this->get_plugins();
     this->dialog = new Dialog(true, this->window());
     this->dialog->set_body(this->dialog_body());
-    this->selector->setUpdatesEnabled(true);
     QPushButton *load_button = new QPushButton("load");
     connect(load_button, &QPushButton::clicked, [this]() {
         QString key = this->selector->get_current();
@@ -29,11 +30,11 @@ LauncherPlugins::LauncherPlugins(QWidget *parent) : QTabWidget(parent)
                     this->addTab(tab, tab->objectName());
                 this->active_plugins.append(plugin_loader);
                 this->active_plugins_list->addItem(key);
+                this->config->set_launcher_plugin(key);
             }
             else {
                 delete plugin_loader;
             }
-            
         }
     });
     this->dialog->set_button(load_button);
@@ -44,13 +45,27 @@ LauncherPlugins::LauncherPlugins(QWidget *parent) : QTabWidget(parent)
     settings_button->setIcon(Theme::get_instance()->make_button_icon("settings", settings_button));
     connect(settings_button, &QPushButton::clicked, [this]() { this->dialog->open(); });
     this->setCornerWidget(settings_button);
+
+    for (auto launcher_plugin : this->config->get_launcher_plugins()) {
+        auto plugin_loader = new QPluginLoader(this);
+        plugin_loader->setFileName(this->plugins[launcher_plugin].absoluteFilePath());
+
+        if (LauncherPlugin *plugin = qobject_cast<LauncherPlugin *>(plugin_loader->instance())) {
+            for (QWidget *tab : plugin->widgets())
+                this->addTab(tab, tab->objectName());
+            this->active_plugins.append(plugin_loader);
+            this->active_plugins_list->addItem(launcher_plugin);
+        }
+        else {
+            delete plugin_loader;
+        }
+    }
 }
 
 QWidget *LauncherPlugins::dialog_body()
 {
     QWidget *widget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
-    layout->setContentsMargins(0, 0, 0, 0);
 
     this->selector = new Selector(this->plugins.keys(), 0, Theme::font_14, this);
     layout->addWidget(this->selector);
@@ -68,9 +83,13 @@ QWidget *LauncherPlugins::dialog_body()
         this->removeTab(idx);
         delete tab;
 
+        this->config->set_launcher_plugin(item->text(), true);
+
         delete this->active_plugins_list->takeItem(idx);
 
-        delete this->active_plugins[idx];
+        if (LauncherPlugin *plugin = qobject_cast<LauncherPlugin *>(this->active_plugins[idx]->instance()))
+            plugin->remove_widget(idx);
+
         this->active_plugins.removeAt(idx);
     });
     layout->addWidget(this->active_plugins_list);
@@ -87,6 +106,9 @@ LauncherPage::LauncherPage(QWidget *parent) : QStackedWidget(parent)
 
     this->addWidget(this->load_msg());
     this->addWidget(this->plugin_tabs);
+
+    if (this->plugin_tabs->count() > 0)
+        this->setCurrentIndex(1);
 }
 
 QWidget *LauncherPage::load_msg()

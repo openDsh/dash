@@ -35,7 +35,7 @@ int XWorker::get_window(uint64_t pid)
     while (retries < MAX_RETRIES) {
         WindowProp client_list = this->get_window_prop(this->root_window, XA_WINDOW, "_NET_CLIENT_LIST");
         Window *windows = (Window *)client_list.prop;
-        for (unsigned long i = 0; i < client_list.size / sizeof(Window); i++) {
+        for (unsigned long i = 0; i < (client_list.size / sizeof(Window)); i++) {
             if (pid == *(uint64_t *)this->get_window_prop(windows[i], XA_CARDINAL, "_NET_WM_PID").prop)
                 return windows[i];
         }
@@ -84,8 +84,8 @@ EmbeddedApp::EmbeddedApp(QWidget *parent) : QWidget(parent), process()
     button->setFlat(true);
     button->setIconSize(Theme::icon_20);
     connect(button, &QPushButton::clicked, [this]() { this->end(); });
-    button->setIcon(Theme::get_instance()->make_button_icon("close", button));
-    
+    button->setIcon(Theme::get_instance()->make_button_icon("close", button, QString(), true));
+
     layout->addWidget(button, 0, Qt::AlignRight);
 
     this->container = new QVBoxLayout();
@@ -124,12 +124,11 @@ void EmbeddedApp::end()
     emit closed();
 }
 
-Launcher::Launcher(QWidget *parent) : QWidget(parent)
+Launcher::Launcher(int idx, QSettings &settings, QWidget *parent) : QWidget(parent), idx(idx), settings(settings)
 {
     this->setObjectName("App");
 
     this->theme = Theme::get_instance();
-    this->config = Config::get_instance();
 
     QStackedLayout *layout = new QStackedLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
@@ -138,11 +137,14 @@ Launcher::Launcher(QWidget *parent) : QWidget(parent)
     connect(this->app, &EmbeddedApp::opened, [layout]() { layout->setCurrentIndex(1); });
     connect(this->app, &EmbeddedApp::closed, [layout]() { layout->setCurrentIndex(0); });
 
+    auto launcher_app = this->settings.value(this->app_key()).toString();
+    this->auto_launch = !launcher_app.isEmpty();
+
     layout->addWidget(this->launcher_widget());
     layout->addWidget(this->app);
 
-    if (this->config->get_launcher_auto_launch() && !this->config->get_launcher_app().isEmpty())
-        this->app->start(this->config->get_launcher_app());
+    if (this->auto_launch)
+        this->app->start(launcher_app);
 }
 
 Launcher::~Launcher()
@@ -150,12 +152,32 @@ Launcher::~Launcher()
     delete this->app;
 }
 
+void Launcher::update_idx(int idx)
+{
+    if (idx == this->idx)
+        return;
+
+    QString home;
+    QString app;
+    if (this->settings.contains(this->home_key()))
+        home = this->settings.value(this->home_key(), this->DEFAULT_DIR).toString();
+    if (this->settings.contains(this->app_key()))
+        app = this->settings.value(this->app_key()).toString();
+
+    this->settings.remove(QString::number(this->idx));
+    this->idx = idx;
+    if (!home.isNull())
+        this->settings.setValue(this->home_key(), home);
+    if (!app.isNull())
+        this->settings.setValue(this->app_key(), app);
+}
+
 QWidget *Launcher::launcher_widget()
 {
     QWidget *widget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
 
-    this->path_label = new QLabel(this->config->get_launcher_home(), this);
+    this->path_label = new QLabel(this->settings.value(this->home_key(), this->DEFAULT_DIR).toString(), this);
 
     layout->addStretch(1);
     layout->addWidget(this->path_label, 1);
@@ -171,17 +193,20 @@ QWidget *Launcher::app_select_widget()
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
-    QString root_path(this->config->get_launcher_home());
+    QString root_path(this->path_label->text());
 
     QPushButton *home_button = new QPushButton(widget);
     home_button->setFlat(true);
     home_button->setCheckable(true);
-    home_button->setChecked(this->config->get_launcher_home() == root_path);
+    home_button->setChecked(true);
     home_button->setIconSize(Theme::icon_32);
     connect(home_button, &QPushButton::clicked, [this](bool checked = false) {
-        this->config->set_launcher_home(checked ? this->path_label->text() : QDir().absolutePath());
+        if (checked)
+            this->settings.setValue(this->home_key(), this->path_label->text());
+        else
+            this->settings.remove(this->home_key());
     });
-    home_button->setIcon(theme->make_button_icon("playlist_add", home_button, "playlist_add_check"));
+    home_button->setIcon(this->theme->make_button_icon("playlist_add", home_button, "playlist_add_check", true));
     layout->addWidget(home_button, 0, Qt::AlignTop);
 
     this->folders = new QListWidget(widget);
@@ -194,11 +219,13 @@ QWidget *Launcher::app_select_widget()
     this->populate_apps(root_path);
     connect(this->apps, &QListWidget::itemClicked, [this](QListWidgetItem *item) {
         QString app_path = this->path_label->text() + '/' + item->text();
-        if (this->config->get_launcher_auto_launch()) this->config->set_launcher_app(app_path);
+        if (this->auto_launch)
+            this->settings.setValue(this->app_key(), app_path);
         this->app->start(app_path);
     });
     connect(this->folders, &QListWidget::itemClicked, [this, home_button](QListWidgetItem *item) {
-        if (!item->isSelected()) return;
+        if (!item->isSelected())
+            return;
 
         this->apps->clear();
         QString current_path(item->data(Qt::UserRole).toString());
@@ -206,7 +233,7 @@ QWidget *Launcher::app_select_widget()
         this->populate_apps(current_path);
         this->populate_dirs(current_path);
 
-        home_button->setChecked(this->config->get_launcher_home() == current_path);
+        home_button->setChecked(this->settings.value(this->home_key(), this->DEFAULT_DIR).toString() == current_path);
     });
     layout->addWidget(this->apps, 5);
 
@@ -219,23 +246,13 @@ QWidget *Launcher::config_widget()
     QVBoxLayout *layout = new QVBoxLayout(widget);
 
     QCheckBox *checkbox = new QCheckBox("launch at startup", widget);
-    checkbox->setChecked(this->config->get_launcher_auto_launch());
+    checkbox->setChecked(this->auto_launch);
     connect(checkbox, &QCheckBox::toggled, [this, checkbox](bool checked) {
-        this->config->set_launcher_auto_launch(checked);
-        QString launcher_app;
-        if (checked) {
-            launcher_app.append(this->path_label->text() + '/');
-            if (this->apps->currentItem() == nullptr) {
-                if (this->apps->count() > 0)
-                    launcher_app.append(this->apps->item(0)->text());
-                else
-                    checkbox->setChecked(false);
-            }
-            else {
-                launcher_app.append(this->apps->currentItem()->text());
-            }
-        }
-        this->config->set_launcher_app(launcher_app);
+        this->auto_launch = checked;
+        if (this->auto_launch && this->apps->currentItem())
+            this->settings.setValue(this->app_key(), this->path_label->text() + '/' + this->apps->currentItem()->text());
+        else
+            this->settings.remove(this->app_key());
     });
 
     layout->addWidget(checkbox);
@@ -248,13 +265,15 @@ void Launcher::populate_dirs(QString path)
     this->folders->clear();
     QDir current_dir(path);
     for (QFileInfo dir : current_dir.entryInfoList(QDir::AllDirs | QDir::Readable)) {
-        if (dir.fileName() == ".") continue;
+        if (dir.fileName() == ".")
+            continue;
 
         QListWidgetItem *item = new QListWidgetItem(dir.fileName(), this->folders);
         if (dir.fileName() == "..") {
             item->setText("↲");
 
-            if (current_dir.isRoot()) item->setFlags(Qt::NoItemFlags);
+            if (current_dir.isRoot())
+                item->setFlags(Qt::NoItemFlags);
         }
         else {
             item->setText(dir.fileName());
@@ -265,18 +284,24 @@ void Launcher::populate_dirs(QString path)
 
 void Launcher::populate_apps(QString path)
 {
-    for (QString app : QDir(path).entryList(QDir::Files | QDir::Executable)) new QListWidgetItem(app, this->apps);
-}
-
-App::~App()
-{
-    for (auto widget : this->loaded_widgets)
-        delete widget;
+    for (QString app : QDir(path).entryList(QDir::Files | QDir::Executable))
+        new QListWidgetItem(app, this->apps);
 }
 
 QList<QWidget *> App::widgets()
 {
     int size = this->loaded_widgets.size();
-    this->loaded_widgets.append(new Launcher());
+    this->loaded_widgets.append(new Launcher(size, this->settings));
     return this->loaded_widgets.mid(size);
+}
+
+void App::remove_widget(int idx)
+{
+    LauncherPlugin::remove_widget(idx);
+
+    this->settings.remove(QString::number(idx));
+    for (int i = 0; i < this->loaded_widgets.size(); i++) {
+        if (Launcher *launcher = qobject_cast<Launcher *>(this->loaded_widgets[i]))
+            launcher->update_idx(i);
+    }
 }

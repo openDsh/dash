@@ -9,6 +9,9 @@ int main(int argc, char *argv[])
     QApplication dash(argc, argv);
     QStringList args = dash.arguments();
 
+    dash.setOrganizationName("openDsh");
+    dash.setApplicationName("dash");
+
     DashWindow window;
     window.setWindowIcon(QIcon(":/logo.png"));
     window.setWindowFlags(Qt::FramelessWindowHint);

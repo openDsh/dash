@@ -9,10 +9,11 @@
 
 class BrightnessPlugin : public Plugin {
    public:
+    BrightnessPlugin() { this->settings.beginGroup("Brightness"); }
     virtual ~BrightnessPlugin() = default;
     virtual void set(int brightness) = 0;
 };
 
-#define BrightnessPlugin_iid "org.dash.BrightnessPlugin"
+#define BrightnessPlugin_iid "openDsh.plugins.BrightnessPlugin"
 
 Q_DECLARE_INTERFACE(BrightnessPlugin, BrightnessPlugin_iid)

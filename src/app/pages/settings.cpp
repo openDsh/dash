@@ -202,8 +202,7 @@ QWidget *MainSettingsTab::color_select_widget()
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
     ColorPicker *label = new ColorPicker(Theme::icon_16, Theme::font_14, widget);
-    label->scale(this->config->get_scale());
-    connect(this->config, &Config::scale_changed, [label](double scale) { label->scale(scale); });
+    label->update(this->config->get_color());
     connect(label, &ColorPicker::color_changed, [this](QColor color) {
         this->config->set_color(color.name());
         this->theme->update();

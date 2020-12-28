@@ -17,6 +17,8 @@ class LauncherPlugins : public QTabWidget {
    private:
     void get_plugins();
 
+    Config *config;
+
     QMap<QString, QFileInfo> plugins;
     QList<QPluginLoader *> active_plugins; // keep track of widgets not plugins (only one instance of the plugin actually gets created anyway)
     QListWidget *active_plugins_list;

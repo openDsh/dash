@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QDir>
 #include <QProcess>
 #include <QtWidgets>
 
@@ -31,7 +32,7 @@ class XWorker : public QObject {
     int get_window(uint64_t pid);
 
    private:
-    const int MAX_RETRIES = 60;
+    const int MAX_RETRIES = 3;
 
     struct WindowProp {
         WindowProp(char *prop, unsigned long size);
@@ -71,22 +72,31 @@ class Launcher : public QWidget {
     Q_OBJECT
 
    public:
-    Launcher(QWidget *parent = nullptr);
+    Launcher(int idx, QSettings &settings, QWidget *parent = nullptr);
     ~Launcher();
+    void update_idx(int idx);
 
    private:
+    const QString DEFAULT_DIR = QDir().absolutePath();
+
     QWidget *launcher_widget();
     QWidget *app_select_widget();
     QWidget *config_widget();
     void populate_dirs(QString path);
     void populate_apps(QString path);
 
+    inline QString home_key() { return QString("%1/home").arg(this->idx); }
+    inline QString app_key() { return QString("%1/app").arg(this->idx); }
+
     Theme *theme;
-    Config *config;
     EmbeddedApp *app;
     QLabel *path_label;
     QListWidget *folders;
     QListWidget *apps;
+    int idx;
+    bool auto_launch = false;
+
+    QSettings &settings;
 };
 
 class App : public QObject, LauncherPlugin {
@@ -95,10 +105,7 @@ class App : public QObject, LauncherPlugin {
     Q_INTERFACES(LauncherPlugin)
 
    public:
-    App() {}
-    ~App();
+    App() { this->settings.beginGroup("App"); }
     QList<QWidget *> widgets() override;
-
-   private:
-    QList<QWidget *> loaded_widgets;
+    void remove_widget(int idx) override;
 };

@@ -1,6 +1,8 @@
 #pragma once
 
 #include <QList>
+#include <QApplication>
+#include <QSettings>
 #include <QWidget>
 
 class Theme;
@@ -9,6 +11,7 @@ class Shortcuts;
 
 class Plugin {
    public:
+    Plugin() : settings(qApp->organizationName(), "plugins") {}
     virtual ~Plugin() = default;
 
     virtual QList<QWidget *> widgets() { return QList<QWidget *>{}; };
@@ -17,8 +20,10 @@ class Plugin {
     static const Theme *theme;
     static const Config *config;
     static const Shortcuts *shortcuts;
+
+    QSettings settings;
 };
 
-#define Plugin_iid "org.dash.Plugin"
+#define Plugin_iid "openDsh.plugins.Plugin"
 
 Q_DECLARE_INTERFACE(Plugin, Plugin_iid)
