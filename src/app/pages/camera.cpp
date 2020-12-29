@@ -46,6 +46,7 @@ CameraPage::CameraPage(QWidget *parent) : QWidget(parent)
 
 }
 
+
 void CameraPage::init_gstreamer_pipeline(std::string vidLaunchStr_, bool sync)
 {
     videoWidget_ = new QQuickWidget(videoContainer_);
@@ -58,10 +59,14 @@ void CameraPage::init_gstreamer_pipeline(std::string vidLaunchStr_, bool sync)
     videoSink_ = surface_->videoSink();
 
     GError* error = nullptr;
-    std::string vidLaunchStr = vidLaunchStr_ + 
-                            " ! videoconvert ! rsvgoverlay location=/tmp/dash_camera_overlay.svg fit-to-frame=true" +
-                            " ! videoconvert " +
-                            " ! capsfilter caps=video/x-raw name=mycapsfilter";
+    std::string vidLaunchStr = vidLaunchStr_;
+    if(this->config->get_cam_overlay()){
+        vidLaunchStr = vidLaunchStr + 
+                    " ! videoconvert ! rsvgoverlay location=/tmp/dash_camera_overlay.svg fit-to-frame=true";
+    }
+    vidLaunchStr = vidLaunchStr +
+                    " ! videoconvert " +
+                    " ! capsfilter caps=video/x-raw name=mycapsfilter";
     DASH_LOG(info) << "[CameraPage] Created GStreamer Pipeline of `"<<vidLaunchStr<<"`";
     vidPipeline_ = gst_parse_launch(vidLaunchStr.c_str(), &error);
     GstBus* bus = gst_pipeline_get_bus(GST_PIPELINE(vidPipeline_));
@@ -86,6 +91,17 @@ QWidget *CameraPage::connect_widget()
     QWidget *widget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
 
+    QPushButton *settings_button = new QPushButton(this);
+    settings_button->setFlat(true);
+    settings_button->setIconSize(Theme::icon_24);
+    settings_button->setIcon(this->theme->make_button_icon("settings", settings_button));
+
+    QHBoxLayout *layout2 = new QHBoxLayout();
+    layout2->setContentsMargins(0, 0, 0, 0);
+    layout2->setSpacing(0);
+    layout2->addStretch();
+    layout2->addWidget(settings_button);
+    layout->addLayout(layout2); 
     QLabel *label = new QLabel("connect camera", widget);
 
     this->status = new QLabel(widget);
@@ -131,7 +147,72 @@ QWidget *CameraPage::connect_widget()
     layout->addStretch();
     layout->addWidget(checkboxes_widget);
 
+    Dialog *dialog = new Dialog(true, this->window());
+    dialog->set_body(new Settings());
+    QPushButton *save_button = new QPushButton("save");
+    connect(save_button, &QPushButton::clicked, [this]() {
+        
+    });
+    dialog->set_button(save_button);
+    connect(settings_button, &QPushButton::clicked, [dialog]() { dialog->open(); });
+
+
     return widget;
+}
+
+CameraPage::Settings::Settings(QWidget *parent) : QWidget(parent)
+{
+    this->config = Config::get_instance();
+    QVBoxLayout *layout = new QVBoxLayout(this);
+    layout->setContentsMargins(6, 0, 6, 0);
+
+    layout->addWidget(this->settings_widget());
+}
+
+QWidget *CameraPage::Settings::settings_widget()
+{
+    QWidget *widget = new QWidget(this);
+    QVBoxLayout *layout = new QVBoxLayout(widget);
+    layout->addLayout(this->camera_overlay_row_widget(), 1);
+    // layout->addLayout(this->rhd_row_widget(), 1);
+    // layout->addWidget(Theme::br(), 1);
+    // layout->addLayout(this->frame_rate_row_widget(), 1);
+    // layout->addLayout(this->resolution_row_widget(), 1);
+    // layout->addLayout(this->dpi_row_widget(), 1);
+    // layout->addWidget(Theme::br(), 1);
+    // layout->addLayout(this->rt_audio_row_widget(), 1);
+    // layout->addLayout(this->audio_channels_row_widget(), 1);
+    // layout->addWidget(Theme::br(), 1);
+    // layout->addLayout(this->bluetooth_row_widget(), 1);
+    // layout->addWidget(Theme::br(), 1);
+    // layout->addLayout(this->touchscreen_row_widget(), 1);
+    // layout->addLayout(this->buttons_row_widget(), 1);
+
+    QScrollArea *scroll_area = new QScrollArea(this);
+    Theme::to_touch_scroller(scroll_area);
+    scroll_area->setWidgetResizable(true);
+    scroll_area->setWidget(widget);
+
+    return scroll_area;
+}
+
+QBoxLayout *CameraPage::Settings::camera_overlay_row_widget()
+{
+    QHBoxLayout *layout = new QHBoxLayout();
+
+    QLabel *label = new QLabel("Reverse Camera Overlay");
+    layout->addWidget(label, 1);
+
+    Switch *toggle = new Switch();
+    toggle->scale(this->config->get_scale());
+    toggle->setChecked(this->config->get_cam_overlay());
+    connect(this->config, &Config::scale_changed, [toggle](double scale) { toggle->scale(scale); });
+    connect(toggle, &Switch::stateChanged, [config = this->config](bool state) {
+        config->set_cam_overlay(state);
+    });
+    layout->addWidget(toggle, 1, Qt::AlignHCenter);
+
+    return layout;
 }
 
 QWidget *CameraPage::local_camera_widget()

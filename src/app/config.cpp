@@ -42,6 +42,7 @@ Config::Config()
     this->cam_local_format_override = this->settings.value("Camera/local_format_override").value<QVideoFrame::PixelFormat>();
     this->cam_autoconnect = this->settings.value("Camera/automatically_reconnect").toBool();
     this->cam_autoconnect_time_secs = this->settings.value("Camera/auto_reconnect_time_secs", 6).toInt();
+    this->cam_overlay = this->settings.value("Camera/overlay_enabled").toBool();
     this->vehicle_plugin = this->settings.value("Vehicle/plugin", QString()).toString();
     this->vehicle_can_bus = this->settings.value("Vehicle/can_bus", false).toBool();
     this->vehicle_interface = this->settings.value("Vehicle/interface", QString()).toString();
@@ -122,6 +123,8 @@ void Config::save()
         this->settings.setValue("Camera/automatically_reconnect", this->cam_autoconnect);
     if (this->cam_autoconnect_time_secs != this->settings.value("Camera/auto_reconnect_time_secs").toInt())
         this->settings.setValue("Camera/auto_reconnect_time_secs", this->cam_autoconnect_time_secs);
+    if (this->cam_overlay != this->settings.value("Camera/overlay_enabled").toBool())
+        this->settings.setValue("Camera/overlay_enabled", this->cam_overlay);
     if (this->vehicle_plugin != this->settings.value("Vehicle/plugin").toString())
         this->settings.setValue("Vehicle/plugin", this->vehicle_plugin);
     if (this->vehicle_can_bus != this->settings.value("Vehicle/can_bus").toBool())

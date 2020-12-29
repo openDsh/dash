@@ -87,6 +87,30 @@ class CameraPage : public QWidget {
     QWidget* videoContainer_;
     QGst::Quick::VideoSurface* surface_;
 
+    class Settings : public QWidget {
+       public:
+        Settings(QWidget *parent = nullptr);
+
+       private:
+        QWidget *settings_widget();
+        QBoxLayout *camera_overlay_row_widget();
+        // QBoxLayout *rhd_row_widget();
+        // QBoxLayout *frame_rate_row_widget();
+        // QBoxLayout *resolution_row_widget();
+        // QBoxLayout *dpi_row_widget();
+        // QBoxLayout *dpi_widget();
+        // QBoxLayout *rt_audio_row_widget();
+        // QBoxLayout *audio_channels_row_widget();
+        // QBoxLayout *bluetooth_row_widget();
+        // QBoxLayout *touchscreen_row_widget();
+        // QCheckBox *button_checkbox(QString name, QString key, aasdk::proto::enums::ButtonCode::Enum code);
+        // QBoxLayout *buttons_row_widget();
+
+        // Bluetooth *bluetooth;
+        Config *config;
+        // Theme *theme;
+    };
+
    signals:
     void connected_network();
     void connected_local();
