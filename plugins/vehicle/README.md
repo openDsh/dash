@@ -10,6 +10,27 @@ If you want to add additional tabs to the vehicle page, you can pass them into `
 
 ## Components
 
+### CANBus Interfacing
+
+canbus/ICANBus.hpp
+
+Any plugin's `init` should take an `ICANBus*` as a parameter.
+
+`ICANBus` provides
+`bool writeFrame(QCanBusFrame frame)`
+
+* Writes `frame` to the CANBus, returns true if successful. Note that use of an elm327 only supports sending frames to id `0x7df` (OBD protocol)
+
+`void registerFrameHandler(int id, std::function<void(QByteArray)> callback)`
+
+* Register a callback (`void custom_callback_method(QByteArray data)`) that is called whenever a CANBus message to `id` is detected - where the frame payload is `data`
+
+
+
+For instance, if your car sends climate data on CAN id 10, you can register a callback on id 10, and then update dash's climate interface according to the received data.
+
+
+
 ### Climate Interface
 app/widgets/climate.hpp
 

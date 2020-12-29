@@ -2,12 +2,12 @@
 
 #include <functional>
 #include <string>
-
-#include <obd/message.hpp>
+#include <QCanBusFrame>
+#include "obd/message.hpp"
 
 struct Command {
     std::string description;
-    Request request;
+    QCanBusFrame frame;
     std::function<double(Response)> decoder;
 };
 

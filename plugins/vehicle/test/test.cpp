@@ -65,7 +65,7 @@ QList<QWidget *> Test::widgets()
     return tabs;
 }
 
-bool Test::init()
+bool Test::init(ICANBus* canbus)
 {
     return true;
 }

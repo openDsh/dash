@@ -18,6 +18,7 @@ FOREACH(plugin_type ${plugin_types})
         add_library(${plugin} SHARED ${plugin_src_files})
         set_target_properties(${plugin} PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/plugins/${plugin_type})
         target_include_directories(${plugin} SYSTEM PRIVATE
+            ${Qt5SerialBus_INCLUDE_DIRS}
             ${Qt5Multimedia_INCLUDE_DIRS}
             ${Qt5MultimediaWidgets_INCLUDE_DIRS}
             ${Qt5Widgets_INCLUDE_DIRS}
@@ -43,6 +44,7 @@ FOREACH(plugin_type ${plugin_types})
             aasdk
             openauto
             ${Boost_LIBRARIES}
+            ${Qt5SerialBus_LIBRARIES}
             ${Qt5Multimedia_LIBRARIES}
             ${Qt5MultimediaWidgets_LIBRARIES}
             ${Qt5Bluetooth_LIBRARIES}
