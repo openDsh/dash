@@ -32,8 +32,6 @@ CameraPage::CameraPage(QWidget *parent) : QWidget(parent)
     connect(this, &CameraPage::connected_local, [layout]() { layout->setCurrentIndex(1); });
     connect(this, &CameraPage::connected_network, [layout]() { layout->setCurrentIndex(2); });
 
-    if (this->config->get_cam_autoconnect())
-        this->connect_cam();
 
     videoContainer_ = nullptr;
 
@@ -44,6 +42,9 @@ CameraPage::CameraPage(QWidget *parent) : QWidget(parent)
     }
     QFile::copy(":/camera_overlay.svg", "/tmp/dash_camera_overlay.svg");
 
+    if (this->config->get_cam_autoconnect())
+
+        this->connect_cam();
 }
 
 
@@ -241,7 +242,7 @@ QBoxLayout *CameraPage::Settings::camera_overlay_width_widget()
 
     QSlider *slider = new QSlider(Qt::Orientation::Horizontal);
     slider->setTracking(false);
-    slider->setRange(0, 100);
+    slider->setRange(0, 150);
     slider->setValue(this->config->get_cam_overlay_width());
     QLabel *value = new QLabel(QString::number(slider->value()));
     connect(slider, &QSlider::valueChanged, [config = this->config, value](int position) {
@@ -277,7 +278,7 @@ QBoxLayout *CameraPage::Settings::camera_overlay_height_widget()
 
     QSlider *slider = new QSlider(Qt::Orientation::Horizontal);
     slider->setTracking(false);
-    slider->setRange(0, 100);
+    slider->setRange(0, 150);
     slider->setValue(this->config->get_cam_overlay_height());
     QLabel *value = new QLabel(QString::number(slider->value()));
     connect(slider, &QSlider::valueChanged, [config = this->config, value](int position) {
