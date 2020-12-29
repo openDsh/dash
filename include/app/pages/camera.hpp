@@ -73,12 +73,14 @@ class CameraPage : public QWidget {
     QString reconnect_message;
     int local_index;
 
+    bool connected = false;
+
     void init_gstreamer_pipeline(std::string vidLaunchStr_, bool sync = false);
     void disconnect_stream();
 
     static GstPadProbeReturn convertProbe(GstPad* pad, GstPadProbeInfo* info, void*);
     static gboolean busCallback(GstBus*, GstMessage* message, gpointer*);
-
+    void showEvent(QShowEvent *event);
 
     QGst::ElementPtr videoSink_;
     QQuickWidget* videoWidget_;
@@ -86,7 +88,13 @@ class CameraPage : public QWidget {
     GstAppSrc* vidSrc_;
     QWidget* videoContainer_;
     QGst::Quick::VideoSurface* surface_;
-
+    class VideoContainer : public QWidget {
+        public:
+         VideoContainer(QWidget *parent = nullptr, CameraPage *page = nullptr);
+        private:
+         void resizeEvent(QResizeEvent *event);
+         CameraPage * page;
+    };
     class Settings : public QWidget {
        public:
         Settings(QWidget *parent = nullptr);

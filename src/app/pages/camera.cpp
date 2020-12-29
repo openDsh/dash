@@ -29,11 +29,12 @@ CameraPage::CameraPage(QWidget *parent) : QWidget(parent)
         layout->setCurrentIndex(0);
         this->disconnect_stream();
     });
-    connect(this, &CameraPage::connected_local, [layout]() { layout->setCurrentIndex(1); });
-    connect(this, &CameraPage::connected_network, [layout]() { layout->setCurrentIndex(2); });
+    connect(this, &CameraPage::connected_local, [layout, this]() { layout->setCurrentIndex(1); this->connected=true; });
+    connect(this, &CameraPage::connected_network, [layout, this]() { layout->setCurrentIndex(2); this->connected=true; });
 
 
     videoContainer_ = nullptr;
+    videoWidget_ = nullptr;
 
     // Write camera_overlay to /tmp so that we can later point gstreamer to it
     if (QFile::exists("/tmp/dash_camera_overlay.svg"))
@@ -41,12 +42,17 @@ CameraPage::CameraPage(QWidget *parent) : QWidget(parent)
         QFile::remove("/tmp/dash_camera_overlay.svg");
     }
     QFile::copy(":/camera_overlay.svg", "/tmp/dash_camera_overlay.svg");
-
-    if (this->config->get_cam_autoconnect())
-
-        this->connect_cam();
 }
 
+void CameraPage::showEvent(QShowEvent *event)
+{
+    QWidget::showEvent(event);
+    DASH_LOG(info) << "[CameraPage] Show event.";
+    if (this->config->get_cam_autoconnect() && this->connected==false)
+    {
+        this->connect_cam();
+    }
+}
 
 void CameraPage::init_gstreamer_pipeline(std::string vidLaunchStr_, bool sync)
 {
@@ -165,6 +171,20 @@ QWidget *CameraPage::connect_widget()
     return widget;
 }
 
+CameraPage::VideoContainer::VideoContainer(QWidget *parent, CameraPage *page_) : QWidget(parent)
+{
+    this->page=page_;
+}
+
+void CameraPage::VideoContainer::resizeEvent(QResizeEvent *event)
+{
+    QWidget::resizeEvent(event);
+    if(this->page->videoWidget_ != nullptr && this->page->videoContainer_ != nullptr){
+        this->page->videoWidget_->resize(event->size());
+    }
+    DASH_LOG(info) << "[CameraPage] videoContainer resized";
+}
+
 CameraPage::Settings::Settings(QWidget *parent) : QWidget(parent)
 {
     this->config = Config::get_instance();
@@ -209,7 +229,7 @@ QBoxLayout *CameraPage::Settings::camera_overlay_row_widget()
 {
     QHBoxLayout *layout = new QHBoxLayout();
 
-    QLabel *label = new QLabel("Reverse Camera Overlay");
+    QLabel *label = new QLabel("Backup Camera Overlay");
     layout->addWidget(label, 1);
 
     Switch *toggle = new Switch();
@@ -317,7 +337,7 @@ QWidget *CameraPage::local_camera_widget()
     disconnect->setIcon(this->theme->make_button_icon("close", disconnect));
     layout->addWidget(disconnect, 0, Qt::AlignRight);
 
-    this->local_video_widget = new QWidget(widget);
+    this->local_video_widget = new CameraPage::VideoContainer(widget, this);
 
     layout->addWidget(this->local_video_widget);
 
@@ -341,7 +361,7 @@ QWidget *CameraPage::network_camera_widget()
     disconnect->setIcon(this->theme->make_button_icon("close", disconnect));
     layout->addWidget(disconnect, 0, Qt::AlignRight);
 
-    this->remote_video_widget = new QWidget(widget);
+    this->remote_video_widget = new CameraPage::VideoContainer(widget, this);
     layout->addWidget(this->remote_video_widget);
 
     return widget;
@@ -565,6 +585,7 @@ void CameraPage::disconnect_stream()
             this->reconnect_in_secs = this->config->get_cam_autoconnect_time_secs();
             this->reconnect_timer->start(1000);
     }
+    this->connected=false;
 }
 
 void CameraPage::connect_local_stream()
