@@ -161,6 +161,12 @@ class Config : public QObject {
     inline bool get_cam_overlay() { return this->cam_overlay; }
     inline void set_cam_overlay(bool enabled) { this->cam_overlay = enabled; }
 
+    inline int get_cam_overlay_width() { return this->cam_overlay_width; }
+    inline void set_cam_overlay_width(int value) { this->cam_overlay_width = value; }
+
+    inline int get_cam_overlay_height() { return this->cam_overlay_height; }
+    inline void set_cam_overlay_height(int value) { this->cam_overlay_height = value; }
+
     inline QString get_brightness_plugin_name() { return this->brightness_plugin; }
     inline QStringList get_brightness_plugins() { return this->brightness_plugins.keys(); }
     inline void set_brightness_plugin(QString brightness_plugin)
@@ -223,6 +229,8 @@ class Config : public QObject {
     bool cam_autoconnect;
     int cam_autoconnect_time_secs;
     bool cam_overlay;
+    int cam_overlay_width;
+    int cam_overlay_height;
     QMap<QString, bool> pages;
     QString vehicle_plugin;
     bool vehicle_can_bus;

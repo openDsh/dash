@@ -61,8 +61,12 @@ void CameraPage::init_gstreamer_pipeline(std::string vidLaunchStr_, bool sync)
     GError* error = nullptr;
     std::string vidLaunchStr = vidLaunchStr_;
     if(this->config->get_cam_overlay()){
+        double width = this->config->get_cam_overlay_width()/100.0;
+        double height = this->config->get_cam_overlay_height()/100.0;
+        double x = (1-width)/2.0;
+        double y = (1-height);
         vidLaunchStr = vidLaunchStr + 
-                    " ! videoconvert ! rsvgoverlay location=/tmp/dash_camera_overlay.svg fit-to-frame=true";
+                    " ! videoconvert ! rsvgoverlay location=/tmp/dash_camera_overlay.svg width-relative="+std::to_string(width)+" height-relative="+std::to_string(height)+" x-relative="+std::to_string(x)+" y-relative="+std::to_string(y);
     }
     vidLaunchStr = vidLaunchStr +
                     " ! videoconvert " +
@@ -151,7 +155,7 @@ QWidget *CameraPage::connect_widget()
     dialog->set_body(new Settings());
     QPushButton *save_button = new QPushButton("save");
     connect(save_button, &QPushButton::clicked, [this]() {
-        
+        this->config->save();
     });
     dialog->set_button(save_button);
     connect(settings_button, &QPushButton::clicked, [dialog]() { dialog->open(); });
@@ -174,12 +178,16 @@ QWidget *CameraPage::Settings::settings_widget()
     QWidget *widget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
     layout->addLayout(this->camera_overlay_row_widget(), 1);
+    layout->addWidget(Theme::br(), 1);
+    layout->addLayout(this->camera_overlay_width_row_widget(), 1);
+    layout->addWidget(Theme::br(), 1);
+    layout->addLayout(this->camera_overlay_height_row_widget(), 1);
+
+
     // layout->addLayout(this->rhd_row_widget(), 1);
-    // layout->addWidget(Theme::br(), 1);
     // layout->addLayout(this->frame_rate_row_widget(), 1);
     // layout->addLayout(this->resolution_row_widget(), 1);
     // layout->addLayout(this->dpi_row_widget(), 1);
-    // layout->addWidget(Theme::br(), 1);
     // layout->addLayout(this->rt_audio_row_widget(), 1);
     // layout->addLayout(this->audio_channels_row_widget(), 1);
     // layout->addWidget(Theme::br(), 1);
@@ -214,6 +222,79 @@ QBoxLayout *CameraPage::Settings::camera_overlay_row_widget()
 
     return layout;
 }
+
+QBoxLayout *CameraPage::Settings::camera_overlay_width_row_widget()
+{
+    QHBoxLayout *layout = new QHBoxLayout();
+
+    QLabel *label = new QLabel("Overlay Width");
+    layout->addWidget(label, 1);
+
+    layout->addLayout(this->camera_overlay_width_widget(), 1);
+
+    return layout;
+}
+
+QBoxLayout *CameraPage::Settings::camera_overlay_width_widget()
+{
+    QHBoxLayout *layout = new QHBoxLayout();
+
+    QSlider *slider = new QSlider(Qt::Orientation::Horizontal);
+    slider->setTracking(false);
+    slider->setRange(0, 100);
+    slider->setValue(this->config->get_cam_overlay_width());
+    QLabel *value = new QLabel(QString::number(slider->value()));
+    connect(slider, &QSlider::valueChanged, [config = this->config, value](int position) {
+        config->set_cam_overlay_width(position);
+        value->setText(QString::number(position));
+    });
+    connect(slider, &QSlider::sliderMoved, [value](int position) {
+        value->setText(QString::number(position));
+    });
+
+    layout->addStretch(2);
+    layout->addWidget(slider, 4);
+    layout->addWidget(value, 2);
+
+    return layout;
+}
+
+QBoxLayout *CameraPage::Settings::camera_overlay_height_row_widget()
+{
+    QHBoxLayout *layout = new QHBoxLayout();
+
+    QLabel *label = new QLabel("Overlay Height");
+    layout->addWidget(label, 1);
+
+    layout->addLayout(this->camera_overlay_height_widget(), 1);
+
+    return layout;
+}
+
+QBoxLayout *CameraPage::Settings::camera_overlay_height_widget()
+{
+    QHBoxLayout *layout = new QHBoxLayout();
+
+    QSlider *slider = new QSlider(Qt::Orientation::Horizontal);
+    slider->setTracking(false);
+    slider->setRange(0, 100);
+    slider->setValue(this->config->get_cam_overlay_height());
+    QLabel *value = new QLabel(QString::number(slider->value()));
+    connect(slider, &QSlider::valueChanged, [config = this->config, value](int position) {
+        config->set_cam_overlay_height(position);
+        value->setText(QString::number(position));
+    });
+    connect(slider, &QSlider::sliderMoved, [value](int position) {
+        value->setText(QString::number(position));
+    });
+
+    layout->addStretch(2);
+    layout->addWidget(slider, 4);
+    layout->addWidget(value, 2);
+
+    return layout;
+}
+
 
 QWidget *CameraPage::local_camera_widget()
 {

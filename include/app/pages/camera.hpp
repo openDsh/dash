@@ -94,7 +94,12 @@ class CameraPage : public QWidget {
        private:
         QWidget *settings_widget();
         QBoxLayout *camera_overlay_row_widget();
-        // QBoxLayout *rhd_row_widget();
+        QBoxLayout *camera_overlay_width_row_widget();
+        QBoxLayout *camera_overlay_height_row_widget();
+        QBoxLayout *camera_overlay_width_widget();
+        QBoxLayout *camera_overlay_height_widget();
+
+
         // QBoxLayout *frame_rate_row_widget();
         // QBoxLayout *resolution_row_widget();
         // QBoxLayout *dpi_row_widget();
