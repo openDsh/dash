@@ -371,7 +371,9 @@ QBoxLayout *OpenAutoPage::Settings::buttons_row_widget()
     return layout;
 }
 
-OpenAutoPage::OpenAutoPage(QWidget *parent) : QStackedWidget(parent)
+OpenAutoPage::OpenAutoPage(Arbiter &arbiter, QWidget *parent)
+    : QStackedWidget(parent)
+    , Page(arbiter, "Android Auto", "android_auto", true, this)
 {
     this->config = Config::get_instance();
     this->theme = Theme::get_instance();

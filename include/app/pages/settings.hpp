@@ -9,11 +9,15 @@
 #include "app/shortcuts.hpp"
 #include "app/theme.hpp"
 
-class SettingsPage : public QTabWidget {
+#include "app/pages/page.hpp"
+
+class Arbiter;
+
+class SettingsPage : public QTabWidget, public Page {
     Q_OBJECT
 
    public:
-    SettingsPage(QWidget *parent = nullptr);
+    SettingsPage(Arbiter &arbiter, QWidget *parent = nullptr);
 };
 
 class MainSettingsTab : public QWidget {
@@ -45,7 +49,7 @@ class LayoutSettingsTab : public QWidget {
     Q_OBJECT
 
    public:
-    LayoutSettingsTab(QWidget *parent = nullptr);
+    LayoutSettingsTab(Arbiter &arbiter, QWidget *parent = nullptr);
 
    private:
     QWidget *settings_widget();
@@ -56,6 +60,7 @@ class LayoutSettingsTab : public QWidget {
     QWidget *scale_row_widget();
     QWidget *scale_widget();
 
+    Arbiter &arbiter;
     Config *config;
     Theme *theme;
 };

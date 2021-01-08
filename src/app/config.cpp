@@ -1,10 +1,45 @@
 #include <QApplication>
 #include <QDir>
+#include <QJsonDocument>
 #include <QTimer>
 #include <QProcess>
+#include <QDebug>
 
 #include "app/config.hpp"
 #include "plugins/brightness_plugin.hpp"
+
+Config::Server::Server(QObject *parent) : QWebSocketServer("dash", QWebSocketServer::NonSecureMode, parent)
+{
+    if (this->listen(QHostAddress::Any, this->PORT)) {
+        connect(this, &QWebSocketServer::newConnection, [this]() {
+            if (auto client = this->nextPendingConnection())
+                this->add_client(client);
+        });
+    }
+}
+
+Config::Server::~Server()
+{
+    this->close();
+    for (auto client : this->clients)
+        delete client;
+}
+
+void Config::Server::add_client(QWebSocket *client)
+{
+    this->clients.append(client);
+
+    connect(client, &QWebSocket::textMessageReceived, [this, client](QString msg) {
+        this->handle_request(client, msg);
+    });
+}
+
+void Config::Server::handle_request(QWebSocket *client, QString request)
+{
+    auto json = QJsonDocument::fromJson(request.toUtf8());
+    qDebug() << json;
+    // client->sendTextMessage(message);
+}
 
 Config::Config()
     : QObject(qApp),
@@ -59,6 +94,8 @@ Config::Config()
     if (this->brightness_active_plugin->isLoaded())
         this->brightness_active_plugin->unload();
     this->brightness_active_plugin->setFileName(this->brightness_plugins[this->brightness_plugin].absoluteFilePath());
+
+    auto socket = new Server(this);
 }
 
 Config::~Config()

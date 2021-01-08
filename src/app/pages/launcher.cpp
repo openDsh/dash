@@ -121,7 +121,9 @@ void EmbeddedApp::end()
     emit closed();
 }
 
-LauncherPage::LauncherPage(QWidget *parent) : QWidget(parent)
+LauncherPage::LauncherPage(Arbiter &arbiter, QWidget *parent)
+    : QWidget(parent)
+    , Page(arbiter, "Launcher", "widgets", true, this)
 {
     this->theme = Theme::get_instance();
     this->config = Config::get_instance();

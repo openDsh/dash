@@ -7,7 +7,9 @@
 #include "app/pages/camera.hpp"
 #include "app/window.hpp"
 
-CameraPage::CameraPage(QWidget *parent) : QWidget(parent)
+CameraPage::CameraPage(Arbiter &arbiter, QWidget *parent)
+    : QWidget(parent)
+    , Page(arbiter, "Camera", "camera", true, this)
 {
     this->theme = Theme::get_instance();
     this->player = new QMediaPlayer(this);

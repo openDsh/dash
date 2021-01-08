@@ -16,6 +16,8 @@
 #include "app/widgets/dialog.hpp"
 
 DashWindow::DashWindow()
+    : QMainWindow()
+    , arbiter()
 {
     this->setAttribute(Qt::WA_TranslucentBackground, true);
 
@@ -26,26 +28,41 @@ DashWindow::DashWindow()
     this->init_theme();
     this->init_config();
 
-    this->openauto = new OpenAutoPage(this);
+    this->openauto = this->arbiter.layout().openauto_page;
     this->stack = new QStackedWidget(this);
     this->rail = new QVBoxLayout();
     this->rail_group = new QButtonGroup(this);
     this->pages = new QStackedLayout();
     this->bar = new QHBoxLayout();
 
-    connect(this->rail_group, QOverload<int, bool>::of(&QButtonGroup::buttonToggled),
-            [this](int id, bool) { this->pages->setCurrentIndex(id); });
+    connect(this->rail_group, &QButtonGroup::idToggled, [this](int id, bool){
+        this->pages->setCurrentWidget(this->arbiter.layout().page(id)->widget());
+    });
     connect(this->openauto, &OpenAutoPage::toggle_fullscreen, [this](QWidget *widget) { this->add_widget(widget); });
 
     connect(this->config, &Config::scale_changed, [theme = this->theme](double scale) { theme->set_scale(scale); });
-    connect(this->config, &Config::page_changed,
-            [rail_group = this->rail_group, pages = this->pages](QWidget *page, bool enabled) {
-                QAbstractButton *button = rail_group->button(pages->indexOf(page));
-                button->setVisible(enabled);
-            });
 
     this->init_ui();
     this->init_shortcuts();
+
+    connect(&this->arbiter, &Arbiter::mode_toggled, [this](){
+        auto mode = this->arbiter.theme().mode;
+        this->theme->set_mode(mode);
+        this->config->set_dark_mode(mode == Session::Theme::Dark);
+        this->theme->update();
+    });
+    connect(&this->arbiter, &Arbiter::color_changed, [this](QColor color){
+        if (this->arbiter.theme().mode == Session::Theme::Light)
+            this->config->set_color_light(color.name());
+        else
+            this->config->set_color_dark(color.name());
+
+        this->theme->update();
+    });
+    connect(&this->arbiter, &Arbiter::page_toggled, [this](Page *page){
+        int id = this->arbiter.layout().page_id(page);
+        this->rail_group->button(id)->setVisible(page->enabled());
+    });
 }
 
 void DashWindow::add_widget(QWidget *widget)
@@ -86,7 +103,10 @@ void DashWindow::init_config()
 
 void DashWindow::init_theme()
 {
-    this->theme->set_mode(this->config->get_dark_mode());
+    this->config->set_dark_mode(this->arbiter.theme().mode == Session::Theme::Dark);
+    this->config->set_color_light(this->arbiter.theme().color(Session::Theme::Light).name());
+    this->config->set_color_dark(this->arbiter.theme().color(Session::Theme::Dark).name());
+    this->theme->set_mode(this->arbiter.theme().mode);
     this->theme->set_scale(this->config->get_scale());
 }
 
@@ -149,12 +169,8 @@ QLayout *DashWindow::body()
 
 void DashWindow::add_pages()
 {
-    this->add_page("Android Auto", this->openauto, "android_auto");
-    this->add_page("Media", new MediaPage(this), "play_circle_outline");
-    this->add_page("Vehicle", new VehiclePage(this), "directions_car");
-    this->add_page("Camera", new CameraPage(this), "camera");
-    this->add_page("Launcher", new LauncherPage(this), "widgets");
-    this->add_page("Settings", new SettingsPage(this), "tune");
+    for (auto page : this->arbiter.layout().pages())
+        this->add_page(page);
 
     // toggle initial page
     for (QAbstractButton *button : this->rail_group->buttons()) {
@@ -176,17 +192,16 @@ void DashWindow::add_pages()
     });
 }
 
-void DashWindow::add_page(QString name, QWidget *page, QString icon)
+void DashWindow::add_page(Page *page)
 {
-    page->setObjectName(name);
-
     QPushButton *button = new QPushButton();
-    button->setProperty("page", QVariant::fromValue(page));
+    button->setProperty("page", true);
     button->setCheckable(true);
     button->setFlat(true);
     button->setIconSize(Theme::icon_32);
-    button->setIcon(this->theme->make_button_icon(icon, button));
+    button->setIcon(this->theme->make_button_icon(page->icon_name(), button));
 
+    auto name = page->pretty_name();
     Shortcut *shortcut = new Shortcut(this->config->get_shortcut(name), this);
     this->shortcuts->add_shortcut(name, name, shortcut);
     connect(shortcut, &Shortcut::activated, [this, button]() {
@@ -194,11 +209,11 @@ void DashWindow::add_page(QString name, QWidget *page, QString icon)
             button->setChecked(true);
     });
 
-    int idx = this->pages->addWidget(page);
-    this->rail_group->addButton(button, idx);
+    this->pages->addWidget(page->widget());
+    this->rail_group->addButton(button, this->arbiter.layout().page_id(page));
     this->rail->addWidget(button);
 
-    button->setVisible(this->config->get_page(page));
+    button->setVisible(page->enabled());
 }
 
 QWidget *DashWindow::controls_bar()
@@ -301,12 +316,7 @@ QWidget *DashWindow::controls_widget()
     dark_mode->setFlat(true);
     dark_mode->setIconSize(Theme::icon_26);
     dark_mode->setIcon(this->theme->make_button_icon("dark_mode", dark_mode));
-    connect(dark_mode, &QPushButton::clicked, [this]() {
-        bool mode = !theme->get_mode();
-        this->config->set_dark_mode(mode);
-        this->theme->set_mode(mode);
-        this->theme->update();
-    });
+    connect(dark_mode, &QPushButton::clicked, [this]() { this->arbiter.toggle_mode(); });
 
     layout->addWidget(volume, 1);
     layout->addWidget(volume_value, 7);
@@ -333,7 +343,7 @@ QWidget *DashWindow::power_control()
     connect(restart, &QPushButton::clicked, [config = this->config]() {
         config->save();
         sync();
-        system("sudo shutdown -r now");
+        system(Session::System::REBOOT_CMD);
     });
     layout->addWidget(restart);
 
@@ -344,7 +354,7 @@ QWidget *DashWindow::power_control()
     connect(power_off, &QPushButton::clicked, [config = this->config]() {
         config->save();
         sync();
-        system("sudo shutdown -h now");
+        system(Session::System::SHUTDOWN_CMD);
     });
     layout->addWidget(power_off);
 

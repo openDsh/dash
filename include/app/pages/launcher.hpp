@@ -6,6 +6,8 @@
 #include "app/config.hpp"
 #include "app/theme.hpp"
 
+#include "app/pages/page.hpp"
+
 #include <X11/Xatom.h>
 #include <X11/Xlib.h>
 #undef Bool
@@ -20,6 +22,8 @@
 #undef None
 #undef Status
 #undef Unsorted
+
+class Arbiter;
 
 class XWorker : public QObject {
     Q_OBJECT
@@ -65,11 +69,11 @@ class EmbeddedApp : public QWidget {
     void opened();
 };
 
-class LauncherPage : public QWidget {
+class LauncherPage : public QWidget, public Page {
     Q_OBJECT
 
    public:
-    LauncherPage(QWidget *parent = nullptr);
+    LauncherPage(Arbiter &arbiter, QWidget *parent = nullptr);
 
    private:
     QWidget *launcher_widget();

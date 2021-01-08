@@ -11,7 +11,9 @@
 #include "app/pages/media.hpp"
 #include "app/window.hpp"
 
-MediaPage::MediaPage(QWidget *parent) : QTabWidget(parent)
+MediaPage::MediaPage(Arbiter &arbiter, QWidget *parent)
+    : QTabWidget(parent)
+    , Page(arbiter, "Media", "play_circle_outline", true, this)
 {
     // this->addTab(new RadioPlayerTab(this), "Radio");
     this->addTab(new BluetoothPlayerTab(this), "Bluetooth");

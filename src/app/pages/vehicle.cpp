@@ -91,7 +91,9 @@ QString Gauge::null_value()
     return null_str;
 }
 
-VehiclePage::VehiclePage(QWidget *parent) : QTabWidget(parent)
+VehiclePage::VehiclePage(Arbiter &arbiter, QWidget *parent)
+    : QTabWidget(parent)
+    , Page(arbiter, "Vehicle", "directions_car", true, this)
 {
     this->addTab(new DataTab(this), "Data");
     this->config = Config::get_instance();

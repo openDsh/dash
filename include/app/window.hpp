@@ -13,7 +13,10 @@
 #include "app/config.hpp"
 #include "app/shortcuts.hpp"
 #include "app/pages/openauto.hpp"
+#include "app/pages/page.hpp"
 #include "app/theme.hpp"
+
+#include "app/arbiter.hpp"
 
 class DashWindow : public QMainWindow {
     Q_OBJECT
@@ -30,6 +33,7 @@ class DashWindow : public QMainWindow {
     void keyReleaseEvent(QKeyEvent *event);
 
    private:
+    Arbiter arbiter;
     Config *config;
     Theme *theme;
     Shortcuts *shortcuts;
@@ -47,7 +51,7 @@ class DashWindow : public QMainWindow {
     void init_shortcuts();
     QLayout *body();
     void add_pages();
-    void add_page(QString name, QWidget *page, QString icon);
+    void add_page(Page *page);
 
     QWidget *controls_bar();
     QLayout *quick_views();

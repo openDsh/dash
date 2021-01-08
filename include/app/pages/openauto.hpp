@@ -21,6 +21,10 @@
 #include "openauto/Service/AndroidAutoEntityFactory.hpp"
 #include "openauto/Service/ServiceFactory.hpp"
 
+#include "app/pages/page.hpp"
+
+class Arbiter;
+
 class OpenAutoWorker : public QObject {
     Q_OBJECT
 
@@ -75,11 +79,11 @@ class OpenAutoFrame : public QWidget {
     void toggle(bool enable);
 };
 
-class OpenAutoPage : public QStackedWidget {
+class OpenAutoPage : public QStackedWidget, public Page {
     Q_OBJECT
 
    public:
-    OpenAutoPage(QWidget *parent = nullptr);
+    OpenAutoPage(Arbiter &arbiter, QWidget *parent = nullptr);
 
     inline void pass_key_event(QKeyEvent *event) { this->worker->send_key_event(event); }
 

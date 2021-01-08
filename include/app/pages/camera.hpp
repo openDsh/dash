@@ -15,11 +15,15 @@
 #include "app/config.hpp"
 #include "app/theme.hpp"
 
-class CameraPage : public QWidget {
+#include "app/pages/page.hpp"
+
+class Arbiter;
+
+class CameraPage : public QWidget, public Page {
     Q_OBJECT
 
    public:
-    CameraPage(QWidget *parent = nullptr);
+    CameraPage(Arbiter &arbiter, QWidget *parent = nullptr);
 
    private:
     QWidget *connect_widget();

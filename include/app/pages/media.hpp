@@ -8,11 +8,15 @@
 #include "app/theme.hpp"
 #include "app/widgets/tuner.hpp"
 
-class MediaPage : public QTabWidget {
+#include "app/pages/page.hpp"
+
+class Arbiter;
+
+class MediaPage : public QTabWidget, public Page {
     Q_OBJECT
 
    public:
-    MediaPage(QWidget *parent = nullptr);
+    MediaPage(Arbiter &arbiter, QWidget *parent = nullptr);
 };
 
 class BluetoothPlayerTab : public QWidget {

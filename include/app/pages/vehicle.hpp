@@ -10,6 +10,10 @@
 #include "app/widgets/selector.hpp"
 #include "app/widgets/dialog.hpp"
 
+#include "app/pages/page.hpp"
+
+class Arbiter;
+
 typedef std::function<double(double, bool)> obd_decoder_t;
 typedef QPair<QString, QString> units_t;
 
@@ -45,11 +49,11 @@ class Gauge : public QWidget {
     void toggle_unit(bool si);
 };
 
-class VehiclePage : public QTabWidget {
+class VehiclePage : public QTabWidget, public Page {
     Q_OBJECT
 
    public:
-    VehiclePage(QWidget *parent = nullptr);
+    VehiclePage(Arbiter &arbiter, QWidget *parent = nullptr);
 
    private:
     void get_plugins();

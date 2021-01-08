@@ -20,10 +20,12 @@
 #include "app/window.hpp"
 #include "app/widgets/sliders.hpp"
 
-SettingsPage::SettingsPage(QWidget *parent) : QTabWidget(parent)
+SettingsPage::SettingsPage(Arbiter &arbiter, QWidget *parent)
+    : QTabWidget(parent)
+    , Page(arbiter, "Settings", "tune", false, this)
 {
     this->addTab(new MainSettingsTab(this), "Main");
-    this->addTab(new LayoutSettingsTab(this), "Layout");
+    this->addTab(new LayoutSettingsTab(this->arbiter), "Layout");
     this->addTab(new BluetoothSettingsTab(this), "Bluetooth");
     this->addTab(new ActionsSettingsTab(this), "Actions");
 
@@ -262,7 +264,9 @@ QWidget *MainSettingsTab::volume_widget()
     return widget;
 }
 
-LayoutSettingsTab::LayoutSettingsTab(QWidget *parent) : QWidget(parent)
+LayoutSettingsTab::LayoutSettingsTab(Arbiter &arbiter, QWidget *parent)
+    : QWidget(parent)
+    , arbiter(arbiter)
 {
     this->theme = Theme::get_instance();
     this->config = Config::get_instance();
@@ -309,13 +313,11 @@ QWidget *LayoutSettingsTab::pages_widget()
     QGroupBox *group = new QGroupBox(widget);
     QVBoxLayout *group_layout = new QVBoxLayout(group);
 
-    DashWindow *window = qobject_cast<DashWindow *>(this->window());
-
-    for (QAbstractButton *page : window->get_pages()) {
-        QCheckBox *button = new QCheckBox(page->property("page").value<QWidget *>()->objectName(), group);
-        button->setChecked(!page->isHidden());
-        connect(button, &QCheckBox::toggled, [page, config = this->config](bool checked) {
-            config->set_page(page->property("page").value<QWidget *>(), checked);
+    for (Page *page : this->arbiter.layout().pages()) {
+        QCheckBox *button = new QCheckBox(page->pretty_name(), group);
+        button->setChecked(page->enabled());
+        connect(button, &QCheckBox::toggled, [this, page]() {
+            this->arbiter.toggle_page(page);
         });
         group_layout->addWidget(button);
     }
