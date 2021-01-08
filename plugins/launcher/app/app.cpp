@@ -80,14 +80,6 @@ EmbeddedApp::EmbeddedApp(QWidget *parent) : QWidget(parent), process()
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
 
-    QPushButton *button = new QPushButton(this);
-    button->setFlat(true);
-    button->setIconSize(Theme::icon_20);
-    connect(button, &QPushButton::clicked, [this]() { this->end(); });
-    button->setIcon(Theme::get_instance()->make_button_icon("close", button, QString(), true));
-
-    layout->addWidget(button, 0, Qt::AlignRight);
-
     this->container = new QVBoxLayout();
     layout->addLayout(this->container, 1);
 }
