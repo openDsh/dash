@@ -76,12 +76,8 @@ EmbeddedApp::EmbeddedApp(QWidget *parent) : QWidget(parent), process()
     connect(&this->process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
             [this](int, QProcess::ExitStatus) { this->end(); });
 
-    QVBoxLayout *layout = new QVBoxLayout(this);
-    layout->setContentsMargins(0, 0, 0, 0);
-    layout->setSpacing(0);
-
-    this->container = new QVBoxLayout();
-    layout->addLayout(this->container, 1);
+    this->container = new QVBoxLayout(this);
+    this->container->setContentsMargins(0, 0, 0, 0);
 }
 
 EmbeddedApp::~EmbeddedApp()
@@ -125,7 +121,7 @@ Launcher::Launcher(int idx, QSettings &settings, QWidget *parent) : QWidget(pare
     QStackedLayout *layout = new QStackedLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
 
-    this->app = new EmbeddedApp(parent);
+    this->app = new EmbeddedApp(this);
     connect(this->app, &EmbeddedApp::opened, [layout]() { layout->setCurrentIndex(1); });
     connect(this->app, &EmbeddedApp::closed, [layout]() { layout->setCurrentIndex(0); });
 
