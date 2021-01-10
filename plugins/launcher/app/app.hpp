@@ -32,7 +32,7 @@ class XWorker : public QObject {
     int get_window(uint64_t pid);
 
    private:
-    const int MAX_RETRIES = 3;
+    const int MAX_RETRIES = 60;
 
     struct WindowProp {
         WindowProp(char *prop, unsigned long size);
