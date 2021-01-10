@@ -68,20 +68,22 @@ void OpenAutoFrame::mouseDoubleClickEvent(QMouseEvent *)
 
 OpenAutoPage::Settings::Settings(QWidget *parent) : QWidget(parent)
 {
-    this->bluetooth = Bluetooth::get_instance();
     this->theme = Theme::get_instance();
     this->config = Config::get_instance();
 
     QVBoxLayout *layout = new QVBoxLayout(this);
-    layout->setContentsMargins(6, 0, 6, 0);
-
-    layout->addWidget(this->settings_widget());
+    layout->addLayout(this->settings_widget());
 }
 
-QWidget *OpenAutoPage::Settings::settings_widget()
+QSize OpenAutoPage::Settings::sizeHint() const
 {
-    QWidget *widget = new QWidget(this);
-    QVBoxLayout *layout = new QVBoxLayout(widget);
+    int label_width = QFontMetrics(this->font()).averageCharWidth() * 20;
+    return QSize(label_width * 2, this->height());
+}
+
+QLayout *OpenAutoPage::Settings::settings_widget()
+{
+    QVBoxLayout *layout = new QVBoxLayout();
 
     layout->addLayout(this->rhd_row_widget(), 1);
     layout->addWidget(Theme::br(), 1);
@@ -97,15 +99,10 @@ QWidget *OpenAutoPage::Settings::settings_widget()
     layout->addLayout(this->touchscreen_row_widget(), 1);
     layout->addLayout(this->buttons_row_widget(), 1);
 
-    QScrollArea *scroll_area = new QScrollArea(this);
-    Theme::to_touch_scroller(scroll_area);
-    scroll_area->setWidgetResizable(true);
-    scroll_area->setWidget(widget);
-
-    return scroll_area;
+    return layout;
 }
 
-QBoxLayout *OpenAutoPage::Settings::rhd_row_widget()
+QLayout *OpenAutoPage::Settings::rhd_row_widget()
 {
     QHBoxLayout *layout = new QHBoxLayout();
 
@@ -127,7 +124,7 @@ QBoxLayout *OpenAutoPage::Settings::rhd_row_widget()
     return layout;
 }
 
-QBoxLayout *OpenAutoPage::Settings::frame_rate_row_widget()
+QLayout *OpenAutoPage::Settings::frame_rate_row_widget()
 {
     QHBoxLayout *layout = new QHBoxLayout();
 
@@ -154,7 +151,7 @@ QBoxLayout *OpenAutoPage::Settings::frame_rate_row_widget()
     return layout;
 }
 
-QBoxLayout *OpenAutoPage::Settings::resolution_row_widget()
+QLayout *OpenAutoPage::Settings::resolution_row_widget()
 {
     QHBoxLayout *layout = new QHBoxLayout();
 
@@ -193,7 +190,7 @@ QBoxLayout *OpenAutoPage::Settings::resolution_row_widget()
     return layout;
 }
 
-QBoxLayout *OpenAutoPage::Settings::dpi_row_widget()
+QLayout *OpenAutoPage::Settings::dpi_row_widget()
 {
     QHBoxLayout *layout = new QHBoxLayout();
 
@@ -205,7 +202,7 @@ QBoxLayout *OpenAutoPage::Settings::dpi_row_widget()
     return layout;
 }
 
-QBoxLayout *OpenAutoPage::Settings::dpi_widget()
+QLayout *OpenAutoPage::Settings::dpi_widget()
 {
     QHBoxLayout *layout = new QHBoxLayout();
 
@@ -229,7 +226,7 @@ QBoxLayout *OpenAutoPage::Settings::dpi_widget()
     return layout;
 }
 
-QBoxLayout *OpenAutoPage::Settings::rt_audio_row_widget()
+QLayout *OpenAutoPage::Settings::rt_audio_row_widget()
 {
     QHBoxLayout *layout = new QHBoxLayout();
 
@@ -251,7 +248,7 @@ QBoxLayout *OpenAutoPage::Settings::rt_audio_row_widget()
     return layout;
 }
 
-QBoxLayout *OpenAutoPage::Settings::audio_channels_row_widget()
+QLayout *OpenAutoPage::Settings::audio_channels_row_widget()
 {
     QHBoxLayout *layout = new QHBoxLayout();
 
@@ -279,7 +276,7 @@ QBoxLayout *OpenAutoPage::Settings::audio_channels_row_widget()
     return layout;
 }
 
-QBoxLayout *OpenAutoPage::Settings::bluetooth_row_widget()
+QLayout *OpenAutoPage::Settings::bluetooth_row_widget()
 {
     QHBoxLayout *layout = new QHBoxLayout();
 
@@ -300,7 +297,7 @@ QBoxLayout *OpenAutoPage::Settings::bluetooth_row_widget()
     return layout;
 }
 
-QBoxLayout *OpenAutoPage::Settings::touchscreen_row_widget()
+QLayout *OpenAutoPage::Settings::touchscreen_row_widget()
 {
     QHBoxLayout *layout = new QHBoxLayout();
 
@@ -339,7 +336,7 @@ QCheckBox *OpenAutoPage::Settings::button_checkbox(QString name, QString key,
     return checkbox;
 }
 
-QBoxLayout *OpenAutoPage::Settings::buttons_row_widget()
+QLayout *OpenAutoPage::Settings::buttons_row_widget()
 {
     QHBoxLayout *layout = new QHBoxLayout();
 
@@ -427,7 +424,7 @@ QWidget *OpenAutoPage::connect_msg()
     layout2->setSpacing(0);
 
     Dialog *dialog = new Dialog(true, this->window());
-    dialog->set_body(new Settings());
+    dialog->set_body(new Settings(this));
     QPushButton *save_button = new QPushButton("save");
     connect(save_button, &QPushButton::clicked, [this]() {
         this->config->openauto_config->setButtonCodes(this->config->openauto_button_codes);

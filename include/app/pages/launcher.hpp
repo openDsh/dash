@@ -1,91 +1,47 @@
 #pragma once
 
-#include <QProcess>
 #include <QtWidgets>
+#include <QPluginLoader>
 
-#include "app/config.hpp"
-#include "app/theme.hpp"
+#include "app/widgets/selector.hpp"
+#include "app/widgets/dialog.hpp"
 
 #include "app/pages/page.hpp"
 
-#include <X11/Xatom.h>
-#include <X11/Xlib.h>
-#undef Bool
-#undef CurrentTime
-#undef CursorShape
-#undef Expose
-#undef KeyPress
-#undef KeyRelease
-#undef FocusIn
-#undef FocusOut
-#undef FontChange
-#undef None
-#undef Status
-#undef Unsorted
-
 class Arbiter;
+class LauncherPage;
 
-class XWorker : public QObject {
+class LauncherPlugins : public QTabWidget {
     Q_OBJECT
 
    public:
-    XWorker(QObject *parent = nullptr);
-    int get_window(uint64_t pid);
+    LauncherPlugins(QWidget *parent = nullptr);
 
    private:
-    const int MAX_RETRIES = 60;
+    void get_plugins();
 
-    struct WindowProp {
-        WindowProp(char *prop, unsigned long size);
-        ~WindowProp();
+    Config *config;
 
-        void *prop;
-        unsigned long size;
-    };
+    QMap<QString, QFileInfo> plugins;
+    QList<QPluginLoader *> active_plugins; // keep track of widgets not plugins (only one instance of the plugin actually gets created anyway)
+    QListWidget *active_plugins_list;
+    Selector *selector;
+    Dialog *dialog;
 
-    WindowProp get_window_prop(Window window, Atom type, const char *name);
+    QWidget *dialog_body();
 
-    Display *display;
-    Window root_window;
+    friend class LauncherPage;
 };
 
-class EmbeddedApp : public QWidget {
-    Q_OBJECT
-
-   public:
-    EmbeddedApp(QWidget *parent = nullptr);
-    ~EmbeddedApp();
-
-    void start(QString app);
-    void end();
-
-   private:
-    QProcess process;
-    QVBoxLayout *container;
-    XWorker *worker;
-
-   signals:
-    void closed();
-    void opened();
-};
-
-class LauncherPage : public QWidget, public Page {
+class LauncherPage : public QStackedWidget, public Page {
     Q_OBJECT
 
    public:
     LauncherPage(Arbiter &arbiter, QWidget *parent = nullptr);
 
    private:
-    QWidget *launcher_widget();
-    QWidget *app_select_widget();
-    QWidget *config_widget();
-    void populate_dirs(QString path);
-    void populate_apps(QString path);
-
     Theme *theme;
-    Config *config;
-    EmbeddedApp *app;
-    QLabel *path_label;
-    QListWidget *folders;
-    QListWidget *apps;
+    LauncherPlugins *plugin_tabs;
+
+    QWidget *load_msg();
 };

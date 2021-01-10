@@ -38,12 +38,10 @@ class Gauge : public QWidget {
     obd_decoder_t decoder;
     std::vector<Command> cmds;
 
-
     bool si;
     int rate;
     int precision;
     QTimer *timer;
-
 
    signals:
     void toggle_unit(bool si);
@@ -78,9 +76,8 @@ class DataTab : public QWidget {
     DataTab(QWidget *parent = nullptr);
 
    private:
-    QWidget *driving_data_widget();
     QWidget *speedo_tach_widget();
-    QWidget *mileage_data_widget();
+    // QWidget *mileage_data_widget();
     QWidget *engine_data_widget();
     QWidget *coolant_temp_widget();
     QWidget *engine_load_widget();

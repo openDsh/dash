@@ -13,7 +13,6 @@ class ColorPicker : public QWidget {
    public:
     ColorPicker(QSize block_size, QFont font, QWidget *parent = nullptr);
 
-    void scale(double scale);
     void update(QColor color);
 
    private:
@@ -26,6 +25,8 @@ class ColorPicker : public QWidget {
     QPushButton *button;
     QPalette hint_palette;
 
+    double scale;
+
     inline void set_icon()
     {
         QPixmap block(this->button->iconSize());
@@ -35,10 +36,12 @@ class ColorPicker : public QWidget {
     inline QLayout *component_slider(QSlider *slider)
     {
         QHBoxLayout *layout = new QHBoxLayout();
+        layout->setContentsMargins(0, 0, 0, 0);
 
         slider->setProperty("neutral", true);
         slider->setTracking(false);
         slider->setRange(0, 255);
+        slider->setFixedHeight(30 * this->scale);
 
         QLabel *label = new QLabel(QString::number(slider->value()));
         label->setFont(this->font);

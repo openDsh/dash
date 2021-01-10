@@ -50,17 +50,17 @@ Gauge::Gauge(units_t units, QFont value_font, QFont unit_font, Gauge::Orientatio
         }
     });
 
-
-
     connect(config, &Config::si_units_changed, [this, units, unit_label](bool si) {
         this->si = si;
         unit_label->setText(this->si ? units.second : units.first);
         value_label->setText(this->null_value());
     });
 
-    layout->addStretch();
+    layout->addStretch(6);
     layout->addWidget(value_label);
+    layout->addStretch(1);
     layout->addWidget(unit_label);
+    layout->addStretch(4);
 }
 
 void Gauge::can_callback(QByteArray payload){
@@ -209,7 +209,7 @@ DataTab::DataTab(QWidget *parent) : QWidget(parent)
 {
     QHBoxLayout *layout = new QHBoxLayout(this);
 
-    QWidget *driving_data = this->driving_data_widget();
+    QWidget *driving_data = this->speedo_tach_widget();
     layout->addWidget(driving_data);
     layout->addWidget(Theme::br(this, true));
 
@@ -222,46 +222,47 @@ DataTab::DataTab(QWidget *parent) : QWidget(parent)
     QSizePolicy sp_right(QSizePolicy::Preferred, QSizePolicy::Preferred);
     sp_right.setHorizontalStretch(2);
     engine_data->setSizePolicy(sp_right);
-    for (auto &gauge : this->gauges) gauge->start();
-}
-
-QWidget *DataTab::driving_data_widget()
-{
-    QWidget *widget = new QWidget(this);
-    QVBoxLayout *layout = new QVBoxLayout(widget);
-
-    layout->addStretch();
-    layout->addWidget(this->speedo_tach_widget());
-    layout->addStretch();
-    // layout->addWidget(Theme::br(widget));
-    // layout->addWidget(this->mileage_data_widget());
-
-    return widget;
+    for (auto &gauge : this->gauges)
+        gauge->start();
 }
 
 QWidget *DataTab::speedo_tach_widget()
 {
     QWidget *widget = new QWidget(this);
-    QHBoxLayout *layout = new QHBoxLayout(widget);
+    QVBoxLayout *layout = new QVBoxLayout(widget);
+    layout->setContentsMargins(0, 0, 0, 0);
 
-    QFont value_font(Theme::font_72);	
-    value_font.setFamily("Titillium Web");	
+    layout->addStretch(3);
 
-    QFont unit_font(Theme::font_16);	
-    unit_font.setWeight(QFont::Light);	
-    unit_font.setItalic(true);
+    QFont speed_value_font(Theme::font_36);
+    speed_value_font.setFamily("Titillium Web");
 
-    Gauge *speed = new Gauge({"mph", "km/h"}, value_font, unit_font,
+    QFont speed_unit_font(Theme::font_16);
+    speed_unit_font.setWeight(QFont::Light);
+    speed_unit_font.setItalic(true);
+
+    Gauge *speed = new Gauge({"mph", "km/h"}, speed_value_font, speed_unit_font,
                              Gauge::BOTTOM, 100, {cmds.SPEED}, 0,
                              [](double x, bool si) { return si ? x : kph_to_mph(x); }, widget);
     layout->addWidget(speed);
     this->gauges.push_back(speed);
 
-    Gauge *rpm = new Gauge({"x1000rpm", "x1000rpm"}, value_font,
-                           unit_font, Gauge::BOTTOM, 100, {cmds.RPM}, 1,
+    layout->addStretch(2);
+
+    QFont tach_value_font(Theme::font_24);
+    tach_value_font.setFamily("Titillium Web");
+
+    QFont tach_unit_font(Theme::font_12);
+    tach_unit_font.setWeight(QFont::Light);
+    tach_unit_font.setItalic(true);
+
+    Gauge *rpm = new Gauge({"x1000rpm", "x1000rpm"}, tach_value_font,
+                           tach_unit_font, Gauge::BOTTOM, 100, {cmds.RPM}, 1,
                            [](double x, bool _) { return x / 1000.0; }, widget);
     layout->addWidget(rpm);
     this->gauges.push_back(rpm);
+
+    layout->addStretch(1);
 
     return widget;
 }
@@ -301,6 +302,8 @@ QWidget *DataTab::engine_data_widget()
 {
     QWidget *widget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setSpacing(0);
 
     layout->addStretch();
     layout->addWidget(this->coolant_temp_widget());
@@ -317,11 +320,13 @@ QWidget *DataTab::coolant_temp_widget()
 {
     QWidget *widget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setSpacing(0);
 
-    QFont value_font(Theme::font_36);
+    QFont value_font(Theme::font_16);
     value_font.setFamily("Titillium Web");
 
-    QFont unit_font(Theme::font_14);
+    QFont unit_font(Theme::font_12);
     unit_font.setWeight(QFont::Light);
     unit_font.setItalic(true);
 
@@ -331,9 +336,8 @@ QWidget *DataTab::coolant_temp_widget()
     layout->addWidget(coolant_temp);
     this->gauges.push_back(coolant_temp);
 
-    QFont label_font(Theme::font_14);
+    QFont label_font(Theme::font_10);
     label_font.setWeight(QFont::Light);
-    label_font.setItalic(true);
 
     QLabel *coolant_temp_label = new QLabel("coolant", widget);
     coolant_temp_label->setFont(label_font);
@@ -347,11 +351,13 @@ QWidget *DataTab::engine_load_widget()
 {
     QWidget *widget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setSpacing(0);
 
-    QFont value_font(Theme::font_36);
+    QFont value_font(Theme::font_16);
     value_font.setFamily("Titillium Web");
 
-    QFont unit_font(Theme::font_14);
+    QFont unit_font(Theme::font_12);
     unit_font.setWeight(QFont::Light);
     unit_font.setItalic(true);
 
@@ -361,7 +367,7 @@ QWidget *DataTab::engine_load_widget()
     layout->addWidget(engine_load);
     this->gauges.push_back(engine_load);
 
-    QFont label_font(Theme::font_14);
+    QFont label_font(Theme::font_10);
     label_font.setWeight(QFont::Light);
 
     QLabel *engine_load_label = new QLabel("load", widget);
