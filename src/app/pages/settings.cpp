@@ -63,6 +63,8 @@ QWidget *MainSettingsTab::settings_widget()
     layout->addWidget(Theme::br(widget), 1);
     layout->addWidget(this->brightness_plugin_row_widget(), 1);
     layout->addWidget(this->brightness_row_widget(), 1);
+    layout->addWidget(Theme::br(widget), 1);
+    layout->addWidget(this->controls_row_widget(), 1);
 
     QScrollArea *scroll_area = new QScrollArea(this);
     Theme::to_touch_scroller(scroll_area);
@@ -202,8 +204,7 @@ QWidget *MainSettingsTab::color_select_widget()
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
     ColorPicker *label = new ColorPicker(Theme::icon_16, Theme::font_14, widget);
-    label->scale(this->config->get_scale());
-    connect(this->config, &Config::scale_changed, [label](double scale) { label->scale(scale); });
+    label->update(this->config->get_color());
     connect(label, &ColorPicker::color_changed, [this](QColor color) {
         this->config->set_color(color.name());
         this->theme->update();
@@ -258,6 +259,46 @@ QWidget *MainSettingsTab::volume_widget()
     layout->addStretch(1);
     layout->addWidget(volume_slider(false, this), 6);
     layout->addStretch(1);
+
+    return widget;
+}
+
+QWidget *MainSettingsTab::controls_row_widget()
+{
+    QWidget *widget = new QWidget(this);
+    QHBoxLayout *layout = new QHBoxLayout(widget);
+
+    QLabel *label = new QLabel("Controls", widget);
+    layout->addWidget(label, 1);
+
+    layout->addWidget(this->controls_widget(), 1);
+
+    return widget;
+}
+
+QWidget *MainSettingsTab::controls_widget()
+{
+    QWidget *widget = new QWidget(this);
+    QVBoxLayout *layout = new QVBoxLayout(widget);
+
+    QPushButton *exit_button = new QPushButton("exit", widget);
+    connect(exit_button, &QPushButton::clicked, []() { qApp->exit(); });
+    layout->addWidget(exit_button);
+    layout->addWidget(Theme::br(widget));
+    QPushButton *shut_down_button = new QPushButton("shut down", widget);
+    connect(shut_down_button, &QPushButton::clicked, [config = this->config]() {
+        config->save();
+        sync();
+        system("sudo shutdown -h now");
+    });
+    layout->addWidget(shut_down_button);
+    QPushButton *restart_button = new QPushButton("restart", widget);
+    connect(restart_button, &QPushButton::clicked, [config = this->config]() {
+        config->save();
+        sync();
+        system("sudo shutdown -r now");
+    });
+    layout->addWidget(restart_button);
 
     return widget;
 }

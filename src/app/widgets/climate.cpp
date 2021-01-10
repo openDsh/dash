@@ -47,6 +47,7 @@ QWidget *ClimateSnackBar::state_widget()
 
     this->fan_speed = new StepMeter(widget);
     layout->addWidget(this->fan_speed);
+
     return widget;
 }
 
