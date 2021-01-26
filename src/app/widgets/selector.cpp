@@ -1,3 +1,5 @@
+#include <algorithm>
+
 #include <QColor>
 #include <QHBoxLayout>
 #include <QLabel>
@@ -17,12 +19,21 @@ Selector::Selector(QList<QString> options, QString current, QFont font, QWidget 
     this->current_idx = std::max(0, this->options.indexOf(current));
 
     QVBoxLayout *layout = new QVBoxLayout(this);
+    layout->setContentsMargins(0, 0, 0, 0);
     layout->addLayout(this->selector());
+}
+
+QSize Selector::sizeHint() const
+{
+    int width = (Theme::icon_32.width() * 2) + this->label->width() + (12 * 2);
+    int height = std::max(Theme::icon_32.height(), this->label->height()) + (12 * 2);
+    return QSize(width, height);
 }
 
 QLayout *Selector::selector()
 {
     QHBoxLayout *layout = new QHBoxLayout();
+    layout->setContentsMargins(0, 0, 0, 0);
 
     this->update_label();
 

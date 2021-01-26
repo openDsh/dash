@@ -10,7 +10,7 @@ Config::Config()
     : QObject(qApp),
       openauto_config(std::make_shared<openauto::configuration::Configuration>()),
       openauto_button_codes(openauto_config->getButtonCodes()),
-      settings(QSettings::IniFormat, QSettings::UserScope, "dash")
+      settings()
 {
     this->load_brightness_plugins();
     this->brightness_active_plugin = new QPluginLoader(this);
@@ -28,9 +28,6 @@ Config::Config()
     this->wireless_active = this->settings.value("Wireless/active", false).toBool();
     this->wireless_address = this->settings.value("Wireless/address", "0.0.0.0").toString();
     this->mouse_active = this->settings.value("mouse_active", true).toBool();
-    this->launcher_home = this->settings.value("Launcher/home", QDir().absolutePath()).toString();
-    this->launcher_auto_launch = this->settings.value("Launcher/auto_launch", false).toBool();
-    this->launcher_app = this->settings.value("Launcher/app", QString()).toString();
     this->quick_view = this->settings.value("quick_view", "none").toString();
     this->brightness_plugin = this->settings.value("brightness_plugin", "mocked").toString();
     this->controls_bar = this->settings.value("controls_bar", false).toBool();
@@ -53,6 +50,10 @@ Config::Config()
     this->settings.beginGroup("Shortcuts");
     for (auto key : this->settings.childKeys())
         this->shortcuts[key] = this->settings.value(key, QString()).toString();
+    this->settings.endGroup();
+    this->settings.beginGroup("Launcher");
+    for (auto key : this->settings.childKeys())
+        this->launcher_plugins.append(this->settings.value(key, QString()).toString());
     this->settings.endGroup();
 
     this->update_system_volume();
@@ -93,12 +94,6 @@ void Config::save()
         this->settings.setValue("Wireless/active", this->wireless_active);
     if (this->wireless_address != this->settings.value("Wireless/address", "0.0.0.0").toString())
         this->settings.setValue("Wireless/address", this->wireless_address);
-    if (this->launcher_home != this->settings.value("Launcher/home", QDir().absolutePath()).toString())
-        this->settings.setValue("Launcher/home", this->launcher_home);
-    if (this->launcher_auto_launch != this->settings.value("Launcher/auto_launch", false).toBool())
-        this->settings.setValue("Launcher/auto_launch", this->launcher_auto_launch);
-    if (this->launcher_app != this->settings.value("Launcher/app", QString()).toString())
-        this->settings.setValue("Launcher/app", this->launcher_app);
     if (this->mouse_active != this->settings.value("mouse_active", true).toBool())
         this->settings.setValue("mouse_active", this->mouse_active);
     if (this->quick_view != this->settings.value("quick_view", "volume").toString())
@@ -132,17 +127,20 @@ void Config::save()
     if (this->home_page != this->settings.value("home_page").toString())
         this->settings.setValue("home_page", this->home_page);
     for (auto id : this->pages.keys()) {
-        QString config_key = QString("Pages/%1").arg(id);
+        QString key = QString("Pages/%1").arg(id);
         bool page_enabled = this->pages[id];
-        if (page_enabled != this->settings.value(config_key, true).toBool())
-            this->settings.setValue(config_key, page_enabled);
+        if (page_enabled != this->settings.value(key, true).toBool())
+            this->settings.setValue(key, page_enabled);
     }
     for (auto id : this->shortcuts.keys()) {
-        QString config_key = QString("Shortcuts/%1").arg(id);
+        QString key = QString("Shortcuts/%1").arg(id);
         QString shortcut = this->shortcuts[id];
-        if (shortcut != this->settings.value(config_key, QString()).toString())
-            this->settings.setValue(config_key, shortcut);
+        if (shortcut != this->settings.value(key, QString()).toString())
+            this->settings.setValue(key, shortcut);
     }
+    this->settings.remove("Launcher");
+    for (int i = 0; i < this->launcher_plugins.size(); i++)
+        this->settings.setValue(QString("Launcher/%1").arg(i), this->launcher_plugins[i]);
 
     this->settings.sync();
 }

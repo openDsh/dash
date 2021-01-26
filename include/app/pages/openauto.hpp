@@ -91,21 +91,23 @@ class OpenAutoPage : public QStackedWidget {
        public:
         Settings(QWidget *parent = nullptr);
 
-       private:
-        QWidget *settings_widget();
-        QBoxLayout *rhd_row_widget();
-        QBoxLayout *frame_rate_row_widget();
-        QBoxLayout *resolution_row_widget();
-        QBoxLayout *dpi_row_widget();
-        QBoxLayout *dpi_widget();
-        QBoxLayout *rt_audio_row_widget();
-        QBoxLayout *audio_channels_row_widget();
-        QBoxLayout *bluetooth_row_widget();
-        QBoxLayout *touchscreen_row_widget();
-        QCheckBox *button_checkbox(QString name, QString key, aasdk::proto::enums::ButtonCode::Enum code);
-        QBoxLayout *buttons_row_widget();
+       protected:
+        QSize sizeHint() const override;
 
-        Bluetooth *bluetooth;
+       private:
+        QLayout *settings_widget();
+        QLayout *rhd_row_widget();
+        QLayout *frame_rate_row_widget();
+        QLayout *resolution_row_widget();
+        QLayout *dpi_row_widget();
+        QLayout *dpi_widget();
+        QLayout *rt_audio_row_widget();
+        QLayout *audio_channels_row_widget();
+        QLayout *bluetooth_row_widget();
+        QLayout *touchscreen_row_widget();
+        QCheckBox *button_checkbox(QString name, QString key, aasdk::proto::enums::ButtonCode::Enum code);
+        QLayout *buttons_row_widget();
+
         Config *config;
         Theme *theme;
     };

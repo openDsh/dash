@@ -329,7 +329,7 @@ QWidget *DashWindow::power_control()
 
     QPushButton *restart = new QPushButton(widget);
     restart->setFlat(true);
-    restart->setIconSize(Theme::icon_42);
+    restart->setIconSize(Theme::icon_36);
     restart->setIcon(this->theme->make_button_icon("refresh", restart));
     connect(restart, &QPushButton::clicked, [config = this->config]() {
         config->save();
@@ -340,7 +340,7 @@ QWidget *DashWindow::power_control()
 
     QPushButton *power_off = new QPushButton(widget);
     power_off->setFlat(true);
-    power_off->setIconSize(Theme::icon_42);
+    power_off->setIconSize(Theme::icon_36);
     power_off->setIcon(this->theme->make_button_icon("power_settings_new", power_off));
     connect(power_off, &QPushButton::clicked, [config = this->config]() {
         config->save();

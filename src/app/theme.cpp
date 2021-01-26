@@ -171,13 +171,17 @@ QIcon Theme::make_icon(QString name)
     return QIcon(QString(":/icons/%1.svg").arg(name));
 }
 
-QIcon Theme::make_button_icon(QString name, QPushButton *button, QString alt_name)
+QIcon Theme::make_button_icon(QString name, QPushButton *button, QString alt_name, bool dynamic)
 {
     if (!alt_name.isNull())
         button->setProperty("alt_icon", QVariant::fromValue(QIcon(QString(":/icons/%1.svg").arg(alt_name))));
-
     button->setProperty("themed_icon", true);
-    return QIcon(QString(":/icons/%1.svg").arg(name));
+
+    QIcon icon = QIcon(QString(":/icons/%1.svg").arg(name));
+    if (dynamic)
+        return this->themed_button_icon(icon, button);
+    else
+        return icon;
 }
 
 void Theme::update()
