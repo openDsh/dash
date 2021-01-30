@@ -3,14 +3,14 @@
 #location of OS details for linux
 OS_RELEASE_FILE="/etc/os-release"
 
-## check if Raspian OS is active, otherwise kill script
-#if grep -q "Raspbian" ${OS_RELEASE_FILE};
-#then
-#  echo "Great this script works for RaspberryPI OS"
-#else
-#  echo "This script works only for an RaspberryPI OS"
-#  exit 1;
-#fi
+#check if Raspian OS is active, otherwise kill script
+if grep -q "Raspbian" ${OS_RELEASE_FILE};
+then
+ echo "Great this script works for RaspberryPI OS"
+else
+ echo "This script works only for an RaspberryPI OS"
+ exit 1;
+fi
 
 display_version(){
     echo "Version 0.2 RaspberryPI Dash additional install helpers"
