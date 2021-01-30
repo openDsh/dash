@@ -10,11 +10,11 @@ fi
 echo ${WorkingDirectory}
 
 #stop and disable dash service
-sudo systemctl stop dash.service
-sudo systemctl disable dash.service
+sudo systemctl stop dash.service || true
+sudo systemctl disable dash.service || true
 
 #remove existing opendash service
-sudo systemctl unmask dash.service
+sudo systemctl unmask dash.service || true
 
 sudo bash -c "echo '[Unit]
 Description=Dash
@@ -29,8 +29,8 @@ Environment=DISPLAY=:0
 Environment=XAUTHORITY=/home/pi/.Xauthority
 WorkingDirectory=${WorkingDirectory}
 ExecStart=/usr/local/bin/dash
-Restart=always
-RestartSec=10s
+Restart=on-failure
+RestartSec=5s
 KillMode=process
 TimeoutSec=infinity
 
