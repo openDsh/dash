@@ -154,6 +154,12 @@ class Config : public QObject {
     inline void set_brightness_plugin(QString brightness_plugin)
     {
         this->brightness_plugin = brightness_plugin;
+
+        if (this->brightness_plugin == "auto") {
+            this->detect_brightness_plugin();
+            return;
+        }
+
         if (this->brightness_active_plugin->isLoaded())
             this->brightness_active_plugin->unload();
         this->brightness_active_plugin->setFileName(this->brightness_plugins[this->brightness_plugin].absoluteFilePath());
@@ -226,6 +232,7 @@ class Config : public QObject {
     QPluginLoader *brightness_active_plugin;
 
     void load_brightness_plugins();
+    void detect_brightness_plugin();
     void update_system_volume();
 
    signals:
