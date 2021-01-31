@@ -10,6 +10,7 @@
 #include <QObject>
 #include <QPair>
 #include <QPushButton>
+#include <QSettings>
 #include <QString>
 
 #include "app/widgets/progress.hpp"
@@ -18,10 +19,11 @@ class Bluetooth : public QObject {
     Q_OBJECT
 
    public:
-    Bluetooth();
+    Bluetooth(QSettings &settings);
 
     void start_scan();
     void stop_scan();
+    void toggle_device(BluezQt::DevicePtr device) const;
 
     inline QList<BluezQt::DevicePtr> get_devices()
     {
@@ -35,8 +37,6 @@ class Bluetooth : public QObject {
         return {QString(), QSharedPointer<BluezQt::MediaPlayer>(nullptr)};
     }
     inline bool has_adapter() { return this->adapter != nullptr; }
-
-    static Bluetooth *get_instance();
 
    private:
     void update_media_player(BluezQt::DevicePtr device);

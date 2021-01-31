@@ -14,6 +14,8 @@ class Page {
    public:
     Page(Arbiter &arbiter, QString pretty_name, QString icon_name, bool toggleable, QWidget *widget);
 
+    virtual void init() = 0;
+
     const QString &pretty_name() { return this->pretty_name_; }
     const QString &icon_name() { return this->icon_name_; }
     const bool &toggleale() { return this->toggleable_; }

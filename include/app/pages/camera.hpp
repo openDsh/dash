@@ -13,7 +13,6 @@
 #include <QCameraViewfinderSettings>
 
 #include "app/config.hpp"
-#include "app/theme.hpp"
 
 #include "app/pages/page.hpp"
 
@@ -24,6 +23,8 @@ class CameraPage : public QWidget, public Page {
 
    public:
     CameraPage(Arbiter &arbiter, QWidget *parent = nullptr);
+
+    void init() override;
 
    private:
     QWidget *connect_widget();
@@ -43,7 +44,6 @@ class CameraPage : public QWidget, public Page {
     void count_down();
     void connect_cam();
 
-    Theme *theme;
     Config *config;
     QLabel *status;
     QMediaPlayer *player;

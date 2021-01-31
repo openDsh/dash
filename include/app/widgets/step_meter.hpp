@@ -5,13 +5,15 @@
 
 #include "app/config.hpp"
 
+class Arbiter;
+
 class StepMeter : public QFrame {
     Q_OBJECT
     Q_PROPERTY(QColor base_color READ get_base_color WRITE set_base_color)
     Q_PROPERTY(QColor bar_color READ get_bar_color WRITE set_bar_color)
 
    public:
-    StepMeter(QWidget *parent = nullptr);
+    StepMeter(Arbiter &arbiter, QWidget *parent = nullptr);
 
     QSize sizeHint() const override;
 

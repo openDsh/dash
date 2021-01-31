@@ -10,10 +10,8 @@
 #include "aasdk/USB/ConnectedAccessoriesEnumerator.hpp"
 #include "aasdk/USB/USBHub.hpp"
 #include "app/config.hpp"
-#include "app/bluetooth.hpp"
 #include "app/widgets/switch.hpp"
 #include "app/widgets/dialog.hpp"
-#include "app/theme.hpp"
 #include "openauto/App.hpp"
 #include "openauto/Configuration/Configuration.hpp"
 #include "openauto/Configuration/IConfiguration.hpp"
@@ -85,6 +83,8 @@ class OpenAutoPage : public QStackedWidget, public Page {
    public:
     OpenAutoPage(Arbiter &arbiter, QWidget *parent = nullptr);
 
+    void init() override;
+
     inline void pass_key_event(QKeyEvent *event) { this->worker->send_key_event(event); }
 
    protected:
@@ -93,7 +93,7 @@ class OpenAutoPage : public QStackedWidget, public Page {
    private:
     class Settings : public QWidget {
        public:
-        Settings(QWidget *parent = nullptr);
+        Settings(Arbiter &arbiter, QWidget *parent = nullptr);
 
        protected:
         QSize sizeHint() const override;
@@ -112,14 +112,13 @@ class OpenAutoPage : public QStackedWidget, public Page {
         QCheckBox *button_checkbox(QString name, QString key, aasdk::proto::enums::ButtonCode::Enum code);
         QLayout *buttons_row_widget();
 
+        Arbiter &arbiter;
         Config *config;
-        Theme *theme;
     };
 
     QWidget *connect_msg();
 
     Config *config;
-    Theme *theme;
     OpenAutoFrame *frame;
     OpenAutoWorker *worker;
 

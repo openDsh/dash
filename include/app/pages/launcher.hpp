@@ -15,11 +15,12 @@ class LauncherPlugins : public QTabWidget {
     Q_OBJECT
 
    public:
-    LauncherPlugins(QWidget *parent = nullptr);
+    LauncherPlugins(Arbiter &arbiter, QWidget *parent = nullptr);
 
    private:
     void get_plugins();
 
+    Arbiter &arbiter;
     Config *config;
 
     QMap<QString, QFileInfo> plugins;
@@ -39,8 +40,9 @@ class LauncherPage : public QStackedWidget, public Page {
    public:
     LauncherPage(Arbiter &arbiter, QWidget *parent = nullptr);
 
+    void init() override;
+
    private:
-    Theme *theme;
     LauncherPlugins *plugin_tabs;
 
     QWidget *load_msg();

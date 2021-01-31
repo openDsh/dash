@@ -14,7 +14,6 @@
 #include "app/shortcuts.hpp"
 #include "app/pages/openauto.hpp"
 #include "app/pages/page.hpp"
-#include "app/theme.hpp"
 
 #include "app/arbiter.hpp"
 
@@ -35,7 +34,6 @@ class DashWindow : public QMainWindow {
    private:
     Arbiter arbiter;
     Config *config;
-    Theme *theme;
     Shortcuts *shortcuts;
 
     OpenAutoPage *openauto;
@@ -45,8 +43,6 @@ class DashWindow : public QMainWindow {
     QStackedLayout *pages;
     QHBoxLayout *bar;
 
-    void init_config();
-    void init_theme();
     void init_ui();
     void init_shortcuts();
     QLayout *body();
@@ -55,8 +51,5 @@ class DashWindow : public QMainWindow {
 
     QWidget *controls_bar();
     QLayout *quick_views();
-    QWidget *brightness_widget(bool skip_buttons = false);
-    QWidget *controls_widget();
     QWidget *power_control();
-    QWidget *save_control();
 };

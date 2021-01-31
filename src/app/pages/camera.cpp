@@ -4,14 +4,19 @@
 #include <QCameraImageCapture>
 #include <QTimer>
 
-#include "app/pages/camera.hpp"
 #include "app/window.hpp"
+#include "app/arbiter.hpp"
+
+#include "app/pages/camera.hpp"
 
 CameraPage::CameraPage(Arbiter &arbiter, QWidget *parent)
     : QWidget(parent)
     , Page(arbiter, "Camera", "camera", true, this)
 {
-    this->theme = Theme::get_instance();
+}
+
+void CameraPage::init()
+{
     this->player = new QMediaPlayer(this);
     this->local_cam = nullptr;
     this->local_index = 0;
@@ -105,7 +110,6 @@ QWidget *CameraPage::local_camera_widget()
 
     QPushButton *disconnect = new QPushButton(widget);
     disconnect->setFlat(true);
-    disconnect->setIconSize(Theme::icon_16);
     connect(disconnect, &QPushButton::clicked, [this]() {
         this->status->setText(QString());
         emit autoconnect_disabled();
@@ -114,7 +118,7 @@ QWidget *CameraPage::local_camera_widget()
         this->local_cam->deleteLater();
         this->local_cam = nullptr;
     });
-    disconnect->setIcon(this->theme->make_button_icon("close", disconnect));
+    this->arbiter.forge().iconize("close", disconnect, 16);
     layout->addWidget(disconnect, 0, Qt::AlignRight);
 
     this->local_video_widget = new QCameraViewfinder(widget);
@@ -132,14 +136,13 @@ QWidget *CameraPage::network_camera_widget()
 
     QPushButton *disconnect = new QPushButton(widget);
     disconnect->setFlat(true);
-    disconnect->setIconSize(Theme::icon_16);
     connect(disconnect, &QPushButton::clicked, [this]() {
         emit autoconnect_disabled();
         this->player->setMedia(QUrl());
         this->status->setText(QString());
         this->player->stop();
     });
-    disconnect->setIcon(this->theme->make_button_icon("close", disconnect));
+    this->arbiter.forge().iconize("close", disconnect, 16);
     layout->addWidget(disconnect, 0, Qt::AlignRight);
 
     QVideoWidget *video = new QVideoWidget(widget);
@@ -204,7 +207,7 @@ QWidget *CameraPage::local_cam_selector()
     QHBoxLayout *refresh_row = new QHBoxLayout();
     QPushButton *refresh_button = new QPushButton(widget);
     refresh_button->setFlat(true);
-    refresh_button->setIcon(this->theme->make_button_icon("refresh", refresh_button));
+    this->arbiter.forge().iconize("refresh", refresh_button, 16);
 
     refresh_row->addStretch(1);
     refresh_row->addWidget(refresh_button);
@@ -225,14 +228,12 @@ QWidget *CameraPage::selector_widget(QWidget *selection)
 
     QPushButton *left_button = new QPushButton(widget);
     left_button->setFlat(true);
-    left_button->setIconSize(Theme::icon_32);
-    left_button->setIcon(this->theme->make_button_icon("arrow_left", left_button));
+    this->arbiter.forge().iconize("arrow_left", left_button, 32);
     connect(left_button, &QPushButton::clicked, this, &CameraPage::prev_cam);
 
     QPushButton *right_button = new QPushButton(this);
     right_button->setFlat(true);
-    right_button->setIconSize(Theme::icon_32);
-    right_button->setIcon(this->theme->make_button_icon("arrow_right", right_button));
+    this->arbiter.forge().iconize("arrow_right", right_button, 32);
     connect(right_button, &QPushButton::clicked, this, &CameraPage::next_cam);
 
     layout->addStretch(1);
@@ -274,7 +275,7 @@ QWidget *CameraPage::network_cam_selector()
 
     QLineEdit *input = new QLineEdit(this->config->get_cam_network_url(), widget);
     input->setContextMenuPolicy(Qt::NoContextMenu);
-    input->setFont(Theme::font_18);
+    input->setFont(this->arbiter.forge().font(18));
     input->setAlignment(Qt::AlignCenter);
     connect(input, &QLineEdit::textEdited, [this](QString text) {
         this->status->clear();

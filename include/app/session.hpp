@@ -2,19 +2,28 @@
 
 #include <array>
 
+#include <QAbstractButton>
+#include <QAbstractScrollArea>
 #include <QColor>
+#include <QDir>
 #include <QFileInfo>
+#include <QFont>
+#include <QFrame>
+#include <QIcon>
+#include <QList>
 #include <QMap>
 #include <QPluginLoader>
 #include <QSettings>
 #include <QString>
 #include <QVector>
+#include <QPalette>
 #include <QWidget>
 
 #include "app/bluetooth.hpp"
 #include "app/shortcuts.hpp"
 #include "app/pages/openauto.hpp"
 #include "app/pages/page.hpp"
+#include "app/quick_views/quick_view.hpp"
 
 class Arbiter;
 
@@ -23,6 +32,9 @@ using Server = uint8_t;
 
 class Session {
    public:
+    static QDir plugin_dir(QString plugin);
+    static QString fmt_plugin(QString plugin);
+
     struct Theme {
         enum Mode {
             Light = 0,
@@ -34,6 +46,9 @@ class Session {
 
         Theme(QSettings &settings);
 
+        QPalette palette() const;
+        void colorize(QAbstractButton *button) const;
+
         QColor &color(Mode mode) { return this->colors_[mode]; }
         QColor color(Mode mode) const { return this->colors_[mode]; }
         QColor &color() { return this->colors_[this->mode]; }
@@ -41,22 +56,29 @@ class Session {
 
        private:
         std::array<QColor, NUM_MODES> colors_;
+
+        QColor base_color() const { return (this->mode == Light) ? QColor(0, 0, 0) : QColor(255, 255, 255); }
     };
 
     struct System {
+        static const char *VOLUME_CMD;
+        static const char *SHUTDOWN_CMD;
+        static const char *REBOOT_CMD;
+
         struct Brightness {
-            QPluginLoader loader;
+            QString plugin;
             uint8_t value;
 
             Brightness(QSettings &settings);
 
-           private:
-            QMap<QString, QFileInfo *> plugins_;
-        };
+            void load_plugin();
+            void set();
+            const QList<QString> plugins() const { return this->plugins_.keys(); }
 
-        static const char *VOLUME_CMD;
-        static const char *SHUTDOWN_CMD;
-        static const char *REBOOT_CMD;
+           private:
+            QPluginLoader loader_;
+            QMap<QString, QFileInfo> plugins_;
+        };
 
         Server server;
         Bluetooth bluetooth;
@@ -64,6 +86,8 @@ class Session {
         uint8_t volume;
 
         System(QSettings &settings);
+
+        void set_volume() const;
 
         // shortcut inserter
 
@@ -74,18 +98,22 @@ class Session {
     struct Layout {
         struct ControlBar {
             bool enabled;
-            QWidget *quick_view;
+            QuickView *curr_quick_view;
 
-            ControlBar(QSettings &settings);
+            ControlBar(QSettings &settings, Arbiter &arbiter);
+
+            const QVector<QuickView *> &quick_views() const { return this->quick_views_; }
+            QuickView *quick_view(int id) const { return this->quick_views_.value(id, nullptr); }
+            int quick_view_id(QuickView *quick_view) const { return this->quick_views_.indexOf(quick_view); }
 
            private:
-            QMap<QString, QWidget *> quick_views_;
+            QVector<QuickView *> quick_views_;
         };
 
-        float scale;
+        double scale;
         ControlBar control_bar;
         OpenAutoPage *openauto_page;
-        Page *active_page;
+        Page *curr_page;
 
         Layout(QSettings &settings, Arbiter &arbiter);
 
@@ -97,7 +125,41 @@ class Session {
         QVector<Page *> pages_;
     };
 
+    struct Forge {
+        static QFrame *br(bool vertical = false);
+        static void to_touch_scroller(QAbstractScrollArea *area);
+
+        Forge(Arbiter &arbiter);
+
+        void iconize(QString name, QAbstractButton *button, uint8_t size, bool dynamic = false) const;
+        void iconize(QString name, QString alt_name, QAbstractButton *button, uint8_t size, bool dynamic = false) const;
+        QFont font(int size, bool mono = false) const;
+        QWidget *brightness_slider(bool buttons = true) const;
+        QWidget *volume_slider(bool buttons = true) const;
+
+       private:
+        Arbiter &arbiter_;
+    };
+
+    struct Core {
+        bool cursor;
+
+        Core(QSettings &settings, Arbiter &arbiter);
+
+        QString stylesheet(Theme::Mode mode, float scale) const;
+        void set_cursor() const;
+
+        QString stylesheet(Theme::Mode mode) const { return this->stylesheets_[mode]; }
+
+       private:
+        std::array<QString, Theme::NUM_MODES> stylesheets_;
+
+        QString parse_stylesheet(QString path) const;
+    };
+
     Session(Arbiter &arbiter);
+
+    void update();
 
     friend class Arbiter;
 
@@ -106,4 +168,6 @@ class Session {
     Theme theme_;
     System system_;
     Layout layout_;
+    Forge forge_;
+    Core core_;
 };

@@ -3,9 +3,7 @@
 #include <QMediaPlayer>
 #include <QtWidgets>
 
-#include "app/bluetooth.hpp"
 #include "app/config.hpp"
-#include "app/theme.hpp"
 #include "app/widgets/tuner.hpp"
 
 #include "app/pages/page.hpp"
@@ -17,33 +15,36 @@ class MediaPage : public QTabWidget, public Page {
 
    public:
     MediaPage(Arbiter &arbiter, QWidget *parent = nullptr);
+
+    void init() override;
 };
 
 class BluetoothPlayerTab : public QWidget {
     Q_OBJECT
 
    public:
-    BluetoothPlayerTab(QWidget *parent = nullptr);
+    BluetoothPlayerTab(Arbiter &arbiter, QWidget *parent = nullptr);
 
    private:
+    Arbiter &arbiter;
+
     QWidget *track_widget();
     QWidget *controls_widget();
-
-    Bluetooth *bluetooth;
 };
 
 class RadioPlayerTab : public QWidget {
     Q_OBJECT
 
    public:
-    RadioPlayerTab(QWidget *parent = nullptr);
+    RadioPlayerTab(Arbiter &arbiter, QWidget *parent = nullptr);
 
    private:
+    Arbiter &arbiter;
+
     QWidget *tuner_widget();
     QWidget *controls_widget();
 
     Config *config;
-    Theme *theme;
     Tuner *tuner;
 };
 
@@ -51,11 +52,13 @@ class LocalPlayerTab : public QWidget {
     Q_OBJECT
 
    public:
-    LocalPlayerTab(QWidget *parent = nullptr);
+    LocalPlayerTab(Arbiter &arbiter, QWidget *parent = nullptr);
 
     static QString durationFmt(int total_ms);
 
    private:
+    Arbiter &arbiter;
+
     QWidget *playlist_widget();
     QWidget *seek_widget();
     QWidget *controls_widget();

@@ -5,12 +5,14 @@
 
 #include "app/config.hpp"
 
+class Arbiter;
+
 class ClimateState : public QFrame {
     Q_OBJECT
     Q_PROPERTY(QColor color READ get_color WRITE set_color)
 
    public:
-    ClimateState(QWidget *parent = nullptr);
+    ClimateState(Arbiter &arbiter, QWidget *parent = nullptr);
 
     QSize sizeHint() const override;
     QColor get_color() { return this->color; };

@@ -28,6 +28,8 @@ GpioWatcher::GpioWatcher(QObject *parent) : QObject(parent)
 
 ShortcutInput::ShortcutInput(QString shortcut, QWidget *parent) : QPushButton(shortcut, parent)
 {
+    this->setProperty("add_hint", true);
+
     this->gpio_watcher = new GpioWatcher(this);
     connect(this->gpio_watcher, &GpioWatcher::gpio_triggered, [this](QString gpio) {
         this->setText(gpio);

@@ -11,10 +11,10 @@ class Test : public QObject, VehiclePlugin {
     Q_INTERFACES(VehiclePlugin)
 
    public:
-    Test();
+    Test() {};
     ~Test();
     QList<QWidget *> widgets() override;
-    bool init(ICANBus* canbus) override;
+    bool init(ICANBus*) override;
 
    private:
     Climate *climate;

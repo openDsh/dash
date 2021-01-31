@@ -53,12 +53,15 @@ class VehiclePage : public QTabWidget, public Page {
    public:
     VehiclePage(Arbiter &arbiter, QWidget *parent = nullptr);
 
+    void init() override;
+
    private:
     void get_plugins();
     void load_plugin();
     QWidget *dialog_body();
     QWidget *can_bus_toggle_row();
     QWidget *interface_selector_row();
+    QWidget *si_units_row_widget();
 
     QMap<QString, int> capabilities;
     QMap<QString, QFileInfo> plugins;
@@ -73,9 +76,10 @@ class DataTab : public QWidget {
     Q_OBJECT
 
    public:
-    DataTab(QWidget *parent = nullptr);
+    DataTab(Arbiter &arbiter, QWidget *parent = nullptr);
 
    private:
+    Arbiter &arbiter;
     QWidget *speedo_tach_widget();
     // QWidget *mileage_data_widget();
     QWidget *engine_data_widget();

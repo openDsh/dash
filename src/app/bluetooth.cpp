@@ -3,6 +3,7 @@
 #include <BluezQt/Device>
 #include <BluezQt/InitManagerJob>
 #include <BluezQt/Manager>
+#include <BluezQt/PendingCall>
 #include <BluezQt/MediaPlayer>
 #include <BluezQt/MediaPlayerTrack>
 #include <QAbstractSlider>
@@ -18,11 +19,12 @@
 #include "app/bluetooth.hpp"
 #include "app/widgets/progress.hpp"
 
-Bluetooth::Bluetooth() : QObject(qApp)
+Bluetooth::Bluetooth(QSettings &settings)
+    : QObject(qApp)
 {
     BluezQt::Manager *manager = new BluezQt::Manager();
     BluezQt::InitManagerJob *job = manager->init();
-    job->exec();
+    // job->exec();
 
     this->adapter = manager->usableAdapter();
 
@@ -31,9 +33,11 @@ Bluetooth::Bluetooth() : QObject(qApp)
     connect(this->scan_timer, &QTimer::timeout, [this]() { this->stop_scan(); });
 
     if (this->has_adapter()) {
+        auto address = settings.value("System/Bluetooth/device", QString()).toString();
         for (auto device : this->get_devices()) {
-            if (device->mediaPlayer() != nullptr) {
+            if ((device->address() == address) && device->mediaPlayer()) {
                 this->media_player_device = device;
+                device->connectToDevice()->waitForFinished();
                 break;
             }
         }
@@ -70,6 +74,14 @@ void Bluetooth::stop_scan()
     }
 }
 
+void Bluetooth::toggle_device(BluezQt::DevicePtr device) const
+{
+    if (device->isConnected())
+        device->disconnectFromDevice()->waitForFinished();
+    else
+        device->connectToDevice()->waitForFinished();
+}
+
 void Bluetooth::update_media_player(BluezQt::DevicePtr device)
 {
     if (device->mediaPlayer() != nullptr) {
@@ -83,10 +95,4 @@ void Bluetooth::update_media_player(BluezQt::DevicePtr device)
         emit media_player_track_changed(BluezQt::MediaPlayerTrack());
         emit media_player_changed(QString(), QSharedPointer<BluezQt::MediaPlayer>(nullptr));
     }
-}
-
-Bluetooth *Bluetooth::get_instance()
-{
-    static Bluetooth bluetooth;
-    return &bluetooth;
 }

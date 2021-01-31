@@ -18,7 +18,7 @@ class ClimateSnackBar : public SnackBar {
     Q_OBJECT
 
    public:
-    ClimateSnackBar();
+    ClimateSnackBar(Arbiter &arbiter);
 
     void set_driver_temp(int temp);
     void set_passenger_temp(int temp);
@@ -40,7 +40,7 @@ class Climate : public QWidget {
     Q_OBJECT
 
    public:
-    Climate(QWidget *parent = nullptr);
+    Climate(Arbiter &arbiter, QWidget *parent = nullptr);
 
     void max_fan_speed(int max_fan_speed);
     int fan_speed() const { return this->fan_speed_; }

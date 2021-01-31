@@ -1,5 +1,7 @@
 #include <QHBoxLayout>
 
+#include "app/arbiter.hpp"
+
 #include "app/pages/page.hpp"
 
 Page::Page(Arbiter &arbiter, QString pretty_name, QString icon_name, bool toggleable, QWidget *widget)
@@ -42,9 +44,7 @@ QPushButton *Page::settings_button()
 {
     auto settings_button = new QPushButton();
     settings_button->setFlat(true);
-    settings_button->setIconSize(Theme::icon_24);
-    auto icon = Theme::get_instance()->make_button_icon("settings", settings_button);
-    settings_button->setIcon(icon);
+    this->arbiter.forge().iconize("settings", settings_button, 24);
 
     auto dialog = this->dialog();
     QObject::connect(settings_button, &QPushButton::clicked, [dialog]{ dialog->open(); });
@@ -63,7 +63,7 @@ QLayout *Page::settings_layout()
 
 Dialog *Page::dialog()
 {
-    auto dialog = new Dialog(true, this->widget_);
+    auto dialog = new Dialog(this->arbiter, true, this->widget_);
     dialog->set_body(this->settings_body());
     auto save_button = new QPushButton("save");
     QObject::connect(save_button, &QPushButton::clicked, [this]{ this->on_settings_save(); });
