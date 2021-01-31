@@ -52,8 +52,8 @@ Config::Config()
         this->launcher_plugins.append(this->settings.value(key, QString()).toString());
     this->settings.endGroup();
 
-    this->load_brightness_plugins();
     this->brightness_active_plugin = new QPluginLoader(this);
+    this->load_brightness_plugins();
     this->set_brightness_plugin(this->settings.value("brightness_plugin", "auto").toString());
 
     this->update_system_volume();
@@ -147,47 +147,37 @@ Config *Config::get_instance()
 
 void Config::load_brightness_plugins()
 {
+    // Include special case "auto" so its displayed on the settings page
     this->brightness_plugins["auto"] = QFileInfo();
 
-    for (const QFileInfo &plugin : Config::plugin_dir("brightness").entryInfoList(QDir::Files)) {
-        if (QLibrary::isLibrary(plugin.absoluteFilePath()))
-            this->brightness_plugins[Config::fmt_plugin(plugin.baseName())] = plugin;
-    }
-}
-
-void Config::detect_brightness_plugin()
-{
-    DASH_LOG(info) << "[Brightness Plugin] Detecting!";
-
     uint8_t highest_priority = 0;
-    QString brightness_plugin = "mocked";
 
-    QMapIterator<QString, QFileInfo> i(this->brightness_plugins);
-    while (i.hasNext()) {
-        i.next();
+    for (const QFileInfo &pluginFile : Config::plugin_dir("brightness").entryInfoList(QDir::Files)) {
+        QString fileName = pluginFile.absoluteFilePath();
+        if (!QLibrary::isLibrary(fileName)) continue;
 
-        if (this->brightness_active_plugin->isLoaded())
-            this->brightness_active_plugin->unload();
-        this->brightness_active_plugin->setFileName(i.value().absoluteFilePath());
+        QString name = Config::fmt_plugin(pluginFile.baseName());
+
+        this->brightness_active_plugin->unload();
+        this->brightness_active_plugin->setFileName(fileName);
 
         if (BrightnessPlugin *plugin = qobject_cast<BrightnessPlugin *>(this->brightness_active_plugin->instance())) {
             bool supported = plugin->is_supported();
             uint8_t priority = plugin->get_priority();
 
-            DASH_LOG(info) << "[Brightness Plugin] Plugin: " << i.key().toStdString() << ", Supported: " << supported << ", Priority: " << unsigned(priority);
+            DASH_LOG(info) << "[Brightness Plugin] Plugin: " << name.toStdString() << ", Supported: " << supported << ", Priority: " << unsigned(priority);
 
-            if (supported && priority > highest_priority) {
-                brightness_plugin = i.key();
+            if (!supported) continue;
+
+            // Note: Only add to the map if the plugin is supported so the settings page doesn't display unsupported plugins
+            this->brightness_plugins[name] = pluginFile;
+
+            if (priority > highest_priority) {
+                this->autodetected_brightness_plugin = name;
                 highest_priority = priority;
             }
         }
     }
-
-    DASH_LOG(info) << "[Brightness Plugin] Selected: " << brightness_plugin.toStdString();
-
-    if (this->brightness_active_plugin->isLoaded())
-        this->brightness_active_plugin->unload();
-    this->brightness_active_plugin->setFileName(this->brightness_plugins[brightness_plugin].absoluteFilePath());
 }
 
 void Config::update_system_volume()
