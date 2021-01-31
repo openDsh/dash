@@ -18,7 +18,7 @@ bool OfficialRPi::is_supported()
 
 uint8_t OfficialRPi::get_priority()
 {
-    return 2;
+    return 3;
 }
 
 void OfficialRPi::set(int brightness)

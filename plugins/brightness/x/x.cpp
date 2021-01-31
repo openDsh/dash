@@ -23,7 +23,7 @@ bool X::is_supported()
 
 uint8_t X::get_priority()
 {
-    return 1;
+    return 2;
 }
 
 void X::set(int brightness)
