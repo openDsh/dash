@@ -57,6 +57,8 @@ Bluetooth::Bluetooth() : QObject(qApp)
         }
 
         DASH_LOG(info) << "[Bluetooth] Has Adapter: " << this->has_adapter() << ", Has Media Device: " << (this->media_player_device != nullptr);
+
+        emit init();
     });
 }
 
