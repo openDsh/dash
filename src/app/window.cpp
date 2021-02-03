@@ -30,7 +30,7 @@ DashWindow::DashWindow()
     this->pages = new QStackedLayout();
     this->bar = new QHBoxLayout();
 
-    connect(this->rail_group, &QButtonGroup::idToggled, [this](int id, bool){
+    connect(this->rail_group, QOverload<int, bool>::of(&QButtonGroup::buttonToggled), [this](int id, bool){
         this->pages->setCurrentWidget(this->arbiter.layout().page(id)->widget());
     });
     connect(this->openauto, &OpenAutoPage::toggle_fullscreen, [this](QWidget *widget) { this->add_widget(widget); });
@@ -181,6 +181,7 @@ void DashWindow::add_page(Page *page)
     });
 
     this->pages->addWidget(page->widget());
+    page->init();
     this->rail_group->addButton(button, this->arbiter.layout().page_id(page));
     this->rail->addWidget(button);
 
@@ -228,8 +229,10 @@ QLayout *DashWindow::quick_views()
     QStackedLayout *layout = new QStackedLayout();
     layout->setContentsMargins(0, 0, 0, 0);
 
-    for (auto quick_view : this->arbiter.layout().control_bar.quick_views())
+    for (auto quick_view : this->arbiter.layout().control_bar.quick_views()) {
         layout->addWidget(quick_view->widget());
+        quick_view->init();
+    }
     layout->setCurrentWidget(this->arbiter.layout().control_bar.curr_quick_view->widget());
     connect(&this->arbiter, &Arbiter::curr_quick_view_changed, [layout](QuickView *quick_view){
         layout->setCurrentWidget(quick_view->widget());

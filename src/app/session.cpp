@@ -367,10 +367,6 @@ Session::Session(Arbiter &arbiter)
     , forge_(arbiter)
     , core_(settings_, arbiter)
 {
-    for (auto page : this->layout_.pages())
-        page->init();
-    for (auto quick_view : this->layout_.control_bar.quick_views())
-        quick_view->init();
 }
 
 void Session::update()
