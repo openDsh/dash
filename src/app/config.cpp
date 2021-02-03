@@ -3,6 +3,7 @@
 #include <QTimer>
 #include <QProcess>
 
+#include "DashLog.hpp"
 #include "app/config.hpp"
 #include "plugins/brightness_plugin.hpp"
 
@@ -12,9 +13,6 @@ Config::Config()
       openauto_button_codes(openauto_config->getButtonCodes()),
       settings()
 {
-    this->load_brightness_plugins();
-    this->brightness_active_plugin = new QPluginLoader(this);
-
     this->volume = this->settings.value("volume", 50).toInt();
     this->dark_mode = this->settings.value("dark_mode", false).toBool();
     this->brightness = this->settings.value("brightness", 255).toInt();
@@ -29,7 +27,6 @@ Config::Config()
     this->wireless_address = this->settings.value("Wireless/address", "0.0.0.0").toString();
     this->mouse_active = this->settings.value("mouse_active", true).toBool();
     this->quick_view = this->settings.value("quick_view", "none").toString();
-    this->brightness_plugin = this->settings.value("brightness_plugin", "mocked").toString();
     this->controls_bar = this->settings.value("controls_bar", false).toBool();
     this->scale = this->settings.value("scale", 1.0).toDouble();
     this->cam_name = this->settings.value("Camera/name").toString();
@@ -55,11 +52,11 @@ Config::Config()
         this->launcher_plugins.append(this->settings.value(key, QString()).toString());
     this->settings.endGroup();
 
-    this->update_system_volume();
+    this->brightness_active_plugin = new QPluginLoader(this);
+    this->load_brightness_plugins();
+    this->set_brightness_plugin(this->settings.value("brightness_plugin", "auto").toString());
 
-    if (this->brightness_active_plugin->isLoaded())
-        this->brightness_active_plugin->unload();
-    this->brightness_active_plugin->setFileName(this->brightness_plugins[this->brightness_plugin].absoluteFilePath());
+    this->update_system_volume();
 }
 
 Config::~Config()
@@ -97,7 +94,7 @@ void Config::save()
         this->settings.setValue("mouse_active", this->mouse_active);
     if (this->quick_view != this->settings.value("quick_view", "volume").toString())
         this->settings.setValue("quick_view", this->quick_view);
-    if (this->brightness_plugin != this->settings.value("brightness_plugin", "mocked").toString())
+    if (this->brightness_plugin != this->settings.value("brightness_plugin", "auto").toString())
         this->settings.setValue("brightness_plugin", this->brightness_plugin);
     if (this->controls_bar != this->settings.value("controls_bar", false).toBool())
         this->settings.setValue("controls_bar", this->controls_bar);
@@ -150,9 +147,36 @@ Config *Config::get_instance()
 
 void Config::load_brightness_plugins()
 {
-    for (const QFileInfo &plugin : Config::plugin_dir("brightness").entryInfoList(QDir::Files)) {
-        if (QLibrary::isLibrary(plugin.absoluteFilePath()))
-            this->brightness_plugins[Config::fmt_plugin(plugin.baseName())] = plugin;
+    // Include special case "auto" so its displayed on the settings page
+    this->brightness_plugins["auto"] = QFileInfo();
+
+    uint8_t highest_priority = 0;
+
+    for (const QFileInfo &pluginFile : Config::plugin_dir("brightness").entryInfoList(QDir::Files)) {
+        QString fileName = pluginFile.absoluteFilePath();
+        if (!QLibrary::isLibrary(fileName)) continue;
+
+        QString name = Config::fmt_plugin(pluginFile.baseName());
+
+        this->brightness_active_plugin->unload();
+        this->brightness_active_plugin->setFileName(fileName);
+
+        if (BrightnessPlugin *plugin = qobject_cast<BrightnessPlugin *>(this->brightness_active_plugin->instance())) {
+            bool supported = plugin->is_supported();
+            uint8_t priority = plugin->get_priority();
+
+            DASH_LOG(info) << "[Brightness Plugin] Plugin: " << name.toStdString() << ", Supported: " << supported << ", Priority: " << unsigned(priority);
+
+            if (!supported) continue;
+
+            // Note: Only add to the map if the plugin is supported so the settings page doesn't display unsupported plugins
+            this->brightness_plugins[name] = pluginFile;
+
+            if (priority > highest_priority) {
+                this->autodetected_brightness_plugin = name;
+                highest_priority = priority;
+            }
+        }
     }
 }
 

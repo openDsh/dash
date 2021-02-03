@@ -154,9 +154,20 @@ class Config : public QObject {
     inline void set_brightness_plugin(QString brightness_plugin)
     {
         this->brightness_plugin = brightness_plugin;
-        if (this->brightness_active_plugin->isLoaded())
+
+        QString name = this->brightness_plugin;
+
+        // If the brightness plugin is the special case "auto" we use the autodetected plugin
+        if (name == "auto")
+            name = this->autodetected_brightness_plugin;
+
+        QString fileName = this->brightness_plugins[name].absoluteFilePath();
+
+        // Only replace the active plugin if its differnt than the one we want
+        if (this->brightness_active_plugin->fileName() != fileName) {
             this->brightness_active_plugin->unload();
-        this->brightness_active_plugin->setFileName(this->brightness_plugins[this->brightness_plugin].absoluteFilePath());
+            this->brightness_active_plugin->setFileName(fileName);
+        }
     }
 
     inline bool get_vehicle_can_bus() { return this->vehicle_can_bus; }
@@ -207,6 +218,7 @@ class Config : public QObject {
     QMap<QString, QString> shortcuts;
     QString quick_view;
     QString brightness_plugin;
+    QString autodetected_brightness_plugin;
     bool controls_bar;
     double scale;
     QString cam_network_url;
@@ -226,6 +238,7 @@ class Config : public QObject {
     QPluginLoader *brightness_active_plugin;
 
     void load_brightness_plugins();
+    void detect_brightness_plugin();
     void update_system_volume();
 
    signals:
