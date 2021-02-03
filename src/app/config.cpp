@@ -36,7 +36,7 @@ Config::Config()
     this->cam_local_format_override = this->settings.value("Camera/local_format_override").value<QVideoFrame::PixelFormat>();
     this->cam_autoconnect = this->settings.value("Camera/automatically_reconnect").toBool();
     this->cam_autoconnect_time_secs = this->settings.value("Camera/auto_reconnect_time_secs", 6).toInt();
-    this->vehicle_plugin = this->settings.value("Vehicle/plugin", QString()).toString();
+    this->vehicle_plugin = this->settings.value("Vehicle/plugin", "unloader").toString();
     this->vehicle_can_bus = this->settings.value("Vehicle/can_bus", false).toBool();
     this->vehicle_interface = this->settings.value("Vehicle/interface", QString()).toString();
     this->settings.beginGroup("Pages");
@@ -92,7 +92,7 @@ void Config::save()
         this->settings.setValue("Wireless/address", this->wireless_address);
     if (this->mouse_active != this->settings.value("mouse_active", true).toBool())
         this->settings.setValue("mouse_active", this->mouse_active);
-    if (this->quick_view != this->settings.value("quick_view", "volume").toString())
+    if (this->quick_view != this->settings.value("quick_view", "none").toString())
         this->settings.setValue("quick_view", this->quick_view);
     if (this->brightness_plugin != this->settings.value("brightness_plugin", "auto").toString())
         this->settings.setValue("brightness_plugin", this->brightness_plugin);
@@ -112,9 +112,9 @@ void Config::save()
         this->settings.setValue("Camera/local_format_override", this->cam_local_format_override);
     if (this->cam_autoconnect != this->settings.value("Camera/automatically_reconnect").toBool())
         this->settings.setValue("Camera/automatically_reconnect", this->cam_autoconnect);
-    if (this->cam_autoconnect_time_secs != this->settings.value("Camera/auto_reconnect_time_secs").toInt())
+    if (this->cam_autoconnect_time_secs != this->settings.value("Camera/auto_reconnect_time_secs", 6).toInt())
         this->settings.setValue("Camera/auto_reconnect_time_secs", this->cam_autoconnect_time_secs);
-    if (this->vehicle_plugin != this->settings.value("Vehicle/plugin").toString())
+    if (this->vehicle_plugin != this->settings.value("Vehicle/plugin", "unloader").toString())
         this->settings.setValue("Vehicle/plugin", this->vehicle_plugin);
     if (this->vehicle_can_bus != this->settings.value("Vehicle/can_bus").toBool())
         this->settings.setValue("Vehicle/can_bus", this->vehicle_can_bus);
