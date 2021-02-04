@@ -16,7 +16,6 @@ class Arbiter : public QObject {
     // void set_mode(Session::Theme::Mode mode);
     void toggle_mode();
     void set_color(const QColor &color);
-    void set_bluetooth_device(BluezQt::DevicePtr device);
     void set_brightness_plugin(QString plugin);
     void set_brightness(uint8_t brightness);
     void set_volume(uint8_t volume);

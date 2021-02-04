@@ -33,16 +33,6 @@ void Arbiter::set_color(const QColor &color)
     emit color_changed(color);
 }
 
-void Arbiter::set_bluetooth_device(BluezQt::DevicePtr device)
-{
-    auto prev_connected = device->isConnected();
-    this->system().bluetooth.toggle_device(device);
-    if (prev_connected)
-        this->settings().remove("System/Bluetooth/device");
-    else
-        this->settings().setValue("System/Bluetooth/device", device->address());
-}
-
 void Arbiter::set_brightness_plugin(QString plugin)
 {
     this->system().brightness.plugin = plugin;

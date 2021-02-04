@@ -33,11 +33,9 @@ Bluetooth::Bluetooth(QSettings &settings)
     connect(this->scan_timer, &QTimer::timeout, [this]() { this->stop_scan(); });
 
     if (this->has_adapter()) {
-        auto address = settings.value("System/Bluetooth/device", QString()).toString();
         for (auto device : this->get_devices()) {
-            if ((device->address() == address) && device->mediaPlayer()) {
+            if (device->isConnected() && device->mediaPlayer()) {
                 this->media_player_device = device;
-                device->connectToDevice()->waitForFinished();
                 break;
             }
         }

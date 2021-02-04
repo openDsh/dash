@@ -509,7 +509,7 @@ QWidget *BluetoothSettingsTab::devices_widget()
             button->setChecked(true);
         connect(button, &QPushButton::clicked, [this, button, device](bool checked = false){
             button->setChecked(!checked);
-            this->arbiter.set_bluetooth_device(device);
+            this->arbiter.system().bluetooth.toggle_device(device);
         });
 
         this->devices[device] = button;
@@ -522,7 +522,7 @@ QWidget *BluetoothSettingsTab::devices_widget()
             button->setChecked(true);
         connect(button, &QPushButton::clicked, [this, button, device](bool checked = false){
             button->setChecked(!checked);
-            this->arbiter.set_bluetooth_device(device);
+            this->arbiter.system().bluetooth.toggle_device(device);
         });
         this->devices[device] = button;
         layout->addWidget(button);
