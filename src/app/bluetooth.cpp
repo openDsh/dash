@@ -24,7 +24,7 @@ Bluetooth::Bluetooth(QSettings &settings)
 {
     BluezQt::Manager *manager = new BluezQt::Manager();
     BluezQt::InitManagerJob *job = manager->init();
-    // job->exec();
+    job->exec();
 
     this->adapter = manager->usableAdapter();
 
