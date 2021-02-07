@@ -52,6 +52,7 @@ class Theme : public QObject {
 
     void set_scale(double scale);
 
+    QIcon make_icon(QString name);
     QIcon make_button_icon(QString name, QPushButton *button, QString alt_name = QString(), bool dynamic = false);
     void update();
 

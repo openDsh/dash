@@ -350,16 +350,68 @@ QWidget *LayoutSettingsTab::pages_widget()
     QGroupBox *group = new QGroupBox(widget);
     QVBoxLayout *group_layout = new QVBoxLayout(group);
 
+    QWidget *icon_row = new QWidget(group);
+    QHBoxLayout *icon_row_layout = new QHBoxLayout(icon_row);
+    group_layout->addWidget(icon_row);
+
+    QLabel *home_icon = new QLabel(icon_row);
+    home_icon->setPixmap(this->theme->make_icon("home").pixmap(home_icon->size()));
+    icon_row_layout->addWidget(home_icon);
+
+    QLabel *visibility_icon = new QLabel(icon_row);
+    visibility_icon->setPixmap(this->theme->make_icon("visibility").pixmap(visibility_icon->size()));
+    icon_row_layout->addWidget(visibility_icon, 1);
+
     DashWindow *window = qobject_cast<DashWindow *>(this->window());
 
+    QButtonGroup *button_group = new QButtonGroup();
     for (QAbstractButton *page : window->get_pages()) {
-        QCheckBox *button = new QCheckBox(page->property("page").value<QWidget *>()->objectName(), group);
-        button->setChecked(!page->isHidden());
-        connect(button, &QCheckBox::toggled, [page, config = this->config](bool checked) {
-            config->set_page(page->property("page").value<QWidget *>(), checked);
+        QString page_name = page->property("page").value<QWidget *>()->objectName();
+
+        QWidget *row = new QWidget(this);
+        QHBoxLayout *row_layout = new QHBoxLayout(row);
+
+        QRadioButton *is_home = new QRadioButton(row);
+        is_home->setEnabled(!page->isHidden());
+        is_home->setChecked(this->config->get_home_page() == page_name);
+        connect(is_home, &QCheckBox::toggled, [page_name, config = this->config](bool checked) {
+            if (checked) {
+                config->set_home_page(page_name);
+            }
         });
-        group_layout->addWidget(button);
+        row_layout->addWidget(is_home);
+        button_group->addButton(is_home);
+
+        QCheckBox *is_enabled = new QCheckBox(page_name, row);
+        is_enabled->setChecked(!page->isHidden());
+        connect(is_enabled, &QCheckBox::toggled, [page, is_home, button_group, config = this->config](bool checked) {
+            config->set_page(page->property("page").value<QWidget *>(), checked);
+            is_home->setEnabled(checked);
+
+            // If the page becomes disabled and is set as the home then replace the home with the fist visible page
+            if (!checked && is_home->isChecked()) {
+                for (QAbstractButton *button : button_group->buttons()) {
+                    if (button->isEnabled()) {
+                        button->setChecked(true);
+                        break;
+                    }
+                }
+            }
+        });
+        row_layout->addWidget(is_enabled, 1);
+        group_layout->addWidget(row);
     }
+
+    // Note: To allow for the radio buttons to all become unchecked if all pages become disabled we need to have an
+    //  additional hidden radio button. We use this hidden radio button for making the settings page the home.
+    QRadioButton *is_settings_home = new QRadioButton();
+    is_settings_home->setChecked(this->config->get_home_page() == "Settings");
+    connect(is_settings_home, &QCheckBox::toggled, [config = this->config](bool checked) {
+        if (checked) {
+            config->set_home_page("Settings");
+        }
+    });
+    button_group->addButton(is_settings_home);
 
     layout->addWidget(group, 1, Qt::AlignHCenter);
 

@@ -156,9 +156,10 @@ void DashWindow::add_pages()
     this->add_page("Launcher", new LauncherPage(this), "widgets");
     this->add_page("Settings", new SettingsPage(this), "tune");
 
-    // toggle initial page
+    // Toggle home page
+    QString home_page = this->config->get_home_page();
     for (QAbstractButton *button : this->rail_group->buttons()) {
-        if (!button->isHidden()) {
+        if (!button->isHidden() && home_page == button->property("page").value<QWidget *>()->objectName()) {
             button->setChecked(true);
             break;
         }

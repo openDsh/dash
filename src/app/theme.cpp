@@ -166,6 +166,11 @@ QIcon Theme::themed_button_icon(QIcon icon, QAbstractButton *button)
     return themed_icon;
 }
 
+QIcon Theme::make_icon(QString name)
+{
+    return QIcon(QString(":/icons/%1.svg").arg(name));
+}
+
 QIcon Theme::make_button_icon(QString name, QPushButton *button, QString alt_name, bool dynamic)
 {
     if (!alt_name.isNull())

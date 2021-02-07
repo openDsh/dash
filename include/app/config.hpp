@@ -121,6 +121,10 @@ class Config : public QObject {
         // emit scale_changed(this->scale);
     }
 
+    inline QString get_home_page() { return this->home_page; }
+    inline void set_home_page(QString home_page) { this->home_page = home_page; }
+
+    inline QMap<QString, bool> get_pages() { return this->pages; }
     inline bool get_page(QWidget *page) { return this->pages.value(page->objectName(), true); }
     inline void set_page(QWidget *page, bool enabled)
     {
@@ -228,6 +232,7 @@ class Config : public QObject {
     QVideoFrame::PixelFormat cam_local_format_override;
     bool cam_autoconnect;
     int cam_autoconnect_time_secs;
+    QString home_page;
     QMap<QString, bool> pages;
     QString vehicle_plugin;
     bool vehicle_can_bus;
