@@ -19,8 +19,8 @@
 #include <QPalette>
 #include <QWidget>
 
+#include "app/action.hpp"
 #include "app/bluetooth.hpp"
-#include "app/shortcuts.hpp"
 #include "app/pages/openauto.hpp"
 #include "app/pages/page.hpp"
 #include "app/quick_views/quick_view.hpp"
@@ -88,11 +88,6 @@ class Session {
         System(QSettings &settings);
 
         void set_volume() const;
-
-        // shortcut inserter
-
-       private:
-        QMap<QString, Shortcut *> shortcuts_;
     };
 
     struct Layout {
@@ -133,6 +128,7 @@ class Session {
 
         void iconize(QString name, QAbstractButton *button, uint8_t size, bool dynamic = false) const;
         void iconize(QString name, QString alt_name, QAbstractButton *button, uint8_t size, bool dynamic = false) const;
+        void symbolize(QAbstractButton *button) const;
         QFont font(int size, bool mono = false) const;
         QWidget *brightness_slider(bool buttons = true) const;
         QWidget *volume_slider(bool buttons = true) const;
@@ -149,10 +145,14 @@ class Session {
         QString stylesheet(Theme::Mode mode, float scale) const;
         void set_cursor() const;
 
+        const QVector<Action *> &actions() const { return this->actions_; }
+        Action *action(int id) const { return this->actions_.value(id, nullptr); }
+        int action_id(Action *action) const { return this->actions_.indexOf(action); }
         QString stylesheet(Theme::Mode mode) const { return this->stylesheets_[mode]; }
 
        private:
         std::array<QString, Theme::NUM_MODES> stylesheets_;
+        QVector<Action *> actions_;
 
         QString parse_stylesheet(QString path) const;
     };

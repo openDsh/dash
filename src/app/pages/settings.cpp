@@ -39,7 +39,6 @@ MainSettingsTab::MainSettingsTab(Arbiter &arbiter, QWidget *parent)
     , arbiter(arbiter)
 {
     this->config = Config::get_instance();
-    this->shortcuts = Shortcuts::get_instance();
 
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->setContentsMargins(6, 0, 6, 0);
@@ -87,20 +86,6 @@ QWidget *MainSettingsTab::dark_mode_row_widget()
         toggle->setChecked(this->arbiter.theme().mode == Session::Theme::Dark);
     });
     connect(toggle, &Switch::stateChanged, [this](bool){ this->arbiter.toggle_mode(); });
-    Shortcut *shortcut = new Shortcut(this->config->get_shortcut("dark_mode_toggle"), this->window());
-    this->shortcuts->add_shortcut("dark_mode_toggle", "Toggle Dark Mode", shortcut);
-    connect(shortcut, &Shortcut::activated, [toggle]() { toggle->click(); });
-
-    Shortcut *temp_shortcut_on = new Shortcut(this->config->get_shortcut("dark_mode_on"), this->window());
-    this->shortcuts->add_shortcut("dark_mode_on", "[Enable Dark Mode]", temp_shortcut_on);
-    connect(temp_shortcut_on, &Shortcut::activated, [toggle]() {
-        if (!toggle->isChecked()) toggle->click();
-    });
-    Shortcut *temp_shortcut_off = new Shortcut(this->config->get_shortcut("dark_mode_off"), this->window());
-    this->shortcuts->add_shortcut("dark_mode_off", "[Disable Dark Mode]", temp_shortcut_off);
-    connect(temp_shortcut_off, &Shortcut::activated, [toggle]() {
-        if (toggle->isChecked()) toggle->click();
-    });
 
     layout->addWidget(toggle, 1, Qt::AlignHCenter);
 
@@ -325,7 +310,7 @@ QWidget *LayoutSettingsTab::pages_widget()
 
     for (auto page : this->arbiter.layout().pages()) {
         if (page->toggleale()) {
-            QCheckBox *button = new QCheckBox(page->pretty_name(), group);
+            QCheckBox *button = new QCheckBox(page->name(), group);
             button->setChecked(page->enabled());
             connect(button, &QCheckBox::toggled, [this, page]{ this->arbiter.toggle_page(page); });
             group_layout->addWidget(button);
@@ -374,8 +359,8 @@ QWidget *LayoutSettingsTab::quick_view_select_widget()
 
     QStringList quick_views;
     for (auto quick_view : this->arbiter.layout().control_bar.quick_views())
-        quick_views.append(quick_view->pretty_name());
-    Selector *selector = new Selector(quick_views, this->arbiter.layout().control_bar.curr_quick_view->pretty_name(), this->arbiter.forge().font(14), this->arbiter, widget);
+        quick_views.append(quick_view->name());
+    Selector *selector = new Selector(quick_views, this->arbiter.layout().control_bar.curr_quick_view->name(), this->arbiter.forge().font(14), this->arbiter, widget);
     connect(selector, &Selector::idx_changed, [this](int idx){
         this->arbiter.set_curr_quick_view(this->arbiter.layout().control_bar.quick_view(idx));
     });
@@ -550,7 +535,6 @@ ActionsSettingsTab::ActionsSettingsTab(Arbiter &arbiter, QWidget *parent)
     , arbiter(arbiter)
 {
     this->config = Config::get_instance();
-    this->shortcuts = Shortcuts::get_instance();
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->setContentsMargins(6, 0, 6, 0);
 
@@ -562,15 +546,8 @@ QWidget *ActionsSettingsTab::settings_widget()
     QWidget *widget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
 
-    QMap<QString, QPair<QString, Shortcut *>> shortcuts = this->shortcuts->get_shortcuts();
-    for (auto id : shortcuts.keys()) {
-        QPair<QString, Shortcut *> shortcut = shortcuts[id];
-        layout->addWidget(this->shortcut_row_widget(id, shortcut.first, shortcut.second));
-    }
-    connect(this->shortcuts, &Shortcuts::shortcut_added,
-            [this, layout](QString id, QString description, Shortcut *shortcut) {
-                layout->addWidget(this->shortcut_row_widget(id, description, shortcut));
-            });
+    for (auto action : this->arbiter.core().actions())
+        layout->addWidget(this->action_row_widget(action));
 
     QScrollArea *scroll_area = new QScrollArea(this);
     Session::Forge::to_touch_scroller(scroll_area);
@@ -580,59 +557,15 @@ QWidget *ActionsSettingsTab::settings_widget()
     return scroll_area;
 }
 
-QWidget *ActionsSettingsTab::shortcut_row_widget(QString id, QString description, Shortcut *shortcut)
+QWidget *ActionsSettingsTab::action_row_widget(Action *action)
 {
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
-    QLabel *label = new QLabel(description, widget);
+    QLabel *label = new QLabel(action->name(), widget);
 
     layout->addWidget(label, 1);
-    layout->addWidget(this->shortcut_input_widget(id, shortcut), 1);
-
-    return widget;
-}
-
-QWidget *ActionsSettingsTab::shortcut_input_widget(QString id, Shortcut *shortcut)
-{
-    QWidget *widget = new QWidget(this);
-    QHBoxLayout *layout = new QHBoxLayout(widget);
-
-    QPushButton *symbol = new QPushButton(widget);
-    QSizePolicy symbol_policy = symbol->sizePolicy();
-    symbol_policy.setRetainSizeWhenHidden(true);
-    symbol->setSizePolicy(symbol_policy);
-    symbol->setFocusPolicy(Qt::NoFocus);
-    symbol->setAttribute(Qt::WA_TransparentForMouseEvents, true);
-    symbol->setFlat(true);
-    symbol->setCheckable(true);
-    if (shortcut->to_str().isEmpty())
-        symbol->hide();
-    else
-        symbol->setChecked(shortcut->to_str().startsWith("gpio"));
-    this->arbiter.forge().iconize("keyboard", "developer_board", symbol, 32);
-
-    ShortcutInput *input = new ShortcutInput(shortcut->to_str(), widget);
-    input->setFlat(true);
-    QFont font(this->arbiter.forge().font(18));
-    font.setFamily("Titillium Web");
-    input->setFont(font);
-    connect(input, &ShortcutInput::shortcut_updated, [this, id, symbol](QString shortcut) {
-        if (shortcut.isEmpty()) {
-            symbol->hide();
-        }
-        else {
-            symbol->setChecked(shortcut.startsWith("gpio"));
-            symbol->show();
-        }
-        this->shortcuts->update_shortcut(id, shortcut);
-        this->config->set_shortcut(id, shortcut);
-    });
-
-    layout->addStretch(1);
-    layout->addWidget(input, 3);
-    layout->addStretch(1);
-    layout->addWidget(symbol, 1, Qt::AlignRight);
+    layout->addWidget(action->input_widget(), 1);
 
     return widget;
 }

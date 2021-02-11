@@ -416,7 +416,7 @@ QWidget *OpenAutoPage::connect_msg()
     QVBoxLayout *layout = new QVBoxLayout(widget);
     layout->setContentsMargins(0, 0, 0, 0);
 
-    QLabel *label = new QLabel("connect device to start Android Auto", widget);
+    QLabel *label = new QLabel("Connect Device to Start Android Auto", widget);
     label->setAlignment(Qt::AlignCenter);
 
     QHBoxLayout *layout2 = new QHBoxLayout();

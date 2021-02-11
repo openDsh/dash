@@ -75,7 +75,7 @@ QWidget *LauncherPlugins::dialog_body()
     layout->addWidget(this->selector);
     layout->addWidget(Session::Forge::br());
 
-    QLabel *label = new QLabel("active plugins", widget);
+    QLabel *label = new QLabel("Active Plugins", widget);
     label->setAlignment(Qt::AlignCenter);
     layout->addWidget(label);
 
@@ -125,7 +125,7 @@ QWidget *LauncherPage::load_msg()
     QVBoxLayout *layout = new QVBoxLayout(widget);
     layout->setContentsMargins(0, 0, 0, 0);
 
-    QLabel *label = new QLabel("load launcher plugin", widget);
+    QLabel *label = new QLabel("Load Launcher Plugin", widget);
     label->setAlignment(Qt::AlignCenter);
 
     QHBoxLayout *layout2 = new QHBoxLayout();

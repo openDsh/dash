@@ -5,7 +5,6 @@
 #include "openauto/Configuration/Configuration.hpp"
 
 #include "app/config.hpp"
-#include "app/shortcuts.hpp"
 
 #include "app/pages/page.hpp"
 
@@ -43,7 +42,6 @@ class MainSettingsTab : public QWidget {
 
     Arbiter &arbiter;
     Config *config;
-    Shortcuts *shortcuts;
 };
 
 class LayoutSettingsTab : public QWidget {
@@ -89,10 +87,8 @@ class ActionsSettingsTab : public QWidget {
 
    private:
     QWidget *settings_widget();
-    QWidget *shortcut_row_widget(QString key, QString name, Shortcut *shortcut);
-    QWidget *shortcut_input_widget(QString id, Shortcut *shortcut);
+    QWidget *action_row_widget(Action *action);
 
     Arbiter &arbiter;
     Config *config;
-    Shortcuts *shortcuts;
 };

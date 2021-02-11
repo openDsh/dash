@@ -5,18 +5,17 @@
 #include <QVBoxLayout>
 #include <QWidget>
 
-#include "app/shortcuts.hpp"
 #include "app/widgets/dialog.hpp"
 
 class Arbiter;
 
 class Page {
    public:
-    Page(Arbiter &arbiter, QString pretty_name, QString icon_name, bool toggleable, QWidget *widget);
+    Page(Arbiter &arbiter, QString name, QString icon_name, bool toggleable, QWidget *widget);
 
     virtual void init() = 0;
 
-    const QString &pretty_name() { return this->pretty_name_; }
+    const QString &name() { return this->name_; }
     const QString &icon_name() { return this->icon_name_; }
     const bool &toggleale() { return this->toggleable_; }
     QWidget *widget() { return this->widget_; }
@@ -45,7 +44,7 @@ class Page {
     QLayout *settings_layout();
 
    private:
-    const QString pretty_name_;
+    const QString name_;
     const QString icon_name_;
     const bool toggleable_;
     QWidget *widget_;

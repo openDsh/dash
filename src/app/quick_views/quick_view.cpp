@@ -4,9 +4,9 @@
 
 #include "app/quick_views/quick_view.hpp"
 
-QuickView::QuickView(Arbiter &arbiter, QString pretty_name, QWidget *widget)
+QuickView::QuickView(Arbiter &arbiter, QString name, QWidget *widget)
     : arbiter(arbiter)
-    , pretty_name_(pretty_name)
+    , name_(name)
     , widget_(widget)
 {
 }

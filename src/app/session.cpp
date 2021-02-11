@@ -112,7 +112,7 @@ const char *Session::System::REBOOT_CMD = "sudo shutdown -r now";
 Session::System::Brightness::Brightness(QSettings &settings)
     : plugin(settings.value("System/Brightness/plugin", "mocked").toString())
     , value(settings.value("System/Brightness/value", 255).toUInt())
-    , loader_()
+    , loader_(qApp)
 {
     for (const auto plugin : Session::plugin_dir("brightness").entryInfoList(QDir::Files)) {
         if (QLibrary::isLibrary(plugin.absoluteFilePath()))
@@ -189,7 +189,12 @@ Session::Layout::Layout(QSettings &settings, Arbiter &arbiter)
     settings.endGroup();
     settings.endGroup();
 
-    this->curr_page = this->pages_[0];
+    for (auto page : this->pages()) {
+        if (page->enabled()) {
+            this->curr_page = page;
+            break;
+        }
+    }
 }
 
 QFrame *Session::Forge::br(bool vertical)
@@ -236,6 +241,15 @@ void Session::Forge::iconize(QString name, QString alt_name, QAbstractButton *bu
     this->iconize(name, button, size, dynamic);
 }
 
+void Session::Forge::symbolize(QAbstractButton *button) const
+{
+    auto policy(button->sizePolicy());
+    policy.setRetainSizeWhenHidden(true);
+    button->setSizePolicy(policy);
+    button->setFocusPolicy(Qt::NoFocus);
+    button->setAttribute(Qt::WA_TransparentForMouseEvents, true);
+}
+
 QFont Session::Forge::font(int size, bool mono) const
 {
     auto name = mono ? "Titillium Web" : "Montserrat";
@@ -255,19 +269,21 @@ QWidget *Session::Forge::brightness_slider(bool buttons) const
     slider->setTracking(false);
     slider->setRange(76, 255);
     slider->setValue(this->arbiter_.system().brightness.value);
-    QObject::connect(slider, &QSlider::valueChanged, [this](int position){ this->arbiter_.set_brightness(position); });
+    QObject::connect(slider, &QSlider::sliderReleased, [this, slider]{
+        this->arbiter_.set_brightness(slider->sliderPosition());
+    });
     QObject::connect(&this->arbiter_, &Arbiter::brightness_changed, [slider](int brightness){ slider->setValue(brightness); });
 
     if (buttons) {
         auto dim_button = new QPushButton();
         dim_button->setFlat(true);
         this->iconize("brightness_low", dim_button, 26);
-        QObject::connect(dim_button, &QPushButton::clicked, [slider]{ slider->setValue(slider->value() - 18); });
+        QObject::connect(dim_button, &QPushButton::clicked, [this]{ this->arbiter_.decrease_brightness(18); });
 
         auto brighten_button = new QPushButton();
         brighten_button->setFlat(true);
         this->iconize("brightness_high", brighten_button, 26);
-        QObject::connect(brighten_button, &QPushButton::clicked, [slider]{ slider->setValue(slider->value() + 18); });
+        QObject::connect(brighten_button, &QPushButton::clicked, [this]{ this->arbiter_.increase_brightness(18); });
 
         layout->addWidget(dim_button);
         layout->addWidget(brighten_button);
@@ -289,19 +305,19 @@ QWidget *Session::Forge::volume_slider(bool buttons) const
     slider->setTracking(false);
     slider->setRange(0, 100);
     slider->setValue(this->arbiter_.system().volume);
-    QObject::connect(slider, &QSlider::valueChanged, [this](int position) { this->arbiter_.set_volume(position); });
+    QObject::connect(slider, &QSlider::sliderReleased, [this, slider]{ this->arbiter_.set_volume(slider->sliderPosition()); });
     QObject::connect(&this->arbiter_, &Arbiter::volume_changed, [slider](int volume) { slider->setValue(volume); });
 
     if (buttons) {
         auto lower_button = new QPushButton();
         lower_button->setFlat(true);
         this->iconize("volume_down", lower_button, 26);
-        QObject::connect(lower_button, &QPushButton::clicked, [slider]{ slider->setValue(slider->value() - 10); });
+        QObject::connect(lower_button, &QPushButton::clicked, [this]{ this->arbiter_.decrease_volume(10); });
 
         auto raise_button = new QPushButton();
         raise_button->setFlat(true);
         this->iconize("volume_up", raise_button, 26);
-        QObject::connect(raise_button, &QPushButton::clicked, [slider]{ slider->setValue(slider->value() + 10); });
+        QObject::connect(raise_button, &QPushButton::clicked, [this]{ this->arbiter_.increase_volume(10); });
 
         layout->addWidget(lower_button);
         layout->addWidget(raise_button);
@@ -315,16 +331,54 @@ QWidget *Session::Forge::volume_slider(bool buttons) const
 Session::Core::Core(QSettings &settings, Arbiter &arbiter)
     : cursor(settings.value("Core/cursor", true).toBool())
 {
+    this->stylesheets_[Session::Theme::Light] = this->parse_stylesheet(":/stylesheets/light.qss");
+    this->stylesheets_[Session::Theme::Dark] = this->parse_stylesheet(":/stylesheets/dark.qss");
+
+    this->actions_ = {
+        new Action(arbiter, "Toggle Dark Mode", [&arbiter]{ arbiter.toggle_mode(); }, arbiter.window()),
+        new Action(arbiter, "Decrease Brightness", [&arbiter]{ arbiter.decrease_brightness(4); }, arbiter.window()),
+        new Action(arbiter, "Increase Brightness", [&arbiter]{ arbiter.increase_brightness(4); }, arbiter.window()),
+        new Action(arbiter, "Decrease Volume", [&arbiter]{ arbiter.decrease_volume(2); }, arbiter.window()),
+        new Action(arbiter, "Increase Volume", [&arbiter]{ arbiter.increase_volume(2); }, arbiter.window())
+    };
+
+    for (auto page : arbiter.layout().pages()) {
+        auto callback = [&arbiter, page]{
+            if (page->enabled())
+                arbiter.set_curr_page(page);
+        };
+        this->actions_.append(new Action(arbiter, "Show " + page->name() + " Page", callback, arbiter.window()));
+    }
+
+    {
+        auto callback = [&arbiter]{
+            int id = arbiter.layout().page_id(arbiter.layout().curr_page);
+            do {
+                id = (id + 1) % arbiter.layout().pages().size();
+            } while (!arbiter.layout().page(id)->enabled());
+            arbiter.set_curr_page(arbiter.layout().page(id));
+        };
+        this->actions_.append(new Action(arbiter, "Cycle Page", callback, arbiter.window()));
+    }
+
+    settings.beginGroup("Core");
+    settings.beginGroup("Action");
+    for (int i = 0; i < this->actions().size(); i++) {
+        auto key = settings.value(QString::number(i), QString()).toString();
+        if (!key.isNull())
+            this->action(i)->set(key);
+    }
+    settings.endGroup();
+    settings.endGroup();
+
     QFontDatabase::addApplicationFont(":/fonts/Titillium_Web/TitilliumWeb-Regular.ttf");
     QFontDatabase::addApplicationFont(":/fonts/Montserrat/Montserrat-LightItalic.ttf");
     QFontDatabase::addApplicationFont(":/fonts/Montserrat/Montserrat-Regular.ttf");
 
     if (qApp)
         qApp->setFont(arbiter.forge().font(14));
-    this->set_cursor();
 
-    this->stylesheets_[Session::Theme::Light] = this->parse_stylesheet(":/stylesheets/light.qss");
-    this->stylesheets_[Session::Theme::Dark] = this->parse_stylesheet(":/stylesheets/dark.qss");
+    this->set_cursor();
 }
 
 QString Session::Core::stylesheet(Theme::Mode mode, float scale) const
@@ -360,7 +414,7 @@ QString Session::Core::parse_stylesheet(QString path) const
 }
 
 Session::Session(Arbiter &arbiter)
-    : settings_(QSettings::IniFormat, QSettings::UserScope, "dash")
+    : settings_(QSettings::IniFormat, QSettings::UserScope, "dash", QString(), qApp)
     , theme_(settings_)
     , system_(settings_)
     , layout_(settings_, arbiter)

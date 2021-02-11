@@ -53,7 +53,7 @@ QWidget *CameraPage::connect_widget()
     QWidget *widget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
 
-    QLabel *label = new QLabel("connect camera", widget);
+    QLabel *label = new QLabel("Connect Camera", widget);
 
     this->status = new QLabel(widget);
 
@@ -62,7 +62,7 @@ QWidget *CameraPage::connect_widget()
     cam_stack->addWidget(this->local_cam_selector());
     cam_stack->addWidget(this->network_cam_selector());
 
-    QCheckBox *auto_reconnect_toggle = new QCheckBox("Automatically reconnect", this);
+    QCheckBox *auto_reconnect_toggle = new QCheckBox("Automatically Reconnect", this);
     auto_reconnect_toggle->setLayoutDirection(Qt::RightToLeft);
     auto_reconnect_toggle->setChecked(this->config->get_cam_autoconnect());
     connect(auto_reconnect_toggle, &QCheckBox::toggled, [this](bool checked) {

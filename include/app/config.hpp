@@ -41,9 +41,6 @@ class Config : public QObject {
     inline QString get_media_home() { return this->media_home; }
     inline void set_media_home(QString media_home) { this->media_home = media_home; }
 
-    inline void set_shortcut(QString id, QString shortcut) { this->shortcuts[id] = shortcut; }
-    inline QString get_shortcut(QString id) { return this->shortcuts[id]; }
-
     inline QString get_cam_network_url() { return this->cam_network_url; }
     inline void set_cam_network_url(QString network_url) { this->cam_network_url = network_url; }
 
@@ -111,14 +108,11 @@ class Config : public QObject {
         void handle_request(QWebSocket *client, QString request);
     };
 
-    QMap<QString, QWidget *> quick_views;
-
     QSettings settings;
     bool si_units;
     double radio_station;
     bool radio_muted;
     QString media_home;
-    QMap<QString, QString> shortcuts;
     QString cam_network_url;
     QString cam_local_device;
     QString cam_name;

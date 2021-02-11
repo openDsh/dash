@@ -2,8 +2,9 @@
 
 #include "app/arbiter.hpp"
 
-Arbiter::Arbiter()
-    : QObject()
+Arbiter::Arbiter(QMainWindow *window)
+    : QObject(window)
+    , window_(window)
     , session_(*this)
 {
 }
@@ -53,6 +54,16 @@ void Arbiter::set_brightness(uint8_t brightness)
     emit brightness_changed(brightness);
 }
 
+void Arbiter::decrease_brightness(uint8_t val)
+{
+    this->set_brightness(std::min(std::max(76, this->system().brightness.value - val), 255));
+}
+
+void Arbiter::increase_brightness(uint8_t val)
+{
+    this->set_brightness(std::min(std::max(76, this->system().brightness.value + val), 255));
+}
+
 void Arbiter::set_volume(uint8_t volume)
 {
     this->system().volume = volume;
@@ -61,6 +72,16 @@ void Arbiter::set_volume(uint8_t volume)
     this->system().set_volume();
 
     emit volume_changed(volume);
+}
+
+void Arbiter::decrease_volume(uint8_t val)
+{
+    this->set_volume(std::min(std::max(0, this->system().volume - val), 100));
+}
+
+void Arbiter::increase_volume(uint8_t val)
+{
+    this->set_volume(std::min(std::max(0, this->system().volume + val), 100));
 }
 
 void Arbiter::set_scale(double scale)
@@ -116,4 +137,20 @@ void Arbiter::toggle_cursor()
     this->core().set_cursor();
 
     emit cursor_toggled();
+}
+
+void Arbiter::set_action(Action *action, QString key)
+{
+    action->set(key);
+    this->settings().beginGroup("Core");
+    this->settings().beginGroup("Action");
+    auto id = QString::number(this->core().action_id(action));
+    if (key.isNull())
+        this->settings().remove(id);
+    else
+        this->settings().setValue(id, key);
+    this->settings().endGroup();
+    this->settings().endGroup();
+
+    emit action_changed(action, key);
 }

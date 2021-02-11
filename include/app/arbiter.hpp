@@ -2,23 +2,31 @@
 
 #include <BluezQt/Device>
 #include <QColor>
+#include <QMainWindow>
 #include <QObject>
+#include <QString>
 
+#include "app/action.hpp"
 #include "app/session.hpp"
 #include "app/pages/page.hpp"
+
 
 class Arbiter : public QObject {
     Q_OBJECT
 
    public:
-    Arbiter();
+    Arbiter(QMainWindow *window);
 
     // void set_mode(Session::Theme::Mode mode);
     void toggle_mode();
     void set_color(const QColor &color);
     void set_brightness_plugin(QString plugin);
     void set_brightness(uint8_t brightness);
+    void decrease_brightness(uint8_t val);
+    void increase_brightness(uint8_t val);
     void set_volume(uint8_t volume);
+    void decrease_volume(uint8_t val);
+    void increase_volume(uint8_t val);
     void set_scale(double scale);
     // void set_control_bar(bool enable);
     void toggle_control_bar();
@@ -28,7 +36,9 @@ class Arbiter : public QObject {
     void toggle_page(Page *page);
     // void set_cursor(bool cursor);
     void toggle_cursor();
+    void set_action(Action *action, QString key);
 
+    QMainWindow *window() { return this->window_; }
     QSettings &settings() { return this->session_.settings_; }
     Session::Theme &theme() { return this->session_.theme_; }
     Session::System &system() { return this->session_.system_; }
@@ -38,6 +48,7 @@ class Arbiter : public QObject {
     void update() { this->session_.update(); }
 
    private:
+    QMainWindow *window_;
     Session session_;
 
    signals:
@@ -56,4 +67,5 @@ class Arbiter : public QObject {
     void page_toggled(Page *page);
     // void cursor_changed(bool cursor);
     void cursor_toggled();
+    void action_changed(Action *action, QString key);
 };

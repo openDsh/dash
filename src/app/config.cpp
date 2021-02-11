@@ -61,10 +61,6 @@ Config::Config()
     this->vehicle_plugin = this->settings.value("Vehicle/plugin", QString()).toString();
     this->vehicle_can_bus = this->settings.value("Vehicle/can_bus", false).toBool();
     this->vehicle_interface = this->settings.value("Vehicle/interface", QString()).toString();
-    this->settings.beginGroup("Shortcuts");
-    for (auto key : this->settings.childKeys())
-        this->shortcuts[key] = this->settings.value(key, QString()).toString();
-    this->settings.endGroup();
     this->settings.beginGroup("Launcher");
     for (auto key : this->settings.childKeys())
         this->launcher_plugins.append(this->settings.value(key, QString()).toString());
@@ -108,12 +104,6 @@ void Config::save()
         this->settings.setValue("Vehicle/can_bus", this->vehicle_can_bus);
     if (this->vehicle_interface != this->settings.value("Vehicle/interface").toString())
         this->settings.setValue("Vehicle/interface", this->vehicle_interface);
-    for (auto id : this->shortcuts.keys()) {
-        QString key = QString("Shortcuts/%1").arg(id);
-        QString shortcut = this->shortcuts[id];
-        if (shortcut != this->settings.value(key, QString()).toString())
-            this->settings.setValue(key, shortcut);
-    }
     this->settings.remove("Launcher");
     for (int i = 0; i < this->launcher_plugins.size(); i++)
         this->settings.setValue(QString("Launcher/%1").arg(i), this->launcher_plugins[i]);

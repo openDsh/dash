@@ -16,12 +16,9 @@
 
 DashWindow::DashWindow()
     : QMainWindow()
-    , arbiter()
+    , arbiter(this)
 {
     this->setAttribute(Qt::WA_TranslucentBackground, true);
-
-    this->config = Config::get_instance();
-    this->shortcuts = Shortcuts::get_instance();
 
     this->openauto = this->arbiter.layout().openauto_page;
     this->stack = new QStackedWidget(this);
@@ -30,18 +27,18 @@ DashWindow::DashWindow()
     this->pages = new QStackedLayout();
     this->bar = new QHBoxLayout();
 
-    connect(this->rail_group, QOverload<int, bool>::of(&QButtonGroup::buttonToggled), [this](int id, bool){
-        this->pages->setCurrentWidget(this->arbiter.layout().page(id)->widget());
+    connect(this->rail_group, QOverload<int>::of(&QButtonGroup::buttonPressed), [this](int id){
+        this->arbiter.set_curr_page(this->arbiter.layout().page(id));
     });
     connect(this->openauto, &OpenAutoPage::toggle_fullscreen, [this](QWidget *widget) { this->add_widget(widget); });
 
     this->init_ui();
-    this->init_shortcuts();
 
     connect(&this->arbiter, &Arbiter::page_toggled, [this](Page *page){
         int id = this->arbiter.layout().page_id(page);
         this->rail_group->button(id)->setVisible(page->enabled());
     });
+    connect(&this->arbiter, &Arbiter::curr_page_changed, [this](Page *page){ this->set_page(page); });
 }
 
 void DashWindow::add_widget(QWidget *widget)
@@ -55,7 +52,6 @@ void DashWindow::showEvent(QShowEvent *event)
     QWidget::showEvent(event);
 
     this->arbiter.update();
-    this->shortcuts->initialize_shortcuts();
 }
 
 void DashWindow::keyPressEvent(QKeyEvent *event)
@@ -89,35 +85,6 @@ void DashWindow::init_ui()
     this->setCentralWidget(this->stack);
 }
 
-void DashWindow::init_shortcuts()
-{
-    Shortcut *brightness_down = new Shortcut(this->config->get_shortcut("brightness_down"), this);
-    this->shortcuts->add_shortcut("brightness_down", "Decrease Brightness", brightness_down);
-    connect(brightness_down, &Shortcut::activated, [this]{
-        auto brightness = std::min(std::max(76, this->arbiter.system().brightness.value - 4), 255);
-        this->arbiter.set_brightness(brightness);
-    });
-    Shortcut *brightness_up = new Shortcut(this->config->get_shortcut("brightness_up"), this);
-    this->shortcuts->add_shortcut("brightness_up", "Increase Brightness", brightness_up);
-    connect(brightness_up, &Shortcut::activated, [this]{
-        auto brightness = std::min(std::max(78, this->arbiter.system().brightness.value + 4), 255);
-        this->arbiter.set_brightness(brightness);
-    });
-
-    Shortcut *volume_down = new Shortcut(this->config->get_shortcut("volume_down"), this);
-    this->shortcuts->add_shortcut("volume_down", "Decrease Volume", volume_down);
-    connect(volume_down, &Shortcut::activated, [this]{
-        auto volume = std::min(std::max(0, this->arbiter.system().volume - 2), 100);
-        this->arbiter.set_volume(volume);
-    });
-    Shortcut *volume_up = new Shortcut(this->config->get_shortcut("volume_up"), this);
-    this->shortcuts->add_shortcut("volume_up", "Increase Volume", volume_up);
-    connect(volume_up, &Shortcut::activated, [this]{
-        auto volume = std::min(std::max(0, this->arbiter.system().volume + 2), 100);
-        this->arbiter.set_volume(volume);
-    });
-}
-
 QLayout *DashWindow::body()
 {
     QVBoxLayout *layout = new QVBoxLayout();
@@ -144,24 +111,7 @@ void DashWindow::add_pages()
     for (auto page : this->arbiter.layout().pages())
         this->add_page(page);
 
-    // toggle initial page
-    for (QAbstractButton *button : this->rail_group->buttons()) {
-        if (!button->isHidden()) {
-            button->setChecked(true);
-            break;
-        }
-    }
-
-    Shortcut *shortcut = new Shortcut(this->config->get_shortcut("cycle_pages"), this);
-    this->shortcuts->add_shortcut("cycle_pages", "Cycle Pages", shortcut);
-    connect(shortcut, &Shortcut::activated, [this]() {
-        int idx = this->rail_group->checkedId();
-        QList<QAbstractButton *> buttons = this->rail_group->buttons();
-        do {
-            idx = (idx + 1) % buttons.size();
-        } while (buttons[idx]->isHidden());
-        buttons[idx]->setChecked(true);
-    });
+    this->set_page(this->arbiter.layout().curr_page);
 }
 
 void DashWindow::add_page(Page *page)
@@ -172,20 +122,19 @@ void DashWindow::add_page(Page *page)
     button->setFlat(true);
     this->arbiter.forge().iconize(page->icon_name(), button, 32);
 
-    auto name = page->pretty_name();
-    Shortcut *shortcut = new Shortcut(this->config->get_shortcut(name), this);
-    this->shortcuts->add_shortcut(name, name, shortcut);
-    connect(shortcut, &Shortcut::activated, [this, button]{
-        if (!button->isHidden())
-            button->setChecked(true);
-    });
-
     this->pages->addWidget(page->widget());
     page->init();
     this->rail_group->addButton(button, this->arbiter.layout().page_id(page));
     this->rail->addWidget(button);
 
     button->setVisible(page->enabled());
+}
+
+void DashWindow::set_page(Page *page)
+{
+    int id = this->arbiter.layout().page_id(page);
+    this->rail_group->button(id)->setChecked(true);
+    this->pages->setCurrentWidget(page->widget());
 }
 
 QWidget *DashWindow::controls_bar()
@@ -198,7 +147,7 @@ QWidget *DashWindow::controls_bar()
     layout->setSpacing(0);
 
     Dialog *power_dialog = new Dialog(this->arbiter, true, this);
-    power_dialog->set_title("power off");
+    power_dialog->set_title("Power Off");
     power_dialog->set_body(this->power_control());
 
     QPushButton *shutdown_button = new QPushButton(widget);

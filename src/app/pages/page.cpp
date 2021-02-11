@@ -4,9 +4,9 @@
 
 #include "app/pages/page.hpp"
 
-Page::Page(Arbiter &arbiter, QString pretty_name, QString icon_name, bool toggleable, QWidget *widget)
+Page::Page(Arbiter &arbiter, QString name, QString icon_name, bool toggleable, QWidget *widget)
     : arbiter(arbiter)
-    , pretty_name_(pretty_name)
+    , name_(name)
     , icon_name_(icon_name)
     , toggleable_(toggleable)
     , widget_(widget)
@@ -72,9 +72,9 @@ Dialog *Page::dialog()
     return dialog;
 }
 
-// BasedPage::BasedPage(QString pretty_name, QString icon_name, bool toggleable, bool enable_settings, QWidget *parent)
+// BasedPage::BasedPage(QString name, QString icon_name, bool toggleable, bool enable_settings, QWidget *parent)
 //     : QWidget(parent)
-//     , Page(pretty_name, icon_name, toggleable, this)
+//     , Page(name, icon_name, toggleable, this)
 // {
 //     auto widget
 //     auto layout = new QVBoxLayout(this);
@@ -85,15 +85,15 @@ Dialog *Page::dialog()
 //         layout->addLayout(this->settings_button_layout());
 // }
 
-// StackedPage::StackedPage(QString pretty_name, QString icon_name, bool toggleable, bool enable_settings, QWidget *parent)
+// StackedPage::StackedPage(QString name, QString icon_name, bool toggleable, bool enable_settings, QWidget *parent)
 //     : QStackedWidget(parent)
-//     , Page(pretty_name, icon_name, toggleable, this)
+//     , Page(name, icon_name, toggleable, this)
 // {
 // }
 
-// TabbedPage::TabbedPage(QString pretty_name, QString icon_name, bool toggleable, bool enable_settings, QWidget *parent)
+// TabbedPage::TabbedPage(QString name, QString icon_name, bool toggleable, bool enable_settings, QWidget *parent)
 //     : QTabWidget(parent)
-//     , Page(pretty_name, icon_name, toggleable, this)
+//     , Page(name, icon_name, toggleable, this)
 // {
 //     if (enable_settings)
 //         this->setCornerWidget(this->settings_button());

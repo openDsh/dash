@@ -11,7 +11,6 @@
 #include <QtWidgets>
 
 #include "app/config.hpp"
-#include "app/shortcuts.hpp"
 #include "app/pages/openauto.hpp"
 #include "app/pages/page.hpp"
 
@@ -33,8 +32,6 @@ class DashWindow : public QMainWindow {
 
    private:
     Arbiter arbiter;
-    Config *config;
-    Shortcuts *shortcuts;
 
     OpenAutoPage *openauto;
     QStackedWidget *stack;
@@ -44,10 +41,10 @@ class DashWindow : public QMainWindow {
     QHBoxLayout *bar;
 
     void init_ui();
-    void init_shortcuts();
     QLayout *body();
     void add_pages();
     void add_page(Page *page);
+    void set_page(Page *page);
 
     QWidget *controls_bar();
     QLayout *quick_views();

@@ -1,7 +1,6 @@
 QMainWindow,
 QMainWindow > QFrame {
     background-color: rgb(238, 238, 238);
-    border-radius: 8px;
 }
 
 QWidget {
@@ -276,4 +275,5 @@ QDialog > QFrame {
 
 *[add_hint="true"] {
     background-color: rgba(0, 0, 0, 12);
+    border-radius: 8px;
 }

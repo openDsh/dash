@@ -8,18 +8,18 @@ class Arbiter;
 
 class QuickView {
    public:
-    QuickView(Arbiter &arbiter, QString pretty_name, QWidget *widget);
+    QuickView(Arbiter &arbiter, QString name, QWidget *widget);
 
     virtual void init() = 0;
 
-    const QString &pretty_name() { return this->pretty_name_; }
+    const QString &name() { return this->name_; }
     QWidget *widget() { return this->widget_; }
 
    protected:
     Arbiter &arbiter;
 
    private:
-    const QString pretty_name_;
+    const QString name_;
     QWidget *widget_;
 };
 
