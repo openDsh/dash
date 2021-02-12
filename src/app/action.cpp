@@ -1,6 +1,10 @@
 #include <algorithm>
+#include <functional>
 
 #include <QDir>
+#include <QHBoxLayout>
+#include <QKeySequence>
+#include <QPushButton>
 #include <QTimer>
 
 #include <QDebug>
@@ -48,7 +52,7 @@ void ActionDialog::keyPressEvent(QKeyEvent *event)
 {
     static const auto mod_keys = {Qt::Key_unknown, Qt::Key_Control, Qt::Key_Shift, Qt::Key_Alt, Qt::Key_Meta};
 
-    auto key = static_cast<Qt::Key>(event->key());
+    const auto key = static_cast<Qt::Key>(event->key());
     if (std::any_of(mod_keys.begin(), mod_keys.end(), [key](Qt::Key mod_key){ return (key == mod_key); }))
         return;
 
@@ -79,22 +83,26 @@ Action::GPIO::GPIO(QObject *parent)
 {
 }
 
-Action::Action(Arbiter &arbiter, QString name, std::function<void()> callback, QWidget *parent)
+Action::GPIO::~GPIO()
+{
+    if (value.isOpen())
+        value.close();
+}
+
+Action::Action(QString name, std::function<void()> callback, QWidget *parent)
     : QObject(parent)
-    , arbiter(arbiter)
     , name_(name)
-    , callback(callback)
     , key_()
     , shortcut(parent)
     , gpio(this)
 {
-    connect(&this->gpio.watcher, &QFileSystemWatcher::fileChanged, [this](QString){
+    connect(&this->gpio.watcher, &QFileSystemWatcher::fileChanged, [this, callback](QString){
         if (this->gpio.value.isOpen()) {
             this->gpio.value.seek(0);
             if (this->gpio.active_low == this->gpio.value.read(1).at(0)) {
                 this->gpio.watcher.blockSignals(true);
-                this->callback();
-                QTimer::singleShot(300, [this]() { this->gpio.watcher.blockSignals(false); });
+                callback();
+                QTimer::singleShot(300, [this]{ this->gpio.watcher.blockSignals(false); });
             }
             else {
                 qDebug() << "[Dash][Action]" << this->key_ << ": active low != value"; // temp
@@ -104,13 +112,7 @@ Action::Action(Arbiter &arbiter, QString name, std::function<void()> callback, Q
             qDebug() << "[Dash][Action]" << this->key_ << ":" << this->gpio.value.fileName() << "is not open"; // temp
         }
     });
-    connect(&this->shortcut, &QShortcut::activated, [this]{ this->callback(); });
-}
-
-Action::~Action()
-{
-    if (this->gpio.value.isOpen())
-        this->gpio.value.close();
+    connect(&this->shortcut, &QShortcut::activated, [callback]{ callback(); });
 }
 
 void Action::set(QString key)
@@ -128,14 +130,14 @@ void Action::set(QString key)
         qDebug() << "[Dash][Action]" << this->key_ << ": setting action as gpio"; // temp
         this->gpio.value.setFileName(GPIONotifier::GPIOX_VALUE_PATH.arg(this->key_));
         if (this->gpio.value.open(QIODevice::ReadOnly)) {
-            QFile active_low_attribute(GPIONotifier::GPIOX_ACTIVE_LOW_PATH.arg(this->key_));
-            if (active_low_attribute.open(QIODevice::ReadOnly)) {
-                this->gpio.active_low = active_low_attribute.read(1)[0];
-                active_low_attribute.close();
+            QFile active_low(GPIONotifier::GPIOX_ACTIVE_LOW_PATH.arg(this->key_), this);
+            if (active_low.open(QIODevice::ReadOnly)) {
+                this->gpio.active_low = active_low.read(1)[0];
+                active_low.close();
                 this->gpio.watcher.addPath(this->gpio.value.fileName());
             }
             else {
-                qDebug() << "[Dash][Action]" << this->key_ << ": failed to open" << active_low_attribute; // temp
+                qDebug() << "[Dash][Action]" << this->key_ << ": failed to open" << active_low; // temp
             }
         }
         else {
@@ -146,41 +148,4 @@ void Action::set(QString key)
         qDebug() << "[Dash][Action]" << this->key_ << ": setting action as key"; // temp
         this->shortcut.setKey(QKeySequence::fromString(this->key_));
     }
-}
-
-QWidget *Action::input_widget()
-{
-    QWidget *widget = new QWidget();
-    QHBoxLayout *layout = new QHBoxLayout(widget);
-
-    ActionDialog *dialog = new ActionDialog(this->arbiter);
-    dialog->set_title(this->name_);
-
-    QPushButton *button = new QPushButton(this->key_);
-    button->setFont(this->arbiter.forge().font(16, true));
-    connect(button, &QPushButton::clicked, [dialog]{ dialog->open(); });
-
-    QPushButton *symbol = new QPushButton();
-    this->arbiter.forge().symbolize(symbol);
-    symbol->setFlat(true);
-    symbol->setCheckable(true);
-    symbol->setVisible(!this->key_.isNull());
-    symbol->setChecked(this->key_.startsWith("gpio"));
-    this->arbiter.forge().iconize("keyboard", "developer_board", symbol, 32);
-
-    QPushButton *save_button = new QPushButton("save");
-    connect(save_button, &QPushButton::clicked, [this, dialog, button, symbol]{
-        this->arbiter.set_action(this, dialog->key());
-        button->setText(this->key_);
-        symbol->setVisible(!this->key_.isNull());
-        symbol->setChecked(this->key_.startsWith("gpio"));
-    });
-    dialog->set_button(save_button);
-
-    layout->addStretch(1);
-    layout->addWidget(button, 3);
-    layout->addStretch(1);
-    layout->addWidget(symbol, 1, Qt::AlignRight);
-
-    return widget;
 }

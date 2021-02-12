@@ -83,11 +83,12 @@ class ActionsSettingsTab : public QWidget {
     Q_OBJECT
 
    public:
-    ActionsSettingsTab(Arbiter &arbiter, QWidget *parent = nullptr);
+    ActionsSettingsTab(Arbiter &arbiter);
 
    private:
-    QWidget *settings_widget();
-    QWidget *action_row_widget(Action *action);
+    QWidget *settings();
+    QWidget *action_row(Action *action);
+    QWidget *action_input(Action *action);
 
     Arbiter &arbiter;
     Config *config;

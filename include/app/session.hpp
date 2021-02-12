@@ -123,12 +123,12 @@ class Session {
     struct Forge {
         static QFrame *br(bool vertical = false);
         static void to_touch_scroller(QAbstractScrollArea *area);
+        static void symbolize(QAbstractButton *button);
 
         Forge(Arbiter &arbiter);
 
         void iconize(QString name, QAbstractButton *button, uint8_t size, bool dynamic = false) const;
         void iconize(QString name, QString alt_name, QAbstractButton *button, uint8_t size, bool dynamic = false) const;
-        void symbolize(QAbstractButton *button) const;
         QFont font(int size, bool mono = false) const;
         QWidget *brightness_slider(bool buttons = true) const;
         QWidget *volume_slider(bool buttons = true) const;

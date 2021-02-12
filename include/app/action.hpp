@@ -1,16 +1,15 @@
 #pragma once
 
-#include <functional>
-
-#include <QApplication>
-#include <QElapsedTimer>
+#include <QCloseEvent>
 #include <QFile>
 #include <QFileSystemWatcher>
 #include <QKeyEvent>
-#include <QPushButton>
+#include <QLabel>
+#include <QObject>
+#include <QRegExp>
 #include <QShortcut>
 #include <QString>
-#include <QRegExp>
+#include <QShowEvent>
 #include <QWidget>
 
 #include "app/widgets/dialog.hpp"
@@ -27,7 +26,7 @@ class GPIONotifier : public QObject {
     static const QString GPIOX_VALUE_PATH;
     static const QString GPIOX_ACTIVE_LOW_PATH;
 
-    GPIONotifier(QObject *parent = nullptr);
+    GPIONotifier(QObject *parent);
 
     void enable() { this->watcher.blockSignals(false); }
     void disable() { this->watcher.blockSignals(true); }
@@ -61,14 +60,12 @@ class Action : public QObject {
     Q_OBJECT
 
    public:
-    Action(Arbiter &arbiter, QString name, std::function<void()> callback, QWidget *parent);
-    ~Action();
+    Action(QString name, std::function<void()> callback, QWidget *parent);
 
-    void set(QString action);
-    QWidget *input_widget();
+    void set(QString key);
 
-    QString key() { return this->key_; }
-    QString name() { return this->name_; }
+    QString key() const { return this->key_; }
+    QString name() const { return this->name_; }
 
    private:
     struct GPIO {
@@ -77,12 +74,12 @@ class Action : public QObject {
         uint8_t active_low;
 
         GPIO(QObject *parent);
+        ~GPIO();
     };
 
-    Arbiter &arbiter;
     QString name_;
-    std::function<void()> callback;
     QString key_;
+
     QShortcut shortcut;
     GPIO gpio;
 };

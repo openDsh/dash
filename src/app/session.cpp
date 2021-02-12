@@ -219,6 +219,15 @@ void Session::Forge::to_touch_scroller(QAbstractScrollArea *area)
     QScroller::scroller(area->viewport())->setScrollerProperties(properties);
 }
 
+void Session::Forge::symbolize(QAbstractButton *button)
+{
+    auto policy(button->sizePolicy());
+    policy.setRetainSizeWhenHidden(true);
+    button->setSizePolicy(policy);
+    button->setFocusPolicy(Qt::NoFocus);
+    button->setAttribute(Qt::WA_TransparentForMouseEvents, true);
+}
+
 Session::Forge::Forge(Arbiter &arbiter)
     : arbiter_(arbiter)
 {
@@ -239,15 +248,6 @@ void Session::Forge::iconize(QString name, QString alt_name, QAbstractButton *bu
 {
     button->setProperty("alt_icon", QVariant::fromValue(QIcon(QString(":/icons/%1.svg").arg(alt_name))));
     this->iconize(name, button, size, dynamic);
-}
-
-void Session::Forge::symbolize(QAbstractButton *button) const
-{
-    auto policy(button->sizePolicy());
-    policy.setRetainSizeWhenHidden(true);
-    button->setSizePolicy(policy);
-    button->setFocusPolicy(Qt::NoFocus);
-    button->setAttribute(Qt::WA_TransparentForMouseEvents, true);
 }
 
 QFont Session::Forge::font(int size, bool mono) const
@@ -335,11 +335,11 @@ Session::Core::Core(QSettings &settings, Arbiter &arbiter)
     this->stylesheets_[Session::Theme::Dark] = this->parse_stylesheet(":/stylesheets/dark.qss");
 
     this->actions_ = {
-        new Action(arbiter, "Toggle Dark Mode", [&arbiter]{ arbiter.toggle_mode(); }, arbiter.window()),
-        new Action(arbiter, "Decrease Brightness", [&arbiter]{ arbiter.decrease_brightness(4); }, arbiter.window()),
-        new Action(arbiter, "Increase Brightness", [&arbiter]{ arbiter.increase_brightness(4); }, arbiter.window()),
-        new Action(arbiter, "Decrease Volume", [&arbiter]{ arbiter.decrease_volume(2); }, arbiter.window()),
-        new Action(arbiter, "Increase Volume", [&arbiter]{ arbiter.increase_volume(2); }, arbiter.window())
+        new Action("Toggle Dark Mode", [&arbiter]{ arbiter.toggle_mode(); }, arbiter.window()),
+        new Action("Decrease Brightness", [&arbiter]{ arbiter.decrease_brightness(4); }, arbiter.window()),
+        new Action("Increase Brightness", [&arbiter]{ arbiter.increase_brightness(4); }, arbiter.window()),
+        new Action("Decrease Volume", [&arbiter]{ arbiter.decrease_volume(2); }, arbiter.window()),
+        new Action("Increase Volume", [&arbiter]{ arbiter.increase_volume(2); }, arbiter.window())
     };
 
     for (auto page : arbiter.layout().pages()) {
@@ -347,7 +347,7 @@ Session::Core::Core(QSettings &settings, Arbiter &arbiter)
             if (page->enabled())
                 arbiter.set_curr_page(page);
         };
-        this->actions_.append(new Action(arbiter, "Show " + page->name() + " Page", callback, arbiter.window()));
+        this->actions_.append(new Action("Show " + page->name() + " Page", callback, arbiter.window()));
     }
 
     {
@@ -358,7 +358,7 @@ Session::Core::Core(QSettings &settings, Arbiter &arbiter)
             } while (!arbiter.layout().page(id)->enabled());
             arbiter.set_curr_page(arbiter.layout().page(id));
         };
-        this->actions_.append(new Action(arbiter, "Cycle Page", callback, arbiter.window()));
+        this->actions_.append(new Action("Cycle Page", callback, arbiter.window()));
     }
 
     settings.beginGroup("Core");
