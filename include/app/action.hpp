@@ -74,7 +74,7 @@ class Action : public QObject {
     struct GPIO {
         QFileSystemWatcher watcher;
         QFile value;
-        bool active_low;
+        uint8_t active_low;
 
         GPIO(QObject *parent);
     };

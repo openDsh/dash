@@ -75,7 +75,7 @@ void ActionDialog::closeEvent(QCloseEvent *event)
 Action::GPIO::GPIO(QObject *parent)
     : watcher(parent)
     , value(parent)
-    , active_low(false)
+    , active_low(0xFF)
 {
 }
 
