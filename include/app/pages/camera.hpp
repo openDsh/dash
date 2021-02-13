@@ -82,6 +82,7 @@ class CameraPage : public QWidget {
     static gboolean busCallback(GstBus*, GstMessage* message, gpointer*);
     void showEvent(QShowEvent *event);
 
+    QStackedLayout* cam_stack;
     QGst::ElementPtr videoSink_;
     QQuickWidget* videoWidget_;
     GstElement* vidPipeline_;
@@ -97,31 +98,21 @@ class CameraPage : public QWidget {
     };
     class Settings : public QWidget {
        public:
-        Settings(QWidget *parent = nullptr);
+        Settings(QStackedLayout *cam_stack, QTimer *reconnect_timer, QWidget *parent = nullptr);
 
        private:
+        QStackedLayout* cam_stack;
+        QTimer* reconnect_timer;
         QWidget *settings_widget();
         QBoxLayout *camera_overlay_row_widget();
         QBoxLayout *camera_overlay_width_row_widget();
         QBoxLayout *camera_overlay_height_row_widget();
         QBoxLayout *camera_overlay_width_widget();
         QBoxLayout *camera_overlay_height_widget();
+        QBoxLayout *camera_network_toggle_row_widget();
+        QBoxLayout *camera_autoconnect_toggle_row_widget();
 
-
-        // QBoxLayout *frame_rate_row_widget();
-        // QBoxLayout *resolution_row_widget();
-        // QBoxLayout *dpi_row_widget();
-        // QBoxLayout *dpi_widget();
-        // QBoxLayout *rt_audio_row_widget();
-        // QBoxLayout *audio_channels_row_widget();
-        // QBoxLayout *bluetooth_row_widget();
-        // QBoxLayout *touchscreen_row_widget();
-        // QCheckBox *button_checkbox(QString name, QString key, aasdk::proto::enums::ButtonCode::Enum code);
-        // QBoxLayout *buttons_row_widget();
-
-        // Bluetooth *bluetooth;
         Config *config;
-        // Theme *theme;
     };
 
    signals:

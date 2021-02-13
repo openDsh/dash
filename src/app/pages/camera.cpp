@@ -7,6 +7,7 @@
 #include "app/pages/camera.hpp"
 #include "app/window.hpp"
 
+
 CameraPage::CameraPage(QWidget *parent) : QWidget(parent)
 {
     this->theme = Theme::get_instance();
@@ -118,35 +119,9 @@ QWidget *CameraPage::connect_widget()
     this->status = new QLabel(widget);
 
     QWidget *cam_stack_widget = new QWidget(widget);
-    QStackedLayout *cam_stack = new QStackedLayout(cam_stack_widget);
-    cam_stack->addWidget(this->local_cam_selector());
-    cam_stack->addWidget(this->network_cam_selector());
-
-    QCheckBox *auto_reconnect_toggle = new QCheckBox("Automatically reconnect", this);
-    auto_reconnect_toggle->setLayoutDirection(Qt::RightToLeft);
-    auto_reconnect_toggle->setChecked(this->config->get_cam_autoconnect());
-    connect(auto_reconnect_toggle, &QCheckBox::toggled, [this](bool checked) {
-        this->config->set_cam_autoconnect(checked);
-        if (!checked) emit autoconnect_disabled(); });
-    connect(this, &CameraPage::autoconnect_disabled, [auto_reconnect_toggle, this]() {
-        this->reconnect_timer->stop();
-        this->config->set_cam_autoconnect(false);
-        auto_reconnect_toggle->setChecked(false);
-    });
-
-    QCheckBox *network_toggle = new QCheckBox("Network", this);
-    connect(network_toggle, &QCheckBox::toggled, [this, cam_stack](bool checked) {
-        cam_stack->setCurrentIndex(checked? 1 : 0);
-        this->status->clear();
-        this->config->set_cam_is_network(checked);
-    });
-    network_toggle->setChecked(this->config->get_cam_is_network());
-
-    QWidget *checkboxes_widget = new QWidget(this);
-    QHBoxLayout *checkboxes = new QHBoxLayout(checkboxes_widget);
-    checkboxes->addWidget(network_toggle);
-    checkboxes->addStretch();
-    checkboxes->addWidget(auto_reconnect_toggle);
+    this->cam_stack = new QStackedLayout(cam_stack_widget);
+    this->cam_stack->addWidget(this->local_cam_selector());
+    this->cam_stack->addWidget(this->network_cam_selector());
 
     layout->addStretch();
     layout->addWidget(label, 0, Qt::AlignCenter);
@@ -156,10 +131,10 @@ QWidget *CameraPage::connect_widget()
     layout->addStretch();
     layout->addWidget(this->connect_button(), 0, Qt::AlignCenter);
     layout->addStretch();
-    layout->addWidget(checkboxes_widget);
+    // layout->addWidget(checkboxes_widget);
 
     Dialog *dialog = new Dialog(true, this->window());
-    dialog->set_body(new Settings());
+    dialog->set_body(new Settings(this->cam_stack, this->reconnect_timer));
     QPushButton *save_button = new QPushButton("save");
     connect(save_button, &QPushButton::clicked, [this]() {
         this->config->save();
@@ -185,9 +160,11 @@ void CameraPage::VideoContainer::resizeEvent(QResizeEvent *event)
     DASH_LOG(info) << "[CameraPage] videoContainer resized";
 }
 
-CameraPage::Settings::Settings(QWidget *parent) : QWidget(parent)
+CameraPage::Settings::Settings(QStackedLayout *cam_stack, QTimer *reconnect_timer, QWidget *parent) : QWidget(parent)
 {
     this->config = Config::get_instance();
+    this->cam_stack = cam_stack;
+    this->reconnect_timer = reconnect_timer;
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->setContentsMargins(6, 0, 6, 0);
 
@@ -203,20 +180,9 @@ QWidget *CameraPage::Settings::settings_widget()
     layout->addLayout(this->camera_overlay_width_row_widget(), 1);
     layout->addWidget(Theme::br(), 1);
     layout->addLayout(this->camera_overlay_height_row_widget(), 1);
-
-
-    // layout->addLayout(this->rhd_row_widget(), 1);
-    // layout->addLayout(this->frame_rate_row_widget(), 1);
-    // layout->addLayout(this->resolution_row_widget(), 1);
-    // layout->addLayout(this->dpi_row_widget(), 1);
-    // layout->addLayout(this->rt_audio_row_widget(), 1);
-    // layout->addLayout(this->audio_channels_row_widget(), 1);
-    // layout->addWidget(Theme::br(), 1);
-    // layout->addLayout(this->bluetooth_row_widget(), 1);
-    // layout->addWidget(Theme::br(), 1);
-    // layout->addLayout(this->touchscreen_row_widget(), 1);
-    // layout->addLayout(this->buttons_row_widget(), 1);
-
+    layout->addWidget(Theme::br(), 1);
+    layout->addLayout(this->camera_network_toggle_row_widget(), 1);
+    
     QScrollArea *scroll_area = new QScrollArea(this);
     Theme::to_touch_scroller(scroll_area);
     scroll_area->setWidgetResizable(true);
@@ -316,6 +282,53 @@ QBoxLayout *CameraPage::Settings::camera_overlay_height_widget()
     return layout;
 }
 
+// QBoxLayout *CameraPage::Settings::camera_network_toggle_row_widget(){
+//     QHBoxLayout *layout = new QHBoxLayout();
+
+//     QLabel *label = new QLabel("Network Camera");
+//     layout->addWidget(label, 1);
+
+//     layout->addLayout(this->network_toggle_widget(), 1);
+
+//     return layout;
+// }
+
+QBoxLayout *CameraPage::Settings::camera_network_toggle_row_widget()
+{
+    QHBoxLayout *layout = new QHBoxLayout();
+    QCheckBox *network_toggle = new QCheckBox(this);
+    connect(network_toggle, &QCheckBox::toggled, [this](bool checked) {
+        this->cam_stack->setCurrentIndex(checked? 1 : 0);
+        this->config->set_cam_is_network(checked);
+    });
+    network_toggle->setChecked(this->config->get_cam_is_network());
+
+    QLabel *label = new QLabel("Network Camera");
+
+    layout->addWidget(label);
+    layout->addWidget(network_toggle);
+    return layout;
+}
+
+QBoxLayout *CameraPage::Settings::camera_autoconnect_toggle_row_widget()
+{
+    QHBoxLayout *layout = new QHBoxLayout();
+    QLabel *label = new QLabel("Automatically reconnect");
+    QCheckBox *auto_reconnect_toggle = new QCheckBox(this);
+    auto_reconnect_toggle->setChecked(this->config->get_cam_autoconnect());
+    connect(auto_reconnect_toggle, &QCheckBox::toggled, [this](bool checked) {
+        this->config->set_cam_autoconnect(checked);
+        if (!checked) emit &CameraPage::autoconnect_disabled(); });
+    connect(this, &CameraPage::autoconnect_disabled, [auto_reconnect_toggle, this]() {
+        this->reconnect_timer->stop();
+        this->config->set_cam_autoconnect(false);
+        auto_reconnect_toggle->setChecked(false);
+    });
+
+    layout->addWidget(label);
+    layout->addWidget(auto_reconnect_toggle);
+    return layout;
+}
 
 QWidget *CameraPage::local_camera_widget()
 {
