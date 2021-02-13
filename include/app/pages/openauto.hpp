@@ -104,6 +104,7 @@ class OpenAutoPage : public QStackedWidget {
         QLayout *rt_audio_row_widget();
         QLayout *audio_channels_row_widget();
         QLayout *bluetooth_row_widget();
+        QLayout *autoconnect_row_widget();
         QLayout *touchscreen_row_widget();
         QCheckBox *button_checkbox(QString name, QString key, aasdk::proto::enums::ButtonCode::Enum code);
         QLayout *buttons_row_widget();

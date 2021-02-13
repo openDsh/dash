@@ -102,11 +102,14 @@ VehiclePage::VehiclePage(QWidget *parent) : QTabWidget(parent)
     for (auto port : QSerialPortInfo::availablePorts())
         this->serial_devices.append(port.systemLocation());
 
+    this->can_devices.append("unloader");
+    this->serial_devices.append("unloader");
+
     this->get_plugins();
     this->active_plugin = new QPluginLoader(this);
     Dialog *dialog = new Dialog(true, this->window());
     dialog->set_body(this->dialog_body());
-    QPushButton *load_button = new QPushButton("load");
+    QPushButton *load_button = new QPushButton("save");
     connect(load_button, &QPushButton::clicked, [this]() { this->load_plugin(); });
     dialog->set_button(load_button);
 
@@ -141,17 +144,32 @@ QWidget *VehiclePage::can_bus_toggle_row()
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
-    QLabel *label = new QLabel("CAN Bus", widget);
+    QLabel *label = new QLabel("Interface", widget);
     layout->addWidget(label, 1);
 
-    Switch *toggle = new Switch(widget);
-    toggle->scale(this->config->get_scale());
-    toggle->setChecked(this->config->get_vehicle_can_bus());
-    connect(this->config, &Config::scale_changed, [toggle](double scale) { toggle->scale(scale); });
-    connect(toggle, &Switch::stateChanged, [this](bool state) {
-        this->config->set_vehicle_can_bus(state);
-    });
-    layout->addWidget(toggle, 1, Qt::AlignHCenter);
+    QGroupBox *group = new QGroupBox();
+    QVBoxLayout *group_layout = new QVBoxLayout(group);
+
+
+    QRadioButton *socketcan_button = new QRadioButton("SocketCAN", group);
+    socketcan_button->setChecked(this->config->get_vehicle_can_bus());
+    connect(socketcan_button, &QRadioButton::clicked,
+            [config = this->config]() { 
+                config->set_vehicle_can_bus(true); 
+                emit config->vehicle_can_bus_changed(true);
+            });
+    group_layout->addWidget(socketcan_button);
+
+    QRadioButton *elm_button = new QRadioButton("ELM327 (USB)", group);
+    elm_button->setChecked(!this->config->get_vehicle_can_bus());
+    connect(elm_button, &QRadioButton::clicked,
+            [config = this->config]() { 
+                config->set_vehicle_can_bus(false); 
+                emit config->vehicle_can_bus_changed(false);
+            });
+    group_layout->addWidget(elm_button);
+
+    layout->addWidget(group, 1, Qt::AlignHCenter);
 
     return widget;
 }
