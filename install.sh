@@ -108,6 +108,9 @@ dependencies=(
 "libgstreamer-plugins-bad1.0-dev"
 "libunwind-dev"
 "qml-module-qtmultimedia"
+"libqt5serialbus5-dev"
+"libqt5serialbus5-plugins"
+"libqt5serialport5-dev"
 )
 
 ###############################  dependencies  #########################

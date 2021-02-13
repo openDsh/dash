@@ -35,6 +35,8 @@ class MainSettingsTab : public QWidget {
     QWidget *mouse_row_widget();
     QWidget *volume_row_widget();
     QWidget *volume_widget();
+    QWidget *controls_row_widget();
+    QWidget *controls_widget();
 
     Config *config;
     Theme *theme;

@@ -11,6 +11,16 @@ OfficialRPi::~OfficialRPi()
         this->brightness_attribute.close();
 }
 
+bool OfficialRPi::is_supported()
+{
+    return QFileInfo(this->brightness_attribute).isWritable();
+}
+
+uint8_t OfficialRPi::get_priority()
+{
+    return 3;
+}
+
 void OfficialRPi::set(int brightness)
 {
     if (this->brightness_attribute.isOpen()) {

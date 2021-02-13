@@ -193,12 +193,12 @@ QScrollBar {
 QScrollBar:vertical {
     padding-top: 6px;
     padding-bottom: 6px;
-    width: 8px;
+    width: 16px;
 }
 
 QScrollBar::handle {
     background-color: rgba(0, 0, 0, 64);
-    border-radius: 3px;
+    border-radius: 8px;
 }
 
 QScrollBar::add-line {

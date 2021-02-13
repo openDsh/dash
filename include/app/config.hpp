@@ -91,15 +91,6 @@ class Config : public QObject {
     inline QString get_wireless_address() { return this->wireless_address; }
     inline void set_wireless_address(QString wireless_address) { this->wireless_address = wireless_address; }
 
-    inline QString get_launcher_home() { return this->launcher_home; }
-    inline void set_launcher_home(QString launcher_home) { this->launcher_home = launcher_home; }
-
-    inline bool get_launcher_auto_launch() { return this->launcher_auto_launch; }
-    inline void set_launcher_auto_launch(bool launcher_auto_launch) { this->launcher_auto_launch = launcher_auto_launch; }
-
-    inline QString get_launcher_app() { return this->launcher_app; }
-    inline void set_launcher_app(QString launcher_app) { this->launcher_app = launcher_app; }
-
     inline bool get_mouse_active() { return this->mouse_active; }
     inline void set_mouse_active(bool mouse_active) { this->mouse_active = mouse_active; }
 
@@ -172,9 +163,20 @@ class Config : public QObject {
     inline void set_brightness_plugin(QString brightness_plugin)
     {
         this->brightness_plugin = brightness_plugin;
-        if (this->brightness_active_plugin->isLoaded())
+
+        QString name = this->brightness_plugin;
+
+        // If the brightness plugin is the special case "auto" we use the autodetected plugin
+        if (name == "auto")
+            name = this->autodetected_brightness_plugin;
+
+        QString fileName = this->brightness_plugins[name].absoluteFilePath();
+
+        // Only replace the active plugin if its differnt than the one we want
+        if (this->brightness_active_plugin->fileName() != fileName) {
             this->brightness_active_plugin->unload();
-        this->brightness_active_plugin->setFileName(this->brightness_plugins[this->brightness_plugin].absoluteFilePath());
+            this->brightness_active_plugin->setFileName(fileName);
+        }
     }
 
     inline bool get_vehicle_can_bus() { return this->vehicle_can_bus; }
@@ -192,6 +194,15 @@ class Config : public QObject {
     {
         this->vehicle_interface = vehicle_interface;
         emit vehicle_interface_changed(this->vehicle_interface);
+    }
+
+    inline const QStringList &get_launcher_plugins() { return this->launcher_plugins; }
+    inline void set_launcher_plugin(QString plugin, bool remove = false)
+    {
+        if (remove)
+            this->launcher_plugins.removeOne(plugin);
+        else
+            this->launcher_plugins.append(plugin);
     }
 
     static Config *get_instance();
@@ -212,13 +223,11 @@ class Config : public QObject {
     QString media_home;
     bool wireless_active;
     QString wireless_address;
-    QString launcher_home;
-    bool launcher_auto_launch;
-    QString launcher_app;
     bool mouse_active;
     QMap<QString, QString> shortcuts;
     QString quick_view;
     QString brightness_plugin;
+    QString autodetected_brightness_plugin;
     bool controls_bar;
     double scale;
     QString cam_network_url;
@@ -235,11 +244,13 @@ class Config : public QObject {
     QString vehicle_plugin;
     bool vehicle_can_bus;
     QString vehicle_interface;
+    QStringList launcher_plugins;
 
     QMap<QString, QFileInfo> brightness_plugins;
     QPluginLoader *brightness_active_plugin;
 
     void load_brightness_plugins();
+    void detect_brightness_plugin();
     void update_system_volume();
 
    signals:

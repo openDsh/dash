@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QFile>
+#include <QFileInfo>
 #include <QObject>
 #include <QString>
 
@@ -14,6 +15,8 @@ class OfficialRPi : public QObject, BrightnessPlugin {
    public:
     OfficialRPi();
     ~OfficialRPi();
+    bool is_supported() override;
+    uint8_t get_priority() override;
     void set(int brightness) override;
 
    private:

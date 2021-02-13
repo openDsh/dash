@@ -4,6 +4,7 @@
 #include <QDebug>
 #include <QFrame>
 #include <QPainter>
+#include <QPainterPath>
 
 #include "app/widgets/step_meter.hpp"
 

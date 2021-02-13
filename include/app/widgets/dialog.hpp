@@ -5,6 +5,7 @@
 #include <QLabel>
 #include <QPainter>
 #include <QPushButton>
+#include <QScrollArea>
 #include <QTimer>
 #include <QVBoxLayout>
 
@@ -20,16 +21,24 @@ class Dialog : public QDialog {
     inline void set_title(QString str)
     {
         QLabel *label = new QLabel(str, this);
-        QFont font(Theme::font_18);
+        QFont font(Theme::font_16);
         font.setBold(true);
         label->setFont(font);
         this->title->addWidget(label);
     }
-    inline void set_body(QWidget *widget, bool tight = false)
+    inline void set_body(QWidget *widget)
     {
-        if (!tight)
-            this->setMinimumSize(widget->size());
-        this->body->addWidget(widget);
+        if (this->fullscreen) {
+            QScrollArea *scroll_area = new QScrollArea(this);
+            Theme::to_touch_scroller(scroll_area);
+            scroll_area->setWidgetResizable(true);
+            scroll_area->setWidget(widget);
+
+            this->body->addWidget(scroll_area);
+        }
+        else {
+            this->body->addWidget(widget);
+        }
     }
     inline void set_button(QPushButton *button)
     {

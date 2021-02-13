@@ -21,6 +21,9 @@ class Selector : public QWidget {
         emit item_changed(this->get_current());
     }
 
+   protected:
+    QSize sizeHint() const override;
+
    private:
     QList<QString> options;
     int current_idx;
