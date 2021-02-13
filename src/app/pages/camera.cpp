@@ -87,7 +87,6 @@ void CameraPage::init_gstreamer_pipeline(std::string vidLaunchStr_, bool sync)
     GstElement* sink = QGlib::RefPointer<QGst::Element>(videoSink_);
     g_object_set(sink, "force-aspect-ratio", false, nullptr);
     g_object_set(sink, "sync", sync, nullptr);
-    // g_object_set(sink, "max-lateness", 200, nullptr);
 
     g_object_set(sink, "async", false, nullptr);
 
@@ -203,19 +202,6 @@ QWidget *CameraPage::Settings::settings_widget()
     layout->addLayout(this->camera_overlay_width_row_widget(), 1);
     layout->addWidget(Theme::br(), 1);
     layout->addLayout(this->camera_overlay_height_row_widget(), 1);
-
-
-    // layout->addLayout(this->rhd_row_widget(), 1);
-    // layout->addLayout(this->frame_rate_row_widget(), 1);
-    // layout->addLayout(this->resolution_row_widget(), 1);
-    // layout->addLayout(this->dpi_row_widget(), 1);
-    // layout->addLayout(this->rt_audio_row_widget(), 1);
-    // layout->addLayout(this->audio_channels_row_widget(), 1);
-    // layout->addWidget(Theme::br(), 1);
-    // layout->addLayout(this->bluetooth_row_widget(), 1);
-    // layout->addWidget(Theme::br(), 1);
-    // layout->addLayout(this->touchscreen_row_widget(), 1);
-    // layout->addLayout(this->buttons_row_widget(), 1);
 
     QScrollArea *scroll_area = new QScrollArea(this);
     Theme::to_touch_scroller(scroll_area);
