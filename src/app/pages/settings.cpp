@@ -19,6 +19,7 @@
 #include "app/widgets/switch.hpp"
 #include "app/window.hpp"
 #include "app/widgets/sliders.hpp"
+#include <QDebug>
 
 SettingsPage::SettingsPage(QWidget *parent) : QTabWidget(parent)
 {
@@ -575,8 +576,15 @@ QWidget *BluetoothSettingsTab::devices_widget()
         layout->addWidget(button);
     });
     connect(this->bluetooth, &Bluetooth::device_changed, [this](BluezQt::DevicePtr device) {
-        this->devices[device]->setText(device->name());
-        this->devices[device]->setChecked(device->isConnected());
+        if(!this->devices.contains(device))
+        {
+            emit this->bluetooth->device_added(device);
+        }
+        else
+        {
+            this->devices[device]->setText(device->name());
+            this->devices[device]->setChecked(device->isConnected());
+        }
     });
     connect(this->bluetooth, &Bluetooth::device_removed, [this, layout](BluezQt::DevicePtr device) {
         layout->removeWidget(devices[device]);
