@@ -102,8 +102,8 @@ VehiclePage::VehiclePage(QWidget *parent) : QTabWidget(parent)
     for (auto port : QSerialPortInfo::availablePorts())
         this->serial_devices.append(port.systemLocation());
 
-    this->can_devices.append("unloader");
-    this->serial_devices.append("unloader");
+    this->can_devices.append("No Interface");
+    this->serial_devices.append("No Interface");
 
     this->get_plugins();
     this->active_plugin = new QPluginLoader(this);
@@ -156,7 +156,6 @@ QWidget *VehiclePage::can_bus_toggle_row()
     connect(socketcan_button, &QRadioButton::clicked,
             [config = this->config]() { 
                 config->set_vehicle_can_bus(true); 
-                emit config->vehicle_can_bus_changed(true);
             });
     group_layout->addWidget(socketcan_button);
 
@@ -165,7 +164,6 @@ QWidget *VehiclePage::can_bus_toggle_row()
     connect(elm_button, &QRadioButton::clicked,
             [config = this->config]() { 
                 config->set_vehicle_can_bus(false); 
-                emit config->vehicle_can_bus_changed(false);
             });
     group_layout->addWidget(elm_button);
 
