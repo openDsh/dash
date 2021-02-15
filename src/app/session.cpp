@@ -49,7 +49,7 @@ Session::Theme::Theme(QSettings &settings)
 QPalette Session::Theme::palette() const
 {
     QPalette palette;
-    QColor color(this->color());
+    auto color = this->color();
     palette.setColor(QPalette::Base, color);
     color.setAlphaF(.5);
     palette.setColor(QPalette::AlternateBase, color);
@@ -60,17 +60,17 @@ QPalette Session::Theme::palette() const
 void Session::Theme::colorize(QAbstractButton *button) const
 {
     QSize size(512, 512);
-    auto icon_mask(button->icon().pixmap(size).createMaskFromColor(Qt::transparent));
+    auto icon_mask = button->icon().pixmap(size).createMaskFromColor(Qt::transparent);
     QBitmap alt_icon_mask;
     {
-        auto alt_icon(button->property("alt_icon").value<QIcon>());
+        auto alt_icon = button->property("alt_icon").value<QIcon>();
         if (!alt_icon.isNull())
             alt_icon_mask = alt_icon.pixmap(size).createMaskFromColor(Qt::transparent);
     }
 
-    QColor base_color(this->base_color());
+    auto base_color = this->base_color();
     base_color.setAlpha((this->mode == Session::Theme::Light) ? 255 : 222);
-    QColor accent_color(this->color());
+    auto accent_color = this->color();
     accent_color.setAlpha((this->mode == Session::Theme::Light) ? 255 : 222);
 
     QPixmap normal_on(size);
@@ -79,7 +79,7 @@ void Session::Theme::colorize(QAbstractButton *button) const
 
     QPixmap normal_off(size);
     {
-        QColor color(base_color);
+        auto color = base_color;
         if (!button->property("color_hint").isNull())
             color.setAlpha((this->mode == Session::Theme::Light) ? 162 : 134);
         normal_off.fill(color);
@@ -89,7 +89,7 @@ void Session::Theme::colorize(QAbstractButton *button) const
     QPixmap disabled_on(size);
     QPixmap disabled_off(size);
     {
-        QColor color(base_color);
+        auto color = base_color;
         color.setAlpha((this->mode == Session::Theme::Light) ? 97 : 128);
         disabled_on.fill(color);
         disabled_on.setMask(!alt_icon_mask.isNull() ? alt_icon_mask : icon_mask);
@@ -183,8 +183,11 @@ Session::Layout::Layout(QSettings &settings, Arbiter &arbiter)
     settings.beginGroup("Layout");
     settings.beginGroup("Page");
     for (int i = 0; i < this->pages().size(); i++) {
-        if (!settings.value(QString::number(i), true).toBool())
-            this->page(i)->toggle();
+        auto page = this->page(i);
+        if (page->toggleale()) {
+            if (!settings.value(QString::number(i), true).toBool())
+                page->enable(false);
+        }
     }
     settings.endGroup();
     settings.endGroup();
@@ -221,7 +224,7 @@ void Session::Forge::to_touch_scroller(QAbstractScrollArea *area)
 
 void Session::Forge::symbolize(QAbstractButton *button)
 {
-    auto policy(button->sizePolicy());
+    auto policy = button->sizePolicy();
     policy.setRetainSizeWhenHidden(true);
     button->setSizePolicy(policy);
     button->setFocusPolicy(Qt::NoFocus);
@@ -352,7 +355,7 @@ Session::Core::Core(QSettings &settings, Arbiter &arbiter)
 
     {
         auto callback = [&arbiter]{
-            int id = arbiter.layout().page_id(arbiter.layout().curr_page);
+            auto id = arbiter.layout().page_id(arbiter.layout().curr_page);
             do {
                 id = (id + 1) % arbiter.layout().pages().size();
             } while (!arbiter.layout().page(id)->enabled());
@@ -363,7 +366,7 @@ Session::Core::Core(QSettings &settings, Arbiter &arbiter)
 
     settings.beginGroup("Core");
     settings.beginGroup("Action");
-    for (int i = 0; i < this->actions().size(); i++) {
+    for (auto i = 0; i < this->actions().size(); i++) {
         auto key = settings.value(QString::number(i), QString()).toString();
         if (!key.isNull())
             this->action(i)->set(key);

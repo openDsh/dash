@@ -1,14 +1,13 @@
 #pragma once
 
-#include <stdlib.h>
-
-#include <QBluetoothDeviceInfo>
-#include <QBluetoothServiceDiscoveryAgent>
-#include <QBluetoothServiceInfo>
+#include <QButtonGroup>
+#include <QKeyEvent>
 #include <QMainWindow>
-#include <QStringList>
-#include <QtDBus/QtDBus>
-#include <QtWidgets>
+#include <QObject>
+#include <QShowEvent>
+#include <QStackedLayout>
+#include <QVBoxLayout>
+#include <QWidget>
 
 #include "app/config.hpp"
 #include "app/pages/openauto.hpp"
@@ -21,9 +20,6 @@ class DashWindow : public QMainWindow {
 
    public:
     DashWindow();
-    void add_widget(QWidget *widget);
-
-    inline QList<QAbstractButton *> get_pages() { return this->rail_group->buttons(); }
 
    protected:
     void showEvent(QShowEvent *event);
@@ -31,22 +27,27 @@ class DashWindow : public QMainWindow {
     void keyReleaseEvent(QKeyEvent *event);
 
    private:
+    struct NavRail {
+        QVBoxLayout *layout;
+        QButtonGroup *group;
+
+        NavRail(QObject *parent);
+    };
+
+    struct Body {
+        QVBoxLayout *layout;
+        QStackedLayout *frame;
+
+        Body(Arbiter &arbiter);
+
+       private:
+        static QWidget *power_control(Arbiter &arbiter);
+        static QWidget *control_bar(Arbiter &arbiter);
+    };
+
     Arbiter arbiter;
+    NavRail rail;
+    Body body;
 
-    OpenAutoPage *openauto;
-    QStackedWidget *stack;
-    QVBoxLayout *rail;
-    QButtonGroup *rail_group;
-    QStackedLayout *pages;
-    QHBoxLayout *bar;
-
-    void init_ui();
-    QLayout *body();
-    void add_pages();
-    void add_page(Page *page);
     void set_page(Page *page);
-
-    QWidget *controls_bar();
-    QLayout *quick_views();
-    QWidget *power_control();
 };

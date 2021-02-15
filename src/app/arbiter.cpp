@@ -9,16 +9,21 @@ Arbiter::Arbiter(QMainWindow *window)
 {
 }
 
-void Arbiter::toggle_mode()
+void Arbiter::set_mode(Session::Theme::Mode mode)
 {
-    auto mode = (this->theme().mode == Session::Theme::Light) ? Session::Theme::Dark : Session::Theme::Light;
     this->theme().mode = mode;
     this->settings().setValue("Theme/mode", mode);
 
     this->session_.update();
 
-    emit mode_toggled();
+    emit mode_changed(mode);
     emit color_changed(this->theme().color());
+}
+
+void Arbiter::toggle_mode()
+{
+    auto mode = (this->theme().mode == Session::Theme::Light) ? Session::Theme::Dark : Session::Theme::Light;
+    this->set_mode(mode);
 }
 
 void Arbiter::set_color(const QColor &color)
@@ -92,13 +97,12 @@ void Arbiter::set_scale(double scale)
     this->scale_changed(scale);
 }
 
-void Arbiter::toggle_control_bar()
+void Arbiter::set_control_bar(bool enabled)
 {
-    auto enabled = !this->layout().control_bar.enabled;
     this->layout().control_bar.enabled = enabled;
     this->settings().setValue("Layout/ControlBar/enabled", enabled);
 
-    emit control_bar_toggled();
+    emit control_bar_changed(enabled);
 }
 
 void Arbiter::set_curr_quick_view(QuickView *quick_view)
@@ -116,27 +120,26 @@ void Arbiter::set_curr_page(Page *page)
     emit curr_page_changed(page);
 }
 
-void Arbiter::toggle_page(Page *page)
+void Arbiter::set_page(Page *page, bool enabled)
 {
-    page->toggle();
+    page->enable(enabled);
     this->settings().beginGroup("Layout");
     this->settings().beginGroup("Page");
     this->settings().setValue(QString::number(this->layout().page_id(page)), page->enabled());
     this->settings().endGroup();
     this->settings().endGroup();
 
-    emit page_toggled(page);
+    emit page_changed(page, enabled);
 }
 
-void Arbiter::toggle_cursor()
+void Arbiter::set_cursor(bool enabled)
 {
-    auto cursor = !this->session_.core_.cursor;
-    this->session_.core_.cursor = cursor;
-    this->settings().setValue("Core/cursor", cursor);
+    this->session_.core_.cursor = enabled;
+    this->settings().setValue("Core/cursor", enabled);
 
     this->core().set_cursor();
 
-    emit cursor_toggled();
+    emit cursor_changed(enabled);
 }
 
 void Arbiter::set_action(Action *action, QString key)

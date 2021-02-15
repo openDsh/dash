@@ -16,8 +16,7 @@ class Arbiter : public QObject {
 
    public:
     Arbiter(QMainWindow *window);
-
-    // void set_mode(Session::Theme::Mode mode);
+    void set_mode(Session::Theme::Mode mode);
     void toggle_mode();
     void set_color(const QColor &color);
     void set_brightness_plugin(QString plugin);
@@ -28,14 +27,11 @@ class Arbiter : public QObject {
     void decrease_volume(uint8_t val);
     void increase_volume(uint8_t val);
     void set_scale(double scale);
-    // void set_control_bar(bool enable);
-    void toggle_control_bar();
+    void set_control_bar(bool enabled);
     void set_curr_quick_view(QuickView *quick_view);
     void set_curr_page(Page *page);
-    // void set_page(Page *page, bool enable);
-    void toggle_page(Page *page);
-    // void set_cursor(bool cursor);
-    void toggle_cursor();
+    void set_page(Page *page, bool enabled);
+    void set_cursor(bool enabled);
     void set_action(Action *action, QString key);
 
     QMainWindow *window() { return this->window_; }
@@ -52,20 +48,16 @@ class Arbiter : public QObject {
     Session session_;
 
    signals:
-    // void mode_changed(Session::Theme::mode mode);
-    void mode_toggled();
+    void mode_changed(Session::Theme::Mode mode);
     void color_changed(QColor color);
     void brightness_plugin_changed(QString plugin);
     void brightness_changed(uint8_t brightness);
     void volume_changed(uint8_t volume);
     void scale_changed(float scale);
-    // void control_bar_changed(bool enabled);
-    void control_bar_toggled();
+    void control_bar_changed(bool enabled);
     void curr_quick_view_changed(QuickView *quick_view);
     void curr_page_changed(Page *page);
-    // void page_changed(Page *page, bool enabled);
-    void page_toggled(Page *page);
-    // void cursor_changed(bool cursor);
-    void cursor_toggled();
+    void page_changed(Page *page, bool enabled);
+    void cursor_changed(bool enabled);
     void action_changed(Action *action, QString key);
 };

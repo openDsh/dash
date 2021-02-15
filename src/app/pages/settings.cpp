@@ -83,10 +83,12 @@ QWidget *MainSettingsTab::dark_mode_row_widget()
     Switch *toggle = new Switch(widget);
     toggle->scale(this->arbiter.layout().scale);
     toggle->setChecked(this->arbiter.theme().mode == Session::Theme::Dark);
-    connect(&this->arbiter, &Arbiter::mode_toggled, [toggle, this](){
-        toggle->setChecked(this->arbiter.theme().mode == Session::Theme::Dark);
+    connect(&this->arbiter, &Arbiter::mode_changed, [toggle, this](Session::Theme::Mode mode){
+        toggle->setChecked(mode == Session::Theme::Dark);
     });
-    connect(toggle, &Switch::stateChanged, [this](bool){ this->arbiter.toggle_mode(); });
+    connect(toggle, &Switch::stateChanged, [this](bool state){
+        this->arbiter.set_mode(state ? Session::Theme::Dark : Session::Theme::Light);
+    });
 
     layout->addWidget(toggle, 1, Qt::AlignHCenter);
 
@@ -186,8 +188,8 @@ QWidget *MainSettingsTab::cursor_row_widget()
     Switch *toggle = new Switch(widget);
     toggle->scale(this->arbiter.layout().scale);
     toggle->setChecked(this->arbiter.core().cursor);
-    connect(toggle, &Switch::stateChanged, [this](bool){
-        this->arbiter.toggle_cursor();
+    connect(toggle, &Switch::stateChanged, [this](bool state){
+        this->arbiter.set_cursor(state);
     });
     layout->addWidget(toggle, 1, Qt::AlignHCenter);
 
@@ -282,8 +284,8 @@ QWidget *LayoutSettingsTab::settings_widget()
 
     QWidget *controls_bar_row = this->quick_view_row_widget();
     controls_bar_row->setVisible(this->arbiter.layout().control_bar.enabled);
-    connect(&this->arbiter, &Arbiter::control_bar_toggled, [this, controls_bar_row]{
-        controls_bar_row->setVisible(this->arbiter.layout().control_bar.enabled);
+    connect(&this->arbiter, &Arbiter::control_bar_changed, [controls_bar_row](bool enabled){
+        controls_bar_row->setVisible(enabled);
     });
     layout->addWidget(controls_bar_row, 1);
 
@@ -313,7 +315,9 @@ QWidget *LayoutSettingsTab::pages_widget()
         if (page->toggleale()) {
             QCheckBox *button = new QCheckBox(page->name(), group);
             button->setChecked(page->enabled());
-            connect(button, &QCheckBox::toggled, [this, page]{ this->arbiter.toggle_page(page); });
+            connect(button, &QCheckBox::toggled, [this, page](bool checked){
+                this->arbiter.set_page(page, checked);
+            });
             group_layout->addWidget(button);
         }
     }
@@ -334,7 +338,7 @@ QWidget *LayoutSettingsTab::control_bar_widget()
     Switch *toggle = new Switch(widget);
     toggle->scale(this->arbiter.layout().scale);
     toggle->setChecked(this->arbiter.layout().control_bar.enabled);
-    connect(toggle, &Switch::stateChanged, [this](bool){ this->arbiter.toggle_control_bar(); });
+    connect(toggle, &Switch::stateChanged, [this](bool state){ this->arbiter.set_control_bar(state); });
     layout->addWidget(toggle, 1, Qt::AlignHCenter);
 
     return widget;

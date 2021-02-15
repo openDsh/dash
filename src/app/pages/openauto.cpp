@@ -395,8 +395,8 @@ void OpenAutoPage::init()
         }
         this->worker->update_size();
     });
-    connect(&this->arbiter, &Arbiter::mode_toggled, [this]{
-        this->worker->set_night_mode(this->arbiter.theme().mode == Session::Theme::Dark);
+    connect(&this->arbiter, &Arbiter::mode_changed, [this](Session::Theme::Mode mode){
+        this->worker->set_night_mode(mode == Session::Theme::Dark);
     });
 
     this->addWidget(this->connect_msg());

@@ -21,7 +21,7 @@ class Page {
     QWidget *widget() { return this->widget_; }
     const bool &enabled() { return this->enabled_; }
 
-    void toggle();
+    void enable(bool enable);
 
    protected:
     class Settings : public QWidget {

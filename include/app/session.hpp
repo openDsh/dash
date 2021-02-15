@@ -45,7 +45,6 @@ class Session {
         Mode mode;
 
         Theme(QSettings &settings);
-
         QPalette palette() const;
         void colorize(QAbstractButton *button) const;
 
@@ -70,9 +69,9 @@ class Session {
             uint8_t value;
 
             Brightness(QSettings &settings);
-
             void load_plugin();
             void set();
+
             const QList<QString> plugins() const { return this->plugins_.keys(); }
 
            private:
@@ -86,7 +85,6 @@ class Session {
         uint8_t volume;
 
         System(QSettings &settings);
-
         void set_volume() const;
     };
 
@@ -126,7 +124,6 @@ class Session {
         static void symbolize(QAbstractButton *button);
 
         Forge(Arbiter &arbiter);
-
         void iconize(QString name, QAbstractButton *button, uint8_t size, bool dynamic = false) const;
         void iconize(QString name, QString alt_name, QAbstractButton *button, uint8_t size, bool dynamic = false) const;
         QFont font(int size, bool mono = false) const;
@@ -141,7 +138,6 @@ class Session {
         bool cursor;
 
         Core(QSettings &settings, Arbiter &arbiter);
-
         QString stylesheet(Theme::Mode mode, float scale) const;
         void set_cursor() const;
 
@@ -158,7 +154,6 @@ class Session {
     };
 
     Session(Arbiter &arbiter);
-
     void update();
 
     friend class Arbiter;

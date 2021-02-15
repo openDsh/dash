@@ -14,10 +14,10 @@ Page::Page(Arbiter &arbiter, QString name, QString icon_name, bool toggleable, Q
 {
 }
 
-void Page::toggle()
+void Page::enable(bool enable)
 {
     if (this->toggleable_)
-        this->enabled_ = !this->enabled_;
+        this->enabled_ = enable;
 }
 
 Page::Settings::Settings() : QWidget()

@@ -29,7 +29,7 @@ ColorPicker::ColorPicker(Arbiter &arbiter, uint8_t block_size, QFont font, QWidg
     this->set_icon();
     layout->addWidget(this->button);
 
-    Dialog *dialog = new Dialog(arbiter, true, this->window());
+    Dialog *dialog = new Dialog(arbiter, true, arbiter.window());
     dialog->set_body(this->dialog_body());
 
     QPushButton *save_button = new QPushButton("save");
