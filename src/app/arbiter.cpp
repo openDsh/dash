@@ -39,12 +39,69 @@ void Arbiter::set_color(const QColor &color)
     emit color_changed(color);
 }
 
+void Arbiter::set_scale(double scale)
+{
+    this->layout().scale = scale;
+    this->settings().setValue("Layout/scale", scale);
+
+    emit scale_changed(scale);
+}
+
+void Arbiter::set_control_bar(bool enabled)
+{
+    this->layout().control_bar.enabled = enabled;
+    this->settings().setValue("Layout/ControlBar/enabled", enabled);
+
+    emit control_bar_changed(enabled);
+}
+
+void Arbiter::set_curr_quick_view(QuickView *quick_view)
+{
+    auto id = this->layout().control_bar.quick_view_id(quick_view);
+    if (id < 0)
+        return;
+
+    this->layout().control_bar.curr_quick_view = quick_view;
+    this->settings().setValue("Layout/ControlBar/quick_view", id);
+
+    emit curr_quick_view_changed(quick_view);
+}
+
+void Arbiter::set_curr_page(Page *page)
+{
+    if (this->layout().page_id(page) < 0)
+        return;
+
+    this->layout().curr_page = page;
+
+    emit curr_page_changed(page);
+}
+
+void Arbiter::set_page(Page *page, bool enabled)
+{
+    auto id = this->layout().page_id(page);
+    if (id < 0 || !page->toggleale())
+        return;
+
+    page->enable(enabled);
+    this->settings().beginGroup("Layout");
+    this->settings().beginGroup("Page");
+    this->settings().setValue(QString::number(id), page->enabled());
+    this->settings().endGroup();
+    this->settings().endGroup();
+
+    emit page_changed(page, enabled);
+}
+
 void Arbiter::set_brightness_plugin(QString plugin)
 {
+    if (!this->system().brightness.plugins().contains(plugin))
+        return;
+
     this->system().brightness.plugin = plugin;
     this->settings().setValue("System/Brightness/plugin", plugin);
 
-    this->system().brightness.load_plugin();
+    this->system().brightness.load();
 
     emit brightness_plugin_changed(plugin);
 }
@@ -89,49 +146,6 @@ void Arbiter::increase_volume(uint8_t val)
     this->set_volume(std::min(std::max(0, this->system().volume + val), 100));
 }
 
-void Arbiter::set_scale(double scale)
-{
-    this->layout().scale = scale;
-    this->settings().setValue("Layout/scale", scale);
-
-    this->scale_changed(scale);
-}
-
-void Arbiter::set_control_bar(bool enabled)
-{
-    this->layout().control_bar.enabled = enabled;
-    this->settings().setValue("Layout/ControlBar/enabled", enabled);
-
-    emit control_bar_changed(enabled);
-}
-
-void Arbiter::set_curr_quick_view(QuickView *quick_view)
-{
-    this->layout().control_bar.curr_quick_view = quick_view;
-    this->settings().setValue("Layout/ControlBar/quick_view", this->layout().control_bar.quick_view_id(quick_view));
-
-    emit curr_quick_view_changed(quick_view);
-}
-
-void Arbiter::set_curr_page(Page *page)
-{
-    this->layout().curr_page = page;
-
-    emit curr_page_changed(page);
-}
-
-void Arbiter::set_page(Page *page, bool enabled)
-{
-    page->enable(enabled);
-    this->settings().beginGroup("Layout");
-    this->settings().beginGroup("Page");
-    this->settings().setValue(QString::number(this->layout().page_id(page)), page->enabled());
-    this->settings().endGroup();
-    this->settings().endGroup();
-
-    emit page_changed(page, enabled);
-}
-
 void Arbiter::set_cursor(bool enabled)
 {
     this->session_.core_.cursor = enabled;
@@ -144,10 +158,13 @@ void Arbiter::set_cursor(bool enabled)
 
 void Arbiter::set_action(Action *action, QString key)
 {
+    auto id = QString::number(this->core().action_id(action));
+    if (id < 0)
+        return;
+
     action->set(key);
     this->settings().beginGroup("Core");
     this->settings().beginGroup("Action");
-    auto id = QString::number(this->core().action_id(action));
     if (key.isNull())
         this->settings().remove(id);
     else

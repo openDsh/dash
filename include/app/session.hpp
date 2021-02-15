@@ -20,15 +20,13 @@
 #include <QWidget>
 
 #include "app/action.hpp"
-#include "app/bluetooth.hpp"
 #include "app/pages/openauto.hpp"
 #include "app/pages/page.hpp"
 #include "app/quick_views/quick_view.hpp"
+#include "app/services/bluetooth.hpp"
+#include "app/services/server.hpp"
 
 class Arbiter;
-
-// dummy type for now
-using Server = uint8_t;
 
 class Session {
    public:
@@ -41,6 +39,8 @@ class Session {
             Dark,
             NUM_MODES
         };
+        static Mode from_str(QString mode);
+        static QString to_str(Mode mode);
 
         Mode mode;
 
@@ -57,35 +57,6 @@ class Session {
         std::array<QColor, NUM_MODES> colors_;
 
         QColor base_color() const { return (this->mode == Light) ? QColor(0, 0, 0) : QColor(255, 255, 255); }
-    };
-
-    struct System {
-        static const char *VOLUME_CMD;
-        static const char *SHUTDOWN_CMD;
-        static const char *REBOOT_CMD;
-
-        struct Brightness {
-            QString plugin;
-            uint8_t value;
-
-            Brightness(QSettings &settings);
-            void load_plugin();
-            void set();
-
-            const QList<QString> plugins() const { return this->plugins_.keys(); }
-
-           private:
-            QPluginLoader loader_;
-            QMap<QString, QFileInfo> plugins_;
-        };
-
-        Server server;
-        Bluetooth bluetooth;
-        Brightness brightness;
-        uint8_t volume;
-
-        System(QSettings &settings);
-        void set_volume() const;
     };
 
     struct Layout {
@@ -116,6 +87,35 @@ class Session {
 
        private:
         QVector<Page *> pages_;
+    };
+
+    struct System {
+        static const char *VOLUME_CMD;
+        static const char *SHUTDOWN_CMD;
+        static const char *REBOOT_CMD;
+
+        struct Brightness {
+            QString plugin;
+            uint8_t value;
+
+            Brightness(QSettings &settings);
+            void load();
+            void set();
+
+            const QList<QString> plugins() const { return this->plugins_.keys(); }
+
+           private:
+            QPluginLoader loader_;
+            QMap<QString, QFileInfo> plugins_;
+        };
+
+        Server server;
+        Bluetooth bluetooth;
+        Brightness brightness;
+        uint8_t volume;
+
+        System(QSettings &settings, Arbiter &arbiter);
+        void set_volume() const;
     };
 
     struct Forge {
@@ -161,8 +161,8 @@ class Session {
    private:
     QSettings settings_;
     Theme theme_;
-    System system_;
     Layout layout_;
+    System system_;
     Forge forge_;
     Core core_;
 };

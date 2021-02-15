@@ -13,8 +13,6 @@
 #include <QString>
 #include <QWidget>
 #include <QVideoFrame>
-#include <QtWebSockets>
-#include <QWebSocketServer>
 
 class Config : public QObject {
     Q_OBJECT
@@ -91,23 +89,6 @@ class Config : public QObject {
     static Config *get_instance();
 
    private:
-    class Server : public QWebSocketServer
-    {
-       public:
-        Server(QObject *parent = nullptr);
-        ~Server();
-
-       private:
-        const uint16_t PORT = 54545; // thats 0xD511 (DSH) in decimal
-
-        QList<QWebSocket *> clients;
-
-        Config *config;
-
-        void add_client(QWebSocket *client);
-        void handle_request(QWebSocket *client, QString request);
-    };
-
     QSettings settings;
     bool si_units;
     double radio_station;

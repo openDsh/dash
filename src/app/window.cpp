@@ -154,6 +154,9 @@ DashWindow::DashWindow()
     connect(&this->arbiter, &Arbiter::page_changed, [this](Page *page, bool enabled){
         int id = this->arbiter.layout().page_id(page);
         this->rail.group->button(id)->setVisible(enabled);
+
+        if ((this->arbiter.layout().curr_page == page) && !enabled)
+            this->arbiter.set_curr_page(this->arbiter.layout().page(id + 1));
     });
 }
 

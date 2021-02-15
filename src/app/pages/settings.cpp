@@ -1,6 +1,7 @@
 #include <BluezQt/Device>
 #include <BluezQt/PendingCall>
 #include <QLabel>
+#include <QLayoutItem>
 #include <QScrollArea>
 
 #include <aasdk_proto/ButtonCodeEnum.pb.h>
@@ -14,11 +15,12 @@
 #include "app/action.hpp"
 #include "app/config.hpp"
 #include "app/session.hpp"
+#include "app/window.hpp"
 #include "app/pages/settings.hpp"
+#include "app/services/server.hpp"
 #include "app/widgets/color_picker.hpp"
 #include "app/widgets/selector.hpp"
 #include "app/widgets/switch.hpp"
-#include "app/window.hpp"
 
 
 SettingsPage::SettingsPage(Arbiter &arbiter, QWidget *parent)
@@ -61,6 +63,8 @@ QWidget *MainSettingsTab::settings_widget()
     layout->addWidget(Session::Forge::br(), 1);
     layout->addWidget(this->brightness_plugin_row_widget(), 1);
     layout->addWidget(this->brightness_row_widget(), 1);
+    layout->addWidget(Session::Forge::br(), 1);
+    layout->addWidget(this->server_row_widget(), 1);
     layout->addWidget(Session::Forge::br(), 1);
     layout->addWidget(this->controls_row_widget(), 1);
 
@@ -221,6 +225,29 @@ QWidget *MainSettingsTab::volume_widget()
     return widget;
 }
 
+QWidget *MainSettingsTab::server_row_widget()
+{
+    QWidget *widget = new QWidget(this);
+    QHBoxLayout *layout = new QHBoxLayout(widget);
+
+    QLabel *label = new QLabel("Server", widget);
+    layout->addWidget(label, 1);
+
+    Switch *toggle = new Switch(widget);
+    toggle->scale(this->arbiter.layout().scale);
+    toggle->setChecked(this->arbiter.system().server.enabled());
+    connect(&this->arbiter.system().server, &Server::changed, [toggle](bool enabled){
+        toggle->setChecked(enabled);
+    });
+    connect(toggle, &Switch::stateChanged, [this](bool state){
+        this->arbiter.system().server.enable(state);
+    });
+
+    layout->addWidget(toggle, 1, Qt::AlignHCenter);
+
+    return widget;
+}
+
 QWidget *MainSettingsTab::controls_row_widget()
 {
     QWidget *widget = new QWidget(this);
@@ -321,6 +348,11 @@ QWidget *LayoutSettingsTab::pages_widget()
             group_layout->addWidget(button);
         }
     }
+    connect(&this->arbiter, &Arbiter::page_changed, [this, group_layout](Page *page, bool enabled){
+        auto item = group_layout->itemAt(this->arbiter.layout().page_id(page));
+        if (auto button = qobject_cast<QCheckBox *>(item->widget()))
+            button->setChecked(enabled);
+    });
 
     layout->addWidget(group, 1, Qt::AlignHCenter);
 

@@ -39,6 +39,26 @@ QString Session::fmt_plugin(QString plugin)
     return plugin;
 }
 
+Session::Theme::Mode Session::Theme::from_str(QString mode)
+{
+    // defaults to light mode if unknown
+    return (mode == "Dark") ? Session::Theme::Dark : Session::Theme::Light;
+}
+
+QString Session::Theme::to_str(Session::Theme::Mode mode)
+{
+    switch (mode) {
+        case Session::Theme::Light:
+            return "Light";
+            break;
+        case Session::Theme::Dark:
+            return "Dark";
+            break;
+        default:
+            return QString();
+    }
+}
+
 Session::Theme::Theme(QSettings &settings)
     : mode(static_cast<Theme::Mode>(settings.value("Theme/mode", Session::Theme::Light).toUInt()))
 {
@@ -105,52 +125,6 @@ void Session::Theme::colorize(QAbstractButton *button) const
     button->setIcon(colored_icon);
 }
 
-const char *Session::System::VOLUME_CMD = "amixer set Master %1% --quiet";
-const char *Session::System::SHUTDOWN_CMD = "sudo shutdown -h now";
-const char *Session::System::REBOOT_CMD = "sudo shutdown -r now";
-
-Session::System::Brightness::Brightness(QSettings &settings)
-    : plugin(settings.value("System/Brightness/plugin", "mocked").toString())
-    , value(settings.value("System/Brightness/value", 255).toUInt())
-    , loader_(qApp)
-{
-    for (const auto plugin : Session::plugin_dir("brightness").entryInfoList(QDir::Files)) {
-        if (QLibrary::isLibrary(plugin.absoluteFilePath()))
-            this->plugins_[Session::fmt_plugin(plugin.baseName())] = plugin;
-    }
-    this->load_plugin();
-    this->set();
-}
-
-void Session::System::Brightness::load_plugin()
-{
-    if (this->loader_.isLoaded())
-        this->loader_.unload();
-    this->loader_.setFileName(this->plugins_[this->plugin].absoluteFilePath());
-}
-
-void Session::System::Brightness::set()
-{
-    if (auto plugin = qobject_cast<BrightnessPlugin *>(this->loader_.instance()))
-        plugin->set(this->value);
-}
-
-Session::System::System(QSettings &settings)
-    : server()
-    , bluetooth(settings)
-    , brightness(settings)
-    , volume(settings.value("System/volume", 50).toUInt())
-{
-    this->set_volume();
-}
-
-void Session::System::set_volume() const
-{
-    auto process = new QProcess();
-    process->start(QString(VOLUME_CMD).arg(this->volume));
-    process->waitForFinished();
-}
-
 Session::Layout::ControlBar::ControlBar(QSettings &settings, Arbiter &arbiter)
     : enabled(settings.value("Layout/ControlBar/enabled", true).toBool())
     , curr_quick_view(nullptr)
@@ -198,6 +172,52 @@ Session::Layout::Layout(QSettings &settings, Arbiter &arbiter)
             break;
         }
     }
+}
+
+const char *Session::System::VOLUME_CMD = "amixer set Master %1% --quiet";
+const char *Session::System::SHUTDOWN_CMD = "sudo shutdown -h now";
+const char *Session::System::REBOOT_CMD = "sudo shutdown -r now";
+
+Session::System::Brightness::Brightness(QSettings &settings)
+    : plugin(settings.value("System/Brightness/plugin", "mocked").toString())
+    , value(settings.value("System/Brightness/value", 255).toUInt())
+    , loader_(qApp)
+{
+    for (const auto file : Session::plugin_dir("brightness").entryInfoList(QDir::Files)) {
+        if (QLibrary::isLibrary(file.absoluteFilePath()))
+            this->plugins_[Session::fmt_plugin(file.baseName())] = file;
+    }
+    this->load();
+    this->set();
+}
+
+void Session::System::Brightness::load()
+{
+    if (this->loader_.isLoaded())
+        this->loader_.unload();
+    this->loader_.setFileName(this->plugins_[this->plugin].absoluteFilePath());
+}
+
+void Session::System::Brightness::set()
+{
+    if (auto plugin = qobject_cast<BrightnessPlugin *>(this->loader_.instance()))
+        plugin->set(this->value);
+}
+
+Session::System::System(QSettings &settings, Arbiter &arbiter)
+    : server(arbiter, qApp)
+    , bluetooth(arbiter)
+    , brightness(settings)
+    , volume(settings.value("System/volume", 50).toUInt())
+{
+    this->set_volume();
+}
+
+void Session::System::set_volume() const
+{
+    auto process = new QProcess();
+    process->start(QString(VOLUME_CMD).arg(this->volume));
+    process->waitForFinished();
 }
 
 QFrame *Session::Forge::br(bool vertical)
@@ -350,7 +370,7 @@ Session::Core::Core(QSettings &settings, Arbiter &arbiter)
             if (page->enabled())
                 arbiter.set_curr_page(page);
         };
-        this->actions_.append(new Action("Show " + page->name() + " Page", callback, arbiter.window()));
+        this->actions_.append(new Action(QString("Show %1 Page").arg(page->name()), callback, arbiter.window()));
     }
 
     {
@@ -419,8 +439,8 @@ QString Session::Core::parse_stylesheet(QString path) const
 Session::Session(Arbiter &arbiter)
     : settings_(QSettings::IniFormat, QSettings::UserScope, "dash", QString(), qApp)
     , theme_(settings_)
-    , system_(settings_)
     , layout_(settings_, arbiter)
+    , system_(settings_, arbiter)
     , forge_(arbiter)
     , core_(settings_, arbiter)
 {

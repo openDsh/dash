@@ -16,10 +16,12 @@
 #include <QBluetoothServiceInfo>
 #include <QTimer>
 
-#include "app/bluetooth.hpp"
 #include "app/widgets/progress.hpp"
+#include "app/arbiter.hpp"
 
-Bluetooth::Bluetooth(QSettings &settings)
+#include "app/services/bluetooth.hpp"
+
+Bluetooth::Bluetooth(Arbiter &arbiter)
     : QObject(qApp)
 {
     BluezQt::Manager *manager = new BluezQt::Manager();

@@ -10,16 +10,17 @@
 #include <QObject>
 #include <QPair>
 #include <QPushButton>
-#include <QSettings>
 #include <QString>
 
 #include "app/widgets/progress.hpp"
+
+class Arbiter;
 
 class Bluetooth : public QObject {
     Q_OBJECT
 
    public:
-    Bluetooth(QSettings &settings);
+    Bluetooth(Arbiter &arbiter);
 
     void start_scan();
     void stop_scan();
