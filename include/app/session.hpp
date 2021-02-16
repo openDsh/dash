@@ -80,6 +80,7 @@ class Session {
         Page *curr_page;
 
         Layout(QSettings &settings, Arbiter &arbiter);
+        Page *next_enabled_page(Page *page);
 
         const QVector<Page *> &pages() const { return this->pages_; }
         Page *page(int id) const { return this->pages_.value(id, nullptr); }

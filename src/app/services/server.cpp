@@ -23,7 +23,7 @@ Server::Server(Arbiter &arbiter, QObject *parent)
         }},
         {"curr_page", {
             [&arbiter]{ return QVariant(arbiter.layout().page_id(arbiter.layout().curr_page)); },
-            [&arbiter](QVariant val){ arbiter.set_curr_page(arbiter.layout().page(val.toInt())); }
+            [&arbiter](QVariant val){ arbiter.set_curr_page(val.toInt()); }
         }},
         {"brightness", {
             [&arbiter]{ return QVariant(arbiter.system().brightness.value); },
@@ -39,7 +39,7 @@ Server::Server(Arbiter &arbiter, QObject *parent)
     for (auto page : this->arbiter.layout().pages()) {
         auto key = QString("page%1").arg(this->arbiter.layout().page_id(page));
         this->handlers.insert(key, {
-            [&arbiter, page]{ return QVariant(page->enabled()); },
+            [page]{ return QVariant(page->enabled()); },
             [&arbiter, page](QVariant val){ arbiter.set_page(page, val.toBool()); }
         });
         pages.append(key);

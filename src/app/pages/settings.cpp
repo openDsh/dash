@@ -399,7 +399,7 @@ QWidget *LayoutSettingsTab::quick_view_select_widget()
         quick_views.append(quick_view->name());
     Selector *selector = new Selector(quick_views, this->arbiter.layout().control_bar.curr_quick_view->name(), this->arbiter.forge().font(14), this->arbiter, widget);
     connect(selector, &Selector::idx_changed, [this](int idx){
-        this->arbiter.set_curr_quick_view(this->arbiter.layout().control_bar.quick_view(idx));
+        this->arbiter.set_curr_quick_view(idx);
     });
 
     layout->addStretch(1);

@@ -15,16 +15,12 @@
 
 #include "app/arbiter.hpp"
 
-class DashWindow : public QMainWindow {
+class Dash : public QWidget {
     Q_OBJECT
 
    public:
-    DashWindow();
-
-   protected:
-    void showEvent(QShowEvent *event);
-    void keyPressEvent(QKeyEvent *event);
-    void keyReleaseEvent(QKeyEvent *event);
+    Dash(Arbiter &arbiter);
+    void init();
 
    private:
     struct NavRail {
@@ -39,16 +35,28 @@ class DashWindow : public QMainWindow {
         QStackedLayout *frame;
 
         Body(Arbiter &arbiter);
-
-       private:
-        static QWidget *power_control(Arbiter &arbiter);
-        static QWidget *control_bar(Arbiter &arbiter);
     };
 
-    Arbiter arbiter;
+    Arbiter &arbiter;
     NavRail rail;
     Body body;
 
-    void add_pages();
     void set_page(Page *page);
+    QWidget *control_bar();
+    QWidget *power_control();
+};
+
+class Window : public QMainWindow {
+    Q_OBJECT
+
+   public:
+    Window();
+
+   protected:
+    void showEvent(QShowEvent *event);
+    void keyPressEvent(QKeyEvent *event);
+    void keyReleaseEvent(QKeyEvent *event);
+
+   private:
+    Arbiter arbiter;
 };

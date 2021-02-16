@@ -22,7 +22,9 @@ class Arbiter : public QObject {
     void set_scale(double scale);
     void set_control_bar(bool enabled);
     void set_curr_quick_view(QuickView *quick_view);
+    void set_curr_quick_view(int id);
     void set_curr_page(Page *page);
+    void set_curr_page(int id);
     void set_page(Page *page, bool enabled);
     void set_brightness_plugin(QString plugin);
     void set_brightness(uint8_t brightness);

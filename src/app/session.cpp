@@ -174,6 +174,16 @@ Session::Layout::Layout(QSettings &settings, Arbiter &arbiter)
     }
 }
 
+Page *Session::Layout::next_enabled_page(Page *page)
+{
+    auto id = this->page_id(page);
+    do {
+        id = (id + 1) % this->pages_.size();
+    } while (!this->page(id)->enabled());
+
+    return this->page(id);
+}
+
 const char *Session::System::VOLUME_CMD = "amixer set Master %1% --quiet";
 const char *Session::System::SHUTDOWN_CMD = "sudo shutdown -h now";
 const char *Session::System::REBOOT_CMD = "sudo shutdown -r now";
@@ -375,11 +385,8 @@ Session::Core::Core(QSettings &settings, Arbiter &arbiter)
 
     {
         auto callback = [&arbiter]{
-            auto id = arbiter.layout().page_id(arbiter.layout().curr_page);
-            do {
-                id = (id + 1) % arbiter.layout().pages().size();
-            } while (!arbiter.layout().page(id)->enabled());
-            arbiter.set_curr_page(arbiter.layout().page(id));
+            auto page = arbiter.layout().next_enabled_page(arbiter.layout().curr_page);
+            arbiter.set_curr_page(page);
         };
         this->actions_.append(new Action("Cycle Page", callback, arbiter.window()));
     }
