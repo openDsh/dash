@@ -128,22 +128,7 @@ DashWindow::DashWindow()
 
     layout->addLayout(this->rail.layout);
     layout->addLayout(this->body.layout);
-
-    for (auto page : this->arbiter.layout().pages()) {
-        auto button = new QPushButton();
-        button->setProperty("color_hint", true);
-        button->setCheckable(true);
-        button->setFlat(true);
-        this->arbiter.forge().iconize(page->icon_name(), button, 32);
-
-        this->rail.group->addButton(button, this->arbiter.layout().page_id(page));
-        this->rail.layout->addWidget(button);
-        this->body.frame->addWidget(page->widget());
-
-        page->init();
-        button->setVisible(page->enabled());
-    }
-    this->set_page(this->arbiter.layout().curr_page);
+    this->add_pages();
 
     this->setCentralWidget(stack);
 
@@ -155,8 +140,13 @@ DashWindow::DashWindow()
         int id = this->arbiter.layout().page_id(page);
         this->rail.group->button(id)->setVisible(enabled);
 
-        if ((this->arbiter.layout().curr_page == page) && !enabled)
-            this->arbiter.set_curr_page(this->arbiter.layout().page(id + 1));
+        if ((this->arbiter.layout().curr_page == page) && !enabled) {
+            auto next_id = id;
+            do {
+                next_id = (next_id + 1) % this->arbiter.layout().pages().size();
+            } while (!this->arbiter.layout().page(next_id)->enabled());
+            this->arbiter.set_curr_page(this->arbiter.layout().page(next_id));
+        }
     });
 }
 
@@ -177,6 +167,25 @@ void DashWindow::keyReleaseEvent(QKeyEvent *event)
 {
     QMainWindow::keyReleaseEvent(event);
     this->arbiter.layout().openauto_page->pass_key_event(event);
+}
+
+void DashWindow::add_pages()
+{
+    for (auto page : this->arbiter.layout().pages()) {
+        auto button = new QPushButton();
+        button->setProperty("color_hint", true);
+        button->setCheckable(true);
+        button->setFlat(true);
+        this->arbiter.forge().iconize(page->icon_name(), button, 32);
+
+        this->rail.group->addButton(button, this->arbiter.layout().page_id(page));
+        this->rail.layout->addWidget(button);
+        this->body.frame->addWidget(page->widget());
+
+        page->init();
+        button->setVisible(page->enabled());
+    }
+    this->set_page(this->arbiter.layout().curr_page);
 }
 
 void DashWindow::set_page(Page *page)

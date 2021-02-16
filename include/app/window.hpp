@@ -49,5 +49,6 @@ class DashWindow : public QMainWindow {
     NavRail rail;
     Body body;
 
+    void add_pages();
     void set_page(Page *page);
 };

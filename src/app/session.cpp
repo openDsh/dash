@@ -437,7 +437,7 @@ QString Session::Core::parse_stylesheet(QString path) const
 }
 
 Session::Session(Arbiter &arbiter)
-    : settings_(QSettings::IniFormat, QSettings::UserScope, "dash", QString(), qApp)
+    : settings_(qApp)
     , theme_(settings_)
     , layout_(settings_, arbiter)
     , system_(settings_, arbiter)
