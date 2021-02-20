@@ -7,15 +7,15 @@
 
 #include "app/window.hpp"
 
-Dash::NavRail::NavRail(QObject *parent)
-    : layout(new QVBoxLayout())
-    , group(new QButtonGroup(parent))
+Dash::NavRail::NavRail()
+    : group()
+    , layout(new QVBoxLayout())
 {
     this->layout->setContentsMargins(0, 0, 0, 0);
     this->layout->setSpacing(0);
 }
 
-Dash::Body::Body(Arbiter &arbiter)
+Dash::Body::Body()
     : layout(new QVBoxLayout())
     , frame(new QStackedLayout())
 {
@@ -23,14 +23,14 @@ Dash::Body::Body(Arbiter &arbiter)
     this->layout->setSpacing(0);
 
     this->frame->setContentsMargins(0, 0, 0, 0);
-    this->layout->addLayout(this->frame);
+    this->layout->addLayout(this->frame, 1);
 }
 
 Dash::Dash(Arbiter &arbiter)
     : QWidget()
     , arbiter(arbiter)
-    , rail(this)
-    , body(this->arbiter)
+    , rail()
+    , body()
 {
     auto layout = new QHBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
@@ -39,11 +39,15 @@ Dash::Dash(Arbiter &arbiter)
     layout->addLayout(this->rail.layout);
     layout->addLayout(this->body.layout);
 
-    connect(this->rail.group, QOverload<int>::of(&QButtonGroup::buttonPressed), [this](int id){ this->arbiter.set_curr_page(id); });
-    connect(&this->arbiter, &Arbiter::curr_page_changed, [this](Page *page){ this->set_page(page); });
+    connect(&this->rail.group, QOverload<int>::of(&QButtonGroup::buttonPressed), [this](int id){
+        this->arbiter.set_curr_page(id);
+    });
+    connect(&this->arbiter, &Arbiter::curr_page_changed, [this](Page *page){
+        this->set_page(page);
+    });
     connect(&this->arbiter, &Arbiter::page_changed, [this](Page *page, bool enabled){
         int id = this->arbiter.layout().page_id(page);
-        this->rail.group->button(id)->setVisible(enabled);
+        this->rail.group.button(id)->setVisible(enabled);
 
         if ((this->arbiter.layout().curr_page == page) && !enabled)
             this->arbiter.set_curr_page(this->arbiter.layout().next_enabled_page(page));
@@ -52,6 +56,12 @@ Dash::Dash(Arbiter &arbiter)
 
 void Dash::init()
 {
+    auto msg_ref = new QWidget();
+    msg_ref->setObjectName("MsgRef");
+    this->body.layout->addWidget(msg_ref);
+
+    this->body.layout->addWidget(this->control_bar());
+
     for (auto page : this->arbiter.layout().pages()) {
         auto button = new QPushButton();
         button->setProperty("color_hint", true);
@@ -59,7 +69,7 @@ void Dash::init()
         button->setFlat(true);
         this->arbiter.forge().iconize(page->icon_name(), button, 32);
 
-        this->rail.group->addButton(button, this->arbiter.layout().page_id(page));
+        this->rail.group.addButton(button, this->arbiter.layout().page_id(page));
         this->rail.layout->addWidget(button);
         this->body.frame->addWidget(page->widget());
 
@@ -67,26 +77,19 @@ void Dash::init()
         button->setVisible(page->enabled());
     }
     this->set_page(this->arbiter.layout().curr_page);
-
-    auto msg_ref = new QWidget();
-    msg_ref->setObjectName("MsgRef");
-    this->body.layout->addWidget(msg_ref);
-
-    this->body.layout->addWidget(this->control_bar());
 }
 
 void Dash::set_page(Page *page)
 {
     auto id = this->arbiter.layout().page_id(page);
-    this->rail.group->button(id)->setChecked(true);
+    this->rail.group.button(id)->setChecked(true);
     this->body.frame->setCurrentWidget(page->widget());
 }
 
-QWidget *Dash::control_bar()
+QWidget *Dash::control_bar() const
 {
     auto widget = new QWidget();
     widget->setObjectName("ControlBar");
-    widget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     auto layout = new QHBoxLayout(widget);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
@@ -128,7 +131,7 @@ QWidget *Dash::control_bar()
     return widget;
 }
 
-QWidget *Dash::power_control()
+QWidget *Dash::power_control() const
 {
     auto widget = new QWidget();
     auto layout = new QHBoxLayout(widget);
@@ -180,7 +183,6 @@ Window::Window()
 void Window::showEvent(QShowEvent *event)
 {
     QWidget::showEvent(event);
-
     this->arbiter.update();
 }
 

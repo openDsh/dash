@@ -176,7 +176,7 @@ Session::Layout::Layout(QSettings &settings, Arbiter &arbiter)
     }
 }
 
-Page *Session::Layout::next_enabled_page(Page *page)
+Page *Session::Layout::next_enabled_page(Page *page) const
 {
     auto id = this->page_id(page);
     do {
@@ -246,7 +246,7 @@ const QList<QString> &Session::System::Brightness::plugins() const
     static const QList<QString> plugins = [this]{
         QList<QString> names;
         for (const auto info : this->plugin_infos_) {
-            if (info.supported || true)
+            if (info.supported)
                 names.append(info.name);
         }
         return names;

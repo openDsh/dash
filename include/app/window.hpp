@@ -24,17 +24,17 @@ class Dash : public QWidget {
 
    private:
     struct NavRail {
+        QButtonGroup group;
         QVBoxLayout *layout;
-        QButtonGroup *group;
 
-        NavRail(QObject *parent);
+        NavRail();
     };
 
     struct Body {
         QVBoxLayout *layout;
         QStackedLayout *frame;
 
-        Body(Arbiter &arbiter);
+        Body();
     };
 
     Arbiter &arbiter;
@@ -42,8 +42,8 @@ class Dash : public QWidget {
     Body body;
 
     void set_page(Page *page);
-    QWidget *control_bar();
-    QWidget *power_control();
+    QWidget *control_bar() const;
+    QWidget *power_control() const;
 };
 
 class Window : public QMainWindow {

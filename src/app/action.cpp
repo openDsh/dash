@@ -19,9 +19,9 @@ const QString GPIONotifier::GPIOX_DIR(GPIONotifier::GPIO_DIR + "/%1");
 const QString GPIONotifier::GPIOX_VALUE_PATH(GPIONotifier::GPIOX_DIR + "/value");
 const QString GPIONotifier::GPIOX_ACTIVE_LOW_PATH(GPIONotifier::GPIOX_DIR + "/active_low");
 
-GPIONotifier::GPIONotifier(QObject *parent)
-    : QObject(parent)
-    , watcher(this)
+GPIONotifier::GPIONotifier()
+    : QObject()
+    , watcher()
 {
     for (auto gpio : QDir(this->GPIO_DIR).entryList(QDir::Dirs | QDir::NoDotAndDotDot)) {
         if (this->GPIOX_REGEX.exactMatch(gpio) && QFile(this->GPIOX_ACTIVE_LOW_PATH.arg(gpio)).exists())
@@ -37,7 +37,7 @@ GPIONotifier::GPIONotifier(QObject *parent)
 
 ActionDialog::ActionDialog(Arbiter &arbiter)
     : Dialog(arbiter, true, arbiter.window())
-    , notifier(this)
+    , notifier()
 {
     this->label = new QLabel();
     this->label->setProperty("add_hint", true);
@@ -76,9 +76,9 @@ void ActionDialog::closeEvent(QCloseEvent *event)
     Dialog::closeEvent(event);
 }
 
-Action::GPIO::GPIO(QObject *parent)
-    : watcher(parent)
-    , value(parent)
+Action::GPIO::GPIO()
+    : watcher()
+    , value()
     , active_low(0xFF)
 {
 }
@@ -91,10 +91,10 @@ Action::GPIO::~GPIO()
 
 Action::Action(QString name, std::function<void()> callback, QWidget *parent)
     : QObject(parent)
+    , shortcut(parent)
+    , gpio()
     , name_(name)
     , key_()
-    , shortcut(parent)
-    , gpio(this)
 {
     connect(&this->gpio.watcher, &QFileSystemWatcher::fileChanged, [this, callback](QString){
         if (this->gpio.value.isOpen()) {

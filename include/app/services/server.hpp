@@ -4,10 +4,9 @@
 
 #include <QList>
 #include <QMap>
-#include <QObject>
 #include <QString>
-#include <QtWebSockets>
 #include <QVariant>
+#include <QWebSocket>
 #include <QWebSocketServer>
 
 class Arbiter;
@@ -24,7 +23,6 @@ class Server : public QWebSocketServer
 
     Server(Arbiter &arbiter);
     ~Server();
-
     void enable(bool enable);
     void register_handler(QString key, Handler handler);
 
@@ -36,12 +34,11 @@ class Server : public QWebSocketServer
     Arbiter &arbiter;
     QList<QWebSocket *> clients;
     QMap<QString, Handler> handlers;
-
     bool enabled_;
 
     void start();
     void stop();
-    void handle_request(QWebSocket *client, QString request);
+    void handle_msg(QWebSocket *client, QString request) const;
 
    signals:
     void changed(bool enabled);

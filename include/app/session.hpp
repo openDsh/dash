@@ -79,7 +79,7 @@ class Session {
         Page *curr_page;
 
         Layout(QSettings &settings, Arbiter &arbiter);
-        Page *next_enabled_page(Page *page);
+        Page *next_enabled_page(Page *page) const;
 
         const QList<Page *> &pages() const { return this->pages_; }
         Page *page(int id) const { return this->pages_.value(id, nullptr); }
@@ -104,7 +104,6 @@ class Session {
             void load();
             void set();
             void reset();
-
             const QList<QString> &plugins() const;
 
            private:

@@ -26,7 +26,7 @@ class GPIONotifier : public QObject {
     static const QString GPIOX_VALUE_PATH;
     static const QString GPIOX_ACTIVE_LOW_PATH;
 
-    GPIONotifier(QObject *parent);
+    GPIONotifier();
 
     void enable() { this->watcher.blockSignals(false); }
     void disable() { this->watcher.blockSignals(true); }
@@ -61,7 +61,6 @@ class Action : public QObject {
 
    public:
     Action(QString name, std::function<void()> callback, QWidget *parent);
-
     void set(QString key);
 
     QString key() const { return this->key_; }
@@ -73,13 +72,13 @@ class Action : public QObject {
         QFile value;
         uint8_t active_low;
 
-        GPIO(QObject *parent);
+        GPIO();
         ~GPIO();
     };
 
-    QString name_;
-    QString key_;
-
     QShortcut shortcut;
     GPIO gpio;
+
+    QString name_;
+    QString key_;
 };

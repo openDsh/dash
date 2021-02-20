@@ -53,7 +53,7 @@ Server::Server(Arbiter &arbiter)
         if (auto client = this->nextPendingConnection()) {
             this->clients.append(client);
             connect(client, &QWebSocket::textMessageReceived, [this, client](QString msg) {
-                this->handle_request(client, msg);
+                this->handle_msg(client, msg);
             });
         }
     });
@@ -95,7 +95,7 @@ void Server::stop()
     this->clients.clear();
 }
 
-void Server::handle_request(QWebSocket *client, QString request)
+void Server::handle_msg(QWebSocket *client, QString request) const
 {
     auto json = QJsonDocument::fromJson(request.toUtf8());
     if (json.isObject()) {
