@@ -29,14 +29,12 @@ class MainSettingsTab : public QWidget {
     QWidget *settings_widget();
     QWidget *dark_mode_row_widget();
     QWidget *brightness_plugin_row_widget();
-    QWidget *brightness_plugin_select_widget();
     QWidget *brightness_row_widget();
     QWidget *brightness_widget();
     QWidget *color_row_widget();
     QWidget *color_select_widget();
     QWidget *cursor_row_widget();
     QWidget *volume_row_widget();
-    QWidget *volume_widget();
     QWidget *server_row_widget();
     QWidget *controls_row_widget();
     QWidget *controls_widget();
@@ -56,7 +54,6 @@ class LayoutSettingsTab : public QWidget {
     QWidget *pages_widget();
     QWidget *control_bar_widget();
     QWidget *quick_view_row_widget();
-    QWidget *quick_view_select_widget();
     QWidget *scale_row_widget();
     QWidget *scale_widget();
 

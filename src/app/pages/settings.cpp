@@ -60,7 +60,6 @@ QWidget *MainSettingsTab::settings_widget()
     layout->addWidget(Session::Forge::br(), 1);
     layout->addWidget(this->volume_row_widget(), 1);
     layout->addWidget(Session::Forge::br(), 1);
-    layout->addWidget(this->brightness_plugin_row_widget(), 1);
     layout->addWidget(this->brightness_row_widget(), 1);
     layout->addWidget(Session::Forge::br(), 1);
     layout->addWidget(this->server_row_widget(), 1);
@@ -98,35 +97,6 @@ QWidget *MainSettingsTab::dark_mode_row_widget()
     return widget;
 }
 
-QWidget *MainSettingsTab::brightness_plugin_row_widget()
-{
-    QWidget *widget = new QWidget(this);
-    QHBoxLayout *layout = new QHBoxLayout(widget);
-
-    QLabel *label = new QLabel("Brightness Plugin", widget);
-    layout->addWidget(label, 1);
-
-    layout->addWidget(this->brightness_plugin_select_widget(), 1);
-
-    return widget;
-}
-
-QWidget *MainSettingsTab::brightness_plugin_select_widget()
-{
-    QWidget *widget = new QWidget(this);
-    QHBoxLayout *layout = new QHBoxLayout(widget);
-
-    auto plugins = this->arbiter.system().brightness.plugins();
-    Selector *selector = new Selector(plugins, this->arbiter.system().brightness.plugin, this->arbiter.forge().font(14), this->arbiter, widget, Session::System::Brightness::AUTO_PLUGIN);
-    connect(selector, &Selector::item_changed, [this](QString item){ this->arbiter.set_brightness_plugin(item); });
-
-    layout->addStretch(1);
-    layout->addWidget(selector, 10);
-    layout->addStretch(1);
-
-    return widget;
-}
-
 QWidget *MainSettingsTab::brightness_row_widget()
 {
     QWidget *widget = new QWidget(this);
@@ -143,11 +113,14 @@ QWidget *MainSettingsTab::brightness_row_widget()
 QWidget *MainSettingsTab::brightness_widget()
 {
     QWidget *widget = new QWidget(this);
-    QHBoxLayout *layout = new QHBoxLayout(widget);
+    QVBoxLayout *layout = new QVBoxLayout(widget);
 
-    layout->addStretch(1);
-    layout->addWidget(this->arbiter.forge().brightness_slider(), 6);
-    layout->addStretch(1);
+    auto plugins = this->arbiter.system().brightness.plugins();
+    Selector *selector = new Selector(plugins, this->arbiter.system().brightness.plugin, this->arbiter.forge().font(14), this->arbiter, widget, Session::System::Brightness::AUTO_PLUGIN);
+    connect(selector, &Selector::item_changed, [this](QString item){ this->arbiter.set_brightness_plugin(item); });
+
+    layout->addWidget(selector);
+    layout->addWidget(this->arbiter.forge().brightness_slider());
 
     return widget;
 }
@@ -207,19 +180,7 @@ QWidget *MainSettingsTab::volume_row_widget()
     QLabel *label = new QLabel("Volume", widget);
     layout->addWidget(label, 1);
 
-    layout->addWidget(this->volume_widget(), 1);
-
-    return widget;
-}
-
-QWidget *MainSettingsTab::volume_widget()
-{
-    QWidget *widget = new QWidget(this);
-    QHBoxLayout *layout = new QHBoxLayout(widget);
-
-    layout->addStretch(1);
-    layout->addWidget(this->arbiter.forge().volume_slider(), 6);
-    layout->addStretch(1);
+    layout->addWidget(this->arbiter.forge().volume_slider(), 1);
 
     return widget;
 }
@@ -383,16 +344,6 @@ QWidget *LayoutSettingsTab::quick_view_row_widget()
     QLabel *label = new QLabel("Quick View", widget);
     layout->addWidget(label, 1);
 
-    layout->addWidget(this->quick_view_select_widget(), 1);
-
-    return widget;
-}
-
-QWidget *LayoutSettingsTab::quick_view_select_widget()
-{
-    QWidget *widget = new QWidget(this);
-    QHBoxLayout *layout = new QHBoxLayout(widget);
-
     QStringList quick_views;
     for (auto quick_view : this->arbiter.layout().control_bar.quick_views())
         quick_views.append(quick_view->name());
@@ -400,10 +351,7 @@ QWidget *LayoutSettingsTab::quick_view_select_widget()
     connect(selector, &Selector::idx_changed, [this](int idx){
         this->arbiter.set_curr_quick_view(idx);
     });
-
-    layout->addStretch(1);
-    layout->addWidget(selector, 10);
-    layout->addStretch(1);
+    layout->addWidget(selector, 1);
 
     return widget;
 }
@@ -442,11 +390,9 @@ QWidget *LayoutSettingsTab::scale_widget()
     this->arbiter.forge().iconize("add", raise_button, 32);
     connect(raise_button, &QPushButton::clicked, [slider]{ slider->setValue(slider->value() + 1); });
 
-    layout->addStretch(1);
     layout->addWidget(lower_button);
     layout->addWidget(slider, 4);
     layout->addWidget(raise_button);
-    layout->addStretch(1);
 
     return widget;
 }
@@ -642,10 +588,8 @@ QWidget *ActionsSettingsTab::action_input(Action *action)
     });
     dialog->set_button(save);
 
-    layout->addStretch(1);
-    layout->addWidget(button, 3);
-    layout->addStretch(1);
-    layout->addWidget(symbol, 1, Qt::AlignRight);
+    layout->addWidget(button, 1);
+    layout->addWidget(symbol, 0, Qt::AlignRight);
 
     return widget;
 }

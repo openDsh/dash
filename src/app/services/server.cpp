@@ -21,7 +21,7 @@ Server::Server(Arbiter &arbiter)
             [&arbiter]{ return QVariant(arbiter.theme().color().name()); },
             [&arbiter](QVariant val){ arbiter.set_color(QColor(val.toString())); }
         }},
-        {"curr_page", {
+        {"page", {
             [&arbiter]{ return QVariant(arbiter.layout().page_id(arbiter.layout().curr_page)); },
             [&arbiter](QVariant val){ arbiter.set_curr_page(val.toInt()); }
         }},
