@@ -151,6 +151,10 @@ QRadioButton {
     background-color: transparent;
 }
 
+QRadioButton:disabled {
+    color: rgb(136, 136, 136);
+}
+
 QCheckBox::indicator {
     width: 22px;
     height: 22px;
@@ -165,6 +169,10 @@ QRadioButton::indicator {
     border-radius: 11px;
 }
 
+QRadioButton::indicator:disabled {
+    border: 2px solid rgb(136, 136, 136);
+}
+
 QCheckBox::indicator::checked {
     image: url(:/icons/light/check.svg);
     background-color: palette(base);
@@ -174,6 +182,11 @@ QCheckBox::indicator::checked {
 QRadioButton::indicator::checked {
     background-color: qradialgradient(cx:0.5, cy:0.5, fx:0.5, fy:0.5, radius:.4, stop:.65 palette(base), stop:.75 transparent);
     border: 2px solid palette(base);
+}
+
+QRadioButton::indicator::checked:disabled {
+    background-color: qradialgradient(cx:0.5, cy:0.5, fx:0.5, fy:0.5, radius:.4, stop:.65 rgb(136, 136, 136), stop:.75 transparent);
+    border: 2px solid rgb(136, 136, 136);
 }
 
 QScrollArea {

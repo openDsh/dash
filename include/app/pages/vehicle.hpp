@@ -60,7 +60,6 @@ class VehiclePage : public QTabWidget, public Page {
     void load_plugin();
     QWidget *dialog_body();
     QWidget *can_bus_toggle_row();
-    QWidget *interface_selector_row();
     QWidget *si_units_row_widget();
 
     QMap<QString, int> capabilities;

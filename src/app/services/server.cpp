@@ -7,8 +7,8 @@
 
 #include "app/services/server.hpp"
 
-Server::Server(Arbiter &arbiter, QObject *parent)
-    : QWebSocketServer("dash", QWebSocketServer::NonSecureMode, parent)
+Server::Server(Arbiter &arbiter)
+    : QWebSocketServer("dash", QWebSocketServer::NonSecureMode)
     , arbiter(arbiter)
     , enabled_(this->arbiter.settings().value("System/Server/enabled", false).toBool())
 {

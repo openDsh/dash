@@ -47,6 +47,7 @@ class Bluetooth : public QObject {
     QTimer *scan_timer;
 
    signals:
+    void init();
     void device_added(BluezQt::DevicePtr);
     void device_changed(BluezQt::DevicePtr);
     void device_removed(BluezQt::DevicePtr);

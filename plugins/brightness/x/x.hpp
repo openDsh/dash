@@ -10,6 +10,8 @@ class X : public QObject, BrightnessPlugin {
 
    public:
     X();
+    bool supported() override;
+    uint8_t priority() override;
     void set(int brightness) override;
 
    private:

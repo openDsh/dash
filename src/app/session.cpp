@@ -1,3 +1,5 @@
+#include <algorithm>
+
 #include <QCoreApplication>
 #include <QFile>
 #include <QFontDatabase>
@@ -188,15 +190,23 @@ const char *Session::System::VOLUME_CMD = "amixer set Master %1% --quiet";
 const char *Session::System::SHUTDOWN_CMD = "sudo shutdown -h now";
 const char *Session::System::REBOOT_CMD = "sudo shutdown -r now";
 
+const char *Session::System::Brightness::AUTO_PLUGIN = "auto";
+
 Session::System::Brightness::Brightness(QSettings &settings)
-    : plugin(settings.value("System/Brightness/plugin", "mocked").toString())
+    : plugin(settings.value("System/Brightness/plugin", Session::System::Brightness::AUTO_PLUGIN).toString())
     , value(settings.value("System/Brightness/value", 255).toUInt())
-    , loader_(qApp)
+    , loader_()
 {
     for (const auto file : Session::plugin_dir("brightness").entryInfoList(QDir::Files)) {
-        if (QLibrary::isLibrary(file.absoluteFilePath()))
-            this->plugins_[Session::fmt_plugin(file.baseName())] = file;
+        auto path = file.absoluteFilePath();
+        if (QLibrary::isLibrary(path)) {
+            auto name = Session::fmt_plugin(file.baseName());
+            if (auto plugin = qobject_cast<BrightnessPlugin *>(QPluginLoader(path).instance()))
+                this->plugin_infos_.append({name, path, plugin->supported(), plugin->priority()});
+        }
     }
+    std::sort(this->plugin_infos_.begin(), this->plugin_infos_.end());
+
     this->load();
     this->set();
 }
@@ -205,7 +215,17 @@ void Session::System::Brightness::load()
 {
     if (this->loader_.isLoaded())
         this->loader_.unload();
-    this->loader_.setFileName(this->plugins_[this->plugin].absoluteFilePath());
+
+    if ((this->plugin == Session::System::Brightness::AUTO_PLUGIN) && !this->plugin_infos_.isEmpty()) {
+        this->loader_.setFileName(this->plugin_infos_.first().path);
+    }
+    else {
+        auto it = std::find_if(this->plugin_infos_.begin(), this->plugin_infos_.end(), [this](PluginInfo &info){
+            return info.name == this->plugin;
+        });
+        if (it != this->plugin_infos_.end())
+            this->loader_.setFileName(it->path);
+    }
 }
 
 void Session::System::Brightness::set()
@@ -214,8 +234,28 @@ void Session::System::Brightness::set()
         plugin->set(this->value);
 }
 
+void Session::System::Brightness::reset()
+{
+    if (auto plugin = qobject_cast<BrightnessPlugin *>(this->loader_.instance()))
+        plugin->set(255);
+}
+
+const QList<QString> &Session::System::Brightness::plugins() const
+{
+    // generates only once
+    static const QList<QString> plugins = [this]{
+        QList<QString> names;
+        for (const auto info : this->plugin_infos_) {
+            if (info.supported || true)
+                names.append(info.name);
+        }
+        return names;
+    }();
+    return plugins;
+}
+
 Session::System::System(QSettings &settings, Arbiter &arbiter)
-    : server(arbiter, qApp)
+    : server(arbiter)
     , bluetooth(arbiter)
     , brightness(settings)
     , volume(settings.value("System/volume", 50).toUInt())
@@ -444,7 +484,7 @@ QString Session::Core::parse_stylesheet(QString path) const
 }
 
 Session::Session(Arbiter &arbiter)
-    : settings_(qApp)
+    : settings_()
     , theme_(settings_)
     , layout_(settings_, arbiter)
     , system_(settings_, arbiter)

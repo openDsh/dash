@@ -133,9 +133,21 @@ QWidget *VehiclePage::dialog_body()
     QStringList plugins = this->plugins.keys();
     this->plugin_selector = new Selector(plugins, this->config->get_vehicle_plugin(), this->arbiter.forge().font(14), this->arbiter, widget, "unloader");
 
-    layout->addWidget(this->can_bus_toggle_row(), 1);
     layout->addWidget(this->si_units_row_widget(), 1);
-    layout->addWidget(this->interface_selector_row(), 1);
+    layout->addWidget(Session::Forge::br(), 1);
+    layout->addWidget(this->can_bus_toggle_row(), 1);
+
+    QStringList devices = this->config->get_vehicle_can_bus() ? this->can_devices : this->serial_devices;
+    Selector *interface_selector = new Selector(devices, this->config->get_vehicle_interface(), this->arbiter.forge().font(14), this->arbiter, widget, "disabled");
+    interface_selector->setVisible((this->can_devices.size() > 0) || (this->serial_devices.size() > 0));
+    connect(interface_selector, &Selector::item_changed, [config = this->config](QString item){
+        config->set_vehicle_interface(item);
+    });
+    connect(this->config, &Config::vehicle_can_bus_changed, [this, interface_selector](bool state){
+        interface_selector->set_options(state ? this->can_devices : this->serial_devices);
+    });
+    layout->addWidget(interface_selector, 1);
+
     layout->addWidget(Session::Forge::br(), 1);
     layout->addWidget(this->plugin_selector, 1);
 
@@ -147,37 +159,29 @@ QWidget *VehiclePage::can_bus_toggle_row()
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
-    QLabel *label = new QLabel("CAN Bus", widget);
-    layout->addWidget(label, 1);
-
-    Switch *toggle = new Switch(widget);
-    toggle->scale(this->arbiter.layout().scale);
-    toggle->setChecked(this->config->get_vehicle_can_bus());
-    connect(toggle, &Switch::stateChanged, [this](bool state) {
-        this->config->set_vehicle_can_bus(state);
-    });
-    layout->addWidget(toggle, 1, Qt::AlignHCenter);
-
-    return widget;
-}
-
-QWidget *VehiclePage::interface_selector_row()
-{
-    QWidget *widget = new QWidget(this);
-    QHBoxLayout *layout = new QHBoxLayout(widget);
-
     QLabel *label = new QLabel("Interface", widget);
     layout->addWidget(label, 1);
 
-    QStringList devices = this->config->get_vehicle_can_bus() ? this->can_devices : this->serial_devices;
-    Selector *selector = new Selector(devices, this->config->get_vehicle_interface(), this->arbiter.forge().font(14), this->arbiter, widget);
-    connect(selector, &Selector::item_changed, [config = this->config](QString item) {
-        config->set_vehicle_interface(item);
+    QGroupBox *group = new QGroupBox();
+    QVBoxLayout *group_layout = new QVBoxLayout(group);
+
+    QRadioButton *socketcan_button = new QRadioButton("SocketCAN", group);
+    socketcan_button->setChecked(this->config->get_vehicle_can_bus());
+    socketcan_button->setEnabled(this->can_devices.size() > 0);
+    connect(socketcan_button, &QRadioButton::clicked, [config = this->config]{
+        config->set_vehicle_can_bus(true);
     });
-    connect(this->config, &Config::vehicle_can_bus_changed, [this, selector](bool state) {
-        selector->set_options(state ? this->can_devices : this->serial_devices);
+    group_layout->addWidget(socketcan_button);
+
+    QRadioButton *elm_button = new QRadioButton("ELM327 (USB)", group);
+    elm_button->setChecked(!this->config->get_vehicle_can_bus());
+    elm_button->setEnabled(this->serial_devices.size() > 0);
+    connect(elm_button, &QRadioButton::clicked, [config = this->config]{
+        config->set_vehicle_can_bus(false);
     });
-    layout->addWidget(selector, 1);
+    group_layout->addWidget(elm_button);
+
+    layout->addWidget(group, 1, Qt::AlignHCenter);
 
     return widget;
 }

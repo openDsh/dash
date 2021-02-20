@@ -22,7 +22,6 @@
 #include "app/widgets/selector.hpp"
 #include "app/widgets/switch.hpp"
 
-
 SettingsPage::SettingsPage(Arbiter &arbiter, QWidget *parent)
     : QTabWidget(parent)
     , Page(arbiter, "Settings", "tune", false, this)
@@ -118,7 +117,7 @@ QWidget *MainSettingsTab::brightness_plugin_select_widget()
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
     auto plugins = this->arbiter.system().brightness.plugins();
-    Selector *selector = new Selector(plugins, this->arbiter.system().brightness.plugin, this->arbiter.forge().font(14), this->arbiter, widget);
+    Selector *selector = new Selector(plugins, this->arbiter.system().brightness.plugin, this->arbiter.forge().font(14), this->arbiter, widget, Session::System::Brightness::AUTO_PLUGIN);
     connect(selector, &Selector::item_changed, [this](QString item){ this->arbiter.set_brightness_plugin(item); });
 
     layout->addStretch(1);
@@ -495,13 +494,16 @@ QWidget *BluetoothSettingsTab::scanner_widget()
     QPushButton *button = new QPushButton("scan", widget);
     button->setFlat(true);
     button->setCheckable(true);
-    button->setEnabled(this->arbiter.system().bluetooth.has_adapter()); // this could potentially be tricky
+    button->setEnabled(false);
     this->arbiter.forge().iconize("bluetooth_searching", button, 36);
     connect(button, &QPushButton::clicked, [this](bool checked){
         if (checked)
             this->arbiter.system().bluetooth.start_scan();
         else
             this->arbiter.system().bluetooth.stop_scan();
+    });
+    connect(&this->arbiter.system().bluetooth, &Bluetooth::init, [this, button]{
+        button->setEnabled(this->arbiter.system().bluetooth.has_adapter());
     });
     layout->addWidget(button);
 
@@ -550,8 +552,13 @@ QWidget *BluetoothSettingsTab::devices_widget()
         layout->addWidget(button);
     });
     connect(&this->arbiter.system().bluetooth, &Bluetooth::device_changed, [this](BluezQt::DevicePtr device){
-        this->devices[device]->setText(device->name());
-        this->devices[device]->setChecked(device->isConnected());
+        if(!this->devices.contains(device)) {
+            emit this->arbiter.system().bluetooth.device_added(device);
+        }
+        else {
+            this->devices[device]->setText(device->name());
+            this->devices[device]->setChecked(device->isConnected());
+        }
     });
     connect(&this->arbiter.system().bluetooth, &Bluetooth::device_removed, [this, layout](BluezQt::DevicePtr device){
         layout->removeWidget(devices[device]);

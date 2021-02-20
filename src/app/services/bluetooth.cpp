@@ -16,6 +16,8 @@
 #include <QBluetoothServiceInfo>
 #include <QTimer>
 
+#include "DashLog.hpp"
+
 #include "app/widgets/progress.hpp"
 #include "app/arbiter.hpp"
 
@@ -24,33 +26,46 @@
 Bluetooth::Bluetooth(Arbiter &arbiter)
     : QObject(qApp)
 {
-    BluezQt::Manager *manager = new BluezQt::Manager();
-    BluezQt::InitManagerJob *job = manager->init();
-    job->exec();
+    DASH_LOG(info) << "[Bluetooth] Init";
 
-    this->adapter = manager->usableAdapter();
-
+    // Setup the scan timeout
     this->scan_timer = new QTimer(this);
     this->scan_timer->setSingleShot(true);
-    connect(this->scan_timer, &QTimer::timeout, [this]() { this->stop_scan(); });
+    connect(this->scan_timer, &QTimer::timeout, [this]{ this->stop_scan(); });
 
-    if (this->has_adapter()) {
-        for (auto device : this->get_devices()) {
-            if (device->isConnected() && device->mediaPlayer()) {
-                this->media_player_device = device;
-                break;
+    BluezQt::Manager *manager = new BluezQt::Manager();
+    BluezQt::InitManagerJob *job = manager->init();
+
+    // Run the job with start() so we don't block this thread
+    job->start();
+    connect(job, &BluezQt::InitManagerJob::result, [this, manager]{
+        DASH_LOG(info) << "[Bluetooth] Init complete!";
+
+        this->adapter = manager->usableAdapter();
+        if (this->has_adapter()) {
+            for (auto device : this->get_devices()) {
+                if (device->mediaPlayer() != nullptr) {
+                    this->media_player_device = device;
+                    break;
+                }
             }
+
+            connect(this->adapter.data(), &BluezQt::Adapter::deviceAdded, [this](BluezQt::DevicePtr device){
+                emit device_added(device);
+            });
+            connect(this->adapter.data(), &BluezQt::Adapter::deviceChanged, [this](BluezQt::DevicePtr device) {
+                emit device_changed(device);
+                this->update_media_player(device);
+            });
+            connect(this->adapter.data(), &BluezQt::Adapter::deviceRemoved, [this](BluezQt::DevicePtr device){
+                emit device_removed(device);
+            });
         }
 
-        connect(this->adapter.data(), &BluezQt::Adapter::deviceAdded,
-                [this](BluezQt::DevicePtr device) { emit device_added(device); });
-        connect(this->adapter.data(), &BluezQt::Adapter::deviceChanged, [this](BluezQt::DevicePtr device) {
-            emit device_changed(device);
-            this->update_media_player(device);
-        });
-        connect(this->adapter.data(), &BluezQt::Adapter::deviceRemoved,
-                [this](BluezQt::DevicePtr device) { emit device_removed(device); });
-    }
+        DASH_LOG(info) << "[Bluetooth] Has Adapter: " << this->has_adapter() << ", Has Media Device: " << (this->media_player_device != nullptr);
+
+        emit init();
+    });
 }
 
 void Bluetooth::start_scan()

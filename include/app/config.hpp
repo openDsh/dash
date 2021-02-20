@@ -2,17 +2,18 @@
 
 #include "openauto/Configuration/Configuration.hpp"
 
-#include <QCoreApplication>
-#include <QDir>
-#include <QFileInfo>
-#include <QFrame>
-#include <QKeySequence>
-#include <QPluginLoader>
 #include <QObject>
 #include <QSettings>
 #include <QString>
-#include <QWidget>
+#include <QStringList>
 #include <QVideoFrame>
+#include <QWidget>
+
+/*
+    NOTE: to only be used for page-specific config
+
+    this is temporary, will soon be migrated to new cool ways
+*/
 
 class Config : public QObject {
     Q_OBJECT
@@ -22,14 +23,6 @@ class Config : public QObject {
     openauto::configuration::Configuration::ButtonCodes openauto_button_codes;
 
     Config();
-
-    inline bool get_si_units() { return this->si_units; }
-    inline void set_si_units(bool si_units)
-    {
-        this->si_units = si_units;
-        this->settings.setValue("Pages/Vehicle/si_units", this->si_units);
-        emit si_units_changed(this->si_units);
-    }
 
     inline double get_radio_station() { return this->radio_station; }
     inline void set_radio_station(double radio_station)
@@ -50,6 +43,43 @@ class Config : public QObject {
     {
         this->media_home = media_home;
         this->settings.setValue("Pages/Media/Local/home", this->media_home);
+    }
+
+    inline bool get_si_units() { return this->si_units; }
+    inline void set_si_units(bool si_units)
+    {
+        this->si_units = si_units;
+        this->settings.setValue("Pages/Vehicle/si_units", this->si_units);
+        emit si_units_changed(this->si_units);
+    }
+
+    inline bool get_vehicle_can_bus() { return this->vehicle_can_bus; }
+    inline void set_vehicle_can_bus(bool vehicle_can_bus)
+    {
+        this->vehicle_can_bus = vehicle_can_bus;
+        this->settings.setValue("Pages/Vehicle/can_bus", this->vehicle_can_bus);
+        emit vehicle_can_bus_changed(this->vehicle_can_bus);
+    }
+
+    inline QString get_vehicle_interface() { return this->vehicle_interface; }
+    inline void set_vehicle_interface(QString vehicle_interface)
+    {
+        this->vehicle_interface = vehicle_interface;
+        if (this->vehicle_interface == "disabled")
+            this->settings.remove("Pages/Vehicle/interface");
+        else
+            this->settings.setValue("Pages/Vehicle/interface", this->vehicle_interface);
+        emit vehicle_interface_changed(this->vehicle_interface);
+    }
+
+    inline QString get_vehicle_plugin() { return this->vehicle_plugin; }
+    inline void set_vehicle_plugin(QString vehicle_plugin)
+    {
+        this->vehicle_plugin = vehicle_plugin;
+        if (this->vehicle_plugin == "unloader")
+            this->settings.remove("Pages/Vehicle/plugin");
+        else
+            this->settings.setValue("Pages/Vehicle/plugin", this->vehicle_plugin);
     }
 
     inline QString get_cam_network_url() { return this->cam_network_url; }
@@ -94,29 +124,6 @@ class Config : public QObject {
         this->settings.setValue("Pages/Camera/auto_reconnect_time_secs", this->cam_autoconnect_time_secs);
     }
 
-    inline bool get_vehicle_can_bus() { return this->vehicle_can_bus; }
-    inline void set_vehicle_can_bus(bool vehicle_can_bus)
-    {
-        this->vehicle_can_bus = vehicle_can_bus;
-        this->settings.setValue("Pages/Vehicle/can_bus", this->vehicle_can_bus);
-        emit vehicle_can_bus_changed(this->vehicle_can_bus);
-    }
-
-    inline QString get_vehicle_plugin() { return this->vehicle_plugin; }
-    inline void set_vehicle_plugin(QString vehicle_plugin)
-    {
-        this->vehicle_plugin = vehicle_plugin;
-        this->settings.setValue("Pages/Vehicle/plugin", this->vehicle_plugin);
-    }
-
-    inline QString get_vehicle_interface() { return this->vehicle_interface; }
-    inline void set_vehicle_interface(QString vehicle_interface)
-    {
-        this->vehicle_interface = vehicle_interface;
-        this->settings.setValue("Pages/Vehicle/interface", this->vehicle_interface);
-        emit vehicle_interface_changed(this->vehicle_interface);
-    }
-
     inline const QStringList &get_launcher_plugins() { return this->launcher_plugins; }
     inline void set_launcher_plugin(QString plugin, bool remove = false)
     {
@@ -125,7 +132,7 @@ class Config : public QObject {
         else
             this->launcher_plugins.append(plugin);
 
-        // need to reindex
+        // need to sync idxs
         this->settings.remove("Pages/Launcher");
         for (int i = 0; i < this->launcher_plugins.size(); i++)
             this->settings.setValue(QString("Pages/Launcher/%1").arg(i), this->launcher_plugins[i]);
@@ -135,19 +142,19 @@ class Config : public QObject {
 
    private:
     QSettings settings;
-    bool si_units;
     double radio_station;
     bool radio_muted;
     QString media_home;
+    bool si_units;
+    bool vehicle_can_bus;
+    QString vehicle_interface;
+    QString vehicle_plugin;
     QString cam_network_url;
     QString cam_local_device;
     bool cam_is_network;
     QVideoFrame::PixelFormat cam_local_format_override;
     bool cam_autoconnect;
     int cam_autoconnect_time_secs;
-    QString vehicle_plugin;
-    bool vehicle_can_bus;
-    QString vehicle_interface;
     QStringList launcher_plugins;
 
    signals:

@@ -12,6 +12,8 @@ class Mocked : public QObject, BrightnessPlugin {
 
    public:
     Mocked();
+    bool supported() override;
+    uint8_t priority() override;
     void set(int brightness) override;
 
    private:

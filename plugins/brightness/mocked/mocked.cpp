@@ -12,6 +12,16 @@ Mocked::Mocked()
     }
 }
 
+bool Mocked::supported()
+{
+    return true;
+}
+
+uint8_t Mocked::priority()
+{
+    return 1;
+}
+
 void Mocked::set(int brightness)
 {
     if (this->window != nullptr)

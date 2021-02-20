@@ -11,6 +11,8 @@ class BrightnessPlugin : public Plugin {
    public:
     BrightnessPlugin() { this->settings.beginGroup("Brightness"); }
     virtual ~BrightnessPlugin() = default;
+    virtual bool supported() = 0;
+    virtual uint8_t priority() = 0;
     virtual void set(int brightness) = 0;
 };
 

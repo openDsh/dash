@@ -14,6 +14,8 @@ class OfficialRPi : public QObject, BrightnessPlugin {
    public:
     OfficialRPi();
     ~OfficialRPi();
+    bool supported() override;
+    uint8_t priority() override;
     void set(int brightness) override;
 
    private:

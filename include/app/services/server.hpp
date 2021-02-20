@@ -22,7 +22,7 @@ class Server : public QWebSocketServer
         std::function<void(QVariant)> set;
     };
 
-    Server(Arbiter &arbiter, QObject *parent = nullptr);
+    Server(Arbiter &arbiter);
     ~Server();
 
     void enable(bool enable);

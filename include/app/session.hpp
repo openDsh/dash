@@ -15,7 +15,6 @@
 #include <QPluginLoader>
 #include <QSettings>
 #include <QString>
-#include <QVector>
 #include <QPalette>
 #include <QWidget>
 
@@ -66,12 +65,12 @@ class Session {
 
             ControlBar(QSettings &settings, Arbiter &arbiter);
 
-            const QVector<QuickView *> &quick_views() const { return this->quick_views_; }
+            const QList<QuickView *> &quick_views() const { return this->quick_views_; }
             QuickView *quick_view(int id) const { return this->quick_views_.value(id, nullptr); }
             int quick_view_id(QuickView *quick_view) const { return this->quick_views_.indexOf(quick_view); }
 
            private:
-            QVector<QuickView *> quick_views_;
+            QList<QuickView *> quick_views_;
         };
 
         double scale;
@@ -82,12 +81,12 @@ class Session {
         Layout(QSettings &settings, Arbiter &arbiter);
         Page *next_enabled_page(Page *page);
 
-        const QVector<Page *> &pages() const { return this->pages_; }
+        const QList<Page *> &pages() const { return this->pages_; }
         Page *page(int id) const { return this->pages_.value(id, nullptr); }
         int page_id(Page *page) const { return this->pages_.indexOf(page); }
 
        private:
-        QVector<Page *> pages_;
+        QList<Page *> pages_;
     };
 
     struct System {
@@ -96,18 +95,34 @@ class Session {
         static const char *REBOOT_CMD;
 
         struct Brightness {
+            static const char *AUTO_PLUGIN;
+
             QString plugin;
             uint8_t value;
 
             Brightness(QSettings &settings);
             void load();
             void set();
+            void reset();
 
-            const QList<QString> plugins() const { return this->plugins_.keys(); }
+            const QList<QString> &plugins() const;
 
            private:
+            struct PluginInfo {
+                QString name;
+                QString path;
+                bool supported;
+                uint8_t priority;
+
+                bool operator<(const PluginInfo &rhs) const
+                {
+                    return (this->supported && !rhs.supported) ||
+                        ((this->supported && rhs.supported) && (this->priority > rhs.priority));
+                }
+            };
+
             QPluginLoader loader_;
-            QMap<QString, QFileInfo> plugins_;
+            QList<PluginInfo> plugin_infos_;
         };
 
         Server server;
@@ -142,14 +157,14 @@ class Session {
         QString stylesheet(Theme::Mode mode, float scale) const;
         void set_cursor() const;
 
-        const QVector<Action *> &actions() const { return this->actions_; }
+        const QList<Action *> &actions() const { return this->actions_; }
         Action *action(int id) const { return this->actions_.value(id, nullptr); }
         int action_id(Action *action) const { return this->actions_.indexOf(action); }
         QString stylesheet(Theme::Mode mode) const { return this->stylesheets_[mode]; }
 
        private:
         std::array<QString, Theme::NUM_MODES> stylesheets_;
-        QVector<Action *> actions_;
+        QList<Action *> actions_;
 
         QString parse_stylesheet(QString path) const;
     };

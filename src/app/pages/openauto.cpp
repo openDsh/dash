@@ -94,6 +94,7 @@ QLayout *OpenAutoPage::Settings::settings_widget()
     layout->addLayout(this->audio_channels_row_widget(), 1);
     layout->addWidget(Session::Forge::br(), 1);
     layout->addLayout(this->bluetooth_row_widget(), 1);
+    layout->addLayout(this->autoconnect_row_widget(), 1);
     layout->addWidget(Session::Forge::br(), 1);
     layout->addLayout(this->touchscreen_row_widget(), 1);
     layout->addLayout(this->buttons_row_widget(), 1);
@@ -287,6 +288,24 @@ QLayout *OpenAutoPage::Settings::bluetooth_row_widget()
     connect(toggle, &Switch::stateChanged, [config = this->config](bool state) {
         config->openauto_config->setBluetoothAdapterType(state ? openauto::configuration::BluetoothAdapterType::LOCAL
                                                                : openauto::configuration::BluetoothAdapterType::NONE);
+    });
+    layout->addWidget(toggle, 1, Qt::AlignHCenter);
+
+    return layout;
+}
+
+QLayout *OpenAutoPage::Settings::autoconnect_row_widget()
+{
+    QHBoxLayout *layout = new QHBoxLayout();
+
+    QLabel *label = new QLabel("Autoconnect Last Device");
+    layout->addWidget(label, 1);
+
+    Switch *toggle = new Switch();
+    toggle->scale(this->arbiter.layout().scale);
+    toggle->setChecked(this->config->openauto_config->getAutoconnectBluetooth());
+    connect(toggle, &Switch::stateChanged, [config = this->config](bool state){
+        config->openauto_config->setAutoconnectBluetooth(state);
     });
     layout->addWidget(toggle, 1, Qt::AlignHCenter);
 
