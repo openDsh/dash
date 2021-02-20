@@ -10,10 +10,10 @@ class QuickView {
    public:
     QuickView(Arbiter &arbiter, QString name, QWidget *widget);
 
-    virtual void init() = 0;
-
     const QString &name() { return this->name_; }
     QWidget *widget() { return this->widget_; }
+
+    virtual void init() = 0;
 
    protected:
     Arbiter &arbiter;

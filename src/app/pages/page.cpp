@@ -4,22 +4,6 @@
 
 #include "app/pages/page.hpp"
 
-Page::Page(Arbiter &arbiter, QString name, QString icon_name, bool toggleable, QWidget *widget)
-    : arbiter(arbiter)
-    , name_(name)
-    , icon_name_(icon_name)
-    , toggleable_(toggleable)
-    , widget_(widget)
-    , enabled_(true)
-{
-}
-
-void Page::enable(bool enable)
-{
-    if (this->toggleable_)
-        this->enabled_ = enable;
-}
-
 Page::Settings::Settings() : QWidget()
 {
     this->layout_ = new QVBoxLayout(this);
@@ -38,6 +22,22 @@ QLayout *Page::Settings::row(QString label, QWidget *control)
     layout->addWidget(control, 1, Qt::AlignHCenter);
 
     return layout;
+}
+
+Page::Page(Arbiter &arbiter, QString name, QString icon_name, bool toggleable, QWidget *widget)
+    : arbiter(arbiter)
+    , name_(name)
+    , icon_name_(icon_name)
+    , toggleable_(toggleable)
+    , widget_(widget)
+    , enabled_(true)
+{
+}
+
+void Page::enable(bool enable)
+{
+    if (this->toggleable_)
+        this->enabled_ = enable;
 }
 
 QPushButton *Page::settings_button()
@@ -71,30 +71,3 @@ Dialog *Page::dialog()
 
     return dialog;
 }
-
-// BasedPage::BasedPage(QString name, QString icon_name, bool toggleable, bool enable_settings, QWidget *parent)
-//     : QWidget(parent)
-//     , Page(name, icon_name, toggleable, this)
-// {
-//     auto widget
-//     auto layout = new QVBoxLayout(this);
-//     layout->setContentsMargins(0, 0, 0, 0);
-//     layout->setSpacing(0);
-
-//     if (enable_settings)
-//         layout->addLayout(this->settings_button_layout());
-// }
-
-// StackedPage::StackedPage(QString name, QString icon_name, bool toggleable, bool enable_settings, QWidget *parent)
-//     : QStackedWidget(parent)
-//     , Page(name, icon_name, toggleable, this)
-// {
-// }
-
-// TabbedPage::TabbedPage(QString name, QString icon_name, bool toggleable, bool enable_settings, QWidget *parent)
-//     : QTabWidget(parent)
-//     , Page(name, icon_name, toggleable, this)
-// {
-//     if (enable_settings)
-//         this->setCornerWidget(this->settings_button());
-// }

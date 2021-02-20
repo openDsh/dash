@@ -83,9 +83,9 @@ class OpenAutoPage : public QStackedWidget, public Page {
    public:
     OpenAutoPage(Arbiter &arbiter, QWidget *parent = nullptr);
 
-    void init() override;
-
     inline void pass_key_event(QKeyEvent *event) { this->worker->send_key_event(event); }
+
+    void init() override;
 
    protected:
     void resizeEvent(QResizeEvent *event);

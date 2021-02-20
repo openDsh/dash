@@ -12,8 +12,7 @@ class Arbiter;
 class Page {
    public:
     Page(Arbiter &arbiter, QString name, QString icon_name, bool toggleable, QWidget *widget);
-
-    virtual void init() = 0;
+    void enable(bool enable);
 
     const QString &name() { return this->name_; }
     const QString &icon_name() { return this->icon_name_; }
@@ -21,13 +20,12 @@ class Page {
     QWidget *widget() { return this->widget_; }
     const bool &enabled() { return this->enabled_; }
 
-    void enable(bool enable);
+    virtual void init() = 0;
 
    protected:
     class Settings : public QWidget {
        public:
         Settings();
-
         void add_row(QString label, QWidget *control);
         // void add_br();
         // void add_widget(QWidget *widget);
@@ -48,7 +46,6 @@ class Page {
     const QString icon_name_;
     const bool toggleable_;
     QWidget *widget_;
-
     bool enabled_;
 
     Dialog *dialog();

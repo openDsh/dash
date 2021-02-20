@@ -35,16 +35,22 @@ Server::Server(Arbiter &arbiter)
         }}
     };
 
-    QJsonArray pages;
+    auto page_key = [this](Page *page){ return QString("page%1").arg(this->arbiter.layout().page_id(page)); };
     for (auto page : this->arbiter.layout().pages()) {
-        auto key = QString("page%1").arg(this->arbiter.layout().page_id(page));
-        this->handlers.insert(key, {
-            [page]{ return QVariant(page->enabled()); },
+        this->handlers.insert(page_key(page), {
+            [page]{ return QVariant(QJsonObject({{"enabled", page->enabled()}, {"name", page->name()}})); },
             [&arbiter, page](QVariant val){ arbiter.set_page(page, val.toBool()); }
         });
-        pages.append(key);
     }
-    this->handlers.insert("pages", {[pages]{ return QVariant(QJsonDocument(pages)); }, [](QVariant){}});
+    this->handlers.insert("pages", {
+        [this, page_key]{
+            QJsonArray pages;
+            for (auto page : this->arbiter.layout().pages())
+                pages.append(QJsonObject({{"key", page_key(page)}, {"enabled", page->enabled()}, {"name", page->name()}}));
+            return QVariant(pages);
+        },
+        [](QVariant){}
+    });
 
     if (this->enabled_)
         this->start();
@@ -98,20 +104,22 @@ void Server::stop()
 void Server::handle_msg(QWebSocket *client, QString request) const
 {
     auto json = QJsonDocument::fromJson(request.toUtf8());
+    QJsonObject repsonse;
     if (json.isObject()) {
         auto object = json.object();
-        for (auto key : object.keys()) {
-            if (this->handlers.contains(key))
+        for (auto key : json.object().keys()) {
+            if (this->handlers.contains(key)) {
                 this->handlers[key].set(object.value(key));
+                repsonse.insert(key, this->handlers[key].get().toJsonValue());
+            }
         }
     }
     else if (json.isArray()) {
-        QJsonObject repsonse;
         for (auto value : json.array()) {
             auto key = value.toString();
             if (this->handlers.contains(key))
                 repsonse.insert(key, this->handlers[key].get().toJsonValue());
         }
-        client->sendTextMessage(QString(QJsonDocument(repsonse).toJson()));
     }
+    client->sendTextMessage(QString(QJsonDocument(repsonse).toJson()));
 }
