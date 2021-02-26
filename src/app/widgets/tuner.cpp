@@ -1,60 +1,98 @@
-#include <math.h>
+#include <cmath>
+
+#include <QFontMetrics>
+#include <QLineF>
 #include <QPainter>
+#include <QPen>
+#include <QPointF>
+#include <QString>
+
+#include "app/arbiter.hpp"
 
 #include "app/widgets/tuner.hpp"
 
-Tuner::Tuner(QWidget *parent) : QSlider(Qt::Orientation::Horizontal, parent)
+Tuner::Tuner(Arbiter &arbiter)
+    : QSlider(Qt::Orientation::Horizontal)
+    , mouse_pos()
+    , scale(arbiter.layout().scale)
 {
-    this->config = Config::get_instance();
+    this->setRange(880, 1080);
+    this->setTickInterval(1);
 
-    setTracking(false);
-    setRange(880, 1080);
-    setTickInterval(1);
-    setValue(this->config->get_radio_station());
-
-    connect(this, &QSlider::valueChanged, [this](int value) {
-        this->config->set_radio_station(value);
-        emit station_updated(value);
-    });
+    connect(this, &QSlider::valueChanged, [this](int value){ emit updated(value); });
 }
 
 QSize Tuner::sizeHint() const
 {
-    auto size = QSlider::sizeHint();
-
-    return QSize(size.width(), size.height() + 96);
+    return QSize(this->width(), this->width() / 3);
 }
 
 void Tuner::paintEvent(QPaintEvent *event)
 {
     QPainter painter(this);
+    const QFontMetrics fontMetrics(this->font());
 
-    QFontMetrics fontMetrics = QFontMetrics(this->font());
+    const bool half_tick = (value() % 2) == 1;
 
-    double count = maximum() - minimum();
-    double tick_dist = (this->width() - 40) / count;
-    for (int i = 0; i <= count; i++) {
-        double x = (i * tick_dist) + 20;
-        double y = this->height();
+    const int ticks = 12;
+    const double spacing = this->width() / (double)(ticks + 2);
 
-        int tick_num = i + minimum();
-        if (tick_num % 10 == 0) {
-            painter.setPen(QPen(this->color, 2));
-            painter.drawLine(QLineF(x, 32, x, this->height() - 32));
+    const double needle_y = this->height() * 0.1;
+    const double needle_x = this->width() / 2.0;
 
-            tick_num /= 10;
-            double font_width = fontMetrics.width(QString::number(tick_num));
-            painter.drawText(QPointF(x - (font_width / 2.0), y), QString::number(tick_num));
+    const double min_tick_height = this->height() * 0.3;
+    const int bottom = this->height() - fontMetrics.height();
+    const double slice = (bottom - min_tick_height) / (double)ticks;
+
+    double x = 0;
+    if (half_tick)
+        x -= (spacing / 2.0);
+    for (int i = 0; i <= (ticks * 2); i += 2) {
+        int station = (this->value() - ticks) + i;
+        int slices = i - ticks;
+        if (half_tick) {
+            station -= 1;
+            slices -= 1;
         }
-        else if (tick_num % 5 == 0) {
-            painter.setPen(QPen(this->color, 2));
-            painter.drawLine(QLineF(x, 40, x, this->height() - 40));
+
+        x += spacing;
+        const double y = (slice * std::abs(slices)) + (this->height() * 0.1);
+
+        int alpha_offset = (255 * (y / (double)this->height())) + 24;
+        auto tick_color = this->color;
+        if (station % 10 == 0) {
+            if (station != this->value()) {
+                QString num = QString::number(station / 10);
+                auto pen = painter.pen();
+                pen.setColor(this->color);
+                painter.setPen(pen);
+                painter.drawText(QPointF(x - (fontMetrics.width(num) / 2.0), this->height()), num);
+                alpha_offset = 12;
+            }
         }
-        else {
-            painter.setPen(QPen(this->color, 1));
-            painter.drawLine(QLineF(x, 48, x, this->height() - 48));
-        }
+        tick_color.setAlpha(255 - alpha_offset);
+        painter.setPen(QPen(tick_color, 4 * this->scale, Qt::SolidLine, Qt::RoundCap));
+        painter.drawLine(QLineF(x, y, x, bottom));
     }
 
+    painter.setPen(QPen(this->accent, 6 * this->scale, Qt::SolidLine, Qt::RoundCap));
+    painter.drawLine(QLineF(needle_x, needle_y, needle_x, bottom));
+
     QSlider::paintEvent(event);
+}
+
+void Tuner::mousePressEvent(QMouseEvent *event)
+{
+    this->mouse_pos = event->pos();
+}
+
+void Tuner::mouseMoveEvent(QMouseEvent *event)
+{
+    int dist = this->mouse_pos.x() - event->pos().x();
+    double ratio = (this->maximum() - this->minimum()) / (double)this->width();
+    int trans = dist * ratio;
+    if (trans != 0) {
+        this->setSliderPosition(this->value() + trans);
+        this->mouse_pos = event->pos();
+    }
 }

@@ -19,7 +19,7 @@ MediaPage::MediaPage(Arbiter &arbiter, QWidget *parent)
 
 void MediaPage::init()
 {
-    // this->addTab(new RadioPlayerTab(this->arbiter, this), "Radio");
+    this->addTab(new RadioPlayerTab(this->arbiter, this), "Radio");
     this->addTab(new BluetoothPlayerTab(this->arbiter, this), "Bluetooth");
     this->addTab(new LocalPlayerTab(this->arbiter, this), "Local");
 }
@@ -125,92 +125,77 @@ RadioPlayerTab::RadioPlayerTab(Arbiter &arbiter, QWidget *parent)
     , arbiter(arbiter)
 {
     this->config = Config::get_instance();
-    this->tuner = new Tuner();
+    this->tuner = new Tuner(this->arbiter);
+    this->tuner->setValue(this->config->get_radio_station());
 
     QVBoxLayout *layout = new QVBoxLayout(this);
 
-    layout->addStretch();
-    layout->addWidget(this->tuner_widget());
-    layout->addStretch();
-    layout->addWidget(this->controls_widget());
-    layout->addStretch();
+    layout->addStretch(1);
+    layout->addWidget(this->tuner_widget(), 2);
+    layout->addWidget(this->controls_widget(), 4);
+    layout->addStretch(1);
 }
 
 QWidget *RadioPlayerTab::tuner_widget()
 {
     QWidget *widget = new QWidget(this);
-    QVBoxLayout *layout = new QVBoxLayout(widget);
+    QHBoxLayout *layout = new QHBoxLayout(widget);
+    layout->setSpacing(0);
 
-    this->tuner->setParent(widget);
+    Dialog *dialog = new Dialog(this->arbiter, true, this->window());
+    QPushButton *load = new QPushButton("load");
+    connect(load, &QPushButton::clicked, []{
+    });
+    dialog->set_button(load);
 
-    QLabel *station = new QLabel(QString::number(this->tuner->sliderPosition() / 10.0, 'f', 1), widget);
-    station->setAlignment(Qt::AlignCenter);
-    station->setFont(this->arbiter.forge().font(36));
-    connect(this->tuner, &Tuner::station_updated, [station](int freq){
+    QPushButton *settings = new QPushButton();
+    settings->setFlat(true);
+    this->arbiter.forge().iconize("settings", settings, 24);
+    connect(settings, &QPushButton::clicked, [dialog]{ dialog->open(); });
+
+    QLabel *station = new QLabel(QString::number(this->tuner->sliderPosition() / 10.0, 'f', 1));
+    station->setFont(this->arbiter.forge().font(36, true));
+    connect(this->tuner, &Tuner::updated, [this, station](int freq){
+        this->config->set_radio_station(freq);
         station->setText(QString::number(freq / 10.0, 'f', 1));
     });
-    layout->addWidget(station);
-    layout->addStretch();
-    layout->addWidget(this->tuner);
+
+    QLabel *info = new QLabel("Lorem ipsum dolor sit amet");
+    info->setWordWrap(true);
+
+    layout->addStretch(2);
+    layout->addWidget(settings);
+    layout->addWidget(station, 2);
+    layout->addWidget(info, 3);
+    layout->addStretch(2);
 
     return widget;
 }
 
 QWidget *RadioPlayerTab::controls_widget()
 {
-    QWidget *widget = new QWidget(this);
+    QWidget *widget = new QWidget();
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
-    QPushButton *scan_reverse_button = new QPushButton(widget);
-    scan_reverse_button->setFlat(true);
-    this->arbiter.forge().iconize("fast_rewind", scan_reverse_button, 56);
-    connect(scan_reverse_button, &QPushButton::clicked, [tuner = this->tuner]{
-        tuner->setSliderPosition(tuner->sliderPosition() - 5);
-    });
-    layout->addStretch();
-    layout->addWidget(scan_reverse_button);
-
-    QPushButton *prev_station_button = new QPushButton(widget);
-    prev_station_button->setFlat(true);
-    this->arbiter.forge().iconize("skip_previous", prev_station_button, 56);
-    connect(prev_station_button, &QPushButton::clicked, [tuner = this->tuner]{
+    QPushButton *prev_station = new QPushButton();
+    prev_station->setFlat(true);
+    this->arbiter.forge().iconize("chevron_left", prev_station, 56);
+    connect(prev_station, &QPushButton::clicked, [tuner = this->tuner]{
         tuner->setSliderPosition(tuner->sliderPosition() - 1);
     });
-    layout->addStretch();
-    layout->addWidget(prev_station_button);
 
-    QPushButton *next_station_button = new QPushButton(widget);
-    next_station_button->setFlat(true);
-    this->arbiter.forge().iconize("skip_next", next_station_button, 56);
-    connect(next_station_button, &QPushButton::clicked, [tuner = this->tuner]{
+    QPushButton *next_station = new QPushButton();
+    next_station->setFlat(true);
+    this->arbiter.forge().iconize("chevron_right", next_station, 56);
+    connect(next_station, &QPushButton::clicked, [tuner = this->tuner]{
         tuner->setSliderPosition(tuner->sliderPosition() + 1);
     });
-    layout->addStretch();
-    layout->addWidget(next_station_button);
 
-    QPushButton *scan_forward_button = new QPushButton(widget);
-    scan_forward_button->setFlat(true);
-    this->arbiter.forge().iconize("fast_forward", scan_forward_button, 56);
-    connect(scan_forward_button, &QPushButton::clicked, [tuner = this->tuner]{
-        tuner->setSliderPosition(tuner->sliderPosition() + 5);
-    });
-    layout->addStretch();
-    layout->addWidget(scan_forward_button);
-
-    layout->addStretch();
-    layout->addWidget(Session::Forge::br(true));
-
-    QPushButton *mute_button = new QPushButton(widget);
-    mute_button->setFlat(true);
-    mute_button->setCheckable(true);
-    mute_button->setChecked(this->config->get_radio_muted());
-    this->arbiter.forge().iconize("volume_off", mute_button, 42);
-    connect(mute_button, &QPushButton::clicked, [config = this->config](bool checked = false){
-        config->set_radio_muted(checked);
-    });
-    layout->addStretch();
-    layout->addWidget(mute_button);
-    layout->addStretch();
+    layout->addStretch(1);
+    layout->addWidget(prev_station);
+    layout->addWidget(this->tuner, 4);
+    layout->addWidget(next_station);
+    layout->addStretch(1);
 
     return widget;
 }
