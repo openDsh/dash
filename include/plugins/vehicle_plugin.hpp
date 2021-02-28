@@ -1,8 +1,5 @@
 #pragma once
 
-#include <QList>
-#include <QWidget>
-
 #include "plugins/plugin.hpp"
 #include "canbus/socketcanbus.hpp"
 

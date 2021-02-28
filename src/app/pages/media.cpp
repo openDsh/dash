@@ -8,8 +8,10 @@
 #include <QListWidgetItem>
 #include <QMediaPlaylist>
 
-#include "app/pages/media.hpp"
+#include "plugins/radio_tuner_plugin.hpp"
+
 #include "app/window.hpp"
+#include "app/pages/media.hpp"
 
 MediaPage::MediaPage(Arbiter &arbiter, QWidget *parent)
     : QTabWidget(parent)
@@ -123,6 +125,7 @@ QWidget *BluetoothPlayerTab::controls_widget()
 RadioPlayerTab::RadioPlayerTab(Arbiter &arbiter, QWidget *parent)
     : QWidget(parent)
     , arbiter(arbiter)
+    , loader()
 {
     this->config = Config::get_instance();
     this->tuner = new Tuner(this->arbiter);
@@ -134,6 +137,21 @@ RadioPlayerTab::RadioPlayerTab(Arbiter &arbiter, QWidget *parent)
     layout->addWidget(this->tuner_widget(), 2);
     layout->addWidget(this->controls_widget(), 4);
     layout->addStretch(1);
+
+    for (const QFileInfo &plugin_file : Session::plugin_dir("radio_tuner").entryInfoList(QDir::Files)) {
+        if (QLibrary::isLibrary(plugin_file.absoluteFilePath())) {
+            this->loader.setFileName(plugin_file.absoluteFilePath());
+            if (RadioTunerPlugin *plugin = qobject_cast<RadioTunerPlugin *>(this->loader.instance()))
+                qDebug() << plugin->power_level();
+        }
+    }
+
+    this->player = new QMediaPlayer(this, QMediaPlayer::StreamPlayback);
+}
+
+RadioPlayerTab::~RadioPlayerTab()
+{
+    this->loader.unload();
 }
 
 QWidget *RadioPlayerTab::tuner_widget()
@@ -144,14 +162,20 @@ QWidget *RadioPlayerTab::tuner_widget()
 
     Dialog *dialog = new Dialog(this->arbiter, true, this->window());
     QPushButton *load = new QPushButton("load");
-    connect(load, &QPushButton::clicked, []{
+    connect(load, &QPushButton::clicked, [this]{
+        if (RadioTunerPlugin *plugin = qobject_cast<RadioTunerPlugin *>(this->loader.instance()))
+            plugin->freq(0);
+        this->player->play();
     });
     dialog->set_button(load);
 
     QPushButton *settings = new QPushButton();
     settings->setFlat(true);
     this->arbiter.forge().iconize("settings", settings, 24);
-    connect(settings, &QPushButton::clicked, [dialog]{ dialog->open(); });
+    connect(settings, &QPushButton::clicked, [this, dialog]{
+        this->player->setMedia(QUrl("http://localhost:2346"));
+        dialog->open();
+    });
 
     QLabel *station = new QLabel(QString::number(this->tuner->sliderPosition() / 10.0, 'f', 1));
     station->setFont(this->arbiter.forge().font(36, true));

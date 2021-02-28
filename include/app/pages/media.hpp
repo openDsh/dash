@@ -37,9 +37,13 @@ class RadioPlayerTab : public QWidget {
 
    public:
     RadioPlayerTab(Arbiter &arbiter, QWidget *parent = nullptr);
+    ~RadioPlayerTab();
 
    private:
     Arbiter &arbiter;
+
+    QPluginLoader loader;
+    QMediaPlayer *player;
 
     QWidget *tuner_widget();
     QWidget *controls_widget();
