@@ -158,7 +158,7 @@ Session::Layout::Layout(QSettings &settings, Arbiter &arbiter)
 
     settings.beginGroup("Layout");
     settings.beginGroup("Page");
-    for (int i = 0; i < this->pages().size(); i++) {
+    for (int i = 0; i < this->pages_.size(); i++) {
         auto page = this->page(i);
         if (page->toggleale()) {
             if (!settings.value(QString::number(i), true).toBool())
@@ -168,7 +168,7 @@ Session::Layout::Layout(QSettings &settings, Arbiter &arbiter)
     settings.endGroup();
     settings.endGroup();
 
-    for (auto page : this->pages()) {
+    for (auto page : this->pages_) {
         if (page->enabled()) {
             this->curr_page = page;
             break;
@@ -416,24 +416,18 @@ Session::Core::Core(QSettings &settings, Arbiter &arbiter)
     };
 
     for (auto page : arbiter.layout().pages()) {
-        auto callback = [&arbiter, page]{
-            if (page->enabled())
-                arbiter.set_curr_page(page);
-        };
+        auto callback = [&arbiter, page]{ arbiter.set_curr_page(page); };
         this->actions_.append(new Action(QString("Show %1 Page").arg(page->name()), callback, arbiter.window()));
     }
 
     {
-        auto callback = [&arbiter]{
-            auto page = arbiter.layout().next_enabled_page(arbiter.layout().curr_page);
-            arbiter.set_curr_page(page);
-        };
+        auto callback = [&arbiter]{ arbiter.set_curr_page(arbiter.layout().next_enabled_page(arbiter.layout().curr_page)); };
         this->actions_.append(new Action("Cycle Page", callback, arbiter.window()));
     }
 
     settings.beginGroup("Core");
     settings.beginGroup("Action");
-    for (auto i = 0; i < this->actions().size(); i++) {
+    for (auto i = 0; i < this->actions_.size(); i++) {
         auto key = settings.value(QString::number(i), QString()).toString();
         if (!key.isNull())
             this->action(i)->set(key);
