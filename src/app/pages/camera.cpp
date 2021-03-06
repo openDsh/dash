@@ -100,7 +100,19 @@ QWidget *CameraPage::connect_widget()
 {
     QWidget *widget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
+    layout->setContentsMargins(0, 0, 0, 0);
 
+    QPushButton *settings_button = new QPushButton(this);
+    settings_button->setFlat(true);
+    settings_button->setIconSize(Theme::icon_24);
+    settings_button->setIcon(this->theme->make_button_icon("settings", settings_button));
+
+    QHBoxLayout *layout2 = new QHBoxLayout();
+    layout2->setContentsMargins(0, 0, 0, 0);
+    layout2->setSpacing(0);
+    layout2->addStretch();
+    layout2->addWidget(settings_button);
+    layout->addLayout(layout2);
     QLabel *label = new QLabel("connect camera", widget);
 
     this->status = new QLabel(widget);
@@ -146,6 +158,13 @@ QWidget *CameraPage::connect_widget()
     layout->addStretch();
     layout->addWidget(checkboxes_widget);
 
+    Dialog *dialog = new Dialog(true, this->window());
+    dialog->set_body(new CameraPage::Settings(this));
+    QPushButton *save_button = new QPushButton("save");
+    connect(save_button, &QPushButton::clicked, [this]{ this->config->save(); });
+    dialog->set_button(save_button);
+    connect(settings_button, &QPushButton::clicked, [dialog]{ dialog->open(); });
+
     return widget;
 }
 
@@ -160,6 +179,128 @@ void CameraPage::VideoContainer::resizeEvent(QResizeEvent *event)
     if ((this->page->videoWidget_ != nullptr) && (this->page->videoContainer_ != nullptr))
         this->page->videoWidget_->resize(event->size());
     DASH_LOG(info) << "[CameraPage] videoContainer resized";
+}
+
+CameraPage::Settings::Settings(QWidget *parent) : QWidget(parent)
+{
+    this->config = Config::get_instance();
+    QVBoxLayout *layout = new QVBoxLayout(this);
+    layout->setContentsMargins(6, 0, 6, 0);
+
+    layout->addWidget(this->settings_widget());
+}
+
+QSize CameraPage::Settings::sizeHint() const
+{
+    int label_width = QFontMetrics(this->font()).averageCharWidth() * 20;
+    return QSize(label_width * 2, this->height() + 12);
+}
+
+QWidget *CameraPage::Settings::settings_widget()
+{
+    QWidget *widget = new QWidget(this);
+    QVBoxLayout *layout = new QVBoxLayout(widget);
+    layout->addWidget(this->camera_overlay_row_widget(), 1);
+    layout->addWidget(Theme::br(), 1);
+    layout->addWidget(this->camera_overlay_width_row_widget(), 1);
+    layout->addWidget(Theme::br(), 1);
+    layout->addWidget(this->camera_overlay_height_row_widget(), 1);
+
+    return widget;
+}
+
+QWidget *CameraPage::Settings::camera_overlay_row_widget()
+{
+    QWidget *widget = new QWidget(this);
+    QHBoxLayout *layout = new QHBoxLayout(widget);
+
+    QLabel *label = new QLabel("Backup Camera Overlay");
+    layout->addWidget(label, 1);
+
+    Switch *toggle = new Switch();
+    toggle->scale(this->config->get_scale());
+    toggle->setChecked(this->config->get_cam_overlay());
+    connect(this->config, &Config::scale_changed, [toggle](double scale) { toggle->scale(scale); });
+    connect(toggle, &Switch::stateChanged, [config = this->config](bool state) { config->set_cam_overlay(state); });
+    layout->addWidget(toggle, 1, Qt::AlignHCenter);
+
+    return widget;
+}
+
+QWidget *CameraPage::Settings::camera_overlay_width_row_widget()
+{
+    QWidget *widget = new QWidget(this);
+    QHBoxLayout *layout = new QHBoxLayout(widget);
+
+    QLabel *label = new QLabel("Overlay Width");
+    layout->addWidget(label, 1);
+
+    layout->addWidget(this->camera_overlay_width_widget(), 1);
+
+    return widget;
+}
+
+QWidget *CameraPage::Settings::camera_overlay_width_widget()
+{
+    QWidget *widget = new QWidget(this);
+    QHBoxLayout *layout = new QHBoxLayout(widget);
+
+    QSlider *slider = new QSlider(Qt::Orientation::Horizontal);
+    slider->setTracking(false);
+    slider->setRange(0, 150);
+    slider->setValue(this->config->get_cam_overlay_width());
+    QLabel *value = new QLabel(QString::number(slider->value()));
+    connect(slider, &QSlider::valueChanged, [config = this->config, value](int position){
+        config->set_cam_overlay_width(position);
+        value->setText(QString::number(position));
+    });
+    connect(slider, &QSlider::sliderMoved, [value](int position){
+        value->setText(QString::number(position));
+    });
+
+    layout->addStretch(2);
+    layout->addWidget(slider, 4);
+    layout->addWidget(value, 2);
+
+    return widget;
+}
+
+QWidget *CameraPage::Settings::camera_overlay_height_row_widget()
+{
+    QWidget *widget = new QWidget(this);
+    QHBoxLayout *layout = new QHBoxLayout(widget);
+
+    QLabel *label = new QLabel("Overlay Height");
+    layout->addWidget(label, 1);
+
+    layout->addWidget(this->camera_overlay_height_widget(), 1);
+
+    return widget;
+}
+
+QWidget *CameraPage::Settings::camera_overlay_height_widget()
+{
+    QWidget *widget = new QWidget(this);
+    QHBoxLayout *layout = new QHBoxLayout(widget);
+
+    QSlider *slider = new QSlider(Qt::Orientation::Horizontal);
+    slider->setTracking(false);
+    slider->setRange(0, 150);
+    slider->setValue(this->config->get_cam_overlay_height());
+    QLabel *value = new QLabel(QString::number(slider->value()));
+    connect(slider, &QSlider::valueChanged, [config = this->config, value](int position){
+        config->set_cam_overlay_height(position);
+        value->setText(QString::number(position));
+    });
+    connect(slider, &QSlider::sliderMoved, [value](int position){
+        value->setText(QString::number(position));
+    });
+
+    layout->addStretch(2);
+    layout->addWidget(slider, 4);
+    layout->addWidget(value, 2);
+
+    return widget;
 }
 
 QWidget *CameraPage::local_camera_widget()
