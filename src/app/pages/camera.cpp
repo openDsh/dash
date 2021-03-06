@@ -460,8 +460,8 @@ void CameraPage::connect_local_stream()
         DASH_LOG(info) << "[CameraPage] Resizing to video container";
         videoWidget_->resize(videoContainer_->size());
         DASH_LOG(info) << "[CameraPage] Size: " << videoContainer_->width() << "x" << videoContainer_->height();
+        videoWidget_->show();
     }
-    videoWidget_->show();
 
     GstElement *capsFilter = gst_bin_get_by_name(GST_BIN(vidPipeline_), "mycapsfilter");
     GstPad *convertPad = gst_element_get_static_pad(capsFilter, "sink");
