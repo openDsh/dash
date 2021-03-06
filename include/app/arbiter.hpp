@@ -1,14 +1,15 @@
 #pragma once
 
-#include <BluezQt/Device>
 #include <QColor>
 #include <QMainWindow>
 #include <QObject>
+#include <QSettings>
 #include <QString>
 
 #include "app/action.hpp"
 #include "app/session.hpp"
 #include "app/pages/page.hpp"
+#include "app/quick_views/quick_view.hpp"
 
 
 class Arbiter : public QObject {

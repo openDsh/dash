@@ -38,6 +38,7 @@ class Session {
             Dark,
             NUM_MODES
         };
+
         static Mode from_str(QString mode);
         static QString to_str(Mode mode);
 

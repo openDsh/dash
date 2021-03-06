@@ -3,7 +3,7 @@
 #include "app/arbiter.hpp"
 
 Arbiter::Arbiter(QMainWindow *window)
-    : QObject(window)
+    : QObject()
     , window_(window)
     , session_(*this)
 {

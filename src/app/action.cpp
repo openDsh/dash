@@ -89,19 +89,19 @@ Action::GPIO::~GPIO()
         value.close();
 }
 
-Action::Action(QString name, std::function<void()> callback, QWidget *parent)
+Action::Action(QString name, std::function<void()> action, QWidget *parent)
     : QObject(parent)
     , shortcut(parent)
     , gpio()
     , name_(name)
     , key_()
 {
-    connect(&this->gpio.watcher, &QFileSystemWatcher::fileChanged, [this, callback](QString){
+    connect(&this->gpio.watcher, &QFileSystemWatcher::fileChanged, [this, action](QString){
         if (this->gpio.value.isOpen()) {
             this->gpio.value.seek(0);
             if (this->gpio.active_low == this->gpio.value.read(1).at(0)) {
                 this->gpio.watcher.blockSignals(true);
-                callback();
+                action();
                 QTimer::singleShot(300, [this]{ this->gpio.watcher.blockSignals(false); });
             }
             else {
@@ -112,7 +112,7 @@ Action::Action(QString name, std::function<void()> callback, QWidget *parent)
             qDebug() << "[Dash][Action]" << this->key_ << ":" << this->gpio.value.fileName() << "is not open"; // temp
         }
     });
-    connect(&this->shortcut, &QShortcut::activated, [callback]{ callback(); });
+    connect(&this->shortcut, &QShortcut::activated, [action]{ action(); });
 }
 
 void Action::set(QString key)

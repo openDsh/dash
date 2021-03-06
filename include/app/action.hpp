@@ -60,7 +60,7 @@ class Action : public QObject {
     Q_OBJECT
 
    public:
-    Action(QString name, std::function<void()> callback, QWidget *parent);
+    Action(QString name, std::function<void()> func, QWidget *parent);
     void set(QString key);
 
     QString key() const { return this->key_; }
