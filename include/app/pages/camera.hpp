@@ -52,6 +52,22 @@ class CameraPage : public QWidget {
         CameraPage *page;
     };
 
+    class Settings : public QWidget {
+       public:
+        Settings(QWidget *parent = nullptr);
+        QSize sizeHint() const override;
+
+       private:
+        QWidget *settings_widget();
+        QWidget *camera_overlay_row_widget();
+        QWidget *camera_overlay_width_row_widget();
+        QWidget *camera_overlay_height_row_widget();
+        QWidget *camera_overlay_width_widget();
+        QWidget *camera_overlay_height_widget();
+
+        Config *config;
+    };
+
     QWidget *connect_widget();
     QWidget *network_camera_widget();
     QWidget *local_camera_widget();
