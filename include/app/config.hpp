@@ -149,6 +149,15 @@ class Config : public QObject {
     inline int get_cam_autoconnect_time_secs() { return this->cam_autoconnect_time_secs; }
     inline void set_cam_autoconnect_time_secs(int seconds) { this->cam_autoconnect_time_secs = seconds; }
 
+    inline bool get_cam_overlay() { return this->cam_overlay; }
+    inline void set_cam_overlay(bool enabled) { this->cam_overlay = enabled; }
+
+    inline int get_cam_overlay_width() { return this->cam_overlay_width; }
+    inline void set_cam_overlay_width(int value) { this->cam_overlay_width = value; }
+
+    inline int get_cam_overlay_height() { return this->cam_overlay_height; }
+    inline void set_cam_overlay_height(int value) { this->cam_overlay_height = value; }
+
     inline QString get_brightness_plugin_name() { return this->brightness_plugin; }
     inline QStringList get_brightness_plugins() { return this->brightness_plugins.keys(); }
     inline void set_brightness_plugin(QString brightness_plugin)
@@ -228,6 +237,9 @@ class Config : public QObject {
     QVideoFrame::PixelFormat cam_local_format_override;
     bool cam_autoconnect;
     int cam_autoconnect_time_secs;
+    bool cam_overlay;
+    int cam_overlay_width;
+    int cam_overlay_height;
     QMap<QString, bool> pages;
     QString vehicle_plugin;
     bool vehicle_can_bus;
@@ -250,6 +262,7 @@ class Config : public QObject {
     void scale_changed(double scale);
     void page_changed(QWidget *page, bool enabled);
     void cam_autoconnect_changed(bool enabled);
+    void cam_overlay_changed(bool enabled);
     void vehicle_can_bus_changed(bool state);
     void vehicle_interface_changed(QString interface);
 };
