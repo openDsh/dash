@@ -22,6 +22,9 @@ Config::Config()
     this->cam_local_format_override = this->settings.value("Pages/Camera/local_format_override", QVideoFrame::Format_Invalid).value<QVideoFrame::PixelFormat>();
     this->cam_autoconnect = this->settings.value("Pages/Camera/automatically_reconnect", false).toBool();
     this->cam_autoconnect_time_secs = this->settings.value("Pages/Camera/auto_reconnect_time_secs", 6).toInt();
+    this->cam_overlay = this->settings.value("Pages/Camera/Overlay/enabled", false).toBool();
+    this->cam_overlay_width = this->settings.value("Pages/Camera/Overlay/width", 100).toInt();
+    this->cam_overlay_height = this->settings.value("Pages/Camera/Overlay/height", 100).toInt();
     this->settings.beginGroup("Pages/Launcher");
     for (auto key : this->settings.childKeys())
         this->launcher_plugins.append(this->settings.value(key, QString()).toString());

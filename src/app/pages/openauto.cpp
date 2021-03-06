@@ -443,7 +443,7 @@ QWidget *OpenAutoPage::connect_msg()
     layout2->setSpacing(0);
 
     Dialog *dialog = new Dialog(this->arbiter, true, this->window());
-    dialog->set_body(new Settings(this->arbiter, this));
+    dialog->set_body(new OpenAutoPage::Settings(this->arbiter, this));
     QPushButton *save_button = new QPushButton("save");
     connect(save_button, &QPushButton::clicked, [this]() {
         this->config->openauto_config->setButtonCodes(this->config->openauto_button_codes);

@@ -124,6 +124,28 @@ class Config : public QObject {
         this->settings.setValue("Pages/Camera/auto_reconnect_time_secs", this->cam_autoconnect_time_secs);
     }
 
+    inline bool get_cam_overlay() { return this->cam_overlay; }
+    inline void set_cam_overlay(bool enabled)
+    {
+        this->cam_overlay = enabled;
+        this->settings.setValue("Pages/Camera/Overlay/enabled", this->cam_overlay);
+    }
+
+    inline int get_cam_overlay_width() { return this->cam_overlay_width; }
+    inline void set_cam_overlay_width(int value)
+    {
+        this->cam_overlay_width = value;
+        this->settings.setValue("Pages/Camera/Overlay/width", this->cam_overlay_width);
+    }
+
+    inline int get_cam_overlay_height() { return this->cam_overlay_height; }
+    inline void set_cam_overlay_height(int value)
+    {
+        this->cam_overlay_height = value;
+        this->settings.setValue("Pages/Camera/Overlay/height", this->cam_overlay_height);
+    }
+
+
     inline const QStringList &get_launcher_plugins() { return this->launcher_plugins; }
     inline void set_launcher_plugin(QString plugin, bool remove = false)
     {
@@ -155,11 +177,15 @@ class Config : public QObject {
     QVideoFrame::PixelFormat cam_local_format_override;
     bool cam_autoconnect;
     int cam_autoconnect_time_secs;
+    bool cam_overlay;
+    int cam_overlay_width;
+    int cam_overlay_height;
     QStringList launcher_plugins;
 
    signals:
     void si_units_changed(bool si_units);
     void cam_autoconnect_changed(bool enabled);
+    void cam_overlay_changed(bool enabled);
     void vehicle_can_bus_changed(bool state);
     void vehicle_interface_changed(QString interface);
 };
