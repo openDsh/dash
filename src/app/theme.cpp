@@ -48,8 +48,6 @@ Theme::Theme() : QObject(qApp), palette()
     QFontDatabase::addApplicationFont(":/fonts/Montserrat/Montserrat-LightItalic.ttf");
     QFontDatabase::addApplicationFont(":/fonts/Montserrat/Montserrat-Regular.ttf");
 
-    qApp->setFont(Theme::font_14);
-
     this->stylesheets["light"] = this->parse_stylesheet(":/stylesheets/light.qss");
     this->stylesheets["dark"] = this->parse_stylesheet(":/stylesheets/dark.qss");
 }
