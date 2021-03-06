@@ -223,27 +223,30 @@ QWidget *MainSettingsTab::controls_row_widget()
 
 QWidget *MainSettingsTab::controls_widget()
 {
-    QWidget *widget = new QWidget(this);
-    QVBoxLayout *layout = new QVBoxLayout(widget);
+    auto widget = new QWidget();
+    auto layout = new QVBoxLayout(widget);
 
-    QPushButton *exit_button = new QPushButton("exit", widget);
-    connect(exit_button, &QPushButton::clicked, []() { qApp->exit(); });
+    auto minimize_button = new QPushButton("minimize");
+    connect(minimize_button, &QPushButton::clicked, [this]{ this->arbiter.window()->setWindowState(Qt::WindowMinimized); });
+    layout->addWidget(minimize_button);
+    auto exit_button = new QPushButton("exit");
+    connect(exit_button, &QPushButton::clicked, [this]{ qApp->exit(); });
     layout->addWidget(exit_button);
     layout->addWidget(Session::Forge::br());
-    QPushButton *shut_down_button = new QPushButton("shut down", widget);
-    connect(shut_down_button, &QPushButton::clicked, [this]{
-        this->arbiter.settings().sync();
-        sync();
-        system(Session::System::SHUTDOWN_CMD);
-    });
-    layout->addWidget(shut_down_button);
-    QPushButton *reboot_button = new QPushButton("reboot", widget);
+    auto reboot_button = new QPushButton("reboot");
     connect(reboot_button, &QPushButton::clicked, [this]{
         this->arbiter.settings().sync();
         sync();
         system(Session::System::REBOOT_CMD);
     });
     layout->addWidget(reboot_button);
+    auto shut_down_button = new QPushButton("shut down");
+    connect(shut_down_button, &QPushButton::clicked, [this]{
+        this->arbiter.settings().sync();
+        sync();
+        system(Session::System::SHUTDOWN_CMD);
+    });
+    layout->addWidget(shut_down_button);
 
     return widget;
 }
