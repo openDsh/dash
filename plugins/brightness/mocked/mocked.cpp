@@ -12,12 +12,12 @@ Mocked::Mocked()
     }
 }
 
-bool Mocked::is_supported()
+bool Mocked::supported()
 {
     return true;
 }
 
-uint8_t Mocked::get_priority()
+uint8_t Mocked::priority()
 {
     return 1;
 }

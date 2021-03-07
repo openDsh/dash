@@ -1,8 +1,6 @@
 #include "app/pages/openauto.hpp"
 
 #include "app/config.hpp"
-#include "app/theme.hpp"
-#include "app/widgets/ip_input.hpp"
 #include "app/widgets/progress.hpp"
 #include "app/window.hpp"
 
@@ -66,9 +64,10 @@ void OpenAutoFrame::mouseDoubleClickEvent(QMouseEvent *)
     emit double_clicked(this->fullscreen);
 }
 
-OpenAutoPage::Settings::Settings(QWidget *parent) : QWidget(parent)
+OpenAutoPage::Settings::Settings(Arbiter &arbiter, QWidget *parent)
+    : QWidget(parent)
+    , arbiter(arbiter)
 {
-    this->theme = Theme::get_instance();
     this->config = Config::get_instance();
 
     QVBoxLayout *layout = new QVBoxLayout(this);
@@ -86,17 +85,17 @@ QLayout *OpenAutoPage::Settings::settings_widget()
     QVBoxLayout *layout = new QVBoxLayout();
 
     layout->addLayout(this->rhd_row_widget(), 1);
-    layout->addWidget(Theme::br(), 1);
+    layout->addWidget(Session::Forge::br(), 1);
     layout->addLayout(this->frame_rate_row_widget(), 1);
     layout->addLayout(this->resolution_row_widget(), 1);
     layout->addLayout(this->dpi_row_widget(), 1);
-    layout->addWidget(Theme::br(), 1);
+    layout->addWidget(Session::Forge::br(), 1);
     layout->addLayout(this->rt_audio_row_widget(), 1);
     layout->addLayout(this->audio_channels_row_widget(), 1);
-    layout->addWidget(Theme::br(), 1);
+    layout->addWidget(Session::Forge::br(), 1);
     layout->addLayout(this->bluetooth_row_widget(), 1);
     layout->addLayout(this->autoconnect_row_widget(), 1);
-    layout->addWidget(Theme::br(), 1);
+    layout->addWidget(Session::Forge::br(), 1);
     layout->addLayout(this->touchscreen_row_widget(), 1);
     layout->addLayout(this->buttons_row_widget(), 1);
 
@@ -111,10 +110,9 @@ QLayout *OpenAutoPage::Settings::rhd_row_widget()
     layout->addWidget(label, 1);
 
     Switch *toggle = new Switch();
-    toggle->scale(this->config->get_scale());
+    toggle->scale(this->arbiter.layout().scale);
     toggle->setChecked(this->config->openauto_config->getHandednessOfTrafficType() ==
                        openauto::configuration::HandednessOfTrafficType::RIGHT_HAND_DRIVE);
-    connect(this->config, &Config::scale_changed, [toggle](double scale) { toggle->scale(scale); });
     connect(toggle, &Switch::stateChanged, [config = this->config](bool state) {
         config->openauto_config->setHandednessOfTrafficType(
             state ? openauto::configuration::HandednessOfTrafficType::RIGHT_HAND_DRIVE
@@ -235,10 +233,9 @@ QLayout *OpenAutoPage::Settings::rt_audio_row_widget()
     layout->addWidget(label, 1);
 
     Switch *toggle = new Switch();
-    toggle->scale(this->config->get_scale());
+    toggle->scale(this->arbiter.layout().scale);
     toggle->setChecked(this->config->openauto_config->getAudioOutputBackendType() ==
                        openauto::configuration::AudioOutputBackendType::RTAUDIO);
-    connect(this->config, &Config::scale_changed, [toggle](double scale) { toggle->scale(scale); });
     connect(toggle, &Switch::stateChanged, [config = this->config](bool state) {
         config->openauto_config->setAudioOutputBackendType(state
                                                                ? openauto::configuration::AudioOutputBackendType::RTAUDIO
@@ -285,10 +282,9 @@ QLayout *OpenAutoPage::Settings::bluetooth_row_widget()
     layout->addWidget(label, 1);
 
     Switch *toggle = new Switch();
-    toggle->scale(this->config->get_scale());
+    toggle->scale(this->arbiter.layout().scale);
     toggle->setChecked(this->config->openauto_config->getBluetoothAdapterType() ==
                        openauto::configuration::BluetoothAdapterType::LOCAL);
-    connect(this->config, &Config::scale_changed, [toggle](double scale) { toggle->scale(scale); });
     connect(toggle, &Switch::stateChanged, [config = this->config](bool state) {
         config->openauto_config->setBluetoothAdapterType(state ? openauto::configuration::BluetoothAdapterType::LOCAL
                                                                : openauto::configuration::BluetoothAdapterType::NONE);
@@ -306,10 +302,9 @@ QLayout *OpenAutoPage::Settings::autoconnect_row_widget()
     layout->addWidget(label, 1);
 
     Switch *toggle = new Switch();
-    toggle->scale(this->config->get_scale());
+    toggle->scale(this->arbiter.layout().scale);
     toggle->setChecked(this->config->openauto_config->getAutoconnectBluetooth());
-    connect(this->config, &Config::scale_changed, [toggle](double scale) { toggle->scale(scale); });
-    connect(toggle, &Switch::stateChanged, [config = this->config](bool state) {
+    connect(toggle, &Switch::stateChanged, [config = this->config](bool state){
         config->openauto_config->setAutoconnectBluetooth(state);
     });
     layout->addWidget(toggle, 1, Qt::AlignHCenter);
@@ -325,9 +320,8 @@ QLayout *OpenAutoPage::Settings::touchscreen_row_widget()
     layout->addWidget(label, 1);
 
     Switch *toggle = new Switch();
-    toggle->scale(this->config->get_scale());
+    toggle->scale(this->arbiter.layout().scale);
     toggle->setChecked(this->config->openauto_config->getTouchscreenEnabled());
-    connect(this->config, &Config::scale_changed, [toggle](double scale) { toggle->scale(scale); });
     connect(toggle, &Switch::stateChanged,
             [config = this->config](bool state) { config->openauto_config->setTouchscreenEnabled(state); });
     layout->addWidget(toggle, 1, Qt::AlignHCenter);
@@ -388,15 +382,20 @@ QLayout *OpenAutoPage::Settings::buttons_row_widget()
     return layout;
 }
 
-OpenAutoPage::OpenAutoPage(QWidget *parent) : QStackedWidget(parent)
+OpenAutoPage::OpenAutoPage(Arbiter &arbiter, QWidget *parent)
+    : QStackedWidget(parent)
+    , Page(arbiter, "Android Auto", "android_auto", true, this)
+{
+}
+
+void OpenAutoPage::init()
 {
     this->config = Config::get_instance();
-    this->theme = Theme::get_instance();
 
     this->frame = new OpenAutoFrame(this);
 
     std::function<void(bool)> callback = [frame = this->frame](bool active) { frame->toggle(active); };
-    this->worker = new OpenAutoWorker(callback, this->theme->get_mode(), frame);
+    this->worker = new OpenAutoWorker(callback, this->arbiter.theme().mode == Session::Theme::Dark, frame);
 
     connect(this->frame, &OpenAutoFrame::toggle, [this](bool enable) {
         if (!enable && this->frame->is_fullscreen()) {
@@ -415,7 +414,9 @@ OpenAutoPage::OpenAutoPage(QWidget *parent) : QStackedWidget(parent)
         }
         this->worker->update_size();
     });
-    connect(this->theme, &Theme::mode_updated, [this](bool mode) { this->worker->set_night_mode(mode); });
+    connect(&this->arbiter, &Arbiter::mode_changed, [this](Session::Theme::Mode mode){
+        this->worker->set_night_mode(mode == Session::Theme::Dark);
+    });
 
     this->addWidget(this->connect_msg());
     this->addWidget(this->frame);
@@ -434,15 +435,15 @@ QWidget *OpenAutoPage::connect_msg()
     QVBoxLayout *layout = new QVBoxLayout(widget);
     layout->setContentsMargins(0, 0, 0, 0);
 
-    QLabel *label = new QLabel("connect device to start Android Auto", widget);
+    QLabel *label = new QLabel("Connect Device to Start Android Auto", widget);
     label->setAlignment(Qt::AlignCenter);
 
     QHBoxLayout *layout2 = new QHBoxLayout();
     layout2->setContentsMargins(0, 0, 0, 0);
     layout2->setSpacing(0);
 
-    Dialog *dialog = new Dialog(true, this->window());
-    dialog->set_body(new OpenAutoPage::Settings(this));
+    Dialog *dialog = new Dialog(this->arbiter, true, this->window());
+    dialog->set_body(new OpenAutoPage::Settings(this->arbiter, this));
     QPushButton *save_button = new QPushButton("save");
     connect(save_button, &QPushButton::clicked, [this]() {
         this->config->openauto_config->setButtonCodes(this->config->openauto_button_codes);
@@ -452,8 +453,7 @@ QWidget *OpenAutoPage::connect_msg()
 
     QPushButton *settings_button = new QPushButton(widget);
     settings_button->setFlat(true);
-    settings_button->setIconSize(Theme::icon_24);
-    settings_button->setIcon(this->theme->make_button_icon("settings", settings_button));
+    this->arbiter.forge().iconize("settings", settings_button, 24);
     connect(settings_button, &QPushButton::clicked, [dialog]() { dialog->open(); });
 
     layout2->addStretch();

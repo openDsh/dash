@@ -3,13 +3,20 @@
 #include <QBitmap>
 #include <QDebug>
 
+#include "app/arbiter.hpp"
+
 #include "app/widgets/climate_state.hpp"
 
-ClimateState::ClimateState(QWidget *parent) : QFrame(parent), climate_ref(QIcon(":/icons/climate_ref.svg").pixmap(512, 512)), defrost(QIcon(":/icons/defrost.svg").pixmap(512, 512)), body(QIcon(":/icons/chevron_right.svg").pixmap(512, 512)), feet(QIcon(":/icons/expand_more.svg").pixmap(512, 512))
+ClimateState::ClimateState(Arbiter &arbiter, QWidget *parent)
+    : QFrame(parent)
+    , climate_ref(QIcon(":/icons/climate_ref.svg").pixmap(512, 512))
+    , defrost(QIcon(":/icons/defrost.svg").pixmap(512, 512))
+    , body(QIcon(":/icons/chevron_right.svg").pixmap(512, 512))
+    , feet(QIcon(":/icons/expand_more.svg").pixmap(512, 512))
 {
     this->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 
-    this->scale = Config::get_instance()->get_scale();
+    this->scale = arbiter.layout().scale;
 }
 
 QSize ClimateState::sizeHint() const

@@ -3,10 +3,10 @@
 #include <QLabel>
 #include <QString>
 
-#include "app/theme.hpp"
 #include "app/widgets/climate.hpp"
 
-ClimateSnackBar::ClimateSnackBar() : SnackBar()
+ClimateSnackBar::ClimateSnackBar(Arbiter &arbiter)
+    : SnackBar(arbiter)
 {
     this->setFocusPolicy(Qt::NoFocus);
     this->setAttribute(Qt::WA_TransparentForMouseEvents, true);
@@ -42,10 +42,10 @@ QWidget *ClimateSnackBar::state_widget()
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
 
-    this->airflow = new ClimateState(widget);
+    this->airflow = new ClimateState(this->arbiter, widget);
     layout->addWidget(this->airflow);
 
-    this->fan_speed = new StepMeter(widget);
+    this->fan_speed = new StepMeter(this->arbiter, widget);
     layout->addWidget(this->fan_speed);
 
     return widget;
@@ -82,11 +82,11 @@ void ClimateSnackBar::set_fan_speed(int speed)
     this->open(3000);
 }
 
-Climate::Climate(QWidget *parent) : QWidget(parent)
+Climate::Climate(Arbiter &arbiter, QWidget *parent) : QWidget(parent)
 {
     this->setObjectName("Climate");
 
-    this->snack_bar = new ClimateSnackBar();
+    this->snack_bar = new ClimateSnackBar(arbiter);
 }
 
 void Climate::max_fan_speed(int max_fan_speed)

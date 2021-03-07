@@ -9,47 +9,23 @@
 #include <QTimer>
 #include <QVBoxLayout>
 
-#include "app/theme.hpp"
+
+class Arbiter;
 
 class Dialog : public QDialog {
     Q_OBJECT
 
    public:
-    Dialog(bool fullscreen, QWidget *parent = nullptr);
+    Dialog(Arbiter &arbiter, bool fullscreen, QWidget *parent = nullptr);
     void open(int timeout = 0);
 
-    inline void set_title(QString str)
-    {
-        QLabel *label = new QLabel(str, this);
-        QFont font(Theme::font_16);
-        font.setBold(true);
-        label->setFont(font);
-        this->title->addWidget(label);
-    }
-    inline void set_body(QWidget *widget)
-    {
-        if (this->fullscreen) {
-            QScrollArea *scroll_area = new QScrollArea(this);
-            Theme::to_touch_scroller(scroll_area);
-            scroll_area->setWidgetResizable(true);
-            scroll_area->setWidget(widget);
-
-            this->body->addWidget(scroll_area);
-        }
-        else {
-            this->body->addWidget(widget);
-        }
-    }
-    inline void set_button(QPushButton *button)
-    {
-        if (this->buttons->count() == 0)
-            this->add_cancel_button();
-        button->setFlat(true);
-        this->buttons->addWidget(button, 0, Qt::AlignRight);
-        connect(button, &QPushButton::clicked, [this]() { this->close(); });
-    }
+    void set_title(QString str);
+    void set_body(QWidget *widget);
+    void set_button(QPushButton *button);
 
    protected:
+    Arbiter &arbiter;
+
     void showEvent(QShowEvent *event);
     void keyPressEvent(QKeyEvent *event);
     bool eventFilter(QObject *object, QEvent *event);
@@ -80,9 +56,8 @@ class SnackBar : public Dialog {
     Q_OBJECT
 
    public:
-    SnackBar() : Dialog(false, get_ref()) {}
+    SnackBar(Arbiter &arbiter) : Dialog(arbiter, false, get_ref()) {}
 
-   protected:
     void resizeEvent(QResizeEvent* event);
 
    private:

@@ -1,28 +1,56 @@
 #pragma once
 
-#include <stdlib.h>
-
-#include <QBluetoothDeviceInfo>
-#include <QBluetoothServiceDiscoveryAgent>
-#include <QBluetoothServiceInfo>
+#include <QButtonGroup>
+#include <QKeyEvent>
 #include <QMainWindow>
-#include <QStringList>
-#include <QtDBus/QtDBus>
-#include <QtWidgets>
+#include <QObject>
+#include <QShowEvent>
+#include <QStackedLayout>
+#include <QVBoxLayout>
+#include <QWidget>
 
 #include "app/config.hpp"
-#include "app/shortcuts.hpp"
 #include "app/pages/openauto.hpp"
-#include "app/theme.hpp"
+#include "app/pages/page.hpp"
 
-class DashWindow : public QMainWindow {
+#include "app/arbiter.hpp"
+
+class Dash : public QWidget {
     Q_OBJECT
 
    public:
-    DashWindow();
-    void add_widget(QWidget *widget);
+    Dash(Arbiter &arbiter);
+    void init();
 
-    inline QList<QAbstractButton *> get_pages() { return this->rail_group->buttons(); }
+   private:
+    struct NavRail {
+        QButtonGroup group;
+        QVBoxLayout *layout;
+
+        NavRail();
+    };
+
+    struct Body {
+        QVBoxLayout *layout;
+        QStackedLayout *frame;
+
+        Body();
+    };
+
+    Arbiter &arbiter;
+    NavRail rail;
+    Body body;
+
+    void set_page(Page *page);
+    QWidget *control_bar() const;
+    QWidget *power_control() const;
+};
+
+class Window : public QMainWindow {
+    Q_OBJECT
+
+   public:
+    Window();
 
    protected:
     void showEvent(QShowEvent *event);
@@ -30,29 +58,5 @@ class DashWindow : public QMainWindow {
     void keyReleaseEvent(QKeyEvent *event);
 
    private:
-    Config *config;
-    Theme *theme;
-    Shortcuts *shortcuts;
-
-    OpenAutoPage *openauto;
-    QStackedWidget *stack;
-    QVBoxLayout *rail;
-    QButtonGroup *rail_group;
-    QStackedLayout *pages;
-    QHBoxLayout *bar;
-
-    void init_config();
-    void init_theme();
-    void init_ui();
-    void init_shortcuts();
-    QLayout *body();
-    void add_pages();
-    void add_page(QString name, QWidget *page, QString icon);
-
-    QWidget *controls_bar();
-    QLayout *quick_views();
-    QWidget *brightness_widget(bool skip_buttons = false);
-    QWidget *controls_widget();
-    QWidget *power_control();
-    QWidget *save_control();
+    Arbiter arbiter;
 };

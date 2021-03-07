@@ -9,7 +9,7 @@ X::X()
     this->screen = QGuiApplication::primaryScreen();
 }
 
-bool X::is_supported()
+bool X::supported()
 {
     if (this->screen != nullptr) {
         // Check that we can execute xrandr
@@ -21,7 +21,7 @@ bool X::is_supported()
     return false;
 }
 
-uint8_t X::get_priority()
+uint8_t X::priority()
 {
     return 2;
 }

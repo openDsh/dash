@@ -6,13 +6,16 @@
 #include <QPainter>
 #include <QPainterPath>
 
+#include "app/arbiter.hpp"
+
 #include "app/widgets/step_meter.hpp"
 
-StepMeter::StepMeter(QWidget *parent) : QFrame(parent)
+StepMeter::StepMeter(Arbiter &arbiter, QWidget *parent)
+    : QFrame(parent)
 {
     this->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 
-    this->scale = Config::get_instance()->get_scale();
+    this->scale = arbiter.layout().scale;
 }
 
 QSize StepMeter::sizeHint() const

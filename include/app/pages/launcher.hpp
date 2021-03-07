@@ -6,17 +6,21 @@
 #include "app/widgets/selector.hpp"
 #include "app/widgets/dialog.hpp"
 
+#include "app/pages/page.hpp"
+
+class Arbiter;
 class LauncherPage;
 
 class LauncherPlugins : public QTabWidget {
     Q_OBJECT
 
    public:
-    LauncherPlugins(QWidget *parent = nullptr);
+    LauncherPlugins(Arbiter &arbiter, QWidget *parent = nullptr);
 
    private:
     void get_plugins();
 
+    Arbiter &arbiter;
     Config *config;
 
     QMap<QString, QFileInfo> plugins;
@@ -30,14 +34,15 @@ class LauncherPlugins : public QTabWidget {
     friend class LauncherPage;
 };
 
-class LauncherPage : public QStackedWidget {
+class LauncherPage : public QStackedWidget, public Page {
     Q_OBJECT
 
    public:
-    LauncherPage(QWidget *parent = nullptr);
+    LauncherPage(Arbiter &arbiter, QWidget *parent = nullptr);
+
+    void init() override;
 
    private:
-    Theme *theme;
     LauncherPlugins *plugin_tabs;
 
     QWidget *load_msg();

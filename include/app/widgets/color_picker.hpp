@@ -5,13 +5,12 @@
 #include <QSlider>
 
 #include "app/widgets/dialog.hpp"
-#include "app/theme.hpp"
 
 class ColorPicker : public QWidget {
     Q_OBJECT
 
    public:
-    ColorPicker(QSize block_size, QFont font, QWidget *parent = nullptr);
+    ColorPicker(Arbiter &arbiter, uint8_t block_size, QFont font, QWidget *parent = nullptr);
 
     void update(QColor color);
 
@@ -45,7 +44,7 @@ class ColorPicker : public QWidget {
 
         QLabel *label = new QLabel(QString::number(slider->value()));
         label->setFont(this->font);
-        label->setIndent(8);
+        label->setAlignment(Qt::AlignCenter);
         QObject::connect(slider, &QSlider::valueChanged, [this, label](int position) {
             label->setText(QString::number(position));
             this->hint_palette.setColor(QPalette::Window, this->color());

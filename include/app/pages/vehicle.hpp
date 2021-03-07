@@ -10,6 +10,10 @@
 #include "app/widgets/selector.hpp"
 #include "app/widgets/dialog.hpp"
 
+#include "app/pages/page.hpp"
+
+class Arbiter;
+
 typedef std::function<double(double, bool)> obd_decoder_t;
 typedef QPair<QString, QString> units_t;
 
@@ -43,18 +47,20 @@ class Gauge : public QWidget {
     void toggle_unit(bool si);
 };
 
-class VehiclePage : public QTabWidget {
+class VehiclePage : public QTabWidget, public Page {
     Q_OBJECT
 
    public:
-    VehiclePage(QWidget *parent = nullptr);
+    VehiclePage(Arbiter &arbiter, QWidget *parent = nullptr);
+
+    void init() override;
 
    private:
     void get_plugins();
     void load_plugin();
     QWidget *dialog_body();
     QWidget *can_bus_toggle_row();
-    QWidget *interface_selector_row();
+    QWidget *si_units_row_widget();
 
     QMap<QString, int> capabilities;
     QMap<QString, QFileInfo> plugins;
@@ -69,9 +75,10 @@ class DataTab : public QWidget {
     Q_OBJECT
 
    public:
-    DataTab(QWidget *parent = nullptr);
+    DataTab(Arbiter &arbiter, QWidget *parent = nullptr);
 
    private:
+    Arbiter &arbiter;
     QWidget *speedo_tach_widget();
     // QWidget *mileage_data_widget();
     QWidget *engine_data_widget();

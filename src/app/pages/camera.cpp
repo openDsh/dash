@@ -4,12 +4,20 @@
 #include <QCameraImageCapture>
 #include <QTimer>
 
-#include "app/pages/camera.hpp"
+#include "app/arbiter.hpp"
+#include "app/session.hpp"
 #include "app/window.hpp"
 
-CameraPage::CameraPage(QWidget *parent) : QWidget(parent)
+#include "app/pages/camera.hpp"
+
+CameraPage::CameraPage(Arbiter &arbiter, QWidget *parent)
+    : QWidget(parent)
+    , Page(arbiter, "Camera", "camera", true, this)
 {
-    this->theme = Theme::get_instance();
+}
+
+void CameraPage::init()
+{
     this->player = new QMediaPlayer(this);
     this->local_cam = nullptr;
     this->local_index = 0;
@@ -104,8 +112,7 @@ QWidget *CameraPage::connect_widget()
 
     QPushButton *settings_button = new QPushButton(this);
     settings_button->setFlat(true);
-    settings_button->setIconSize(Theme::icon_24);
-    settings_button->setIcon(this->theme->make_button_icon("settings", settings_button));
+    this->arbiter.forge().iconize("settings", settings_button, 24);
 
     QHBoxLayout *layout2 = new QHBoxLayout();
     layout2->setContentsMargins(0, 0, 0, 0);
@@ -113,7 +120,7 @@ QWidget *CameraPage::connect_widget()
     layout2->addStretch();
     layout2->addWidget(settings_button);
     layout->addLayout(layout2);
-    QLabel *label = new QLabel("connect camera", widget);
+    QLabel *label = new QLabel("Connect Camera", widget);
 
     this->status = new QLabel(widget);
 
@@ -122,7 +129,7 @@ QWidget *CameraPage::connect_widget()
     cam_stack->addWidget(this->local_cam_selector());
     cam_stack->addWidget(this->network_cam_selector());
 
-    QCheckBox *auto_reconnect_toggle = new QCheckBox("Automatically reconnect", this);
+    QCheckBox *auto_reconnect_toggle = new QCheckBox("Automatically Reconnect", this);
     auto_reconnect_toggle->setLayoutDirection(Qt::RightToLeft);
     auto_reconnect_toggle->setChecked(this->config->get_cam_autoconnect());
     connect(auto_reconnect_toggle, &QCheckBox::toggled, [this](bool checked){
@@ -158,11 +165,8 @@ QWidget *CameraPage::connect_widget()
     layout->addStretch();
     layout->addWidget(checkboxes_widget);
 
-    Dialog *dialog = new Dialog(true, this->window());
-    dialog->set_body(new CameraPage::Settings(this));
-    QPushButton *save_button = new QPushButton("save");
-    connect(save_button, &QPushButton::clicked, [this]{ this->config->save(); });
-    dialog->set_button(save_button);
+    Dialog *dialog = new Dialog(this->arbiter, true, this->window());
+    dialog->set_body(new CameraPage::Settings(this->arbiter, this));
     connect(settings_button, &QPushButton::clicked, [dialog]{ dialog->open(); });
 
     return widget;
@@ -181,7 +185,9 @@ void CameraPage::VideoContainer::resizeEvent(QResizeEvent *event)
     DASH_LOG(info) << "[CameraPage] videoContainer resized";
 }
 
-CameraPage::Settings::Settings(QWidget *parent) : QWidget(parent)
+CameraPage::Settings::Settings(Arbiter &arbiter, QWidget *parent)
+    : QWidget(parent)
+    , arbiter(arbiter)
 {
     this->config = Config::get_instance();
     QVBoxLayout *layout = new QVBoxLayout(this);
@@ -192,7 +198,7 @@ CameraPage::Settings::Settings(QWidget *parent) : QWidget(parent)
 
 QSize CameraPage::Settings::sizeHint() const
 {
-    int label_width = QFontMetrics(this->font()).averageCharWidth() * 20;
+    int label_width = QFontMetrics(this->font()).averageCharWidth() * 21;
     return QSize(label_width * 2, this->height() + 12);
 }
 
@@ -201,9 +207,8 @@ QWidget *CameraPage::Settings::settings_widget()
     QWidget *widget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
     layout->addWidget(this->camera_overlay_row_widget(), 1);
-    layout->addWidget(Theme::br(), 1);
+    layout->addWidget(Session::Forge::br(), 1);
     layout->addWidget(this->camera_overlay_width_row_widget(), 1);
-    layout->addWidget(Theme::br(), 1);
     layout->addWidget(this->camera_overlay_height_row_widget(), 1);
 
     return widget;
@@ -218,9 +223,8 @@ QWidget *CameraPage::Settings::camera_overlay_row_widget()
     layout->addWidget(label, 1);
 
     Switch *toggle = new Switch();
-    toggle->scale(this->config->get_scale());
+    toggle->scale(this->arbiter.layout().scale);
     toggle->setChecked(this->config->get_cam_overlay());
-    connect(this->config, &Config::scale_changed, [toggle](double scale) { toggle->scale(scale); });
     connect(toggle, &Switch::stateChanged, [config = this->config](bool state) { config->set_cam_overlay(state); });
     layout->addWidget(toggle, 1, Qt::AlignHCenter);
 
@@ -305,7 +309,6 @@ QWidget *CameraPage::Settings::camera_overlay_height_widget()
 
 QWidget *CameraPage::local_camera_widget()
 {
-
     QWidget *widget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
     layout->setContentsMargins(0, 0, 0, 0);
@@ -313,14 +316,13 @@ QWidget *CameraPage::local_camera_widget()
 
     QPushButton *disconnect = new QPushButton(widget);
     disconnect->setFlat(true);
-    disconnect->setIconSize(Theme::icon_16);
     connect(disconnect, &QPushButton::clicked, [this]{
         this->status->setText(QString());
         emit autoconnect_disabled();
         emit disconnected();
         this->local_cam = nullptr;
     });
-    disconnect->setIcon(this->theme->make_button_icon("close", disconnect));
+    this->arbiter.forge().iconize("close", disconnect, 16);
     layout->addWidget(disconnect, 0, Qt::AlignRight);
 
     this->local_video_widget = new CameraPage::VideoContainer(widget, this);
@@ -339,12 +341,11 @@ QWidget *CameraPage::network_camera_widget()
 
     QPushButton *disconnect = new QPushButton(widget);
     disconnect->setFlat(true);
-    disconnect->setIconSize(Theme::icon_16);
     connect(disconnect, &QPushButton::clicked, [this]{
         emit autoconnect_disabled();
         emit disconnected();
     });
-    disconnect->setIcon(this->theme->make_button_icon("close", disconnect));
+    this->arbiter.forge().iconize("close", disconnect, 16);
     layout->addWidget(disconnect, 0, Qt::AlignRight);
 
     this->remote_video_widget = new CameraPage::VideoContainer(widget, this);
@@ -408,7 +409,7 @@ QWidget *CameraPage::local_cam_selector()
     QHBoxLayout *refresh_row = new QHBoxLayout();
     QPushButton *refresh_button = new QPushButton(widget);
     refresh_button->setFlat(true);
-    refresh_button->setIcon(this->theme->make_button_icon("refresh", refresh_button));
+    this->arbiter.forge().iconize("refresh", refresh_button, 16);
 
     refresh_row->addStretch(1);
     refresh_row->addWidget(refresh_button);
@@ -429,14 +430,12 @@ QWidget *CameraPage::selector_widget(QWidget *selection)
 
     QPushButton *left_button = new QPushButton(widget);
     left_button->setFlat(true);
-    left_button->setIconSize(Theme::icon_32);
-    left_button->setIcon(this->theme->make_button_icon("arrow_left", left_button));
+    this->arbiter.forge().iconize("arrow_left", left_button, 32);
     connect(left_button, &QPushButton::clicked, this, &CameraPage::prev_cam);
 
     QPushButton *right_button = new QPushButton(this);
     right_button->setFlat(true);
-    right_button->setIconSize(Theme::icon_32);
-    right_button->setIcon(this->theme->make_button_icon("arrow_right", right_button));
+    this->arbiter.forge().iconize("arrow_right", right_button, 32);
     connect(right_button, &QPushButton::clicked, this, &CameraPage::next_cam);
 
     layout->addStretch(1);
@@ -477,7 +476,7 @@ QWidget *CameraPage::network_cam_selector()
 
     QLineEdit *input = new QLineEdit(this->config->get_cam_network_url(), widget);
     input->setContextMenuPolicy(Qt::NoContextMenu);
-    input->setFont(Theme::font_18);
+    input->setFont(this->arbiter.forge().font(18));
     input->setAlignment(Qt::AlignCenter);
     connect(input, &QLineEdit::textEdited, [this](QString text){
         this->status->clear();
@@ -559,7 +558,7 @@ void CameraPage::disconnect_stream()
     g_object_unref(vidPipeline_);
     if (this->config->get_cam_autoconnect()) {
         qDebug() << "Camera disconnected. Auto reconnect in" << this->config->get_cam_autoconnect_time_secs() << "seconds";
-        this->reconnect_message = this->status->text() + ". reconnecting in %1 ";
+        this->reconnect_message = this->status->text() + " - reconnecting in %1 ";
         this->reconnect_in_secs = this->config->get_cam_autoconnect_time_secs();
         this->reconnect_timer->start(1000);
     }
@@ -575,12 +574,12 @@ void CameraPage::connect_local_stream()
     }
     const QString &local = this->config->get_cam_local_device();
     if (!this->local_cam_available(local)) {
-        this->status->setText("Camera unavailable");
+        this->status->setText("camera unavailable");
         return;
     }
     this->local_cam = new QCamera(local.toUtf8(), this);
     this->local_cam->load();
-    qDebug() << "Camera status: " << this->local_cam->status();
+    qDebug() << "camera status: " << this->local_cam->status();
 
     QSize res = this->choose_video_resolution();
 

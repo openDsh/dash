@@ -1,7 +1,6 @@
 QMainWindow,
 QMainWindow > QFrame {
     background-color: rgb(18, 18, 18);
-    border-radius: 8px;
 }
 
 QWidget {
@@ -152,6 +151,10 @@ QRadioButton {
     background-color: transparent;
 }
 
+QRadioButton:disabled {
+    color: rgb(136, 136, 136);
+}
+
 QCheckBox::indicator {
     width: 22px;
     height: 22px;
@@ -166,6 +169,10 @@ QRadioButton::indicator {
     border-radius: 11px;
 }
 
+QRadioButton::indicator:disabled {
+    border: 2px solid rgb(136, 136, 136);
+}
+
 QCheckBox::indicator::checked {
     image: url(:/icons/dark/check.svg);
     background-color: palette(base);
@@ -175,6 +182,11 @@ QCheckBox::indicator::checked {
 QRadioButton::indicator::checked {
     background-color: qradialgradient(cx:0.5, cy:0.5, fx:0.5, fy:0.5, radius:.4, stop:.65 palette(base), stop:.75 transparent);
     border: 2px solid palette(base);
+}
+
+QRadioButton::indicator::checked:disabled {
+    background-color: qradialgradient(cx:0.5, cy:0.5, fx:0.5, fy:0.5, radius:.4, stop:.65 rgb(136, 136, 136), stop:.75 transparent);
+    border: 2px solid rgb(136, 136, 136);
 }
 
 QScrollArea {
@@ -268,7 +280,7 @@ QDialog > QFrame {
     border: 2px solid rgb(66, 66, 66);
 }
 
-#ControlsBar {
+#ControlBar {
     background-color: rgb(48, 48, 48);
     border-top-left-radius: 6px;
     border-top-right-radius: 6px;
@@ -276,4 +288,5 @@ QDialog > QFrame {
 
 *[add_hint="true"] {
     background-color: rgba(255, 255, 255, 31);
+    border-radius: 8px;
 }

@@ -32,14 +32,19 @@
 #include <QtQuickWidgets/QQuickWidget>
 
 #include "app/config.hpp"
-#include "app/theme.hpp"
 #include "DashLog.hpp"
 
-class CameraPage : public QWidget {
+#include "app/pages/page.hpp"
+
+class Arbiter;
+
+class CameraPage : public QWidget, public Page {
     Q_OBJECT
 
    public:
-    CameraPage(QWidget *parent = nullptr);
+    CameraPage(Arbiter &arbiter, QWidget *parent = nullptr);
+
+    void init() override;
 
    private:
     class VideoContainer : public QWidget {
@@ -54,7 +59,7 @@ class CameraPage : public QWidget {
 
     class Settings : public QWidget {
        public:
-        Settings(QWidget *parent = nullptr);
+        Settings(Arbiter &arbiter, QWidget *parent = nullptr);
         QSize sizeHint() const override;
 
        private:
@@ -65,6 +70,7 @@ class CameraPage : public QWidget {
         QWidget *camera_overlay_width_widget();
         QWidget *camera_overlay_height_widget();
 
+        Arbiter &arbiter;
         Config *config;
     };
 
@@ -83,7 +89,6 @@ class CameraPage : public QWidget {
     void count_down();
     void connect_cam();
 
-    Theme *theme;
     Config *config;
     QLabel *status;
     QMediaPlayer *player;

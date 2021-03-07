@@ -1,6 +1,7 @@
 #include <BluezQt/Device>
 #include <BluezQt/PendingCall>
 #include <QLabel>
+#include <QLayoutItem>
 #include <QScrollArea>
 
 #include <aasdk_proto/ButtonCodeEnum.pb.h>
@@ -11,36 +12,35 @@
 #include "openauto/Configuration/BluetootAdapterType.hpp"
 #include "openauto/Configuration/HandednessOfTrafficType.hpp"
 
+#include "app/action.hpp"
 #include "app/config.hpp"
+#include "app/session.hpp"
+#include "app/window.hpp"
 #include "app/pages/settings.hpp"
-#include "app/theme.hpp"
+#include "app/services/server.hpp"
 #include "app/widgets/color_picker.hpp"
 #include "app/widgets/selector.hpp"
 #include "app/widgets/switch.hpp"
-#include "app/window.hpp"
-#include "app/widgets/sliders.hpp"
-#include <QDebug>
 
-SettingsPage::SettingsPage(QWidget *parent) : QTabWidget(parent)
+SettingsPage::SettingsPage(Arbiter &arbiter, QWidget *parent)
+    : QTabWidget(parent)
+    , Page(arbiter, "Settings", "tune", false, this)
 {
-    this->addTab(new MainSettingsTab(this), "Main");
-    this->addTab(new LayoutSettingsTab(this), "Layout");
-    this->addTab(new BluetoothSettingsTab(this), "Bluetooth");
-    this->addTab(new ActionsSettingsTab(this), "Actions");
-
-    QPushButton *save_button = new QPushButton(this);
-    save_button->setFlat(true);
-    save_button->setIconSize(Theme::icon_24);
-    save_button->setIcon(Theme::get_instance()->make_button_icon("save_alt", save_button));
-    connect(save_button, &QPushButton::clicked, []() { Config::get_instance()->save(); });
-    this->setCornerWidget(save_button);
 }
 
-MainSettingsTab::MainSettingsTab(QWidget *parent) : QWidget(parent)
+void SettingsPage::init()
 {
-    this->theme = Theme::get_instance();
+    this->addTab(new MainSettingsTab(this->arbiter), "Main");
+    this->addTab(new LayoutSettingsTab(this->arbiter), "Layout");
+    this->addTab(new BluetoothSettingsTab(this->arbiter, this), "Bluetooth");
+    this->addTab(new ActionsSettingsTab(this->arbiter), "Actions");
+}
+
+MainSettingsTab::MainSettingsTab(Arbiter &arbiter, QWidget *parent)
+    : QWidget(parent)
+    , arbiter(arbiter)
+{
     this->config = Config::get_instance();
-    this->shortcuts = Shortcuts::get_instance();
 
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->setContentsMargins(6, 0, 6, 0);
@@ -55,20 +55,19 @@ QWidget *MainSettingsTab::settings_widget()
 
     layout->addWidget(this->dark_mode_row_widget(), 1);
     layout->addWidget(this->color_row_widget(), 1);
-    layout->addWidget(Theme::br(widget), 1);
-    layout->addWidget(this->mouse_row_widget(), 1);
-    layout->addWidget(Theme::br(widget), 1);
-    layout->addWidget(this->si_units_row_widget(), 1);
-    layout->addWidget(Theme::br(widget), 1);
+    layout->addWidget(Session::Forge::br(), 1);
+    layout->addWidget(this->cursor_row_widget(), 1);
+    layout->addWidget(Session::Forge::br(), 1);
     layout->addWidget(this->volume_row_widget(), 1);
-    layout->addWidget(Theme::br(widget), 1);
-    layout->addWidget(this->brightness_plugin_row_widget(), 1);
+    layout->addWidget(Session::Forge::br(), 1);
     layout->addWidget(this->brightness_row_widget(), 1);
-    layout->addWidget(Theme::br(widget), 1);
+    layout->addWidget(Session::Forge::br(), 1);
+    layout->addWidget(this->server_row_widget(), 1);
+    layout->addWidget(Session::Forge::br(), 1);
     layout->addWidget(this->controls_row_widget(), 1);
 
     QScrollArea *scroll_area = new QScrollArea(this);
-    Theme::to_touch_scroller(scroll_area);
+    Session::Forge::to_touch_scroller(scroll_area);
     scroll_area->setWidgetResizable(true);
     scroll_area->setWidget(widget);
 
@@ -84,61 +83,16 @@ QWidget *MainSettingsTab::dark_mode_row_widget()
     layout->addWidget(label, 1);
 
     Switch *toggle = new Switch(widget);
-    toggle->scale(this->config->get_scale());
-    toggle->setChecked(this->config->get_dark_mode());
-    connect(this->config, &Config::scale_changed, [toggle](double scale) { toggle->scale(scale); });
-    connect(this->theme, &Theme::mode_updated,
-            [toggle, config = this->config](bool mode) { toggle->setChecked(mode); });
-    connect(toggle, &Switch::stateChanged, [theme = this->theme, config = this->config](bool state) {
-        config->set_dark_mode(state);
-        theme->set_mode(state);
-        theme->update();
+    toggle->scale(this->arbiter.layout().scale);
+    toggle->setChecked(this->arbiter.theme().mode == Session::Theme::Dark);
+    connect(&this->arbiter, &Arbiter::mode_changed, [toggle, this](Session::Theme::Mode mode){
+        toggle->setChecked(mode == Session::Theme::Dark);
     });
-    Shortcut *shortcut = new Shortcut(this->config->get_shortcut("dark_mode_toggle"), this->window());
-    this->shortcuts->add_shortcut("dark_mode_toggle", "Toggle Dark Mode", shortcut);
-    connect(shortcut, &Shortcut::activated, [toggle]() { toggle->click(); });
-
-    Shortcut *temp_shortcut_on = new Shortcut(this->config->get_shortcut("dark_mode_on"), this->window());
-    this->shortcuts->add_shortcut("dark_mode_on", "[Enable Dark Mode]", temp_shortcut_on);
-    connect(temp_shortcut_on, &Shortcut::activated, [toggle]() {
-        if (!toggle->isChecked()) toggle->click();
-    });
-    Shortcut *temp_shortcut_off = new Shortcut(this->config->get_shortcut("dark_mode_off"), this->window());
-    this->shortcuts->add_shortcut("dark_mode_off", "[Disable Dark Mode]", temp_shortcut_off);
-    connect(temp_shortcut_off, &Shortcut::activated, [toggle]() {
-        if (toggle->isChecked()) toggle->click();
+    connect(toggle, &Switch::stateChanged, [this](bool state){
+        this->arbiter.set_mode(state ? Session::Theme::Dark : Session::Theme::Light);
     });
 
     layout->addWidget(toggle, 1, Qt::AlignHCenter);
-
-    return widget;
-}
-
-QWidget *MainSettingsTab::brightness_plugin_row_widget()
-{
-    QWidget *widget = new QWidget(this);
-    QHBoxLayout *layout = new QHBoxLayout(widget);
-
-    QLabel *label = new QLabel("Brightness Plugin", widget);
-    layout->addWidget(label, 1);
-
-    layout->addWidget(this->brightness_plugin_select_widget(), 1);
-
-    return widget;
-}
-
-QWidget *MainSettingsTab::brightness_plugin_select_widget()
-{
-    QWidget *widget = new QWidget(this);
-    QHBoxLayout *layout = new QHBoxLayout(widget);
-
-    auto plugins = this->config->get_brightness_plugins();
-    Selector *selector = new Selector(plugins, this->config->get_brightness_plugin_name(), Theme::font_14, widget);
-    connect(selector, &Selector::item_changed, [config = this->config](QString item) { config->set_brightness_plugin(item); });
-
-    layout->addStretch(1);
-    layout->addWidget(selector, 10);
-    layout->addStretch(1);
 
     return widget;
 }
@@ -159,29 +113,14 @@ QWidget *MainSettingsTab::brightness_row_widget()
 QWidget *MainSettingsTab::brightness_widget()
 {
     QWidget *widget = new QWidget(this);
-    QHBoxLayout *layout = new QHBoxLayout(widget);
+    QVBoxLayout *layout = new QVBoxLayout(widget);
 
-    layout->addStretch(1);
-    layout->addWidget(brightness_slider(true, this), 6);
-    layout->addStretch(1);
+    auto plugins = this->arbiter.system().brightness.plugins();
+    Selector *selector = new Selector(plugins, this->arbiter.system().brightness.plugin, this->arbiter.forge().font(14), this->arbiter, widget, Session::System::Brightness::AUTO_PLUGIN);
+    connect(selector, &Selector::item_changed, [this](QString item){ this->arbiter.set_brightness_plugin(item); });
 
-    return widget;
-}
-
-QWidget *MainSettingsTab::si_units_row_widget()
-{
-    QWidget *widget = new QWidget(this);
-    QHBoxLayout *layout = new QHBoxLayout(widget);
-
-    QLabel *label = new QLabel("SI Units", widget);
-    layout->addWidget(label, 1);
-
-    Switch *toggle = new Switch(widget);
-    toggle->scale(this->config->get_scale());
-    toggle->setChecked(this->config->get_si_units());
-    connect(this->config, &Config::scale_changed, [toggle](double scale) { toggle->scale(scale); });
-    connect(toggle, &Switch::stateChanged, [config = this->config](bool state) { config->set_si_units(state); });
-    layout->addWidget(toggle, 1, Qt::AlignHCenter);
+    layout->addWidget(selector);
+    layout->addWidget(this->arbiter.forge().brightness_slider());
 
     return widget;
 }
@@ -204,35 +143,29 @@ QWidget *MainSettingsTab::color_select_widget()
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
-    ColorPicker *label = new ColorPicker(Theme::icon_16, Theme::font_14, widget);
-    label->update(this->config->get_color());
-    connect(label, &ColorPicker::color_changed, [this](QColor color) {
-        this->config->set_color(color.name());
-        this->theme->update();
-    });
-    connect(this->theme, &Theme::mode_updated,
-            [label, config = this->config](bool) { label->update(config->get_color()); });
+    ColorPicker *label = new ColorPicker(this->arbiter, 16, this->arbiter.forge().font(14), widget);
+    label->update(this->arbiter.theme().color());
+    connect(label, &ColorPicker::color_changed, [this](QColor color){ this->arbiter.set_color(color); });
+    connect(&this->arbiter, &Arbiter::color_changed, [label](QColor color){ label->update(color); });
 
     layout->addWidget(label);
 
     return widget;
 }
 
-QWidget *MainSettingsTab::mouse_row_widget()
+QWidget *MainSettingsTab::cursor_row_widget()
 {
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
-    QLabel *label = new QLabel("Mouse", widget);
+    QLabel *label = new QLabel("Cursor", widget);
     layout->addWidget(label, 1);
 
     Switch *toggle = new Switch(widget);
-    toggle->scale(this->config->get_scale());
-    toggle->setChecked(this->config->get_mouse_active());
-    connect(this->config, &Config::scale_changed, [toggle](double scale) { toggle->scale(scale); });
-    connect(toggle, &Switch::stateChanged, [config = this->config](bool state) {
-        qApp->setOverrideCursor(state ? Qt::ArrowCursor : Qt::BlankCursor);
-        config->set_mouse_active(state);
+    toggle->scale(this->arbiter.layout().scale);
+    toggle->setChecked(this->arbiter.core().cursor);
+    connect(toggle, &Switch::stateChanged, [this](bool state){
+        this->arbiter.set_cursor(state);
     });
     layout->addWidget(toggle, 1, Qt::AlignHCenter);
 
@@ -247,19 +180,30 @@ QWidget *MainSettingsTab::volume_row_widget()
     QLabel *label = new QLabel("Volume", widget);
     layout->addWidget(label, 1);
 
-    layout->addWidget(this->volume_widget(), 1);
+    layout->addWidget(this->arbiter.forge().volume_slider(), 1);
 
     return widget;
 }
 
-QWidget *MainSettingsTab::volume_widget()
+QWidget *MainSettingsTab::server_row_widget()
 {
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
-    layout->addStretch(1);
-    layout->addWidget(volume_slider(false, this), 6);
-    layout->addStretch(1);
+    QLabel *label = new QLabel("Server", widget);
+    layout->addWidget(label, 1);
+
+    Switch *toggle = new Switch(widget);
+    toggle->scale(this->arbiter.layout().scale);
+    toggle->setChecked(this->arbiter.system().server.enabled());
+    connect(&this->arbiter.system().server, &Server::changed, [toggle](bool enabled){
+        toggle->setChecked(enabled);
+    });
+    connect(toggle, &Switch::stateChanged, [this](bool state){
+        this->arbiter.system().server.enable(state);
+    });
+
+    layout->addWidget(toggle, 1, Qt::AlignHCenter);
 
     return widget;
 }
@@ -279,34 +223,38 @@ QWidget *MainSettingsTab::controls_row_widget()
 
 QWidget *MainSettingsTab::controls_widget()
 {
-    QWidget *widget = new QWidget(this);
-    QVBoxLayout *layout = new QVBoxLayout(widget);
+    auto widget = new QWidget();
+    auto layout = new QVBoxLayout(widget);
 
-    QPushButton *exit_button = new QPushButton("exit", widget);
-    connect(exit_button, &QPushButton::clicked, []() { qApp->exit(); });
+    auto minimize_button = new QPushButton("minimize");
+    connect(minimize_button, &QPushButton::clicked, [this]{ this->arbiter.window()->setWindowState(Qt::WindowMinimized); });
+    layout->addWidget(minimize_button);
+    auto exit_button = new QPushButton("exit");
+    connect(exit_button, &QPushButton::clicked, [this]{ qApp->exit(); });
     layout->addWidget(exit_button);
-    layout->addWidget(Theme::br(widget));
-    QPushButton *shut_down_button = new QPushButton("shut down", widget);
-    connect(shut_down_button, &QPushButton::clicked, [config = this->config]() {
-        config->save();
+    layout->addWidget(Session::Forge::br());
+    auto reboot_button = new QPushButton("reboot");
+    connect(reboot_button, &QPushButton::clicked, [this]{
+        this->arbiter.settings().sync();
         sync();
-        system("sudo shutdown -h now");
+        system(Session::System::REBOOT_CMD);
+    });
+    layout->addWidget(reboot_button);
+    auto shut_down_button = new QPushButton("shut down");
+    connect(shut_down_button, &QPushButton::clicked, [this]{
+        this->arbiter.settings().sync();
+        sync();
+        system(Session::System::SHUTDOWN_CMD);
     });
     layout->addWidget(shut_down_button);
-    QPushButton *restart_button = new QPushButton("restart", widget);
-    connect(restart_button, &QPushButton::clicked, [config = this->config]() {
-        config->save();
-        sync();
-        system("sudo shutdown -r now");
-    });
-    layout->addWidget(restart_button);
 
     return widget;
 }
 
-LayoutSettingsTab::LayoutSettingsTab(QWidget *parent) : QWidget(parent)
+LayoutSettingsTab::LayoutSettingsTab(Arbiter &arbiter, QWidget *parent)
+    : QWidget(parent)
+    , arbiter(arbiter)
 {
-    this->theme = Theme::get_instance();
     this->config = Config::get_instance();
 
     QVBoxLayout *layout = new QVBoxLayout(this);
@@ -321,19 +269,21 @@ QWidget *LayoutSettingsTab::settings_widget()
     QVBoxLayout *layout = new QVBoxLayout(widget);
 
     layout->addWidget(this->pages_widget());
-    layout->addWidget(Theme::br(widget), 1);
-    layout->addWidget(this->controls_bar_widget(), 1);
+    layout->addWidget(Session::Forge::br(), 1);
+    layout->addWidget(this->control_bar_widget(), 1);
 
     QWidget *controls_bar_row = this->quick_view_row_widget();
-    controls_bar_row->setVisible(this->config->get_controls_bar());
-    connect(this->config, &Config::controls_bar_changed, [controls_bar_row](bool controls_bar) { controls_bar_row->setVisible(controls_bar); });
+    controls_bar_row->setVisible(this->arbiter.layout().control_bar.enabled);
+    connect(&this->arbiter, &Arbiter::control_bar_changed, [controls_bar_row](bool enabled){
+        controls_bar_row->setVisible(enabled);
+    });
     layout->addWidget(controls_bar_row, 1);
 
-    layout->addWidget(Theme::br(widget), 1);
+    layout->addWidget(Session::Forge::br(), 1);
     layout->addWidget(this->scale_row_widget(), 1);
 
     QScrollArea *scroll_area = new QScrollArea(this);
-    Theme::to_touch_scroller(scroll_area);
+    Session::Forge::to_touch_scroller(scroll_area);
     scroll_area->setWidgetResizable(true);
     scroll_area->setWidget(widget);
 
@@ -351,35 +301,39 @@ QWidget *LayoutSettingsTab::pages_widget()
     QGroupBox *group = new QGroupBox(widget);
     QVBoxLayout *group_layout = new QVBoxLayout(group);
 
-    DashWindow *window = qobject_cast<DashWindow *>(this->window());
-
-    for (QAbstractButton *page : window->get_pages()) {
-        QCheckBox *button = new QCheckBox(page->property("page").value<QWidget *>()->objectName(), group);
-        button->setChecked(!page->isHidden());
-        connect(button, &QCheckBox::toggled, [page, config = this->config](bool checked) {
-            config->set_page(page->property("page").value<QWidget *>(), checked);
-        });
-        group_layout->addWidget(button);
+    for (auto page : this->arbiter.layout().pages()) {
+        if (page->toggleale()) {
+            QCheckBox *button = new QCheckBox(page->name(), group);
+            button->setChecked(page->enabled());
+            connect(button, &QCheckBox::toggled, [this, page](bool checked){
+                this->arbiter.set_page(page, checked);
+            });
+            group_layout->addWidget(button);
+        }
     }
+    connect(&this->arbiter, &Arbiter::page_changed, [this, group_layout](Page *page, bool enabled){
+        auto item = group_layout->itemAt(this->arbiter.layout().page_id(page));
+        if (auto button = qobject_cast<QCheckBox *>(item->widget()))
+            button->setChecked(enabled);
+    });
 
     layout->addWidget(group, 1, Qt::AlignHCenter);
 
     return widget;
 }
 
-QWidget *LayoutSettingsTab::controls_bar_widget()
+QWidget *LayoutSettingsTab::control_bar_widget()
 {
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
-    QLabel *label = new QLabel("Controls Bar", widget);
+    QLabel *label = new QLabel("Control Bar", widget);
     layout->addWidget(label, 1);
 
     Switch *toggle = new Switch(widget);
-    toggle->scale(this->config->get_scale());
-    toggle->setChecked(this->config->get_controls_bar());
-    connect(this->config, &Config::scale_changed, [toggle](double scale) { toggle->scale(scale); });
-    connect(toggle, &Switch::stateChanged, [config = this->config](bool state) { config->set_controls_bar(state); });
+    toggle->scale(this->arbiter.layout().scale);
+    toggle->setChecked(this->arbiter.layout().control_bar.enabled);
+    connect(toggle, &Switch::stateChanged, [this](bool state){ this->arbiter.set_control_bar(state); });
     layout->addWidget(toggle, 1, Qt::AlignHCenter);
 
     return widget;
@@ -393,23 +347,14 @@ QWidget *LayoutSettingsTab::quick_view_row_widget()
     QLabel *label = new QLabel("Quick View", widget);
     layout->addWidget(label, 1);
 
-    layout->addWidget(this->quick_view_select_widget(), 1);
-
-    return widget;
-}
-
-QWidget *LayoutSettingsTab::quick_view_select_widget()
-{
-    QWidget *widget = new QWidget(this);
-    QHBoxLayout *layout = new QHBoxLayout(widget);
-
-    auto plugins = this->config->get_quick_views().keys();
-    Selector *selector = new Selector(plugins, this->config->get_quick_view(), Theme::font_14, widget);
-    connect(selector, &Selector::item_changed, [config = this->config](QString item) { config->set_quick_view(item); });
-
-    layout->addStretch(1);
-    layout->addWidget(selector, 10);
-    layout->addStretch(1);
+    QStringList quick_views;
+    for (auto quick_view : this->arbiter.layout().control_bar.quick_views())
+        quick_views.append(quick_view->name());
+    Selector *selector = new Selector(quick_views, this->arbiter.layout().control_bar.curr_quick_view->name(), this->arbiter.forge().font(14), this->arbiter, widget);
+    connect(selector, &Selector::idx_changed, [this](int idx){
+        this->arbiter.set_curr_quick_view(idx);
+    });
+    layout->addWidget(selector, 1);
 
     return widget;
 }
@@ -435,40 +380,30 @@ QWidget *LayoutSettingsTab::scale_widget()
     QSlider *slider = new QSlider(Qt::Orientation::Horizontal, widget);
     slider->setTracking(false);
     slider->setRange(2, 6);
-    slider->setValue(this->config->get_scale() * 4);
-    connect(slider, &QSlider::valueChanged, [config = this->config, slider](int position) {
-        slider->setEnabled(false);
-        double scale = position / 4.0;
-        config->set_scale(scale);
-        slider->setEnabled(true);
-        slider->setFocus();
-    });
+    slider->setValue(this->arbiter.layout().scale * 4);
+    connect(slider, &QSlider::valueChanged, [this, slider](int position){ this->arbiter.set_scale(position / 4.0); });
 
     QPushButton *lower_button = new QPushButton(widget);
     lower_button->setFlat(true);
-    lower_button->setIconSize(Theme::icon_32);
-    lower_button->setIcon(this->theme->make_button_icon("remove", lower_button));
-    connect(lower_button, &QPushButton::clicked, [slider]() { slider->setValue(slider->value() - 1); });
+    this->arbiter.forge().iconize("remove", lower_button, 32);
+    connect(lower_button, &QPushButton::clicked, [slider]{ slider->setValue(slider->value() - 1); });
 
     QPushButton *raise_button = new QPushButton(widget);
     raise_button->setFlat(true);
-    raise_button->setIconSize(Theme::icon_32);
-    raise_button->setIcon(this->theme->make_button_icon("add", raise_button));
-    connect(raise_button, &QPushButton::clicked, [slider]() { slider->setValue(slider->value() + 1); });
+    this->arbiter.forge().iconize("add", raise_button, 32);
+    connect(raise_button, &QPushButton::clicked, [slider]{ slider->setValue(slider->value() + 1); });
 
-    layout->addStretch(1);
     layout->addWidget(lower_button);
     layout->addWidget(slider, 4);
     layout->addWidget(raise_button);
-    layout->addStretch(1);
 
     return widget;
 }
 
-BluetoothSettingsTab::BluetoothSettingsTab(QWidget *parent) : QWidget(parent)
+BluetoothSettingsTab::BluetoothSettingsTab(Arbiter &arbiter, QWidget *parent)
+    : QWidget(parent)
+    , arbiter(arbiter)
 {
-    this->bluetooth = Bluetooth::get_instance();
-    this->theme = Theme::get_instance();
     this->config = Config::get_instance();
 
     QHBoxLayout *layout = new QHBoxLayout(this);
@@ -487,10 +422,11 @@ QWidget *BluetoothSettingsTab::controls_widget()
     layout->addStretch();
     layout->addWidget(label);
 
-    QLabel *connected_device = new QLabel(this->bluetooth->get_media_player().first, widget);
+    QLabel *connected_device = new QLabel(this->arbiter.system().bluetooth.get_media_player().first, widget);
     connected_device->setIndent(16);
-    connect(this->bluetooth, &Bluetooth::media_player_changed,
-            [connected_device](QString name, BluezQt::MediaPlayerPtr) { connected_device->setText(name); });
+    connect(&this->arbiter.system().bluetooth, &Bluetooth::media_player_changed, [connected_device](QString name, BluezQt::MediaPlayerPtr){
+        connected_device->setText(name);
+    });
     layout->addWidget(connected_device);
     layout->addStretch();
 
@@ -508,23 +444,21 @@ QWidget *BluetoothSettingsTab::scanner_widget()
     button->setFlat(true);
     button->setCheckable(true);
     button->setEnabled(false);
-    connect(this->bluetooth, &Bluetooth::init, [bluetooth = this->bluetooth, button]() {
-        button->setEnabled(bluetooth->has_adapter());
-    });
-    button->setIconSize(Theme::icon_36);
-    button->setIcon(this->theme->make_button_icon("bluetooth_searching", button));
-    connect(button, &QPushButton::clicked, [bluetooth = this->bluetooth](bool checked) {
+    this->arbiter.forge().iconize("bluetooth_searching", button, 36);
+    connect(button, &QPushButton::clicked, [this](bool checked){
         if (checked)
-            bluetooth->start_scan();
+            this->arbiter.system().bluetooth.start_scan();
         else
-            bluetooth->stop_scan();
+            this->arbiter.system().bluetooth.stop_scan();
+    });
+    connect(&this->arbiter.system().bluetooth, &Bluetooth::init, [this, button]{
+        button->setEnabled(this->arbiter.system().bluetooth.has_adapter());
     });
     layout->addWidget(button);
 
     ProgressIndicator *loader = new ProgressIndicator(widget);
-    loader->scale(this->config->get_scale());
-    connect(this->config, &Config::scale_changed, [loader](double scale) { loader->scale(scale); });
-    connect(this->bluetooth, &Bluetooth::scan_status, [button, loader](bool status) {
+    loader->scale(this->arbiter.layout().scale);
+    connect(&this->arbiter.system().bluetooth, &Bluetooth::scan_status, [button, loader](bool status){
         if (status)
             loader->start_animation();
         else
@@ -541,154 +475,124 @@ QWidget *BluetoothSettingsTab::devices_widget()
     QWidget *widget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
 
-    for (BluezQt::DevicePtr device : this->bluetooth->get_devices()) {
-        if (device->address() == this->config->get_bluetooth_device()) device->connectToDevice();
+    for (BluezQt::DevicePtr device : this->arbiter.system().bluetooth.get_devices()) {
         QPushButton *button = new QPushButton(device->name(), widget);
         button->setCheckable(true);
-        if (device->isConnected()) button->setChecked(true);
-        connect(button, &QPushButton::clicked, [config = this->config, button, device](bool checked = false) {
+        if (device->isConnected())
+            button->setChecked(true);
+        connect(button, &QPushButton::clicked, [this, button, device](bool checked = false){
             button->setChecked(!checked);
-            if (checked) {
-                device->connectToDevice();
-                config->set_bluetooth_device(device->address());
-            }
-            else {
-                device->disconnectFromDevice();
-                config->set_bluetooth_device(QString());
-            }
+            this->arbiter.system().bluetooth.toggle_device(device);
         });
 
         this->devices[device] = button;
         layout->addWidget(button);
     }
-    connect(this->bluetooth, &Bluetooth::device_added, [this, layout, widget](BluezQt::DevicePtr device) {
+    connect(&this->arbiter.system().bluetooth, &Bluetooth::device_added, [this, layout, widget](BluezQt::DevicePtr device){
         QPushButton *button = new QPushButton(device->name(), widget);
         button->setCheckable(true);
-        if (device->isConnected()) button->setChecked(true);
-        connect(button, &QPushButton::clicked, [button, device](bool checked = false) {
+        if (device->isConnected())
+            button->setChecked(true);
+        connect(button, &QPushButton::clicked, [this, button, device](bool checked = false){
             button->setChecked(!checked);
-            if (checked)
-                device->connectToDevice()->waitForFinished();
-            else
-                device->disconnectFromDevice()->waitForFinished();
+            this->arbiter.system().bluetooth.toggle_device(device);
         });
         this->devices[device] = button;
         layout->addWidget(button);
     });
-    connect(this->bluetooth, &Bluetooth::device_changed, [this](BluezQt::DevicePtr device) {
-        if(!this->devices.contains(device))
-        {
-            emit this->bluetooth->device_added(device);
+    connect(&this->arbiter.system().bluetooth, &Bluetooth::device_changed, [this](BluezQt::DevicePtr device){
+        if(!this->devices.contains(device)) {
+            emit this->arbiter.system().bluetooth.device_added(device);
         }
-        else
-        {
+        else {
             this->devices[device]->setText(device->name());
             this->devices[device]->setChecked(device->isConnected());
         }
     });
-    connect(this->bluetooth, &Bluetooth::device_removed, [this, layout](BluezQt::DevicePtr device) {
+    connect(&this->arbiter.system().bluetooth, &Bluetooth::device_removed, [this, layout](BluezQt::DevicePtr device){
         layout->removeWidget(devices[device]);
         delete this->devices[device];
         this->devices.remove(device);
     });
 
     QScrollArea *scroll_area = new QScrollArea(this);
-    Theme::to_touch_scroller(scroll_area);
+    Session::Forge::to_touch_scroller(scroll_area);
     scroll_area->setWidgetResizable(true);
     scroll_area->setWidget(widget);
 
     return scroll_area;
 }
 
-ActionsSettingsTab::ActionsSettingsTab(QWidget *parent) : QWidget(parent)
+ActionsSettingsTab::ActionsSettingsTab(Arbiter &arbiter)
+    : QWidget()
+    , arbiter(arbiter)
 {
-    this->theme = Theme::get_instance();
-    this->config = Config::get_instance();
-    this->shortcuts = Shortcuts::get_instance();
-    QVBoxLayout *layout = new QVBoxLayout(this);
+    auto layout = new QVBoxLayout(this);
     layout->setContentsMargins(6, 0, 6, 0);
 
-    layout->addWidget(this->settings_widget());
+    layout->addWidget(this->settings());
 }
 
-QWidget *ActionsSettingsTab::settings_widget()
+QWidget *ActionsSettingsTab::settings()
 {
-    QWidget *widget = new QWidget(this);
-    QVBoxLayout *layout = new QVBoxLayout(widget);
+    auto widget = new QWidget();
+    auto layout = new QVBoxLayout(widget);
 
-    QMap<QString, QPair<QString, Shortcut *>> shortcuts = this->shortcuts->get_shortcuts();
-    for (auto id : shortcuts.keys()) {
-        QPair<QString, Shortcut *> shortcut = shortcuts[id];
-        layout->addWidget(this->shortcut_row_widget(id, shortcut.first, shortcut.second));
-    }
-    connect(this->shortcuts, &Shortcuts::shortcut_added,
-            [this, layout](QString id, QString description, Shortcut *shortcut) {
-                layout->addWidget(this->shortcut_row_widget(id, description, shortcut));
-            });
+    for (auto action : this->arbiter.core().actions())
+        layout->addWidget(this->action_row(action));
 
-    QScrollArea *scroll_area = new QScrollArea(this);
-    Theme::to_touch_scroller(scroll_area);
+    auto scroll_area = new QScrollArea();
+    Session::Forge::to_touch_scroller(scroll_area);
     scroll_area->setWidgetResizable(true);
     scroll_area->setWidget(widget);
 
     return scroll_area;
 }
 
-QWidget *ActionsSettingsTab::shortcut_row_widget(QString id, QString description, Shortcut *shortcut)
+QWidget *ActionsSettingsTab::action_row(Action *action)
 {
-    QWidget *widget = new QWidget(this);
-    QHBoxLayout *layout = new QHBoxLayout(widget);
+    auto widget = new QWidget();
+    auto layout = new QHBoxLayout(widget);
 
-    QLabel *label = new QLabel(description, widget);
+    auto label = new QLabel(action->name());
 
     layout->addWidget(label, 1);
-    layout->addWidget(this->shortcut_input_widget(id, shortcut), 1);
+    layout->addWidget(this->action_input(action), 1);
 
     return widget;
 }
 
-QWidget *ActionsSettingsTab::shortcut_input_widget(QString id, Shortcut *shortcut)
+QWidget *ActionsSettingsTab::action_input(Action *action)
 {
-    QWidget *widget = new QWidget(this);
-    QHBoxLayout *layout = new QHBoxLayout(widget);
+    auto widget = new QWidget();
+    auto layout = new QHBoxLayout(widget);
 
-    QPushButton *symbol = new QPushButton(widget);
-    QSizePolicy symbol_policy = symbol->sizePolicy();
-    symbol_policy.setRetainSizeWhenHidden(true);
-    symbol->setSizePolicy(symbol_policy);
-    symbol->setFocusPolicy(Qt::NoFocus);
-    symbol->setAttribute(Qt::WA_TransparentForMouseEvents, true);
+    auto dialog = new ActionDialog(this->arbiter);
+    dialog->set_title(action->name());
+
+    auto button = new QPushButton(action->key());
+    button->setFont(this->arbiter.forge().font(16, true));
+    connect(button, &QPushButton::clicked, [dialog]{ dialog->open(); });
+
+    auto symbol = new QPushButton();
+    Session::Forge::symbolize(symbol);
     symbol->setFlat(true);
     symbol->setCheckable(true);
-    if (shortcut->to_str().isEmpty())
-        symbol->hide();
-    else
-        symbol->setChecked(shortcut->to_str().startsWith("gpio"));
-    symbol->setIconSize(Theme::icon_32);
-    symbol->setIcon(this->theme->make_button_icon("keyboard", symbol, "developer_board"));
+    symbol->setVisible(!action->key().isNull());
+    symbol->setChecked(action->key().startsWith("gpio"));
+    this->arbiter.forge().iconize("keyboard", "developer_board", symbol, 32);
 
-    ShortcutInput *input = new ShortcutInput(shortcut->to_str(), widget);
-    input->setProperty("add_hint", true);
-    input->setFlat(true);
-    QFont font(Theme::font_18);
-    font.setFamily("Titillium Web");
-    input->setFont(font);
-    connect(input, &ShortcutInput::shortcut_updated, [this, id, symbol](QString shortcut) {
-        if (shortcut.isEmpty()) {
-            symbol->hide();
-        }
-        else {
-            symbol->setChecked(shortcut.startsWith("gpio"));
-            symbol->show();
-        }
-        this->shortcuts->update_shortcut(id, shortcut);
-        this->config->set_shortcut(id, shortcut);
+    auto save = new QPushButton("save");
+    connect(save, &QPushButton::clicked, [this, action, dialog, button, symbol]{
+        this->arbiter.set_action(action, dialog->key());
+        button->setText(action->key());
+        symbol->setVisible(!action->key().isNull());
+        symbol->setChecked(action->key().startsWith("gpio"));
     });
+    dialog->set_button(save);
 
-    layout->addStretch(1);
-    layout->addWidget(input, 3);
-    layout->addStretch(1);
-    layout->addWidget(symbol, 1, Qt::AlignRight);
+    layout->addWidget(button, 1);
+    layout->addWidget(symbol, 0, Qt::AlignRight);
 
     return widget;
 }
