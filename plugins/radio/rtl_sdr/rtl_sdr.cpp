@@ -29,7 +29,7 @@ RtlSdr::RtlSdr()
         if (status != QProcess::NormalExit)
             this->kill();
     });
-    connect(&this->socket, &QTcpSocket::errorOccurred, [this](QAbstractSocket::SocketError){ this->kill(); });
+    connect(&this->socket, &QTcpSocket::disconnected, [this](){ this->kill(); });
 }
 
 bool RtlSdr::play()
