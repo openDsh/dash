@@ -183,8 +183,10 @@ void RadioPlayerTab::load_plugin()
     auto key = this->plugin_selector->get_current();
     if (!key.isNull()) {
         this->loader.setFileName(this->plugins[key].absoluteFilePath());
-        if (RadioPlugin *plugin = qobject_cast<RadioPlugin *>(this->loader.instance()))
-            this->play_button->setChecked(plugin->freq(this->tuner->value() * 100000));
+        if (RadioPlugin *plugin = qobject_cast<RadioPlugin *>(this->loader.instance())) {
+            if (!plugin->freq(this->tuner->value() * 100000))
+                this->play_button->setChecked(false);
+        }
     }
     this->config->set_radio_plugin(key);
 }
