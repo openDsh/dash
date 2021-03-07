@@ -6,9 +6,9 @@ class RadioPlugin : public Plugin {
    public:
     RadioPlugin() { this->settings.beginGroup("Radio"); }
     virtual ~RadioPlugin() = default;
-    virtual bool play() = 0;
-    virtual bool stop() = 0;
-    virtual bool freq(int hz) = 0;
+    virtual void play() = 0;
+    virtual void stop() = 0;
+    virtual void freq(int hz) = 0;
 };
 
 #define RadioPlugin_iid "openDsh.plugins.RadioPlugin"

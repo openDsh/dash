@@ -148,9 +148,9 @@ RadioPlayerTab::RadioPlayerTab(Arbiter &arbiter, QWidget *parent)
     connect(this->play_button, &QPushButton::clicked, [this](bool checked){
         if (RadioPlugin *plugin = qobject_cast<RadioPlugin *>(this->loader.instance())) {
             if (checked)
-                this->play_button->setChecked(plugin->play());
+                plugin->play();
             else
-                this->play_button->setChecked(!plugin->stop());
+                plugin->stop();
         }
         else {
             this->play_button->setChecked(false);
@@ -184,8 +184,7 @@ void RadioPlayerTab::load_plugin()
     if (!key.isNull()) {
         this->loader.setFileName(this->plugins[key].absoluteFilePath());
         if (RadioPlugin *plugin = qobject_cast<RadioPlugin *>(this->loader.instance())) {
-            if (!plugin->freq(this->tuner->value() * 100000))
-                this->play_button->setChecked(false);
+            plugin->freq(this->tuner->value() * 100000);
         }
     }
     this->config->set_radio_plugin(key);
