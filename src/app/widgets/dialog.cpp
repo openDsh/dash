@@ -5,10 +5,13 @@
 #include <QPropertyAnimation>
 #include <QRect>
 
+#include "app/arbiter.hpp"
 #include "app/config.hpp"
 #include "app/widgets/dialog.hpp"
 
-Dialog::Dialog(bool fullscreen, QWidget *parent) : QDialog(parent, Qt::FramelessWindowHint)
+Dialog::Dialog(Arbiter &arbiter, bool fullscreen, QWidget *parent)
+    : QDialog(parent, Qt::FramelessWindowHint)
+    , arbiter(arbiter)
 {
     this->setAttribute(Qt::WA_TranslucentBackground, true);
 
@@ -16,7 +19,7 @@ Dialog::Dialog(bool fullscreen, QWidget *parent) : QDialog(parent, Qt::Frameless
     if (this->fullscreen)
         this->setModal(true);
 
-    this->scale = Config::get_instance()->get_scale();
+    this->scale = this->arbiter.layout().scale;
 
     QHBoxLayout *layout = new QHBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
@@ -37,6 +40,39 @@ void Dialog::open(int timeout)
     this->activateWindow();
     if (timeout > 0)
         this->timer->start(timeout);
+}
+
+void Dialog::set_title(QString str)
+{
+    QLabel *label = new QLabel(str, this);
+    QFont font(this->arbiter.forge().font(16));
+    font.setBold(true);
+    label->setFont(font);
+    this->title->addWidget(label);
+}
+
+void Dialog::set_body(QWidget *widget)
+{
+    if (this->fullscreen) {
+        QScrollArea *scroll_area = new QScrollArea(this);
+        Session::Forge::to_touch_scroller(scroll_area);
+        scroll_area->setWidgetResizable(true);
+        scroll_area->setWidget(widget);
+
+        this->body->addWidget(scroll_area);
+    }
+    else {
+        this->body->addWidget(widget);
+    }
+}
+
+void Dialog::set_button(QPushButton *button)
+{
+    if (this->buttons->count() == 0)
+        this->add_cancel_button();
+    button->setFlat(true);
+    this->buttons->addWidget(button, 0, Qt::AlignRight);
+    connect(button, &QPushButton::clicked, [this]() { this->close(); });
 }
 
 QWidget *Dialog::content_widget()
@@ -131,6 +167,13 @@ bool Dialog::eventFilter(QObject *object, QEvent *event)
 
 void SnackBar::resizeEvent(QResizeEvent* event)
 {
+    // its possible the ref didnt exist when the parent was originally set
+    if (!this->parentWidget()) {
+        auto flags = this->windowFlags();
+        this->setParent(this->get_ref());
+        this->setWindowFlags(flags);
+    }
+
     if (QWidget *parent = this->parentWidget())
         this->setFixedWidth(parent->width() * (2 / 3.0));
 

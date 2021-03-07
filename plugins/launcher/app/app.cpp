@@ -2,7 +2,8 @@
 #include <unistd.h>
 
 #include "app/config.hpp"
-#include "app/theme.hpp"
+#include "app/arbiter.hpp"
+#include "app/session.hpp"
 
 #include "app.hpp"
 
@@ -112,11 +113,13 @@ void EmbeddedApp::end()
     emit closed();
 }
 
-Launcher::Launcher(int idx, QSettings &settings, QWidget *parent) : QWidget(parent), idx(idx), settings(settings)
+Launcher::Launcher(Arbiter &arbiter, QSettings &settings, int idx, QWidget *parent)
+    : QWidget(parent)
+    , arbiter(arbiter)
+    , settings(settings)
+    , idx(idx)
 {
     this->setObjectName("App");
-
-    this->theme = Theme::get_instance();
 
     QStackedLayout *layout = new QStackedLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
@@ -187,23 +190,22 @@ QWidget *Launcher::app_select_widget()
     home_button->setFlat(true);
     home_button->setCheckable(true);
     home_button->setChecked(true);
-    home_button->setIconSize(Theme::icon_32);
     connect(home_button, &QPushButton::clicked, [this](bool checked = false) {
         if (checked)
             this->settings.setValue(this->home_key(), this->path_label->text());
         else
             this->settings.remove(this->home_key());
     });
-    home_button->setIcon(this->theme->make_button_icon("playlist_add", home_button, "playlist_add_check", true));
+    this->arbiter.forge().iconize("playlist_add", "playlist_add_check", home_button, 32, true);
     layout->addWidget(home_button, 0, Qt::AlignTop);
 
     this->folders = new QListWidget(widget);
-    Theme::to_touch_scroller(this->folders);
+    Session::Forge::to_touch_scroller(this->folders);
     this->populate_dirs(root_path);
     layout->addWidget(this->folders, 4);
 
     this->apps = new QListWidget(widget);
-    Theme::to_touch_scroller(this->apps);
+    Session::Forge::to_touch_scroller(this->apps);
     this->populate_apps(root_path);
     connect(this->apps, &QListWidget::itemClicked, [this](QListWidgetItem *item) {
         QString app_path = this->path_label->text() + '/' + item->text();
@@ -279,7 +281,7 @@ void Launcher::populate_apps(QString path)
 QList<QWidget *> App::widgets()
 {
     int size = this->loaded_widgets.size();
-    this->loaded_widgets.append(new Launcher(size, this->settings));
+    this->loaded_widgets.append(new Launcher(*this->arbiter, this->settings, size));
     return this->loaded_widgets.mid(size);
 }
 

@@ -5,11 +5,14 @@
 #include <QLabel>
 #include <QList>
 
+#include "app/arbiter.hpp"
 #include "app/widgets/selector.hpp"
-#include "app/theme.hpp"
 
-Selector::Selector(QList<QString> options, QString current, QFont font, QWidget *parent, QString placeholder) :
-        QWidget(parent), options(options), placeholder(placeholder)
+Selector::Selector(QList<QString> options, QString current, QFont font, Arbiter &arbiter, QWidget *parent, QString placeholder)
+    : QWidget(parent)
+    , options(options)
+    , placeholder(placeholder)
+    , arbiter(arbiter)
 {
     this->label = new QLabel(this);
     this->label->setAlignment(Qt::AlignCenter);
@@ -25,8 +28,9 @@ Selector::Selector(QList<QString> options, QString current, QFont font, QWidget 
 
 QSize Selector::sizeHint() const
 {
-    int width = (Theme::icon_32.width() * 2) + this->label->width() + (12 * 2);
-    int height = std::max(Theme::icon_32.height(), this->label->height()) + (12 * 2);
+    int base = 32 * this->arbiter.layout().scale;
+    int width = (base * 2) + this->label->width() + (12 * 2);
+    int height = std::max(base, this->label->height()) + (12 * 2);
     return QSize(width, height);
 }
 
@@ -39,23 +43,23 @@ QLayout *Selector::selector()
 
     QPushButton *left_button = new QPushButton();
     left_button->setFlat(true);
-    left_button->setIconSize(Theme::icon_32);
-    left_button->setIcon(Theme::get_instance()->make_button_icon("arrow_left", left_button));
+    this->arbiter.forge().iconize("arrow_left", left_button, 32);
     connect(left_button, &QPushButton::clicked, [this]() {
         int count = this->options.size();
         this->current_idx = ((this->current_idx - 1) % count + count) % count;
         this->update_label();
         emit item_changed(this->get_current());
+        emit idx_changed(this->current_idx - (this->placeholder.isNull() ? 0 : 1));
     });
 
     QPushButton *right_button = new QPushButton();
     right_button->setFlat(true);
-    right_button->setIconSize(Theme::icon_32);
-    right_button->setIcon(Theme::get_instance()->make_button_icon("arrow_right", right_button));
+    this->arbiter.forge().iconize("arrow_right", right_button, 32);
     connect(right_button, &QPushButton::clicked, [this]() {
         this->current_idx = (this->current_idx + 1) % this->options.size();
         this->update_label();
         emit item_changed(this->get_current());
+        emit idx_changed(this->current_idx - (this->placeholder.isNull() ? 0 : 1));
     });
 
     layout->addWidget(left_button);

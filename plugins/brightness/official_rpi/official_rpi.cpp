@@ -1,3 +1,5 @@
+#include <QFileInfo>
+
 #include "official_rpi.hpp"
 
 OfficialRPi::OfficialRPi() : brightness_attribute(this->PATH)
@@ -11,12 +13,12 @@ OfficialRPi::~OfficialRPi()
         this->brightness_attribute.close();
 }
 
-bool OfficialRPi::is_supported()
+bool OfficialRPi::supported()
 {
     return QFileInfo(this->brightness_attribute).isWritable();
 }
 
-uint8_t OfficialRPi::get_priority()
+uint8_t OfficialRPi::priority()
 {
     return 3;
 }

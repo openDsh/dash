@@ -21,6 +21,7 @@
 #undef Status
 #undef Unsorted
 
+class Arbiter;
 class Config;
 class Theme;
 
@@ -72,7 +73,7 @@ class Launcher : public QWidget {
     Q_OBJECT
 
    public:
-    Launcher(int idx, QSettings &settings, QWidget *parent = nullptr);
+    Launcher(Arbiter &arbiter, QSettings &settings, int idx, QWidget *parent = nullptr);
     ~Launcher();
     void update_idx(int idx);
 
@@ -88,7 +89,8 @@ class Launcher : public QWidget {
     inline QString home_key() { return QString("%1/home").arg(this->idx); }
     inline QString app_key() { return QString("%1/app").arg(this->idx); }
 
-    Theme *theme;
+    Arbiter &arbiter;
+    QSettings &settings;
     EmbeddedApp *app;
     QLabel *path_label;
     QListWidget *folders;
@@ -96,7 +98,6 @@ class Launcher : public QWidget {
     int idx;
     bool auto_launch = false;
 
-    QSettings &settings;
 };
 
 class App : public QObject, LauncherPlugin {

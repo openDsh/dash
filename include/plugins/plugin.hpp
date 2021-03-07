@@ -5,23 +5,23 @@
 #include <QSettings>
 #include <QWidget>
 
-class Theme;
-class Config;
-class Shortcuts;
+class Arbiter;
 
 class Plugin {
    public:
     Plugin() : settings(qApp->organizationName(), "plugins") {}
     virtual ~Plugin() = default;
 
+    inline void dashize(Arbiter *arbiter)
+    {
+        if (!this->arbiter)
+            this->arbiter = arbiter;
+    }
     virtual QList<QWidget *> widgets() { return QList<QWidget *>{}; };
 
    protected:
-    static const Theme *theme;
-    static const Config *config;
-    static const Shortcuts *shortcuts;
-
     QSettings settings;
+    Arbiter *arbiter = nullptr;
 };
 
 #define Plugin_iid "openDsh.plugins.Plugin"

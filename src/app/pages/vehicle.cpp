@@ -91,9 +91,15 @@ QString Gauge::null_value()
     return null_str;
 }
 
-VehiclePage::VehiclePage(QWidget *parent) : QTabWidget(parent)
+VehiclePage::VehiclePage(Arbiter &arbiter, QWidget *parent)
+    : QTabWidget(parent)
+    , Page(arbiter, "Vehicle", "directions_car", true, this)
 {
-    this->addTab(new DataTab(this), "Data");
+}
+
+void VehiclePage::init()
+{
+    this->addTab(new DataTab(this->arbiter, this), "Data");
     this->config = Config::get_instance();
 
     for (auto device : QCanBus::instance()->availableDevices("socketcan"))
@@ -102,21 +108,17 @@ VehiclePage::VehiclePage(QWidget *parent) : QTabWidget(parent)
     for (auto port : QSerialPortInfo::availablePorts())
         this->serial_devices.append(port.systemLocation());
 
-    this->can_devices.append("No Interface");
-    this->serial_devices.append("No Interface");
-
     this->get_plugins();
     this->active_plugin = new QPluginLoader(this);
-    Dialog *dialog = new Dialog(true, this->window());
+    Dialog *dialog = new Dialog(this->arbiter, true, this->window());
     dialog->set_body(this->dialog_body());
-    QPushButton *load_button = new QPushButton("save");
+    QPushButton *load_button = new QPushButton("load");
     connect(load_button, &QPushButton::clicked, [this]() { this->load_plugin(); });
     dialog->set_button(load_button);
 
     QPushButton *settings_button = new QPushButton(this);
     settings_button->setFlat(true);
-    settings_button->setIconSize(Theme::icon_24);
-    settings_button->setIcon(Theme::get_instance()->make_button_icon("settings", settings_button));
+    this->arbiter.forge().iconize("settings", settings_button, 24);
     connect(settings_button, &QPushButton::clicked, [dialog]() { dialog->open(); });
     this->setCornerWidget(settings_button);
 
@@ -129,11 +131,24 @@ QWidget *VehiclePage::dialog_body()
     QVBoxLayout *layout = new QVBoxLayout(widget);
 
     QStringList plugins = this->plugins.keys();
-    this->plugin_selector = new Selector(plugins, this->config->get_vehicle_plugin(), Theme::font_14, widget, "unloader");
+    this->plugin_selector = new Selector(plugins, this->config->get_vehicle_plugin(), this->arbiter.forge().font(14), this->arbiter, widget, "unloader");
 
+    layout->addWidget(this->si_units_row_widget(), 1);
+    layout->addWidget(Session::Forge::br(), 1);
     layout->addWidget(this->can_bus_toggle_row(), 1);
-    layout->addWidget(this->interface_selector_row(), 1);
-    layout->addWidget(Theme::br(widget), 1);
+
+    QStringList devices = this->config->get_vehicle_can_bus() ? this->can_devices : this->serial_devices;
+    Selector *interface_selector = new Selector(devices, this->config->get_vehicle_interface(), this->arbiter.forge().font(14), this->arbiter, widget, "disabled");
+    interface_selector->setVisible((this->can_devices.size() > 0) || (this->serial_devices.size() > 0));
+    connect(interface_selector, &Selector::item_changed, [config = this->config](QString item){
+        config->set_vehicle_interface(item);
+    });
+    connect(this->config, &Config::vehicle_can_bus_changed, [this, interface_selector](bool state){
+        interface_selector->set_options(state ? this->can_devices : this->serial_devices);
+    });
+    layout->addWidget(interface_selector, 1);
+
+    layout->addWidget(Session::Forge::br(), 1);
     layout->addWidget(this->plugin_selector, 1);
 
     return widget;
@@ -150,21 +165,20 @@ QWidget *VehiclePage::can_bus_toggle_row()
     QGroupBox *group = new QGroupBox();
     QVBoxLayout *group_layout = new QVBoxLayout(group);
 
-
     QRadioButton *socketcan_button = new QRadioButton("SocketCAN", group);
     socketcan_button->setChecked(this->config->get_vehicle_can_bus());
-    connect(socketcan_button, &QRadioButton::clicked,
-            [config = this->config]() { 
-                config->set_vehicle_can_bus(true); 
-            });
+    socketcan_button->setEnabled(this->can_devices.size() > 0);
+    connect(socketcan_button, &QRadioButton::clicked, [config = this->config]{
+        config->set_vehicle_can_bus(true);
+    });
     group_layout->addWidget(socketcan_button);
 
     QRadioButton *elm_button = new QRadioButton("ELM327 (USB)", group);
     elm_button->setChecked(!this->config->get_vehicle_can_bus());
-    connect(elm_button, &QRadioButton::clicked,
-            [config = this->config]() { 
-                config->set_vehicle_can_bus(false); 
-            });
+    elm_button->setEnabled(this->serial_devices.size() > 0);
+    connect(elm_button, &QRadioButton::clicked, [config = this->config]{
+        config->set_vehicle_can_bus(false);
+    });
     group_layout->addWidget(elm_button);
 
     layout->addWidget(group, 1, Qt::AlignHCenter);
@@ -172,32 +186,28 @@ QWidget *VehiclePage::can_bus_toggle_row()
     return widget;
 }
 
-QWidget *VehiclePage::interface_selector_row()
+QWidget *VehiclePage::si_units_row_widget()
 {
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
-    QLabel *label = new QLabel("Interface", widget);
+    QLabel *label = new QLabel("SI Units", widget);
     layout->addWidget(label, 1);
 
-    QStringList devices = this->config->get_vehicle_can_bus() ? this->can_devices : this->serial_devices;
-    Selector *selector = new Selector(devices, this->config->get_vehicle_interface(), Theme::font_14, widget);
-    connect(selector, &Selector::item_changed, [config = this->config](QString item) {
-        config->set_vehicle_interface(item);
-    });
-    connect(this->config, &Config::vehicle_can_bus_changed, [this, selector](bool state) {
-        selector->set_options(state ? this->can_devices : this->serial_devices);
-    });
-    layout->addWidget(selector, 1);
+    Switch *toggle = new Switch(widget);
+    toggle->scale(this->arbiter.layout().scale);
+    toggle->setChecked(this->config->get_si_units());
+    connect(toggle, &Switch::stateChanged, [config = this->config](bool state) { config->set_si_units(state); });
+    layout->addWidget(toggle, 1, Qt::AlignHCenter);
 
     return widget;
 }
 
 void VehiclePage::get_plugins()
 {
-    for (const QFileInfo &plugin : Config::plugin_dir("vehicle").entryInfoList(QDir::Files)) {
+    for (const QFileInfo &plugin : Session::plugin_dir("vehicle").entryInfoList(QDir::Files)) {
         if (QLibrary::isLibrary(plugin.absoluteFilePath()))
-            this->plugins[Config::fmt_plugin(plugin.baseName())] = plugin;
+            this->plugins[Session::fmt_plugin(plugin.baseName())] = plugin;
     }
 }
 
@@ -211,6 +221,7 @@ void VehiclePage::load_plugin()
         this->active_plugin->setFileName(this->plugins[key].absoluteFilePath());
 
         if (VehiclePlugin *plugin = qobject_cast<VehiclePlugin *>(this->active_plugin->instance())) {
+            plugin->dashize(&this->arbiter);
             plugin->init((config->get_vehicle_can_bus())?((ICANBus *)SocketCANBus::get_instance()):((ICANBus *)elm327::get_instance()));
             for (QWidget *tab : plugin->widgets())
                 this->addTab(tab, tab->objectName());
@@ -219,13 +230,15 @@ void VehiclePage::load_plugin()
     this->config->set_vehicle_plugin(key);
 }
 
-DataTab::DataTab(QWidget *parent) : QWidget(parent)
+DataTab::DataTab(Arbiter &arbiter, QWidget *parent)
+    : QWidget(parent)
+    , arbiter(arbiter)
 {
     QHBoxLayout *layout = new QHBoxLayout(this);
 
     QWidget *driving_data = this->speedo_tach_widget();
     layout->addWidget(driving_data);
-    layout->addWidget(Theme::br(this, true));
+    layout->addWidget(Session::Forge::br(true));
 
     QWidget *engine_data = this->engine_data_widget();
     layout->addWidget(engine_data);
@@ -248,10 +261,9 @@ QWidget *DataTab::speedo_tach_widget()
 
     layout->addStretch(3);
 
-    QFont speed_value_font(Theme::font_36);
-    speed_value_font.setFamily("Titillium Web");
+    QFont speed_value_font(this->arbiter.forge().font(36, true));
 
-    QFont speed_unit_font(Theme::font_16);
+    QFont speed_unit_font(this->arbiter.forge().font(16));
     speed_unit_font.setWeight(QFont::Light);
     speed_unit_font.setItalic(true);
 
@@ -263,10 +275,9 @@ QWidget *DataTab::speedo_tach_widget()
 
     layout->addStretch(2);
 
-    QFont tach_value_font(Theme::font_24);
-    tach_value_font.setFamily("Titillium Web");
+    QFont tach_value_font(this->arbiter.forge().font(24, true));
 
-    QFont tach_unit_font(Theme::font_12);
+    QFont tach_unit_font(this->arbiter.forge().font(12));
     tach_unit_font.setWeight(QFont::Light);
     tach_unit_font.setItalic(true);
 
@@ -322,7 +333,7 @@ QWidget *DataTab::engine_data_widget()
     layout->addStretch();
     layout->addWidget(this->coolant_temp_widget());
     layout->addStretch();
-    layout->addWidget(Theme::br(widget));
+    layout->addWidget(Session::Forge::br());
     layout->addStretch();
     layout->addWidget(this->engine_load_widget());
     layout->addStretch();
@@ -337,10 +348,9 @@ QWidget *DataTab::coolant_temp_widget()
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
 
-    QFont value_font(Theme::font_16);
-    value_font.setFamily("Titillium Web");
+    QFont value_font(this->arbiter.forge().font(16, true));
 
-    QFont unit_font(Theme::font_12);
+    QFont unit_font(this->arbiter.forge().font(12));
     unit_font.setWeight(QFont::Light);
     unit_font.setItalic(true);
 
@@ -350,7 +360,7 @@ QWidget *DataTab::coolant_temp_widget()
     layout->addWidget(coolant_temp);
     this->gauges.push_back(coolant_temp);
 
-    QFont label_font(Theme::font_10);
+    QFont label_font(this->arbiter.forge().font(10));
     label_font.setWeight(QFont::Light);
 
     QLabel *coolant_temp_label = new QLabel("coolant", widget);
@@ -368,10 +378,9 @@ QWidget *DataTab::engine_load_widget()
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
 
-    QFont value_font(Theme::font_16);
-    value_font.setFamily("Titillium Web");
+    QFont value_font(this->arbiter.forge().font(16, true));
 
-    QFont unit_font(Theme::font_12);
+    QFont unit_font(this->arbiter.forge().font(12));
     unit_font.setWeight(QFont::Light);
     unit_font.setItalic(true);
 
@@ -381,7 +390,7 @@ QWidget *DataTab::engine_load_widget()
     layout->addWidget(engine_load);
     this->gauges.push_back(engine_load);
 
-    QFont label_font(Theme::font_10);
+    QFont label_font(this->arbiter.forge().font(10));
     label_font.setWeight(QFont::Light);
 
     QLabel *engine_load_label = new QLabel("load", widget);
