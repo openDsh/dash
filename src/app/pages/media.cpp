@@ -121,16 +121,41 @@ QWidget *BluetoothPlayerTab::controls_widget()
     return widget;
 }
 
+QMap<QString, QFileInfo> RadioPlayerTab::get_plugins()
+{
+    QMap<QString, QFileInfo> plugins;
+    for (auto plugin : Session::plugin_dir("radio").entryInfoList(QDir::Files)) {
+        if (QLibrary::isLibrary(plugin.absoluteFilePath()))
+            plugins[Session::fmt_plugin(plugin.baseName())] = plugin;
+    }
+
+    return plugins;
+}
+
 RadioPlayerTab::RadioPlayerTab(Arbiter &arbiter, QWidget *parent)
     : QWidget(parent)
     , arbiter(arbiter)
     , config(Config::get_instance())
-    , tuner(new Tuner(this->arbiter))
-    , plugin_selector(nullptr)
+    , plugins(RadioPlayerTab::get_plugins())
     , loader()
+    , tuner(new Tuner(this->arbiter))
+    , plugin_selector(new Selector(this->plugins.keys(), this->config->get_radio_plugin(), this->arbiter.forge().font(14), this->arbiter, nullptr, "unloader"))
+    , play_button(new QPushButton())
 {
-    this->get_plugins();
-    this->plugin_selector = new Selector(this->plugins.keys(), this->config->get_radio_plugin(), this->arbiter.forge().font(14), this->arbiter, nullptr, "unloader");
+    this->play_button->setFlat(true);
+    this->play_button->setCheckable(true);
+    this->arbiter.forge().iconize("play", "stop", this->play_button, 48);
+    connect(this->play_button, &QPushButton::clicked, [this](bool checked){
+        if (RadioPlugin *plugin = qobject_cast<RadioPlugin *>(this->loader.instance())) {
+            if (checked)
+                this->play_button->setChecked(plugin->play());
+            else
+                this->play_button->setChecked(!plugin->stop());
+        }
+        else {
+            this->play_button->setChecked(false);
+        }
+    });
 
     this->tuner->setValue(this->config->get_radio_station());
 
@@ -148,24 +173,18 @@ RadioPlayerTab::~RadioPlayerTab()
     this->loader.unload();
 }
 
-void RadioPlayerTab::get_plugins()
-{
-    for (auto plugin : Session::plugin_dir("radio").entryInfoList(QDir::Files)) {
-        if (QLibrary::isLibrary(plugin.absoluteFilePath()))
-            this->plugins[Session::fmt_plugin(plugin.baseName())] = plugin;
-    }
-}
-
 void RadioPlayerTab::load_plugin()
 {
     if (this->loader.isLoaded())
         this->loader.unload();
 
+    this->play_button->setChecked(false);
+
     auto key = this->plugin_selector->get_current();
     if (!key.isNull()) {
         this->loader.setFileName(this->plugins[key].absoluteFilePath());
         if (RadioPlugin *plugin = qobject_cast<RadioPlugin *>(this->loader.instance()))
-            plugin->freq(this->tuner->value() * 100000);
+            this->play_button->setChecked(plugin->freq(this->tuner->value() * 100000));
     }
     this->config->set_radio_plugin(key);
 }
@@ -210,28 +229,11 @@ QWidget *RadioPlayerTab::tuner_widget()
     // auto info = new QLabel("station info");
     // info->setWordWrap(true);
 
-    QPushButton *play_button = new QPushButton(widget);
-    play_button->setFlat(true);
-    play_button->setCheckable(true);
-    play_button->setChecked(false);
-    this->arbiter.forge().iconize("play", "stop", play_button, 56);
-    connect(play_button, &QPushButton::clicked, [this, play_button](bool checked = false) {
-        if (RadioPlugin *plugin = qobject_cast<RadioPlugin *>(this->loader.instance())) {
-            if (checked)
-                plugin->play();
-            else
-                plugin->stop();
-        }
-        else {
-            play_button->setChecked(!checked);
-        }
-    });
-
     layout->addStretch(2);
     layout->addWidget(settings_button);
     layout->addWidget(station, 2);
     // layout->addWidget(info, 3);
-    layout->addWidget(play_button, 3);
+    layout->addWidget(this->play_button, 3);
     layout->addStretch(2);
 
     return widget;

@@ -44,14 +44,16 @@ class RadioPlayerTab : public QWidget {
     ~RadioPlayerTab();
 
    private:
+    static QMap<QString, QFileInfo> get_plugins();
+
     Arbiter &arbiter;
     Config *config;
+    QMap<QString, QFileInfo> plugins;
+    QPluginLoader loader;
     Tuner *tuner;
     Selector *plugin_selector;
-    QPluginLoader loader;
-    QMap<QString, QFileInfo> plugins;
+    QPushButton *play_button;
 
-    void get_plugins();
     void load_plugin();
     QWidget *dialog_body();
     QWidget *tuner_widget();

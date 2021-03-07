@@ -1,7 +1,7 @@
 #pragma once
 
-#include <QList>
 #include <QApplication>
+#include <QList>
 #include <QSettings>
 #include <QWidget>
 

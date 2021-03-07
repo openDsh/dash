@@ -13,13 +13,14 @@ class RtlSdr : public QObject, RadioPlugin {
 
    public:
     RtlSdr();
-    bool supported() override;
-    void play() override;
-    void stop() override;
-    void freq(int hz) override;
+    bool play() override;
+    bool stop() override;
+    bool freq(int hz) override;
 
    private:
     QProcess server;
     QProcess player;
     QTcpSocket socket;
+
+    void kill();
 };

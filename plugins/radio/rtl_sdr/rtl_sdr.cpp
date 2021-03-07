@@ -20,25 +20,47 @@ RtlSdr::RtlSdr()
 
     this->player.setProgram("ffplay");
     this->player.setArguments({"http://localhost:2346", "-nodisp"});
+
+    connect(&this->server, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), [this](int, QProcess::ExitStatus status){
+        if (status != QProcess::NormalExit)
+            this->kill();
+    });
+    connect(&this->player, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), [this](int, QProcess::ExitStatus status){
+        if (status != QProcess::NormalExit)
+            this->kill();
+    });
+    connect(&this->socket, &QTcpSocket::errorOccurred, [this](QAbstractSocket::SocketError){ this->kill(); });
 }
 
-bool RtlSdr::supported()
+bool RtlSdr::play()
 {
-    return this->socket.isValid();
-}
+    if ((this->server.state() != QProcess::Running) || (this->player.state() != QProcess::Running) || !this->socket.isValid())
+        return false;
 
-void RtlSdr::play()
-{
     this->player.start();
+    return true;
 }
 
-void RtlSdr::stop()
+bool RtlSdr::stop()
 {
+    if ((this->server.state() != QProcess::Running) || (this->player.state() != QProcess::Running) || !this->socket.isValid())
+        return false;
+
     this->player.terminate();
+    return true;
 }
 
-void RtlSdr::freq(int hz)
+bool RtlSdr::freq(int hz)
 {
-    if(socket.state() == QAbstractSocket::ConnectedState)
-        socket.write(QJsonDocument(QJsonObject({{"method", "SetFrequency"}, {"params", QJsonArray({hz})}})).toJson());
+    if(this->socket.state() == QAbstractSocket::ConnectedState)
+        return (this->socket.write(QJsonDocument(QJsonObject({{"method", "SetFrequency"}, {"params", QJsonArray({hz})}})).toJson()) != -1);
+    else
+        return false;
+}
+
+void RtlSdr::kill()
+{
+    this->socket.close();
+    this->player.kill();
+    this->server.kill();
 }
