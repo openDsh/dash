@@ -8,10 +8,9 @@
 #include <QListWidgetItem>
 #include <QMediaPlaylist>
 
-#include "plugins/radio_tuner_plugin.hpp"
-
 #include "app/window.hpp"
 #include "app/pages/media.hpp"
+#include "plugins/radio_plugin.hpp"
 
 MediaPage::MediaPage(Arbiter &arbiter, QWidget *parent)
     : QTabWidget(parent)
@@ -125,28 +124,23 @@ QWidget *BluetoothPlayerTab::controls_widget()
 RadioPlayerTab::RadioPlayerTab(Arbiter &arbiter, QWidget *parent)
     : QWidget(parent)
     , arbiter(arbiter)
+    , config(Config::get_instance())
+    , tuner(new Tuner(this->arbiter))
+    , plugin_selector(nullptr)
     , loader()
 {
-    this->config = Config::get_instance();
-    this->tuner = new Tuner(this->arbiter);
+    this->get_plugins();
+    this->plugin_selector = new Selector(this->plugins.keys(), this->config->get_radio_plugin(), this->arbiter.forge().font(14), this->arbiter, nullptr, "unloader");
+
     this->tuner->setValue(this->config->get_radio_station());
 
-    QVBoxLayout *layout = new QVBoxLayout(this);
-
+    auto layout = new QVBoxLayout(this);
     layout->addStretch(1);
     layout->addWidget(this->tuner_widget(), 2);
     layout->addWidget(this->controls_widget(), 4);
     layout->addStretch(1);
 
-    for (const QFileInfo &plugin_file : Session::plugin_dir("radio_tuner").entryInfoList(QDir::Files)) {
-        if (QLibrary::isLibrary(plugin_file.absoluteFilePath())) {
-            this->loader.setFileName(plugin_file.absoluteFilePath());
-            if (RadioTunerPlugin *plugin = qobject_cast<RadioTunerPlugin *>(this->loader.instance()))
-                qDebug() << plugin->power_level();
-        }
-    }
-
-    this->player = new QMediaPlayer(this, QMediaPlayer::StreamPlayback);
+    this->load_plugin();
 }
 
 RadioPlayerTab::~RadioPlayerTab()
@@ -154,43 +148,90 @@ RadioPlayerTab::~RadioPlayerTab()
     this->loader.unload();
 }
 
+void RadioPlayerTab::get_plugins()
+{
+    for (auto plugin : Session::plugin_dir("radio").entryInfoList(QDir::Files)) {
+        if (QLibrary::isLibrary(plugin.absoluteFilePath()))
+            this->plugins[Session::fmt_plugin(plugin.baseName())] = plugin;
+    }
+}
+
+void RadioPlayerTab::load_plugin()
+{
+    if (this->loader.isLoaded())
+        this->loader.unload();
+
+    auto key = this->plugin_selector->get_current();
+    if (!key.isNull()) {
+        this->loader.setFileName(this->plugins[key].absoluteFilePath());
+        if (RadioPlugin *plugin = qobject_cast<RadioPlugin *>(this->loader.instance()))
+            plugin->freq(this->tuner->value() * 100000);
+    }
+    this->config->set_radio_plugin(key);
+}
+
+QWidget *RadioPlayerTab::dialog_body()
+{
+    auto widget = new QWidget(this);
+    auto layout = new QVBoxLayout(widget);
+
+    layout->addWidget(this->plugin_selector, 0, Qt::AlignCenter);
+
+    return widget;
+}
+
 QWidget *RadioPlayerTab::tuner_widget()
 {
-    QWidget *widget = new QWidget(this);
-    QHBoxLayout *layout = new QHBoxLayout(widget);
+    auto widget = new QWidget(this);
+    auto layout = new QHBoxLayout(widget);
     layout->setSpacing(0);
 
-    Dialog *dialog = new Dialog(this->arbiter, true, this->window());
-    QPushButton *load = new QPushButton("load");
-    connect(load, &QPushButton::clicked, [this]{
-        if (RadioTunerPlugin *plugin = qobject_cast<RadioTunerPlugin *>(this->loader.instance()))
-            plugin->freq(0);
-        this->player->play();
-    });
-    dialog->set_button(load);
+    auto dialog = new Dialog(this->arbiter, true, this->window());
+    dialog->set_body(this->dialog_body());
 
-    QPushButton *settings = new QPushButton();
-    settings->setFlat(true);
-    this->arbiter.forge().iconize("settings", settings, 24);
-    connect(settings, &QPushButton::clicked, [this, dialog]{
-        this->player->setMedia(QUrl("http://localhost:2346"));
-        dialog->open();
-    });
+    auto load_button = new QPushButton("load");
+    connect(load_button, &QPushButton::clicked, [this]{ this->load_plugin(); });
+    dialog->set_button(load_button);
 
-    QLabel *station = new QLabel(QString::number(this->tuner->sliderPosition() / 10.0, 'f', 1));
+    auto settings_button = new QPushButton();
+    settings_button->setFlat(true);
+    this->arbiter.forge().iconize("settings", settings_button, 24);
+    connect(settings_button, &QPushButton::clicked, [dialog]{ dialog->open(); });
+
+    auto station = new QLabel(QString::number(this->tuner->sliderPosition() / 10.0, 'f', 1));
     station->setFont(this->arbiter.forge().font(36, true));
     connect(this->tuner, &Tuner::updated, [this, station](int freq){
         this->config->set_radio_station(freq);
         station->setText(QString::number(freq / 10.0, 'f', 1));
+        if (RadioPlugin *plugin = qobject_cast<RadioPlugin *>(this->loader.instance()))
+            plugin->freq(freq * 100000);
     });
 
-    QLabel *info = new QLabel("Lorem ipsum dolor sit amet");
-    info->setWordWrap(true);
+    // auto info = new QLabel("station info");
+    // info->setWordWrap(true);
+
+    QPushButton *play_button = new QPushButton(widget);
+    play_button->setFlat(true);
+    play_button->setCheckable(true);
+    play_button->setChecked(false);
+    this->arbiter.forge().iconize("play", "stop", play_button, 56);
+    connect(play_button, &QPushButton::clicked, [this, play_button](bool checked = false) {
+        if (RadioPlugin *plugin = qobject_cast<RadioPlugin *>(this->loader.instance())) {
+            if (checked)
+                plugin->play();
+            else
+                plugin->stop();
+        }
+        else {
+            play_button->setChecked(!checked);
+        }
+    });
 
     layout->addStretch(2);
-    layout->addWidget(settings);
+    layout->addWidget(settings_button);
     layout->addWidget(station, 2);
-    layout->addWidget(info, 3);
+    // layout->addWidget(info, 3);
+    layout->addWidget(play_button, 3);
     layout->addStretch(2);
 
     return widget;
@@ -198,17 +239,17 @@ QWidget *RadioPlayerTab::tuner_widget()
 
 QWidget *RadioPlayerTab::controls_widget()
 {
-    QWidget *widget = new QWidget();
-    QHBoxLayout *layout = new QHBoxLayout(widget);
+    auto widget = new QWidget();
+    auto layout = new QHBoxLayout(widget);
 
-    QPushButton *prev_station = new QPushButton();
+    auto prev_station = new QPushButton();
     prev_station->setFlat(true);
     this->arbiter.forge().iconize("chevron_left", prev_station, 56);
     connect(prev_station, &QPushButton::clicked, [tuner = this->tuner]{
         tuner->setSliderPosition(tuner->sliderPosition() - 1);
     });
 
-    QPushButton *next_station = new QPushButton();
+    auto next_station = new QPushButton();
     next_station->setFlat(true);
     this->arbiter.forge().iconize("chevron_right", next_station, 56);
     connect(next_station, &QPushButton::clicked, [tuner = this->tuner]{

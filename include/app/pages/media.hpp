@@ -1,12 +1,16 @@
 #pragma once
 
+#include <QFileInfo>
+#include <QMap>
 #include <QMediaPlayer>
+#include <QPluginLoader>
+#include <QString>
 #include <QtWidgets>
 
 #include "app/config.hpp"
-#include "app/widgets/tuner.hpp"
-
 #include "app/pages/page.hpp"
+#include "app/widgets/selector.hpp"
+#include "app/widgets/tuner.hpp"
 
 class Arbiter;
 
@@ -41,15 +45,18 @@ class RadioPlayerTab : public QWidget {
 
    private:
     Arbiter &arbiter;
-
+    Config *config;
+    Tuner *tuner;
+    Selector *plugin_selector;
     QPluginLoader loader;
-    QMediaPlayer *player;
+    QMap<QString, QFileInfo> plugins;
 
+    void get_plugins();
+    void load_plugin();
+    QWidget *dialog_body();
     QWidget *tuner_widget();
     QWidget *controls_widget();
 
-    Config *config;
-    Tuner *tuner;
 };
 
 class LocalPlayerTab : public QWidget {
