@@ -18,8 +18,6 @@ Tuner::Tuner(Arbiter &arbiter)
 {
     this->setRange(880, 1080);
     this->setTickInterval(1);
-
-    connect(this, &QSlider::valueChanged, [this](int value){ emit updated(value); });
 }
 
 QSize Tuner::sizeHint() const

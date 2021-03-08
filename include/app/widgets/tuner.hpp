@@ -33,7 +33,4 @@ class Tuner : public QSlider {
     QColor accent;
     QPoint mouse_pos;
     double scale;
-
-   signals:
-    void updated(int station);
 };

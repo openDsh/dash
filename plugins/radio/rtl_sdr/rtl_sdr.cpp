@@ -14,7 +14,7 @@ RtlSdr::RtlSdr()
     , socket()
 {
     this->server.start("rtl_fm_streamer", {"-P", "2346", "-j", "2345"});
-    sleep(1);
+    sleep(3);
     this->socket.connectToHost("localhost", 2345);
     this->socket.waitForConnected();
 

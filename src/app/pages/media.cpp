@@ -195,7 +195,9 @@ QWidget *RadioPlayerTab::dialog_body()
     auto widget = new QWidget(this);
     auto layout = new QVBoxLayout(widget);
 
+    layout->addStretch();
     layout->addWidget(this->plugin_selector, 0, Qt::AlignCenter);
+    layout->addStretch();
 
     return widget;
 }
@@ -220,7 +222,7 @@ QWidget *RadioPlayerTab::tuner_widget()
 
     auto station = new QLabel(QString::number(this->tuner->sliderPosition() / 10.0, 'f', 1));
     station->setFont(this->arbiter.forge().font(36, true));
-    connect(this->tuner, &Tuner::updated, [this, station](int freq){
+    connect(this->tuner, &Tuner::valueChanged, [this, station](int freq){
         this->config->set_radio_station(freq);
         station->setText(QString::number(freq / 10.0, 'f', 1));
         if (RadioPlugin *plugin = qobject_cast<RadioPlugin *>(this->loader.instance()))
