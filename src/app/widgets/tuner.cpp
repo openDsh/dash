@@ -75,8 +75,12 @@ void Tuner::paintEvent(QPaintEvent *event)
 
     painter.setPen(QPen(this->accent, 6 * this->scale, Qt::SolidLine, Qt::RoundCap));
     painter.drawLine(QLineF(needle_x, needle_y, needle_x, bottom));
+}
 
-    QSlider::paintEvent(event);
+void Tuner::resizeEvent(QResizeEvent *event)
+{
+    // idk why this works but oh 🐳
+    this->updateGeometry();
 }
 
 void Tuner::mousePressEvent(QMouseEvent *event)
