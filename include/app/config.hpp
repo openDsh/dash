@@ -38,6 +38,16 @@ class Config : public QObject {
         this->settings.setValue("Pages/Media/Radio/muted", this->radio_muted);
     }
 
+    inline QString get_radio_plugin() { return this->radio_plugin; }
+    inline void set_radio_plugin(QString radio_plugin)
+    {
+        this->radio_plugin = radio_plugin;
+        if (this->radio_plugin == "unloader")
+            this->settings.remove("Pages/Media/Radio/plugin");
+        else
+            this->settings.setValue("Pages/Media/Radio/plugin", this->radio_plugin);
+    }
+
     inline QString get_media_home() { return this->media_home; }
     inline void set_media_home(QString media_home)
     {
@@ -166,6 +176,7 @@ class Config : public QObject {
     QSettings settings;
     double radio_station;
     bool radio_muted;
+    QString radio_plugin;
     QString media_home;
     bool si_units;
     bool vehicle_can_bus;

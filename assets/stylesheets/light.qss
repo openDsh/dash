@@ -245,23 +245,21 @@ Switch {
 
 Tuner {
     qproperty-color: rgb(0, 0, 0);
-    padding-left: 16px;
-    padding-right: 16px;
+    qproperty-accent: palette(base);
 }
 
 Tuner::groove {
-    background-color: rgb(0, 0, 0);
+    background-color: none;
 }
 
 Tuner::handle {
-    width: 6px;
-    margin-top: -32px;
-    margin-bottom: -32px;
-    border-radius: 3px;
+    background-color: none;
+    width: 0px;
+    height: 0px;
 }
 
 Tuner::sub-page {
-    background-color: rgb(0, 0, 0);
+    background-color: none;
 }
 
 StepMeter {
