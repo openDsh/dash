@@ -614,7 +614,6 @@ void AboutSettingsTab::resizeEvent(QResizeEvent *event)
     QWidget::resizeEvent(event);
     QSize size = QSize(event->size().width() / 3 * 2, event->size().height() / 3 * 2);
     this->logo->setPixmap(QPixmap(":/splash.png").scaled(size, Qt::KeepAspectRatio));
-    // this->label1->setText(QString("%1 %2").arg(size.width()).arg(size.height()));
 }
 
 
@@ -625,14 +624,9 @@ QWidget *AboutSettingsTab::load_msg()
     layout->setContentsMargins(0, 0, 0, 0);
 
     this->logo = new QLabel(widget);
-    // QSize parent_size = this->arbiter.window()->maximumSize();
-    // QSize size = QSize(parent_size.width() / 2, parent_size.height() / 2);
     this->logo->setAlignment(Qt::AlignCenter);
-    // this->logo->setPixmap(QPixmap(":/splash.png").scaled(size, Qt::KeepAspectRatio));
 
-    // QLabel *label1 = new QLabel("Dash", widget);
     this->label1 = new QLabel("Dash", widget);
-    // this->label1 = new QLabel(QString("%1 %2").arg(parent_size.width()).arg(parent_size.height()), widget);
     this->label1->setAlignment(Qt::AlignCenter);
     QLabel *label2 = new QLabel(GIT_BRANCH " rev " GIT_REVISION GIT_CHANGES, widget);
     label2->setAlignment(Qt::AlignCenter);
