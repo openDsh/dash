@@ -60,3 +60,5 @@ CMakeFiles/
 CMakeCache.txt
 Makefile
 *_autogen/
+gitversion.h
+openauto.ini
