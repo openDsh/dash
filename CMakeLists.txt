@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5.1)
+cmake_minimum_required(VERSION 3.7.0)
 project(dash CXX)
 
 set(CMAKE_AUTOMOC ON)
@@ -83,6 +83,8 @@ file(GLOB_RECURSE source_files ${sources_directory}/*.cpp ${include_directory}/*
 add_subdirectory(plugins)
 
 add_executable(dash ${source_files})
+
+include(${base_directory}/cmake_modules/gitversion.cmake)
 
 target_include_directories(dash PRIVATE
     ${CMAKE_CURRENT_BINARY_DIR}

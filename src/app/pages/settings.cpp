@@ -21,6 +21,7 @@
 #include "app/widgets/color_picker.hpp"
 #include "app/widgets/selector.hpp"
 #include "app/widgets/switch.hpp"
+#include "gitversion.h"
 
 SettingsPage::SettingsPage(Arbiter &arbiter, QWidget *parent)
     : QTabWidget(parent)
@@ -34,6 +35,7 @@ void SettingsPage::init()
     this->addTab(new LayoutSettingsTab(this->arbiter), "Layout");
     this->addTab(new BluetoothSettingsTab(this->arbiter, this), "Bluetooth");
     this->addTab(new ActionsSettingsTab(this->arbiter), "Actions");
+    this->addTab(new AboutSettingsTab(this->arbiter), "About");
 }
 
 MainSettingsTab::MainSettingsTab(Arbiter &arbiter, QWidget *parent)
@@ -593,6 +595,56 @@ QWidget *ActionsSettingsTab::action_input(Action *action)
 
     layout->addWidget(button, 1);
     layout->addWidget(symbol, 0, Qt::AlignRight);
+
+    return widget;
+}
+
+AboutSettingsTab::AboutSettingsTab(Arbiter &arbiter)
+    : QWidget()
+    , arbiter(arbiter)
+{
+    auto layout = new QVBoxLayout(this);
+    layout->setContentsMargins(6, 0, 6, 0);
+
+    layout->addWidget(this->load_msg());
+}
+
+void AboutSettingsTab::resizeEvent(QResizeEvent *event)
+{
+    QWidget::resizeEvent(event);
+    QSize size = QSize(event->size().width() / 3 * 2, event->size().height() / 3 * 2);
+    this->logo->setPixmap(QPixmap(":/splash.png").scaled(size, Qt::KeepAspectRatio));
+    // this->label1->setText(QString("%1 %2").arg(size.width()).arg(size.height()));
+}
+
+
+QWidget *AboutSettingsTab::load_msg()
+{
+    QWidget *widget = new QWidget(this);
+    QVBoxLayout *layout = new QVBoxLayout(widget);
+    layout->setContentsMargins(0, 0, 0, 0);
+
+    this->logo = new QLabel(widget);
+    // QSize parent_size = this->arbiter.window()->maximumSize();
+    // QSize size = QSize(parent_size.width() / 2, parent_size.height() / 2);
+    this->logo->setAlignment(Qt::AlignCenter);
+    // this->logo->setPixmap(QPixmap(":/splash.png").scaled(size, Qt::KeepAspectRatio));
+
+    // QLabel *label1 = new QLabel("Dash", widget);
+    this->label1 = new QLabel("Dash", widget);
+    // this->label1 = new QLabel(QString("%1 %2").arg(parent_size.width()).arg(parent_size.height()), widget);
+    this->label1->setAlignment(Qt::AlignCenter);
+    QLabel *label2 = new QLabel(GIT_BRANCH " rev " GIT_REVISION GIT_CHANGES, widget);
+    label2->setAlignment(Qt::AlignCenter);
+    QLabel *label3 = new QLabel(BUILD_TIMESTAMP, widget);
+    label3->setAlignment(Qt::AlignCenter);
+
+    layout->addStretch();
+    layout->addWidget(this->logo);
+    layout->addWidget(this->label1);
+    layout->addWidget(label2);
+    layout->addWidget(label3);
+    layout->addStretch();
 
     return widget;
 }
