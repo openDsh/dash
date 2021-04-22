@@ -44,4 +44,4 @@ endif()
 
 string(TIMESTAMP _time_stamp)
 
-configure_file(${base_directory}/build/gitversion.h.in ${include_directory}/gitversion.h @ONLY)
+configure_file(${base_directory}/src/gitversion.h.in ${include_directory}/gitversion.h @ONLY)
