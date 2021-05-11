@@ -7,7 +7,6 @@
 int main(int argc, char *argv[])
 {
     QApplication dash(argc, argv);
-    QSplashScreen splash;
 
     dash.setOrganizationName("openDsh");
     dash.setApplicationName("dash");
@@ -19,7 +18,9 @@ int main(int argc, char *argv[])
     if (use_fixed_size)
         size = QSize(args.at(1).toInt(), args.at(2).toInt());
 
-    splash.setPixmap(QPixmap(":/splash.png").scaled(size, Qt::KeepAspectRatio));
+    QPixmap pixmap(QPixmap(":/splash.png").scaledToHeight(size.height()/2));
+    QSplashScreen splash(pixmap);
+    splash.setMask(pixmap.mask());
     splash.show();
     dash.processEvents();
 
