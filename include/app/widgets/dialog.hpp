@@ -36,7 +36,6 @@ class Dialog : public QDialog {
     QHBoxLayout *buttons;
     QTimer *timer;
     bool fullscreen;
-    double scale;
 
     QWidget *content_widget();
     void set_position();
@@ -56,7 +55,7 @@ class SnackBar : public Dialog {
     Q_OBJECT
 
    public:
-    SnackBar(Arbiter &arbiter) : Dialog(arbiter, false, get_ref()) {}
+    SnackBar(Arbiter &arbiter);
 
     void resizeEvent(QResizeEvent* event);
 

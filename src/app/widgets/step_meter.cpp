@@ -13,16 +13,14 @@
 StepMeter::StepMeter(Arbiter &arbiter, QWidget *parent)
     : QFrame(parent)
 {
-    this->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+    this->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Ignored);
 
     this->scale = arbiter.layout().scale;
 }
 
 QSize StepMeter::sizeHint() const
 {
-    int width = ((12 * this->scale) * this->steps) + ((4 * this->scale) * (this->steps + 1));
-    int height = (8 * this->scale) * this->steps;
-    return QSize(width, height);
+    return QSize(this->height() * 2, this->height());
 }
 
 void StepMeter::paintEvent(QPaintEvent *event)
@@ -31,17 +29,12 @@ void StepMeter::paintEvent(QPaintEvent *event)
     painter.setRenderHint(QPainter::Antialiasing);
     painter.setRenderHint(QPainter::HighQualityAntialiasing);
 
-    int bar_height = 8 * this->scale;
-    int bar_width = 12 * this->scale;
     int spacing = 4 * this->scale;
+    int bar_width = (this->width() - (spacing * (this->steps + 1))) / this->steps;
 
-    int x_offset = std::max(0, (this->width() - (this->steps * (bar_width + spacing))) / 2);
-    int y_offset = std::max(0, (this->height() - (this->steps * bar_height)) / 2);
-    for (int i = this->steps; i > 0; i--) {
-        QPolygon bar(QRect(x_offset + ((i - 1) * (bar_width + spacing)), y_offset + (this->steps - i) * bar_height, bar_width, i * bar_height));
-        QPoint top_left = bar.point(0);
-        top_left.ry() += bar_height - (2 * this->scale);
-        bar.setPoint(0, top_left);
+    for (int i = 0; i < this->steps; i++) {
+        double bar_height = (i + 1) * (this->height() / (double)this->steps);
+        QPolygonF bar(QRectF((i * (bar_width + spacing)) + spacing, this->height() - bar_height, bar_width, bar_height));
 
         QPainterPath path;
         path.addPolygon(bar);

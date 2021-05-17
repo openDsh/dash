@@ -16,6 +16,8 @@ Tuner::Tuner(Arbiter &arbiter)
     , mouse_pos()
     , scale(arbiter.layout().scale)
 {
+    this->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Maximum);
+
     this->setRange(880, 1080);
     this->setTickInterval(1);
 }

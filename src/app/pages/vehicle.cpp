@@ -3,6 +3,7 @@
 
 #include "app/config.hpp"
 #include "app/pages/vehicle.hpp"
+#include "app/widgets/vehicle_state.hpp"
 #include "app/window.hpp"
 #include "obd/conversions.hpp"
 #include "canbus/elm327.hpp"
@@ -99,14 +100,18 @@ VehiclePage::VehiclePage(Arbiter &arbiter, QWidget *parent)
 
 void VehiclePage::init()
 {
+    this->addTab([this](){
+        return new VehicleState(this->arbiter);
+    }(), "Vehicle");
+
     this->addTab(new DataTab(this->arbiter, this), "Data");
     this->config = Config::get_instance();
 
-    for (auto device : QCanBus::instance()->availableDevices("socketcan"))
-        this->can_devices.append(device.name());
+    // for (auto device : QCanBus::instance()->availableDevices("socketcan"))
+    //     this->can_devices.append(device.name());
 
-    for (auto port : QSerialPortInfo::availablePorts())
-        this->serial_devices.append(port.systemLocation());
+    // for (auto port : QSerialPortInfo::availablePorts())
+    //     this->serial_devices.append(port.systemLocation());
 
     this->get_plugins();
     this->active_plugin = new QPluginLoader(this);

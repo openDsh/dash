@@ -19,8 +19,6 @@ Dialog::Dialog(Arbiter &arbiter, bool fullscreen, QWidget *parent)
     if (this->fullscreen)
         this->setModal(true);
 
-    this->scale = this->arbiter.layout().scale;
-
     QHBoxLayout *layout = new QHBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
@@ -112,7 +110,7 @@ void Dialog::set_position()
             QPoint window_center = window->mapToGlobal(window->rect().center());
             QPoint parent_center = parent->mapToGlobal(parent->rect().center());
 
-            int offset = std::ceil(4 * this->scale);
+            int offset = std::ceil(4 * this->arbiter.layout().scale);
 
             QPoint pivot;
             if (parent_center.y() > window_center.y()) {
@@ -147,7 +145,7 @@ void Dialog::showEvent(QShowEvent *event)
 
     if (this->fullscreen) {
         if (QWidget *parent = this->parentWidget()) {
-            int margin = std::ceil(48 * this->scale) * 2;
+            int margin = std::ceil(48 * this->arbiter.layout().scale) * 2;
             this->setFixedWidth(std::min(this->width(), parent->width() - margin));
             this->setFixedHeight(std::min(this->height(), parent->height() - margin));
         }
@@ -163,6 +161,12 @@ bool Dialog::eventFilter(QObject *object, QEvent *event)
         this->timer->start(this->timer->interval());
 
     return QWidget::eventFilter(object, event);
+}
+
+SnackBar::SnackBar(Arbiter &arbiter)
+    : Dialog(arbiter, false, this->get_ref())
+{
+    this->setFixedHeight(64 * this->arbiter.layout().scale);
 }
 
 void SnackBar::resizeEvent(QResizeEvent* event)

@@ -54,5 +54,6 @@
         <file>fonts/Titillium_Web/TitilliumWeb-Regular.ttf</file>
         <file>fonts/Montserrat/Montserrat-LightItalic.ttf</file>
         <file>fonts/Montserrat/Montserrat-Regular.ttf</file>
+        <file>graphics/vehicle/car_interface_v2beta.svg</file>
     </qresource>
 </RCC>

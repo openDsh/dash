@@ -1,28 +1,28 @@
 #pragma once
 
 #include <QWidget>
-#include <QIcon>
+#include <QDomDocument>
 
 #include "app/config.hpp"
 
 class Arbiter;
 
-class ClimateState : public QFrame {
+class VehicleState : public QFrame {
     Q_OBJECT
     Q_PROPERTY(QColor color READ get_color WRITE set_color)
 
    public:
-    ClimateState(Arbiter &arbiter, QWidget *parent = nullptr);
+    VehicleState(Arbiter &arbiter, QWidget *parent = nullptr);
 
     QSize sizeHint() const override;
     QColor get_color() { return this->color; };
     void set_color(QColor color) { this->color = color; }
-    void toggle_defrost(bool enabled);
-    void toggle_body(bool enabled);
-    void toggle_feet(bool enabled);
+
+    void toggle_fdriver_door(bool open);
 
    protected:
     void paintEvent(QPaintEvent *event) override;
+    void mousePressEvent(QMouseEvent *event) override;
 
     void resizeEvent(QResizeEvent *event)
     {
@@ -33,14 +33,9 @@ class ClimateState : public QFrame {
    private:
     QColor color = Qt::transparent;
 
-    bool defrost_state = false;
-    bool body_state = false;
-    bool feet_state = false;
+    bool fdriver_door = false;
 
     double scale;
 
-    QPixmap climate_ref;
-    QPixmap defrost;
-    QPixmap body;
-    QPixmap feet;
+    QDomDocument vehicle_ref;
 };
