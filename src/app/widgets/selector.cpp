@@ -32,9 +32,9 @@ QSize Selector::sizeHint() const
     auto it = std::max_element(this->options.begin(), this->options.end(), [](const auto &a, const auto &b){
         return a.size() < b.size();
     });
-    int size = it->size();//(it != this->options.end()) ? it->size() : 0;
 
     int base = 32 * this->arbiter.layout().scale;
+    int size = (it != this->options.end()) ? it->size() : 0;
     int width = (base * 2) + std::max(this->label->width(), QFontMetrics(this->label->font()).width(size)) + (12 * 4);
     int height = std::max(base, this->label->height()) + (12 * 2);
     return QSize(width, height);

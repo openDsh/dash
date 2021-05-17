@@ -107,11 +107,11 @@ void VehiclePage::init()
     this->addTab(new DataTab(this->arbiter, this), "Data");
     this->config = Config::get_instance();
 
-    // for (auto device : QCanBus::instance()->availableDevices("socketcan"))
-    //     this->can_devices.append(device.name());
+    for (auto device : QCanBus::instance()->availableDevices("socketcan"))
+        this->can_devices.append(device.name());
 
-    // for (auto port : QSerialPortInfo::availablePorts())
-    //     this->serial_devices.append(port.systemLocation());
+    for (auto port : QSerialPortInfo::availablePorts())
+        this->serial_devices.append(port.systemLocation());
 
     this->get_plugins();
     this->active_plugin = new QPluginLoader(this);
