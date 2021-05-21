@@ -385,6 +385,7 @@ QLayout *OpenAutoPage::Settings::buttons_row_widget()
 OpenAutoPage::OpenAutoPage(Arbiter &arbiter, QWidget *parent)
     : QStackedWidget(parent)
     , Page(arbiter, "Android Auto", "android_auto", true, this)
+    , connected_icon_name_("android_auto_color")
 {
 }
 
@@ -403,6 +404,7 @@ void OpenAutoPage::init()
             this->frame->toggle_fullscreen();
         }
         this->setCurrentIndex(enable ? 1 : 0);
+        emit connected(enable);
     });
     connect(this->frame, &OpenAutoFrame::double_clicked, [this](bool fullscreen) {
         if (fullscreen) {

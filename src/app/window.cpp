@@ -67,7 +67,7 @@ void Dash::init()
         button->setProperty("color_hint", true);
         button->setCheckable(true);
         button->setFlat(true);
-        this->arbiter.forge().iconize(page->icon_name(), button, 32);
+        this->arbiter.forge().iconize(page->icon_name(), button, 32, true);
 
         this->rail.group.addButton(button, this->arbiter.layout().page_id(page));
         this->rail.layout->addWidget(button);
@@ -77,6 +77,19 @@ void Dash::init()
         button->setVisible(page->enabled());
     }
     this->set_page(this->arbiter.layout().curr_page);
+    this->init_connected_pages();
+}
+
+void Dash::init_connected_pages()
+{
+    OpenAutoPage *oaPage = this->arbiter.layout().openauto_page;
+    QAbstractButton *oaButton = this->rail.group.button(this->arbiter.layout().page_id(oaPage));
+    connect(oaPage, &OpenAutoPage::connected, this, [this, oaPage, oaButton](bool connected){
+        if (connected)
+            this->arbiter.forge().set_icon(oaPage->connected_icon_name(), oaButton, false);
+        else 
+            this->arbiter.forge().set_icon(oaPage->icon_name(), oaButton, true);
+    });
 }
 
 void Dash::set_page(Page *page)

@@ -125,6 +125,7 @@ void Session::Theme::colorize(QAbstractButton *button) const
     colored_icon.addPixmap(normal_on, QIcon::Normal, QIcon::On);
     colored_icon.addPixmap(normal_off, QIcon::Normal, QIcon::Off);
     button->setIcon(colored_icon);
+    button->setProperty("colorized", true);
 }
 
 Session::Layout::ControlBar::ControlBar(QSettings &settings, Arbiter &arbiter)
@@ -310,9 +311,16 @@ void Session::Forge::iconize(QString name, QAbstractButton *button, uint8_t size
 {
     auto scaled = size * this->arbiter_.layout().scale;
     button->setIconSize(QSize(scaled, scaled));
-
-    button->setProperty("iconized", true);
     button->setIcon(QIcon(QString(":/icons/%1.svg").arg(name)));
+    button->setProperty("colorized",false);
+    if (dynamic)
+        this->arbiter_.theme().colorize(button);
+}
+
+void Session::Forge::set_icon(QString name, QAbstractButton *button, bool dynamic) const
+{
+    button->setIcon(QIcon(QString(":/icons/%1.svg").arg(name)));
+    button->setProperty("colorized",false);
     if (dynamic)
         this->arbiter_.theme().colorize(button);
 }
@@ -494,8 +502,8 @@ void Session::update()
         qApp->setStyleSheet(this->core_.stylesheet(this->theme_.mode, this->layout_.scale));
 
         for (QWidget *widget : qApp->allWidgets()) {
-            auto button = qobject_cast<QAbstractButton*>(widget);
-            if ((button != nullptr) && !button->property("iconized").isNull())
+	  if( auto button = qobject_cast<QAbstractButton*>(widget) )
+            if (button->property("colorized").toBool())
                 this->theme_.colorize(button);
         }
     }

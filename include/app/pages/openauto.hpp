@@ -86,6 +86,7 @@ class OpenAutoPage : public QStackedWidget, public Page {
     inline void pass_key_event(QKeyEvent *event) { this->worker->send_key_event(event); }
 
     void init() override;
+    const QString &connected_icon_name() { return this->connected_icon_name_; }
 
    protected:
     void resizeEvent(QResizeEvent *event);
@@ -117,6 +118,7 @@ class OpenAutoPage : public QStackedWidget, public Page {
         Config *config;
     };
 
+    const QString connected_icon_name_;
     QWidget *connect_msg();
 
     Config *config;
@@ -125,4 +127,5 @@ class OpenAutoPage : public QStackedWidget, public Page {
 
    signals:
     void toggle_fullscreen(QWidget *widget);
+    void connected(bool yes);
 };
