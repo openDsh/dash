@@ -82,14 +82,19 @@ void Dash::init()
 
 void Dash::init_connected_pages()
 {
-    OpenAutoPage *oaPage = this->arbiter.layout().openauto_page;
-    QAbstractButton *oaButton = this->rail.group.button(this->arbiter.layout().page_id(oaPage));
-    connect(oaPage, &OpenAutoPage::connected, this, [this, oaPage, oaButton](bool connected){
-        if (connected)
-            this->arbiter.forge().set_icon(oaPage->connected_icon_name(), oaButton, false);
-        else 
-            this->arbiter.forge().set_icon(oaPage->icon_name(), oaButton, true);
-    });
+    if (Config::get_instance()->get_show_aa_connected())
+    {
+        OpenAutoPage *oaPage = this->arbiter.layout().openauto_page;
+        QAbstractButton *oaButton = this->rail.group.button(this->arbiter.layout().page_id(oaPage));
+        connect(oaPage, &OpenAutoPage::connected, this, [this, oaPage, oaButton](bool connected){
+            QElapsedTimer timer;
+            timer.start();
+            if (connected)
+                this->arbiter.forge().set_icon(oaPage->connected_icon_name(), oaButton, false);
+            else 
+                this->arbiter.forge().set_icon(oaPage->icon_name(), oaButton, true);
+        });
+    }
 }
 
 void Dash::set_page(Page *page)
