@@ -71,6 +71,9 @@ else
     dash=true
 fi
 
+script_path=$(dirname "$(realpath -s "$0")")
+echo "Script directory is $script_path"
+
 installArgs="-DCMAKE_BUILD_TYPE=${BUILD_TYPE} $installArgs"
 
 #Array of dependencies any new dependencies can be added here
@@ -211,7 +214,7 @@ else
     echo Aasdk install failed with code $?
     exit 1
   fi
-  cd ../../dash
+  cd $script_path
 fi
 
 
@@ -288,7 +291,7 @@ if [ $gstreamer = true ]; then
   fi
 
   sudo ldconfig
-  cd ../../dash
+  cd $script_path
 
 else
 	echo -e Skipping Gstreamer'\n'
@@ -360,7 +363,7 @@ else
     echo Openauto make install failed with error code $?
     exit 1
   fi
-  cd ../../dash
+  cd $script_path
 fi
 
 
