@@ -311,10 +311,7 @@ void Session::Forge::iconize(QString name, QAbstractButton *button, uint8_t size
 {
     auto scaled = size * this->arbiter_.layout().scale;
     button->setIconSize(QSize(scaled, scaled));
-    button->setIcon(QIcon(QString(":/icons/%1.svg").arg(name)));
-    button->setProperty("colorized",false);
-    if (dynamic)
-        this->arbiter_.theme().colorize(button);
+    this->set_icon(name, button, dynamic);
 }
 
 void Session::Forge::set_icon(QString name, QAbstractButton *button, bool dynamic) const
