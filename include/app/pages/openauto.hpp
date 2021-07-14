@@ -27,7 +27,7 @@ class OpenAutoWorker : public QObject {
     Q_OBJECT
 
    public:
-    OpenAutoWorker(std::function<void(bool)> callback, bool night_mode, QWidget *frame);
+    OpenAutoWorker(std::function<void(bool)> callback, std::function<void(bool)> inputServiceCallback, bool night_mode, QWidget *frame);
     ~OpenAutoWorker();
 
     inline void start() { this->app->waitForDevice(true); }
@@ -35,6 +35,7 @@ class OpenAutoWorker : public QObject {
     inline void update_size() { this->service_factory.resize(); }
     inline void set_night_mode(bool mode) { this->service_factory.setNightMode(mode); }
     inline void send_key_event(QKeyEvent *event) { this->service_factory.sendKeyEvent(event); }
+    openauto::service::IService::Pointer getInputService();
 
    private:
     void create_usb_workers();

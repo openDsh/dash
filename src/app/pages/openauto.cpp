@@ -4,7 +4,7 @@
 #include "app/widgets/progress.hpp"
 #include "app/window.hpp"
 
-OpenAutoWorker::OpenAutoWorker(std::function<void(bool)> callback, bool night_mode, QWidget *frame)
+OpenAutoWorker::OpenAutoWorker(std::function<void(bool)> callback, std::function<void(bool)> androidAutoStatusCallback, bool night_mode, QWidget *frame)
     : QObject(qApp),
       io_service(),
       work(io_service),
@@ -19,7 +19,7 @@ OpenAutoWorker::OpenAutoWorker(std::function<void(bool)> callback, bool night_mo
       connected_accessories_enumerator(
           std::make_shared<aasdk::usb::ConnectedAccessoriesEnumerator>(usb_wrapper, io_service, query_chain_factory)),
       app(std::make_shared<openauto::App>(io_service, usb_wrapper, tcp_wrapper, android_auto_entity_factory, usb_hub,
-                                          connected_accessories_enumerator))
+                                          connected_accessories_enumerator, androidAutoStatusCallback))
 {
     this->create_usb_workers();
     this->create_io_service_workers();
@@ -56,6 +56,11 @@ void OpenAutoWorker::create_io_service_workers()
     this->thread_pool.emplace_back(worker);
     this->thread_pool.emplace_back(worker);
     this->thread_pool.emplace_back(worker);
+}
+
+openauto::service::IService::Pointer OpenAutoWorker::getInputService()
+{
+    return this->app->getInputService();
 }
 
 void OpenAutoFrame::mouseDoubleClickEvent(QMouseEvent *)
@@ -395,7 +400,8 @@ void OpenAutoPage::init()
     this->frame = new OpenAutoFrame(this);
 
     std::function<void(bool)> callback = [frame = this->frame](bool active) { frame->toggle(active); };
-    this->worker = new OpenAutoWorker(callback, this->arbiter.theme().mode == Session::Theme::Dark, frame);
+    std::function<void(bool)> androidAutoStatusCallback = [this](bool created) { if(created) this->arbiter.inputService = std::dynamic_pointer_cast<openauto::service::InputService>(this->worker->getInputService());};
+    this->worker = new OpenAutoWorker(callback, androidAutoStatusCallback, this->arbiter.theme().mode == Session::Theme::Dark, frame);
 
     connect(this->frame, &OpenAutoFrame::toggle, [this](bool enable) {
         if (!enable && this->frame->is_fullscreen()) {

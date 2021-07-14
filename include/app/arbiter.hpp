@@ -10,7 +10,7 @@
 #include "app/session.hpp"
 #include "app/pages/page.hpp"
 #include "app/quick_views/quick_view.hpp"
-
+#include "openauto/Service/InputService.hpp"
 
 class Arbiter : public QObject {
     Q_OBJECT
@@ -45,6 +45,8 @@ class Arbiter : public QObject {
     Session::Forge &forge() { return this->session_.forge_; }
     Session::Core &core() { return this->session_.core_; }
     void update() { this->session_.update(); }
+
+    std::shared_ptr<openauto::service::InputService> inputService;
 
    private:
     QMainWindow *window_;
