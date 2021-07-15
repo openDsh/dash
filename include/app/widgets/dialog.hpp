@@ -56,9 +56,12 @@ class SnackBar : public Dialog {
     Q_OBJECT
 
    public:
-    SnackBar(Arbiter &arbiter) : Dialog(arbiter, false, get_ref()) {}
+    SnackBar(Arbiter &arbiter);
 
     void resizeEvent(QResizeEvent* event);
+
+   protected:
+    bool eventFilter(QObject *object, QEvent *event);
 
    private:
     QWidget *get_ref();
