@@ -1,6 +1,7 @@
 #include "app/session.hpp"
-#include <QDebug>
+
 #include "app/arbiter.hpp"
+
 Arbiter::Arbiter(QMainWindow *window)
     : QObject()
     , window_(window)
@@ -15,7 +16,6 @@ void Arbiter::set_mode(Session::Theme::Mode mode)
 
     this->session_.update();
 
-    qDebug()<<"Mode change";
     emit mode_changed(mode);
     emit color_changed(this->theme().color());
 }
