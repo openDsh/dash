@@ -12,6 +12,7 @@
 #include "app/quick_views/quick_view.hpp"
 #include "openauto/Service/InputService.hpp"
 
+
 class Arbiter : public QObject {
     Q_OBJECT
 
@@ -36,6 +37,7 @@ class Arbiter : public QObject {
     void increase_volume(uint8_t val);
     void set_cursor(bool enabled);
     void set_action(Action *action, QString key);
+    void send_openauto_button_press(aasdk::proto::enums::ButtonCode::Enum buttonCode);
 
     QMainWindow *window() { return this->window_; }
     QSettings &settings() { return this->session_.settings_; }
@@ -45,8 +47,6 @@ class Arbiter : public QObject {
     Session::Forge &forge() { return this->session_.forge_; }
     Session::Core &core() { return this->session_.core_; }
     void update() { this->session_.update(); }
-
-    std::shared_ptr<openauto::service::InputService> inputService;
 
    private:
     QMainWindow *window_;
@@ -65,4 +65,5 @@ class Arbiter : public QObject {
     void volume_changed(uint8_t volume);
     void cursor_changed(bool enabled);
     void action_changed(Action *action, QString key);
+    void openauto_button_press(aasdk::proto::enums::ButtonCode::Enum buttonCode);
 };
