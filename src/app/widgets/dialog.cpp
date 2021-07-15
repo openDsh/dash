@@ -165,6 +165,10 @@ bool Dialog::eventFilter(QObject *object, QEvent *event)
     return QWidget::eventFilter(object, event);
 }
 
+SnackBar::SnackBar(Arbiter &arbiter) : Dialog(arbiter, false, get_ref())
+{
+    this->installEventFilter(this);
+}
 void SnackBar::resizeEvent(QResizeEvent* event)
 {
     // its possible the ref didnt exist when the parent was originally set
@@ -178,6 +182,15 @@ void SnackBar::resizeEvent(QResizeEvent* event)
         this->setFixedWidth(parent->width() * (2 / 3.0));
 
     Dialog::resizeEvent(event);
+}
+
+bool SnackBar::eventFilter(QObject *object, QEvent *event)
+{
+    if (event->type() == QEvent::MouseButtonPress) {
+      this->close();
+      return true;
+    }
+    return false;
 }
 
 QWidget *SnackBar::get_ref()
