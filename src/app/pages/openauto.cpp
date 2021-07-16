@@ -418,6 +418,11 @@ void OpenAutoPage::init()
         this->worker->set_night_mode(mode == Session::Theme::Dark);
     });
 
+    connect(&this->arbiter, &Arbiter::openauto_button_press, [this](aasdk::proto::enums::ButtonCode::Enum buttonCode){
+        this->worker->send_button_press(buttonCode);
+        DASH_LOG(info)<<"[OpenAutoPage] Firing button press";
+    });
+
     this->addWidget(this->connect_msg());
     this->addWidget(this->frame);
 }
