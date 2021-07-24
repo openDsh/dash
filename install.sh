@@ -420,11 +420,11 @@ else
       exit 1
   fi
 
-  #Setting openGL driver and GPU memory to 256mb
+  #Setting openGL driver and GPU memory to 128mb
   if $isRpi; then
-    sudo raspi-config nonint do_memory_split 256
+    sudo raspi-config nonint do_memory_split 128
     if [[ $? -eq 0 ]]; then
-      echo -e Memory set to 256mb'\n'
+      echo -e Memory set to 128mb'\n'
     else
       echo Setting memory failed with error code $? please set manually
       exit 1
