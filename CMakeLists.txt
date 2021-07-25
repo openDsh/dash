@@ -153,6 +153,8 @@ target_link_libraries(dash
     )
 
 install(TARGETS dash DESTINATION bin COMPONENT applications)
+install(DIRECTORY lib DESTINATION lib COMPONENT applications)
+
 SET(CPACK_GENERATOR "DEB")
 SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "OpenDsh") #required
 SET(CPACK_PACKAGE_VENDOR "OpenDsh")
