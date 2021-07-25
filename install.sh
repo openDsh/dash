@@ -202,6 +202,15 @@ else
     echo Aasdk Make failed with code $?
     exit 1
   fi
+  #beginning cpack
+  cpack
+
+  if [[ $? -eq 0 ]]; then
+    echo -e Aasdk cpack completed successfully '\n'
+  else
+    echo Aasdk cpack failed with code $?
+    exit 1
+  fi
 
   #begin make install
   sudo make install
@@ -353,6 +362,14 @@ else
     echo Openauto make failed with error code $?
     exit 1
   fi
+  echo Beginning openauto cpack
+  cpack
+  if [[ $? -eq 0 ]]; then
+    echo -e Openauto cpack OK'\n'
+  else
+    echo Openauto cpack failed with error code $?
+    exit 1
+  fi
 
   #run make install
   echo Beginning make install
@@ -399,7 +416,6 @@ else
   if [[ $? -eq 0 ]]; then
       echo -e Dash make ok, executable can be found ../bin/dash
       echo
-
       #check and add usb rules for openauto if they dont exist
       echo Checking if permissions exist
       #udev rule to be created below, change as needed
@@ -418,6 +434,14 @@ else
     else
       echo Dash make failed with error code $?
       exit 1
+  fi
+  echo Running CPack for dash
+  cpack
+  if [[ $? -eq 0 ]]; then
+    echo -e Dash CPack OK'\n'
+  else
+    echo Dash CPack failed with error code $?
+    exit 1
   fi
 
   #Setting openGL driver and GPU memory to 256mb
