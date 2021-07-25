@@ -24,6 +24,7 @@ FOREACH(plugin_type ${plugin_types})
             ${Qt5MultimediaWidgets_INCLUDE_DIRS}
             ${Qt5Widgets_INCLUDE_DIRS}
             ${Qt5Bluetooth_INCLUDE_DIRS}
+            ${Qt5DBus_INCLUDE_DIRS}
             ${Boost_INCLUDE_DIRS}
             ${LIBUSB_1_INCLUDE_DIRS}
             ${PROTOBUF_INCLUDE_DIR}
@@ -44,6 +45,7 @@ FOREACH(plugin_type ${plugin_types})
             aasdk_proto
             aasdk
             openauto
+            ${Qt5DBus_LIBRARIES}
             ${Boost_LIBRARIES}
             ${Qt5WebSockets_LIBRARIES}
             ${Qt5SerialBus_LIBRARIES}
