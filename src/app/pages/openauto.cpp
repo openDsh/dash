@@ -418,8 +418,8 @@ void OpenAutoPage::init()
         this->worker->set_night_mode(mode == Session::Theme::Dark);
     });
 
-    connect(&this->arbiter, &Arbiter::openauto_button_press, [this](aasdk::proto::enums::ButtonCode::Enum buttonCode){
-        this->worker->send_button_press(buttonCode);
+    connect(&this->arbiter, &Arbiter::openauto_button_press, [this](aasdk::proto::enums::ButtonCode::Enum buttonCode, openauto::projection::WheelDirection wheelDirection){
+        this->worker->send_button_press(buttonCode, wheelDirection);
         DASH_LOG(info)<<"[OpenAutoPage] Firing button press";
     });
 

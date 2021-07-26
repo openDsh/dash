@@ -37,7 +37,7 @@ class OpenAutoWorker : public QObject {
     inline void update_size() { this->service_factory.resize(); }
     inline void set_night_mode(bool mode) { this->service_factory.setNightMode(mode); }
     inline void send_key_event(QKeyEvent *event) { this->service_factory.sendKeyEvent(event); }
-    inline void send_button_press(aasdk::proto::enums::ButtonCode::Enum buttonCode) { this->service_factory.sendButtonPress(buttonCode); };
+    inline void send_button_press(aasdk::proto::enums::ButtonCode::Enum buttonCode, openauto::projection::WheelDirection wheelDirection) { this->service_factory.sendButtonPress(buttonCode, wheelDirection); };
 
    private:
     void create_usb_workers();
