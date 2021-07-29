@@ -141,7 +141,7 @@ QCanBusFrame elm327::receive()
 
     retFrame->setFrameId(0x7E8);
     QByteArray payload = QByteArray::fromHex("0000000000000000");
-    for(int i=0; i<resp_str.length()/2; i++){
+    for( std::vector<int>::size_type i=0; i < resp_str.length()/2; i++){
         payload[i+1] = std::stoi(resp_str.substr(2*i, 2), nullptr, 16);
     }
     payload[0] = resp_str.length()/2;
