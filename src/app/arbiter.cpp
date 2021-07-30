@@ -191,3 +191,8 @@ void Arbiter::send_openauto_button_press(aasdk::proto::enums::ButtonCode::Enum b
 {
     emit openauto_button_press(buttonCode, wheelDirection);
 }
+
+void Arbiter::send_openauto_full_screen(bool fullscreen)
+{
+    emit openauto_full_screen(fullscreen);
+}

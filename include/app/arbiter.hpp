@@ -38,6 +38,7 @@ class Arbiter : public QObject {
     void set_cursor(bool enabled);
     void set_action(Action *action, QString key);
     void send_openauto_button_press(aasdk::proto::enums::ButtonCode::Enum buttonCode, openauto::projection::WheelDirection wheelDirection = openauto::projection::WheelDirection::NONE);
+    void send_openauto_full_screen(bool fullscreen = true);
 
     QMainWindow *window() { return this->window_; }
     QSettings &settings() { return this->session_.settings_; }
@@ -66,4 +67,5 @@ class Arbiter : public QObject {
     void cursor_changed(bool enabled);
     void action_changed(Action *action, QString key);
     void openauto_button_press(aasdk::proto::enums::ButtonCode::Enum buttonCode, openauto::projection::WheelDirection wheelDirection);
+    void openauto_full_screen(bool fullscreen);
 };
