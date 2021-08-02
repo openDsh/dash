@@ -405,14 +405,7 @@ void OpenAutoPage::init()
         this->setCurrentIndex(enable ? 1 : 0);
     });
     connect(this->frame, &OpenAutoFrame::double_clicked, [this](bool fullscreen) {
-        if (fullscreen) {
-            emit toggle_fullscreen(this->frame);
-        }
-        else {
-            this->addWidget(frame);
-            this->setCurrentWidget(frame);
-        }
-        this->worker->update_size();
+       this->set_full_screen(fullscreen);
     });
     connect(&this->arbiter, &Arbiter::mode_changed, [this](Session::Theme::Mode mode){
         this->worker->set_night_mode(mode == Session::Theme::Dark);
@@ -423,8 +416,24 @@ void OpenAutoPage::init()
         DASH_LOG(info)<<"[OpenAutoPage] Firing button press";
     });
 
+    connect(&this->arbiter, &Arbiter::openauto_full_screen, [this](bool fullscreen) {
+        this->set_full_screen(fullscreen);
+    });
+
     this->addWidget(this->connect_msg());
     this->addWidget(this->frame);
+}
+
+void OpenAutoPage::set_full_screen(bool fullscreen)
+{
+    if (fullscreen) {
+        emit toggle_fullscreen(this->frame);
+    }
+    else {
+        this->addWidget(frame);
+        this->setCurrentWidget(frame);
+    }
+    this->worker->update_size();
 }
 
 void OpenAutoPage::resizeEvent(QResizeEvent *event)

@@ -85,9 +85,8 @@ class OpenAutoPage : public QStackedWidget, public Page {
 
    public:
     OpenAutoPage(Arbiter &arbiter, QWidget *parent = nullptr);
-
     inline void pass_key_event(QKeyEvent *event) { this->worker->send_key_event(event); }
-
+    void set_full_screen(bool fullscreen);
     void init() override;
 
    protected:
