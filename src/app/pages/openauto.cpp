@@ -97,6 +97,7 @@ QLayout *OpenAutoPage::Settings::settings_widget()
     layout->addLayout(this->autoconnect_row_widget(), 1);
     layout->addWidget(Session::Forge::br(), 1);
     layout->addLayout(this->connected_indicator_widget(), 1);
+    layout->addLayout(this->force_aa_fullscreen_widget(), 1);
     layout->addWidget(Session::Forge::br(), 1);
     layout->addLayout(this->touchscreen_row_widget(), 1);
     layout->addLayout(this->buttons_row_widget(), 1);
@@ -326,6 +327,24 @@ QLayout *OpenAutoPage::Settings::connected_indicator_widget()
     toggle->setChecked(this->config->get_show_aa_connected());
     connect(toggle, &Switch::stateChanged, [config = this->config](bool state){
         config->set_show_aa_connected(state);
+    });
+    layout->addWidget(toggle, 1, Qt::AlignHCenter);
+
+    return layout;
+}
+
+QLayout *OpenAutoPage::Settings::force_aa_fullscreen_widget()
+{
+    QHBoxLayout *layout = new QHBoxLayout();
+
+    QLabel *label = new QLabel("Force AA fullscreen");
+    layout->addWidget(label, 1);
+
+    Switch *toggle = new Switch();
+    toggle->scale(this->arbiter.layout().scale);
+    toggle->setChecked(this->config->get_force_aa_fullscreen());
+    connect(toggle, &Switch::stateChanged, [config = this->config](bool state){
+        config->set_force_aa_fullscreen(state);
     });
     layout->addWidget(toggle, 1, Qt::AlignHCenter);
 

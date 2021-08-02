@@ -167,7 +167,7 @@ class Config : public QObject {
     {
         this->force_aa_fullscreen = enabled;
         this->settings.setValue("Pages/OpenAuto/force_aa_fullscreen", this->force_aa_fullscreen);
-    }    
+    }
 
     inline const QStringList &get_launcher_plugins() { return this->launcher_plugins; }
     inline void set_launcher_plugin(QString plugin, bool remove = false)
