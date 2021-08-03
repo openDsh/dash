@@ -443,8 +443,8 @@ void OpenAutoPage::init()
             this->frame->toggle_fullscreen();
         }
         this->setCurrentIndex(enable ? 1 : 0);
-        if(enable && this->config->get_force_aa_fullscreen())
-            this->set_full_screen(true);
+        if(enable && this->config->get_force_aa_fullscreen() || !enable)
+            this->set_full_screen(enable);
         emit connected(enable);
     });
     connect(this->frame, &OpenAutoFrame::double_clicked, [this](bool fullscreen) {
