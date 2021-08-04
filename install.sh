@@ -19,7 +19,7 @@ display_help() {
 
 #location of OS details for linux
 OS_RELEASE_FILE="/etc/os-release"
-CPU_CORES_COUNT=`grep -c ^processor /proc/cpuinfo`
+CPU_CORE_COUNT=`grep -c ^processor /proc/cpuinfo`
 
 #check if Raspian is in the file, if not set the install Args to be false
 if grep -q "Raspbian" ${OS_RELEASE_FILE}; then
@@ -186,7 +186,7 @@ else
   cd build
 
   #beginning cmake
-  cmake -DCMAKE_BUILD_TYPE=Release -- -j$CPU_CORES_COUNT ../
+  cmake -DCMAKE_BUILD_TYPE=Release -- -j$CPU_CORE_COUNT ../
   if [[ $? -eq 0 ]]; then
       echo -e Aasdk CMake completed successfully'\n'
   else
@@ -195,7 +195,7 @@ else
   fi
 
   #beginning make
-  make -j$CPU_CORES_COUNT
+  make -j$CPU_CORE_COUNT
 
   if [[ $? -eq 0 ]]; then
     echo -e Aasdk Make completed successfully '\n'
@@ -261,7 +261,7 @@ if [ $gstreamer = true ]; then
 
   #run cmake
   echo Beginning cmake
-  cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_LIBDIR=lib/$(dpkg-architecture -qDEB_HOST_MULTIARCH) -DCMAKE_INSTALL_INCLUDEDIR=include -DQT_VERSION=5 -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS=-std=c++11 -- -j$CPU_CORES_COUNT
+  cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_LIBDIR=lib/$(dpkg-architecture -qDEB_HOST_MULTIARCH) -DCMAKE_INSTALL_INCLUDEDIR=include -DQT_VERSION=5 -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS=-std=c++11 -- -j$CPU_CORE_COUNT
 
   if [[ $? -eq 0 ]]; then
     echo -e Make ok'\n'
@@ -271,7 +271,7 @@ if [ $gstreamer = true ]; then
   fi
 
   echo Making Gstreamer
-  make -j$CPU_CORES_COUNT
+  make -j$CPU_CORE_COUNT
 
   if [[ $? -eq 0 ]]; then
     echo -e Gstreamer make ok'\n'
@@ -338,7 +338,7 @@ else
   cd build
 
   echo Beginning openauto cmake
-  cmake ${installArgs} -DGST_BUILD=true -- -j$CPU_CORES_COUNT ../
+  cmake ${installArgs} -DGST_BUILD=true -- -j$CPU_CORE_COUNT ../
   if [[ $? -eq 0 ]]; then
     echo -e Openauto CMake OK'\n'
   else
@@ -347,7 +347,7 @@ else
   fi
 
   echo Beginning openauto make
-  make -j$CPU_CORES_COUNT
+  make -j$CPU_CORE_COUNT
   if [[ $? -eq 0 ]]; then
     echo -e Openauto make OK'\n'
   else
@@ -387,7 +387,7 @@ else
 
 	echo -e Installing dash'\n'
   echo Running CMake for dash
-  cmake ${installArgs} -DGST_BUILD=TRUE -- -j$CPU_CORES_COUNT ../
+  cmake ${installArgs} -DGST_BUILD=TRUE -- -j$CPU_CORE_COUNT ../
   if [[ $? -eq 0 ]]; then
     echo -e Dash CMake OK'\n'
   else
@@ -396,7 +396,7 @@ else
   fi
 
   echo Running Dash make
-  make -j$CPU_CORES_COUNT
+  make -j$CPU_CORE_COUNT
   if [[ $? -eq 0 ]]; then
       echo -e Dash make ok, executable can be found ../bin/dash
       echo
