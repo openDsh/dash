@@ -20,6 +20,13 @@ display_help() {
 #location of OS details for linux
 OS_RELEASE_FILE="/etc/os-release"
 CPU_CORE_COUNT=`grep -c ^processor /proc/cpuinfo`
+RAM_SIZE=`free -g | grep "Mem:" | awk '{print $2}'`
+
+if [[ $(($RAM_SIZE + 0)) -lt 4 ]]; then
+  CPU_CORE_COUNT=2
+fi
+echo "RAM size is ${RAM_SIZE} GB, Utilizing threads: ${CPU_CORE_COUNT}"
+exit 0
 
 #check if Raspian is in the file, if not set the install Args to be false
 if grep -q "Raspbian" ${OS_RELEASE_FILE}; then
