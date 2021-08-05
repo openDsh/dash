@@ -385,7 +385,7 @@ QWidget *DataTab::engine_load_widget()
     unit_font.setItalic(true);
 
     Gauge *engine_load =
-        new Gauge({"%", "%"}, value_font, unit_font, Gauge::RIGHT,
+        new Gauge({"Nm", "Nm"}, value_font, unit_font, Gauge::RIGHT,
                   500, {cmds.LOAD}, 1, [](double x, bool _) { return x; }, widget);
     layout->addWidget(engine_load);
     this->gauges.push_back(engine_load);
