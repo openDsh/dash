@@ -25,6 +25,9 @@ RAM_SIZE=`free -g | grep "Mem:" | awk '{print $2}'`
 if [[ $(($RAM_SIZE + 0)) -lt 4 ]]; then
   CPU_CORE_COUNT=2
 fi
+if [[ $(($RAM_SIZE + 0)) -lt 2 ]]; then
+  CPU_CORE_COUNT=1
+fi
 echo "RAM size is ${RAM_SIZE} GB, Utilizing threads: ${CPU_CORE_COUNT}"
 
 #check if Raspian is in the file, if not set the install Args to be false
