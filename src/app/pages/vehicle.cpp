@@ -48,7 +48,7 @@ Gauge::Gauge(Command cmd, QFont value_font, QFont unit_font, Gauge::Orientation 
 }
 
 void Gauge::set_value(int value){
-    DASH_LOG(info)<<"[Gauges] set_value: "<<std::to_string(value);
+    // DASH_LOG(info)<<"[Gauges] set_value: "<<std::to_string(value);
     value_label->setText(this->format_value(this->decoder(value, this->si)));
 }
 
@@ -231,10 +231,8 @@ DataTab::DataTab(Arbiter &arbiter, QWidget *parent)
     engine_data->setSizePolicy(sp_right);
 
     connect(&this->arbiter, &Arbiter::vehicle_update_data, [this](QString gauge_id, int value){
-        DASH_LOG(info)<<"[Gauges] arbiter update: "<<qPrintable(gauge_id)<<" to "<< std::to_string(value);
+        // DASH_LOG(info)<<"[Gauges] arbiter update: "<<qPrintable(gauge_id)<<" to "<< std::to_string(value);
         for (auto &gauge : this->gauges) {
-            // QString id = gauge->get_id();
-            // DASH_LOG(info)<<"[Gauges] gauge id: " << qPrintable(gauge->get_id());
             if(gauge->get_id() == gauge_id){
                 // DASH_LOG(info)<<"[Gauges] Found: "<<gauge->get_id();
                 gauge->set_value(value);
