@@ -250,31 +250,9 @@ QWidget *DataTab::speedo_tach_widget()
     layout->setContentsMargins(0, 0, 0, 0);
 
     layout->addStretch(3);
-
-    QFont speed_value_font(this->arbiter.forge().font(36, true));
-
-    QFont speed_unit_font(this->arbiter.forge().font(16));
-    speed_unit_font.setWeight(QFont::Light);
-    speed_unit_font.setItalic(true);
-
-    Gauge *speed = new Gauge(cmds.SPEED, speed_value_font, speed_unit_font,
-                             Gauge::BOTTOM, widget);
-    layout->addWidget(speed);
-    this->gauges.push_back(speed);
-
+    layout->addWidget(this->vehicle_data_widget(cmds.SPEED));
     layout->addStretch(2);
-
-    QFont tach_value_font(this->arbiter.forge().font(24, true));
-
-    QFont tach_unit_font(this->arbiter.forge().font(12));
-    tach_unit_font.setWeight(QFont::Light);
-    tach_unit_font.setItalic(true);
-
-    Gauge *rpm = new Gauge(cmds.RPM, tach_value_font,
-                           tach_unit_font, Gauge::BOTTOM, widget);
-    layout->addWidget(rpm);
-    this->gauges.push_back(rpm);
-
+    layout->addWidget(this->vehicle_data_widget(cmds.RPM));
     layout->addStretch(1);
 
     return widget;
@@ -319,69 +297,43 @@ QWidget *DataTab::engine_data_widget()
     layout->setSpacing(0);
 
     layout->addStretch();
-    layout->addWidget(this->coolant_temp_widget());
+    layout->addWidget(this->vehicle_data_widget(cmds.COOLANT_TEMP));
     layout->addStretch();
     layout->addWidget(Session::Forge::br());
     layout->addStretch();
-    layout->addWidget(this->engine_load_widget());
+    layout->addWidget(this->vehicle_data_widget(cmds.LOAD));
     layout->addStretch();
 
     return widget;
 }
 
-QWidget *DataTab::coolant_temp_widget()
+QWidget *DataTab::vehicle_data_widget(Command cfg)
 {
     QWidget *widget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
 
-    QFont value_font(this->arbiter.forge().font(16, true));
+    QFont value_font(this->arbiter.forge().font(cfg.font_size.value, true));
 
-    QFont unit_font(this->arbiter.forge().font(12));
+    QFont unit_font(this->arbiter.forge().font(cfg.font_size.unit));
     unit_font.setWeight(QFont::Light);
     unit_font.setItalic(true);
 
-    Gauge *coolant_temp = new Gauge(cmds.COOLANT_TEMP,
+    Gauge *gauge = new Gauge(cfg,
         value_font, unit_font, Gauge::RIGHT, widget);
-    layout->addWidget(coolant_temp);
-    this->gauges.push_back(coolant_temp);
+    layout->addWidget(gauge);
+    this->gauges.push_back(gauge);
 
-    QFont label_font(this->arbiter.forge().font(10));
-    label_font.setWeight(QFont::Light);
+    if (cfg.font_size.label > 0) {
+        QFont label_font(this->arbiter.forge().font(cfg.font_size.label));
+        label_font.setWeight(QFont::Light);
 
-    QLabel *coolant_temp_label = new QLabel("coolant", widget);
-    coolant_temp_label->setFont(label_font);
-    coolant_temp_label->setAlignment(Qt::AlignHCenter);
-    layout->addWidget(coolant_temp_label);
+        QLabel *gauge_label = new QLabel(cfg.description, widget);
+        gauge_label->setFont(label_font);
+        gauge_label->setAlignment(Qt::AlignHCenter);
+        layout->addWidget(gauge_label);
+    }
 
-    return widget;
-}
-
-QWidget *DataTab::engine_load_widget()
-{
-    QWidget *widget = new QWidget(this);
-    QVBoxLayout *layout = new QVBoxLayout(widget);
-    layout->setContentsMargins(0, 0, 0, 0);
-    layout->setSpacing(0);
-
-    QFont value_font(this->arbiter.forge().font(16, true));
-
-    QFont unit_font(this->arbiter.forge().font(12));
-    unit_font.setWeight(QFont::Light);
-    unit_font.setItalic(true);
-
-    Gauge *engine_load =
-        new Gauge(cmds.LOAD, value_font, unit_font, Gauge::RIGHT, widget);
-    layout->addWidget(engine_load);
-    this->gauges.push_back(engine_load);
-
-    QFont label_font(this->arbiter.forge().font(10));
-    label_font.setWeight(QFont::Light);
-
-    QLabel *engine_load_label = new QLabel("load", widget);
-    engine_load_label->setFont(label_font);
-    engine_load_label->setAlignment(Qt::AlignHCenter);
-    layout->addWidget(engine_load_label);
     return widget;
 }

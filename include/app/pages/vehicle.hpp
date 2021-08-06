@@ -79,8 +79,7 @@ class DataTab : public QWidget {
     QWidget *speedo_tach_widget();
     // QWidget *mileage_data_widget();
     QWidget *engine_data_widget();
-    QWidget *coolant_temp_widget();
-    QWidget *engine_load_widget();
+    QWidget *vehicle_data_widget(Command cfg);
 
     std::vector<Gauge *> gauges;
 };
