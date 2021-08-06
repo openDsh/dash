@@ -26,10 +26,7 @@ class Gauge : public QWidget {
     Gauge(QString id, units_t units, QFont value_font, QFont unit_font, Orientation orientation, int rate,
           std::vector<Command> cmds, int precision, obd_decoder_t decoder, QWidget *parent = nullptr);
 
-    // inline void start() { this->timer->start(this->rate); }
-    // inline void stop() { this->timer->stop(); }
     inline QString get_id() { return this->id; };
-    void can_callback(QByteArray payload);
     void set_value(int value);
 
    private:
@@ -44,7 +41,6 @@ class Gauge : public QWidget {
     bool si;
     int rate;
     int precision;
-    // QTimer *timer;
 
    signals:
     void toggle_unit(bool si);

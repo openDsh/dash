@@ -13,13 +13,6 @@ Gauge::Gauge(QString id, units_t units, QFont value_font, QFont unit_font, Gauge
 : QWidget(parent)
 {
     Config *config = Config::get_instance();
-    // ICANBus *bus = (config->get_vehicle_can_bus())?((ICANBus *)SocketCANBus::get_instance()):((ICANBus *)elm327::get_instance());
-
-    using namespace std::placeholders;
-    std::function<void(QByteArray)> callback = std::bind(&Gauge::can_callback, this, std::placeholders::_1);
-
-    // bus->registerFrameHandler(cmds[0].frame.frameId(), callback);
-    // DASH_LOG(info)<<"[Gauges] Registered frame handler for id "<<(cmds[0].frame.frameId());
 
     this->id = id;
     this->si = config->get_si_units();
@@ -44,13 +37,6 @@ Gauge::Gauge(QString id, units_t units, QFont value_font, QFont unit_font, Gauge
     unit_label->setFont(unit_font);
     unit_label->setAlignment(Qt::AlignCenter);
 
-    // this->timer = new QTimer(this);
-    // connect(this->timer, &QTimer::timeout, [this, bus, cmds]() {
-    //     // for (auto cmd : cmds) {
-    //     //     bus->writeFrame(cmd.frame);
-    //     // }
-    // });
-
     connect(config, &Config::si_units_changed, [this, units, unit_label](bool si) {
         this->si = si;
         unit_label->setText(this->si ? units.second : units.first);
@@ -62,16 +48,6 @@ Gauge::Gauge(QString id, units_t units, QFont value_font, QFont unit_font, Gauge
     layout->addStretch(1);
     layout->addWidget(unit_label);
     layout->addStretch(4);
-}
-
-void Gauge::can_callback(QByteArray payload){
-    Response resp = Response(payload);
-    DASH_LOG(info)<<"[Gauges] can_calback: "<<std::to_string(resp.PID);
-    for(auto cmd : cmds){
-        if(cmd.frame.payload().at(2) == resp.PID || cmd.frame.payload().at(2) == 0x00){
-            value_label->setText(this->format_value(this->decoder(cmd.decoder(resp), this->si)));
-        }
-    }
 }
 
 void Gauge::set_value(int value){
@@ -256,10 +232,6 @@ DataTab::DataTab(Arbiter &arbiter, QWidget *parent)
     QSizePolicy sp_right(QSizePolicy::Preferred, QSizePolicy::Preferred);
     sp_right.setHorizontalStretch(2);
     engine_data->setSizePolicy(sp_right);
-    // for (auto &gauge : this->gauges){
-    //     // DASH_LOG(info)<<"[Gauges] start: "<<(gauge->get_id().toUtf8().constData());
-    //     gauge->start();
-    // }
 
     connect(&this->arbiter, &Arbiter::vehicle_update_data, [this](QString gauge_id, int value){
         DASH_LOG(info)<<"[Gauges] arbiter update: "<<qPrintable(gauge_id)<<" to "<< std::to_string(value);
