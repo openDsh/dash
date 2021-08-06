@@ -102,6 +102,9 @@ void Dash::set_page(Page *page)
     auto id = this->arbiter.layout().page_id(page);
     this->rail.group.button(id)->setChecked(true);
     this->body.frame->setCurrentWidget(page->widget());
+    if(id == 0 && Config::get_instance()->get_force_aa_fullscreen()) {
+        this->arbiter.layout().openauto_page->set_full_screen(true);
+    }
 }
 
 QWidget *Dash::control_bar() const

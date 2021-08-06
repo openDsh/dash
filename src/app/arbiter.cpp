@@ -78,7 +78,8 @@ void Arbiter::set_curr_page(Page *page)
         return;
 
     // Exit Full screen mode
-    this->send_openauto_full_screen(false);
+    if (this->layout().page_id(page) != 0)
+        this->send_openauto_full_screen(false);
     
     this->layout().curr_page = page;
 

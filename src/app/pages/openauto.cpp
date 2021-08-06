@@ -337,7 +337,7 @@ QLayout *OpenAutoPage::Settings::force_aa_fullscreen_widget()
 {
     QHBoxLayout *layout = new QHBoxLayout();
 
-    QLabel *label = new QLabel("Force AA fullscreen");
+    QLabel *label = new QLabel("Fullscreen mode");
     layout->addWidget(label, 1);
 
     Switch *toggle = new Switch();
