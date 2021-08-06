@@ -23,8 +23,7 @@ class Gauge : public QWidget {
    public:
     enum Orientation { BOTTOM, RIGHT };
 
-    Gauge(QString id, units_t units, QFont value_font, QFont unit_font, Orientation orientation, int rate,
-          std::vector<Command> cmds, int precision, obd_decoder_t decoder, QWidget *parent = nullptr);
+    Gauge(Command cmd, QFont value_font, QFont unit_font, Orientation orientation, QWidget *parent = nullptr);
 
     inline QString get_id() { return this->id; };
     void set_value(int value);
@@ -35,12 +34,11 @@ class Gauge : public QWidget {
     QLabel *value_label;
 
     obd_decoder_t decoder;
-    std::vector<Command> cmds;
 
     QString id;
     bool si;
-    int rate;
     int precision;
+    units_t units;
 
    signals:
     void toggle_unit(bool si);
