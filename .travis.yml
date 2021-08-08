@@ -1,3 +1,11 @@
+language: cpp
+sudo: required
+compiler:
+ - clang
+os:
+ - linux
+dist: bionic
+
 before_install:
  - sudo apt-get install qtbase5-dev qtdeclarative5-dev libqt5webkit5-dev 
  - sudo apt-get install qt5-default qttools5-dev-tools
