@@ -4,15 +4,11 @@ compiler:
  - clang
 os:
  - linux
-dist: bionic
+dist: focal
 
 addons:
   apt:
-    sources:
-      - sourceline: 'ppa:beineri/opt-qt-5.13.2-bionic'
     packages:
-      - qt513base
-      - qt513serialbus
       - libxkbcommon-x11-0
       - libgl1-mesa-dev
 
