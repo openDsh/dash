@@ -6,9 +6,20 @@ os:
  - linux
 dist: bionic
 
-before_install:
- - sudo apt-get install qtbase5-dev qtdeclarative5-dev libqt5webkit5-dev 
- - sudo apt-get install qt5-default qttools5-dev-tools
+addons:
+  apt:
+    packages:
+      - libxkbcommon-x11-0
+      - libgl1-mesa-dev
+
+services: 
+  - xvfb
+
+env:
+  - QT_CI_PACKAGES=qt.qt5.5132.gcc_64,qt.qt5.5132.qtwebengine PATH="$TRAVIS_BUILD_DIR/Qt/5.13.2/gcc_64/bin:${PATH}"
 
 script:
- - ./install.sh
+  - git clone https://github.com/benlau/qtci.git
+  - source qtci/path.env
+  - install-qt 5.13.2
+  - ./install.sh
