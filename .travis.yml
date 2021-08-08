@@ -5,6 +5,9 @@ compiler:
 os:
  - linux
 dist: focal
+arch:
+  - arm64
+  - amd64
 
 addons:
   apt:
