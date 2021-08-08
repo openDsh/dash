@@ -397,7 +397,7 @@ else
   echo Running Dash make
   make -j4
   if [[ $? -eq 0 ]]; then
-      echo -e Dash make ok, executable can be found ../bin/dash
+      echo -e Dash make ok, executable can be found ../bi.dash ./dash & ./dash &
       echo
 
       #check and add usb rules for openauto if they dont exist
