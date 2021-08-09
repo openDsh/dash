@@ -2,32 +2,22 @@
 
 #include <functional>
 #include <string>
+
+#include <QTimer>
 #include <QCanBusFrame>
 #include "obd/message.hpp"
 
-typedef QPair<QString, QString> units_t;
-struct font_size_t {
-    int label;
-    int value;
-    int unit;
-};
-
-typedef std::function<double(double, bool)> unit_converter_t;
 typedef std::function<double(Response)> decoder_t;
 
 struct Command {
     QString id;
-    QString description;
-    units_t units;
-    font_size_t font_size;
-    int precision;
-    unit_converter_t converter;
     QCanBusFrame frame;
     decoder_t decoder;
+    QTimer *timer;
+    int rate;
 };
 
-
-typedef Command Commands[6];
+typedef QList<Command> Commands;
 // struct Commands {
 //     Command LOAD;
 //     Command COOLANT_TEMP;

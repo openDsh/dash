@@ -6,15 +6,40 @@
 
 #include "canbus/socketcanbus.hpp"
 #include "obd/message.hpp"
-#include "obd/command.hpp"
+#include "obd/conversions.hpp"
+
 #include "app/widgets/selector.hpp"
 #include "app/widgets/dialog.hpp"
-
 #include "app/pages/page.hpp"
 
 class Arbiter;
 
 typedef QPair<QString, QString> units_t;
+struct font_size_t {
+    int label;
+    int value;
+    int unit;
+};
+typedef std::function<double(double, bool)> unit_converter_t;
+
+struct GaugeConfig {
+    QString id;
+    QString description;
+    units_t units;
+    font_size_t font_size;
+    int precision;
+    unit_converter_t converter;
+};
+
+// typedef QList<Gauge> Gauges;
+struct GaugesConfig {
+    GaugeConfig LOAD;
+    GaugeConfig COOLANT_TEMP;
+    GaugeConfig RPM;
+    GaugeConfig SPEED;
+    GaugeConfig INTAKE_TEMP;
+    GaugeConfig MAF;
+};
 
 class Gauge : public QWidget {
     Q_OBJECT
@@ -22,7 +47,7 @@ class Gauge : public QWidget {
    public:
     enum Orientation { BOTTOM, RIGHT };
 
-    Gauge(Command cmd, QFont value_font, QFont unit_font, Orientation orientation, QWidget *parent = nullptr);
+    Gauge(GaugeConfig cfg, QFont value_font, QFont unit_font, Orientation orientation, QWidget *parent = nullptr);
 
     inline QString get_id() { return this->id; };
     void set_value(int value);
@@ -78,7 +103,7 @@ class DataTab : public QWidget {
     QWidget *speedo_tach_widget();
     // QWidget *mileage_data_widget();
     QWidget *engine_data_widget();
-    QWidget *vehicle_data_widget(Command cfg);
+    QWidget *vehicle_data_widget(GaugeConfig cfg);
 
     std::vector<Gauge *> gauges;
 };

@@ -7,18 +7,40 @@
 #include "canbus/elm327.hpp"
 #include "plugins/vehicle_plugin.hpp"
 
-Gauge::Gauge(Command cmd, QFont value_font, QFont unit_font, Gauge::Orientation orientation, QWidget *parent)
+GaugesConfig gauges_cfg = 
+{
+  {"load", "Calculated Engine Load", {"%", "%"}, 
+    {10, 16, 12}, 1, [](double x, bool _) { return x; }
+  },
+  {"coolant_temp", "Engine Coolant Temperature", {"°F", "°C"}, 
+    {10, 16, 12}, 1, [](double x, bool si) { return si ? x : Conversion::c_to_f(x); }
+  },
+  {"rpm", "Engine Revolutions Per Minute (RPM)", {"x1000rpm", "x1000rpm"}, 
+    {0, 24, 12}, 1, [](double x, bool _) { return x / 1000.0; }
+  },
+  {"speed", "Vehicle Speed", {"mph", "km/h"}, 
+    {0, 36, 16}, 0, [](double x, bool si) { return si ? x : Conversion::kph_to_mph(x); }
+  },
+  {"intake_temp", "Intake Air Temperature", {"°F", "°C"}, 
+    {10, 16, 12}, 1, [](double x, bool si) { return si ? x : Conversion::c_to_f(x); }
+  },
+  {"maf_rate", "Mass Air Flow (MAF) Rate", {"g/s", "g/s"},  
+    {10, 16, 12}, 1, [](double x, bool si) { return x; }
+  }
+};
+
+Gauge::Gauge(GaugeConfig cfg, QFont value_font, QFont unit_font, Gauge::Orientation orientation, QWidget *parent)
 : QWidget(parent)
 {
     Config *config = Config::get_instance();
 
-    this->id = cmd.id;
+    this->id = cfg.id;
     this->si = config->get_si_units();
 
-    this->precision = cmd.precision;
+    this->precision = cfg.precision;
 
-    this->units = cmd.units;
-    this->converter = cmd.converter;
+    this->units = cfg.units;
+    this->converter = cfg.converter;
 
     QBoxLayout *layout;
     if (orientation == BOTTOM)
@@ -248,9 +270,9 @@ QWidget *DataTab::speedo_tach_widget()
     layout->setContentsMargins(0, 0, 0, 0);
 
     layout->addStretch(3);
-    layout->addWidget(this->vehicle_data_widget(cmds.SPEED));
+    layout->addWidget(this->vehicle_data_widget(gauges_cfg.SPEED));
     layout->addStretch(2);
-    layout->addWidget(this->vehicle_data_widget(cmds.RPM));
+    layout->addWidget(this->vehicle_data_widget(gauges_cfg.RPM));
     layout->addStretch(1);
 
     return widget;
@@ -276,7 +298,7 @@ QWidget *DataTab::speedo_tach_widget()
 //	   unit_font.setItalic(true);
 //
 //     Gauge *mileage = new Gauge({"mpg", "km/L"}, value_font, unit_font,
-//                                Gauge::BOTTOM, 100, {cmds.SPEED, cmds.MAF}, 1,
+//                                Gauge::BOTTOM, 100, {gauges_cfg.SPEED, gauges_cfg.MAF}, 1,
 //                                [](std::vector<double> x, bool si) {
 //                                    return (si ? x[0] : kph_to_mph(x[0])) / (si ? gps_to_lph(x[1]) : gps_to_gph(x[1]));
 //                                },
@@ -295,17 +317,17 @@ QWidget *DataTab::engine_data_widget()
     layout->setSpacing(0);
 
     layout->addStretch();
-    layout->addWidget(this->vehicle_data_widget(cmds.COOLANT_TEMP));
+    layout->addWidget(this->vehicle_data_widget(gauges_cfg.COOLANT_TEMP));
     layout->addStretch();
     layout->addWidget(Session::Forge::br());
     layout->addStretch();
-    layout->addWidget(this->vehicle_data_widget(cmds.LOAD));
+    layout->addWidget(this->vehicle_data_widget(gauges_cfg.LOAD));
     layout->addStretch();
 
     return widget;
 }
 
-QWidget *DataTab::vehicle_data_widget(Command cfg)
+QWidget *DataTab::vehicle_data_widget(GaugeConfig cfg)
 {
     QWidget *widget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
