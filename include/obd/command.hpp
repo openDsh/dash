@@ -12,22 +12,29 @@ struct font_size_t {
     int unit;
 };
 
+typedef std::function<double(double, bool)> unit_converter_t;
+typedef std::function<double(Response)> decoder_t;
+
 struct Command {
     QString id;
     QString description;
     units_t units;
     font_size_t font_size;
     int precision;
-    std::function<double(double x, bool si)> decoder;
+    unit_converter_t converter;
+    QCanBusFrame frame;
+    decoder_t decoder;
 };
 
-struct Commands {
-    Command LOAD;
-    Command COOLANT_TEMP;
-    Command RPM;
-    Command SPEED;
-    Command INTAKE_TEMP;
-    Command MAF;
-};
+
+typedef Command Commands[6];
+// struct Commands {
+//     Command LOAD;
+//     Command COOLANT_TEMP;
+//     Command RPM;
+//     Command SPEED;
+//     Command INTAKE_TEMP;
+//     Command MAF;
+// };
 
 extern Commands cmds;

@@ -18,7 +18,7 @@ Gauge::Gauge(Command cmd, QFont value_font, QFont unit_font, Gauge::Orientation 
     this->precision = cmd.precision;
 
     this->units = cmd.units;
-    this->decoder = cmd.decoder;
+    this->converter = cmd.converter;
 
     QBoxLayout *layout;
     if (orientation == BOTTOM)
@@ -49,7 +49,7 @@ Gauge::Gauge(Command cmd, QFont value_font, QFont unit_font, Gauge::Orientation 
 
 void Gauge::set_value(int value){
     // DASH_LOG(info)<<"[Gauges] set_value: "<<std::to_string(value);
-    value_label->setText(this->format_value(this->decoder(value, this->si)));
+    value_label->setText(this->format_value(this->converter(value, this->si)));
 }
 
 QString Gauge::format_value(double value)

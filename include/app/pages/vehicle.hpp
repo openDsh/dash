@@ -14,7 +14,6 @@
 
 class Arbiter;
 
-typedef std::function<double(double, bool)> obd_decoder_t;
 typedef QPair<QString, QString> units_t;
 
 class Gauge : public QWidget {
@@ -33,7 +32,7 @@ class Gauge : public QWidget {
     QString null_value();
     QLabel *value_label;
 
-    obd_decoder_t decoder;
+    unit_converter_t converter;
 
     QString id;
     bool si;
