@@ -9,4 +9,6 @@ class Conversion {
     static double gps_to_gph(double val) { return val * 0.0805; };
 
     static double gps_to_lph(double val) { return val * 3.6; };
+    
+    static double l100km_to_mpg(double val) { return (val == 0 ? 0 : (235.214583 / val)); };
 };
