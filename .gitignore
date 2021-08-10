@@ -62,3 +62,11 @@ Makefile
 *_autogen/
 gitversion.h
 openauto.ini
+
+# Plugins #
+###########
+!plugins/vehicle/
+plugins/vehicle/*
+!plugins/vehicle/test
+!plugins/vehicle/obd2
+!plugins/vehicle/README.md
