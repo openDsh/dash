@@ -1,0 +1,65 @@
+# Heavily inspired (i.e. copy/paste) from https://gist.github.com/NickNaso/0d478f1481686d5bcc868cac06620a60
+name: Dash CMake Build Matrix
+
+# Controls when the action will run. Triggers the workflow on push
+on: 
+  push:
+  pull_request:
+  release:
+    # tags:
+    # - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    name: ${{ matrix.config.name }}
+    runs-on: ${{ matrix.config.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        config: 
+        - {
+            name: "Ubuntu Latest GCC (Release)",
+            os: ubuntu-latest,
+            build_type: "Release",
+            cc: "gcc",
+            cxx: "g++",
+            generators: "Ninja"
+          }
+
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      - name: Print env
+        run: |
+          echo github.event.action: ${{ github.event.action }}
+          echo github.event_name: ${{ github.event_name }}
+
+      - name: Install dependencies on ubuntu
+        if: startsWith(matrix.config.name, 'Ubuntu Latest GCC')
+        run: |
+          sudo apt-get update
+          # sudo apt-get install --no-install-recommends libxkbcommon-x11-0 libgl1-mesa-dev xserver-xorg-video-all xserver-xorg-input-all xserver-xorg-core xinit x11-xserver-utils
+          cmake --version
+          gcc --version
+          
+      - name: Patch install.sh
+        shell: bash
+        run: |
+          sed -i 's/libusb-1.0.0-dev/libusb-1.0-0-dev/g' install.sh
+          sed -i 's/^\s*\.\/dash/\# \.\/dash/g' install.sh
+
+      - name: Build
+        shell: bash
+        run: ./install.sh
+
+      # - name: Run app and check logs
+      #   shell: bash
+      #   run: |
+      #     ./bin/dash > dash.log
+      #     grep 'Init complete!' dash.log
+      #     status=$?
+      #     [ $status -eq 0 ] && exit 0 || exit 1
