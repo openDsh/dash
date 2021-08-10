@@ -445,6 +445,7 @@ void OpenAutoPage::init()
         this->setCurrentIndex(enable ? 1 : 0);
         if(enable && this->config->get_force_aa_fullscreen() || !enable)
             this->set_full_screen(enable);
+        this->device_connected = enable;
         emit connected(enable);
     });
     connect(this->frame, &OpenAutoFrame::double_clicked, [this](bool fullscreen) {
@@ -460,7 +461,9 @@ void OpenAutoPage::init()
     });
 
     connect(&this->arbiter, &Arbiter::openauto_full_screen, [this](bool fullscreen) {
-        this->set_full_screen(fullscreen);
+        if(!this->is_connected()) return;
+        if(fullscreen != this->frame->is_fullscreen())
+            this->set_full_screen(fullscreen);
     });
 
     this->addWidget(this->connect_msg());

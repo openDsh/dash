@@ -89,6 +89,7 @@ class OpenAutoPage : public QStackedWidget, public Page {
     void set_full_screen(bool fullscreen);
     void init() override;
     const QString &connected_icon_name() { return this->connected_icon_name_; }
+    inline bool is_connected() { return this->device_connected; }
 
    protected:
     void resizeEvent(QResizeEvent *event);
@@ -122,6 +123,7 @@ class OpenAutoPage : public QStackedWidget, public Page {
         Config *config;
     };
 
+    bool device_connected = false;
     const QString connected_icon_name_;
     QWidget *connect_msg();
 
