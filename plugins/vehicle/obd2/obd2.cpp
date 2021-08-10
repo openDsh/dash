@@ -32,7 +32,7 @@ void Obd2::readObd2(Command cmd, QByteArray payload){
     Response resp = Response(payload);
     if(cmd.frame.payload().at(2) == resp.PID){
         double value = cmd.decoder(resp);
-        OBD2_LOG(info)<<QString(cmd.id).toStdString()<<": "<<value;
+        OBD2_LOG(debug)<<QString(cmd.id).toStdString()<<": "<<value;
         if (cmd.id == "maf_rate") {
             this->maf_rate = Conversion::gps_to_lph(value);
         } else if (cmd.id == "speed") {

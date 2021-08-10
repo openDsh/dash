@@ -24,7 +24,7 @@ GaugesConfig gauges_cfg =
   {"intake_temp", "Intake Air Temperature", {"°F", "°C"}, 
     {10, 16, 12}, 1, [](double x, bool si) { return si ? x : Conversion::c_to_f(x); }
   },
-  {"mpg", "Petrol consumption MPG or l/100km", {"mpg", "l/100km"},  
+  {"mpg", "Petrol consumption", {"mpg", "l/100km"},  
     {10, 16, 12}, 1, [](double x, bool si) { return si ? x : Conversion::l100km_to_mpg(x); }
   }
 };
@@ -70,7 +70,7 @@ Gauge::Gauge(GaugeConfig cfg, QFont value_font, QFont unit_font, Gauge::Orientat
 }
 
 void Gauge::set_value(int value){
-    DASH_LOG(info)<<"[Gauges] set_value: "<<std::to_string(value);
+    DASH_LOG(debug)<<"[Gauges] set_value: "<<std::to_string(value);
     value_label->setText(this->format_value(this->converter(value, this->si)));
 }
 
