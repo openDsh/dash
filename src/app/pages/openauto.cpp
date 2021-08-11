@@ -343,8 +343,9 @@ QLayout *OpenAutoPage::Settings::force_aa_fullscreen_widget()
     Switch *toggle = new Switch();
     toggle->scale(this->arbiter.layout().scale);
     toggle->setChecked(this->config->get_force_aa_fullscreen());
-    connect(toggle, &Switch::stateChanged, [config = this->config](bool state){
-        config->set_force_aa_fullscreen(state);
+    connect(toggle, &Switch::stateChanged, [this](bool state){
+        this->config->set_force_aa_fullscreen(state);
+        this->arbiter.send_openauto_full_screen(state);
     });
     layout->addWidget(toggle, 1, Qt::AlignHCenter);
 
@@ -438,6 +439,7 @@ void OpenAutoPage::init()
     this->worker = new OpenAutoWorker(callback, this->arbiter.theme().mode == Session::Theme::Dark, frame);
 
     connect(this->frame, &OpenAutoFrame::toggle, [this](bool enable) {
+        DASH_LOG(info)<<"[OpenAutoPage] Connected status: "<<enable;
         if (!enable && this->frame->is_fullscreen()) {
             this->addWidget(frame);
             this->frame->toggle_fullscreen();
@@ -461,9 +463,7 @@ void OpenAutoPage::init()
     });
 
     connect(&this->arbiter, &Arbiter::openauto_full_screen, [this](bool fullscreen) {
-        if(!this->is_connected()) return;
-        if(fullscreen != this->frame->is_fullscreen())
-            this->set_full_screen(fullscreen);
+        this->set_full_screen(fullscreen);
     });
 
     this->addWidget(this->connect_msg());
@@ -472,13 +472,9 @@ void OpenAutoPage::init()
 
 void OpenAutoPage::set_full_screen(bool fullscreen)
 {
-    if (fullscreen) {
-        emit toggle_fullscreen(this->frame);
-    }
-    else {
-        this->addWidget(frame);
-        this->setCurrentWidget(frame);
-    }
+    // if(fullscreen) {
+    emit toggle_fullscreen(fullscreen);
+    // }
     this->worker->update_size();
 }
 

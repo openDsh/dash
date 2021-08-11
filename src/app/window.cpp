@@ -52,6 +52,14 @@ Dash::Dash(Arbiter &arbiter)
         if ((this->arbiter.layout().curr_page == page) && !enabled)
             this->arbiter.set_curr_page(this->arbiter.layout().next_enabled_page(page));
     });
+    connect(this->arbiter.layout().openauto_page, &OpenAutoPage::toggle_fullscreen, [this](bool fullscreen){
+        DASH_LOG(info)<<"[OpenAutoPage] toggle_fullscreen:"<<fullscreen; 
+        for (auto button : this->rail.group.buttons()){
+            // this->arbiter.layout().pages().at(1);
+            // button->getId
+            button->setVisible(!fullscreen);
+        }
+    });    
 }
 
 void Dash::init()
@@ -75,6 +83,7 @@ void Dash::init()
 
         page->init();
         button->setVisible(page->enabled());
+        button->setVisible(false);
     }
     this->set_page(this->arbiter.layout().curr_page);
     this->init_connected_pages();
@@ -102,9 +111,9 @@ void Dash::set_page(Page *page)
     auto id = this->arbiter.layout().page_id(page);
     this->rail.group.button(id)->setChecked(true);
     this->body.frame->setCurrentWidget(page->widget());
-    if(id == 0 && Config::get_instance()->get_force_aa_fullscreen()) {
-        this->arbiter.layout().openauto_page->set_full_screen(true);
-    }
+    // if(id == 0 && Config::get_instance()->get_force_aa_fullscreen()) {
+    //     this->arbiter.layout().openauto_page->set_full_screen(true);
+    // }
 }
 
 QWidget *Dash::control_bar() const
@@ -192,13 +201,10 @@ Window::Window()
     this->setCentralWidget(stack);
 
     auto dash = new Dash(this->arbiter);
+    DASH_LOG(info)<<"[OpenAutoPage] Widgets count: "<<stack->count();
     stack->addWidget(dash);
+    DASH_LOG(info)<<"[OpenAutoPage] Widgets count: "<<stack->count();
     dash->init();
-
-    connect(this->arbiter.layout().openauto_page, &OpenAutoPage::toggle_fullscreen, [stack](QWidget *widget){
-        stack->addWidget(widget);
-        stack->setCurrentWidget(widget);
-    });
 }
 
 void Window::showEvent(QShowEvent *event)
