@@ -52,14 +52,6 @@ Dash::Dash(Arbiter &arbiter)
         if ((this->arbiter.layout().curr_page == page) && !enabled)
             this->arbiter.set_curr_page(this->arbiter.layout().next_enabled_page(page));
     });
-    connect(this->arbiter.layout().openauto_page, &OpenAutoPage::toggle_fullscreen, [this](bool fullscreen){
-        DASH_LOG(info)<<"[OpenAutoPage] toggle_fullscreen:"<<fullscreen; 
-        for (auto button : this->rail.group.buttons()){
-            // this->arbiter.layout().pages().at(1);
-            // button->getId
-            button->setVisible(!fullscreen);
-        }
-    });    
 }
 
 void Dash::init()
@@ -68,23 +60,9 @@ void Dash::init()
     msg_ref->setObjectName("MsgRef");
     this->body.layout->addWidget(msg_ref);
 
+    this->rail.layout->addWidget(this->main_menu());
     this->body.layout->addWidget(this->control_bar());
 
-    for (auto page : this->arbiter.layout().pages()) {
-        auto button = new QPushButton();
-        button->setProperty("color_hint", true);
-        button->setCheckable(true);
-        button->setFlat(true);
-        this->arbiter.forge().iconize(page->icon_name(), button, 32, true);
-
-        this->rail.group.addButton(button, this->arbiter.layout().page_id(page));
-        this->rail.layout->addWidget(button);
-        this->body.frame->addWidget(page->widget());
-
-        page->init();
-        button->setVisible(page->enabled());
-        button->setVisible(false);
-    }
     this->set_page(this->arbiter.layout().curr_page);
     this->init_connected_pages();
 }
@@ -100,7 +78,7 @@ void Dash::init_connected_pages()
             timer.start();
             if (connected)
                 this->arbiter.forge().set_icon(oaPage->connected_icon_name(), oaButton, false);
-            else 
+            else
                 this->arbiter.forge().set_icon(oaPage->icon_name(), oaButton, true);
         });
     }
@@ -108,15 +86,90 @@ void Dash::init_connected_pages()
 
 void Dash::set_page(Page *page)
 {
+    bool fullscreen = this->arbiter.layout().fullscreen_mode;
+    bool fullscreen_delay = this->arbiter.layout().fullscreen_delay;
+    if (fullscreen && fullscreen_delay != 0) {
+        this->arbiter.toggle_fullscreen_mode();
+        this->arbiter.toggle_fullscreen_mode();
+    }
     auto id = this->arbiter.layout().page_id(page);
     this->rail.group.button(id)->setChecked(true);
     this->body.frame->setCurrentWidget(page->widget());
-    // if(id == 0 && Config::get_instance()->get_force_aa_fullscreen()) {
-    //     this->arbiter.layout().openauto_page->set_full_screen(true);
-    // }
 }
 
-QWidget *Dash::control_bar() const
+QWidget *Dash::main_menu()
+{
+    auto widget = new QWidget();
+    widget->setObjectName("MainMenu");
+    auto layout = new QVBoxLayout(widget);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setSpacing(0);
+
+    for (auto page : this->arbiter.layout().pages()) {
+        auto button = new QPushButton();
+        button->setProperty("color_hint", true);
+        button->setCheckable(true);
+        button->setFlat(true);
+        this->arbiter.forge().iconize(page->icon_name(), button, 32, true);
+
+        this->rail.group.addButton(button, this->arbiter.layout().page_id(page));
+        layout->addWidget(button);
+        this->body.frame->addWidget(page->widget());
+
+        page->init();
+        button->setVisible(page->enabled());
+    }
+    this->menu_width = widget->width();
+    connect(&this->arbiter, &Arbiter::fullscreen_mode_changed, [widget, this](bool enabled)
+        {
+        if (!enabled) {
+            widget->setMaximumWidth(this->menu_width);
+        } else {
+            if(!this->arbiter.layout().fullscreen_acknowledged) {
+                this->fullscreen_hint_dialog()->show();
+            }
+            QPropertyAnimation *animation = new QPropertyAnimation(widget, "maximumWidth");
+            animation->setDuration(this->arbiter.layout().fullscreen_delay);
+            animation->setStartValue(this->menu_width);
+            animation->setEndValue(0);
+            animation->start();
+        }
+    });
+
+    return widget;
+}
+
+Dialog *Dash::fullscreen_hint_dialog()
+{
+    QWidget *body = new QWidget();
+    auto layout = new QVBoxLayout(body);
+    layout->setContentsMargins(10, 10, 10, 10);
+    // layout->setSpacing(0);
+
+    // layout->setStretch(1, 3);
+    QLabel *hint1 = new QLabel("Exit by double clicking mouse");
+    QLabel *hint2 = new QLabel("Or Settings->Layout->Fullscreen mode.");
+    QCheckBox *remember = new QCheckBox("Do not show", this);
+    remember->setChecked(this->arbiter.layout().fullscreen_acknowledged);
+    connect(remember, &QCheckBox::toggled, [this](bool checked){
+        this->arbiter.set_fullscreen_acknowledged(checked);
+    });
+    layout->addWidget(hint1, 1);
+    layout->addWidget(hint2);
+    layout->addWidget(Session::Forge::br(), 1);
+    layout->addWidget(remember, 1);
+
+    QPushButton *fake_button = new QPushButton();
+    fake_button->setVisible(false);
+
+    Dialog *dialog = new Dialog(this->arbiter, false, this->window());
+    dialog->set_title("Full screen mode enabled");
+    dialog->set_body(body);
+    dialog->set_button(fake_button);
+    return dialog;
+}
+
+QWidget *Dash::control_bar()
 {
     auto widget = new QWidget();
     widget->setObjectName("ControlBar");
@@ -156,6 +209,19 @@ QWidget *Dash::control_bar() const
     widget->setVisible(this->arbiter.layout().control_bar.enabled);
     connect(&this->arbiter, &Arbiter::control_bar_changed, [widget](bool enabled){
         widget->setVisible(enabled);
+    });
+    this->control_bar_height = widget->height();
+    connect(&this->arbiter, &Arbiter::fullscreen_mode_changed, [widget, this](bool enabled){
+        // widget->setVisible(!enabled);
+        if (!enabled) {
+            widget->setMaximumHeight(this->control_bar_height);
+        } else {
+            QPropertyAnimation *animation = new QPropertyAnimation(widget, "maximumHeight");
+            animation->setDuration(this->arbiter.layout().fullscreen_delay);
+            animation->setStartValue(this->control_bar_height);
+            animation->setEndValue(0);
+            animation->start();
+        }
     });
 
     return widget;
@@ -201,9 +267,7 @@ Window::Window()
     this->setCentralWidget(stack);
 
     auto dash = new Dash(this->arbiter);
-    DASH_LOG(info)<<"[OpenAutoPage] Widgets count: "<<stack->count();
     stack->addWidget(dash);
-    DASH_LOG(info)<<"[OpenAutoPage] Widgets count: "<<stack->count();
     dash->init();
 }
 
@@ -223,4 +287,12 @@ void Window::keyReleaseEvent(QKeyEvent *event)
 {
     QMainWindow::keyReleaseEvent(event);
     this->arbiter.layout().openauto_page->pass_key_event(event);
+}
+
+void Window::mouseDoubleClickEvent(QMouseEvent *event)
+{
+    if (event->button() == Qt::LeftButton ){
+        this->arbiter.toggle_fullscreen_mode();
+    }
+    QMainWindow::mouseDoubleClickEvent(event);
 }

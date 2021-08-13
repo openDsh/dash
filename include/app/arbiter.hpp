@@ -20,9 +20,13 @@ class Arbiter : public QObject {
     Arbiter(QMainWindow *window);
     void set_mode(Session::Theme::Mode mode);
     void toggle_mode();
+    void toggle_fullscreen_mode();
+    void set_fullscreen_acknowledged(bool status);
     void set_color(const QColor &color);
     void set_scale(double scale);
     void set_control_bar(bool enabled);
+    void set_fullscreen_mode(bool enabled);
+    void set_fullscreen_delay(int duration);
     void set_curr_quick_view(QuickView *quick_view);
     void set_curr_quick_view(int id);
     void set_curr_page(Page *page);
@@ -38,7 +42,6 @@ class Arbiter : public QObject {
     void set_cursor(bool enabled);
     void set_action(Action *action, QString key);
     void send_openauto_button_press(aasdk::proto::enums::ButtonCode::Enum buttonCode, openauto::projection::WheelDirection wheelDirection = openauto::projection::WheelDirection::NONE);
-    void send_openauto_full_screen(bool fullscreen = true);
 
     QMainWindow *window() { return this->window_; }
     QSettings &settings() { return this->session_.settings_; }
@@ -67,5 +70,5 @@ class Arbiter : public QObject {
     void cursor_changed(bool enabled);
     void action_changed(Action *action, QString key);
     void openauto_button_press(aasdk::proto::enums::ButtonCode::Enum buttonCode, openauto::projection::WheelDirection wheelDirection);
-    void openauto_full_screen(bool fullscreen);
+    void fullscreen_mode_changed(bool fullscreen);
 };

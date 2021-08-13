@@ -43,7 +43,12 @@ class Dash : public QWidget {
 
     void init_connected_pages();
     void set_page(Page *page);
-    QWidget *control_bar() const;
+    int menu_width;
+    int control_bar_height;
+
+    Dialog *fullscreen_hint_dialog();
+    QWidget *main_menu();
+    QWidget *control_bar();
     QWidget *power_control() const;
 };
 
@@ -57,6 +62,7 @@ class Window : public QMainWindow {
     void showEvent(QShowEvent *event);
     void keyPressEvent(QKeyEvent *event);
     void keyReleaseEvent(QKeyEvent *event);
+    void mouseDoubleClickEvent(QMouseEvent *event);
 
    private:
     Arbiter arbiter;

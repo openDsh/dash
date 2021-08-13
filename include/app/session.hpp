@@ -75,6 +75,9 @@ class Session {
         };
 
         double scale;
+        bool fullscreen_mode;
+        bool fullscreen_acknowledged;
+        int fullscreen_delay;
         ControlBar control_bar;
         OpenAutoPage *openauto_page;
         Page *curr_page;

@@ -322,6 +322,9 @@ QWidget *CameraPage::local_camera_widget()
         emit disconnected();
         this->local_cam = nullptr;
     });
+    QObject::connect(&this->arbiter, &Arbiter::fullscreen_mode_changed, [disconnect](bool fullscreen){
+        disconnect->setVisible(!fullscreen);
+    });
     this->arbiter.forge().iconize("close", disconnect, 16);
     layout->addWidget(disconnect, 0, Qt::AlignRight);
 
@@ -345,6 +348,9 @@ QWidget *CameraPage::network_camera_widget()
         emit autoconnect_disabled();
         emit disconnected();
     });
+    QObject::connect(&this->arbiter, &Arbiter::fullscreen_mode_changed, [disconnect](bool fullscreen){
+        disconnect->setVisible(!fullscreen);
+    });    
     this->arbiter.forge().iconize("close", disconnect, 16);
     layout->addWidget(disconnect, 0, Qt::AlignRight);
 

@@ -55,6 +55,34 @@ void Arbiter::set_control_bar(bool enabled)
     emit control_bar_changed(enabled);
 }
 
+void Arbiter::set_fullscreen_mode(bool enabled)
+{
+    this->layout().fullscreen_mode = enabled;
+    this->settings().setValue("Layout/FullscreenMode/Enabled", enabled);
+
+    emit fullscreen_mode_changed(enabled);
+}
+
+void Arbiter::set_fullscreen_delay(int duration)
+{
+    this->layout().fullscreen_delay = duration;
+    this->settings().setValue("Layout/FullscreenMode/Delay", duration);
+}
+
+void Arbiter::toggle_fullscreen_mode()
+{
+    DASH_LOG(info)<<"toggle_fullscreen_mode";
+    // this->fullscreen_timer->start(delay);
+    bool fullscreen = !this->layout().fullscreen_mode;
+    this->layout().fullscreen_mode = fullscreen;
+    emit fullscreen_mode_changed(fullscreen);
+}
+
+void Arbiter::set_fullscreen_acknowledged(bool status){
+    this->layout().fullscreen_acknowledged = status;
+    this->settings().setValue("Layout/FullscreenMode/Acknowledged", status);
+}
+
 void Arbiter::set_curr_quick_view(QuickView *quick_view)
 {
     auto id = this->layout().control_bar.quick_view_id(quick_view);
@@ -76,7 +104,7 @@ void Arbiter::set_curr_page(Page *page)
 {
     if (this->layout().page_id(page) < 0 || !page->enabled())
         return;
-   
+
     this->layout().curr_page = page;
 
     emit curr_page_changed(page);
@@ -192,7 +220,3 @@ void Arbiter::send_openauto_button_press(aasdk::proto::enums::ButtonCode::Enum b
     emit openauto_button_press(buttonCode, wheelDirection);
 }
 
-void Arbiter::send_openauto_full_screen(bool fullscreen)
-{
-    emit openauto_full_screen(fullscreen);
-}

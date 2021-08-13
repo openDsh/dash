@@ -274,6 +274,12 @@ QWidget *LayoutSettingsTab::settings_widget()
     layout->addWidget(Session::Forge::br(), 1);
     layout->addWidget(this->control_bar_widget(), 1);
 
+    layout->addWidget(Session::Forge::br(), 1);
+    layout->addWidget(this->fullscreen_mode_widget(), 1);
+
+    layout->addWidget(Session::Forge::br(), 1);
+    layout->addWidget(this->fullscreen_delay_row_widget(), 1);
+
     QWidget *controls_bar_row = this->quick_view_row_widget();
     controls_bar_row->setVisible(this->arbiter.layout().control_bar.enabled);
     connect(&this->arbiter, &Arbiter::control_bar_changed, [controls_bar_row](bool enabled){
@@ -337,6 +343,65 @@ QWidget *LayoutSettingsTab::control_bar_widget()
     toggle->setChecked(this->arbiter.layout().control_bar.enabled);
     connect(toggle, &Switch::stateChanged, [this](bool state){ this->arbiter.set_control_bar(state); });
     layout->addWidget(toggle, 1, Qt::AlignHCenter);
+
+    return widget;
+}
+
+QWidget *LayoutSettingsTab::fullscreen_mode_widget()
+{
+    QWidget *widget = new QWidget(this);
+    QHBoxLayout *layout = new QHBoxLayout(widget);
+
+    QLabel *label = new QLabel("Fullscreen mode", widget);
+    layout->addWidget(label, 1);
+
+    Switch *toggle = new Switch(widget);
+    toggle->scale(this->arbiter.layout().scale);
+    toggle->setChecked(this->arbiter.layout().fullscreen_mode);
+    connect(toggle, &Switch::stateChanged, [this](bool state){ this->arbiter.set_fullscreen_mode(state); });
+    layout->addWidget(toggle, 1, Qt::AlignHCenter);
+
+    return widget;
+}
+
+QWidget *LayoutSettingsTab::fullscreen_delay_row_widget()
+{
+    QWidget *widget = new QWidget(this);
+    QHBoxLayout *layout = new QHBoxLayout(widget);
+
+    QLabel *label = new QLabel("Fullscreen animation duration", widget);
+    label->setToolTip("Set minimum value to disable animation");
+    layout->addWidget(label, 1);
+
+    layout->addWidget(this->fullscreen_delay_widget(), 1);
+
+    return widget;
+}
+
+QWidget *LayoutSettingsTab::fullscreen_delay_widget()
+{
+    QWidget *widget = new QWidget(this);
+    QHBoxLayout *layout = new QHBoxLayout(widget);
+
+    QSlider *slider = new QSlider(Qt::Orientation::Horizontal, widget);
+    slider->setTracking(false);
+    slider->setRange(0, 6);
+    slider->setValue(this->arbiter.layout().fullscreen_delay/500);
+    connect(slider, &QSlider::valueChanged, [this, slider](int position){ this->arbiter.set_fullscreen_delay(position * 500); });
+
+    QPushButton *lower_button = new QPushButton(widget);
+    lower_button->setFlat(true);
+    this->arbiter.forge().iconize("remove", lower_button, 32);
+    connect(lower_button, &QPushButton::clicked, [slider]{ slider->setValue(slider->value() - 1); });
+
+    QPushButton *raise_button = new QPushButton(widget);
+    raise_button->setFlat(true);
+    this->arbiter.forge().iconize("add", raise_button, 32);
+    connect(raise_button, &QPushButton::clicked, [slider]{ slider->setValue(slider->value() + 1); });
+
+    layout->addWidget(lower_button);
+    layout->addWidget(slider, 4);
+    layout->addWidget(raise_button);
 
     return widget;
 }

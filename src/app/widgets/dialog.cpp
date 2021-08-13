@@ -16,8 +16,7 @@ Dialog::Dialog(Arbiter &arbiter, bool fullscreen, QWidget *parent)
     this->setAttribute(Qt::WA_TranslucentBackground, true);
 
     this->fullscreen = fullscreen;
-    if (this->fullscreen)
-        this->setModal(true);
+    this->setModal(true);
 
     this->scale = this->arbiter.layout().scale;
 

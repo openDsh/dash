@@ -53,6 +53,9 @@ class LayoutSettingsTab : public QWidget {
     QWidget *settings_widget();
     QWidget *pages_widget();
     QWidget *control_bar_widget();
+    QWidget *fullscreen_mode_widget();
+    QWidget *fullscreen_delay_row_widget();
+    QWidget *fullscreen_delay_widget();
     QWidget *quick_view_row_widget();
     QWidget *scale_row_widget();
     QWidget *scale_widget();

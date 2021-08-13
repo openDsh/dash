@@ -97,7 +97,6 @@ QLayout *OpenAutoPage::Settings::settings_widget()
     layout->addLayout(this->autoconnect_row_widget(), 1);
     layout->addWidget(Session::Forge::br(), 1);
     layout->addLayout(this->connected_indicator_widget(), 1);
-    layout->addLayout(this->force_aa_fullscreen_widget(), 1);
     layout->addWidget(Session::Forge::br(), 1);
     layout->addLayout(this->touchscreen_row_widget(), 1);
     layout->addLayout(this->buttons_row_widget(), 1);
@@ -333,25 +332,6 @@ QLayout *OpenAutoPage::Settings::connected_indicator_widget()
     return layout;
 }
 
-QLayout *OpenAutoPage::Settings::force_aa_fullscreen_widget()
-{
-    QHBoxLayout *layout = new QHBoxLayout();
-
-    QLabel *label = new QLabel("Fullscreen mode");
-    layout->addWidget(label, 1);
-
-    Switch *toggle = new Switch();
-    toggle->scale(this->arbiter.layout().scale);
-    toggle->setChecked(this->config->get_force_aa_fullscreen());
-    connect(toggle, &Switch::stateChanged, [this](bool state){
-        this->config->set_force_aa_fullscreen(state);
-        this->arbiter.send_openauto_full_screen(state);
-    });
-    layout->addWidget(toggle, 1, Qt::AlignHCenter);
-
-    return layout;
-}
-
 QLayout *OpenAutoPage::Settings::touchscreen_row_widget()
 {
     QHBoxLayout *layout = new QHBoxLayout();
@@ -445,8 +425,6 @@ void OpenAutoPage::init()
             this->frame->toggle_fullscreen();
         }
         this->setCurrentIndex(enable ? 1 : 0);
-        if(enable && this->config->get_force_aa_fullscreen() || !enable)
-            this->set_full_screen(enable);
         this->device_connected = enable;
         emit connected(enable);
     });
@@ -462,19 +440,13 @@ void OpenAutoPage::init()
         DASH_LOG(info)<<"[OpenAutoPage] Firing button press";
     });
 
-    connect(&this->arbiter, &Arbiter::openauto_full_screen, [this](bool fullscreen) {
-        this->set_full_screen(fullscreen);
-    });
-
     this->addWidget(this->connect_msg());
     this->addWidget(this->frame);
 }
 
 void OpenAutoPage::set_full_screen(bool fullscreen)
 {
-    // if(fullscreen) {
     emit toggle_fullscreen(fullscreen);
-    // }
     this->worker->update_size();
 }
 
