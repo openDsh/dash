@@ -60,8 +60,7 @@ void OpenAutoWorker::create_io_service_workers()
 
 void OpenAutoFrame::mouseDoubleClickEvent(QMouseEvent *)
 {
-    this->toggle_fullscreen();
-    emit double_clicked(this->fullscreen);
+    emit double_clicked();
 }
 
 OpenAutoPage::Settings::Settings(Arbiter &arbiter, QWidget *parent)
@@ -420,16 +419,12 @@ void OpenAutoPage::init()
 
     connect(this->frame, &OpenAutoFrame::toggle, [this](bool enable) {
         DASH_LOG(info)<<"[OpenAutoPage] Connected status: "<<enable;
-        if (!enable && this->frame->is_fullscreen()) {
-            this->addWidget(frame);
-            this->frame->toggle_fullscreen();
-        }
         this->setCurrentIndex(enable ? 1 : 0);
         this->device_connected = enable;
         emit connected(enable);
     });
-    connect(this->frame, &OpenAutoFrame::double_clicked, [this](bool fullscreen) {
-       this->set_full_screen(fullscreen);
+    connect(this->frame, &OpenAutoFrame::double_clicked, [this]() {
+       this->arbiter.toggle_fullscreen_mode();
     });
     connect(&this->arbiter, &Arbiter::mode_changed, [this](Session::Theme::Mode mode){
         this->worker->set_night_mode(mode == Session::Theme::Dark);
@@ -442,12 +437,6 @@ void OpenAutoPage::init()
 
     this->addWidget(this->connect_msg());
     this->addWidget(this->frame);
-}
-
-void OpenAutoPage::set_full_screen(bool fullscreen)
-{
-    emit toggle_fullscreen(fullscreen);
-    this->worker->update_size();
 }
 
 void OpenAutoPage::resizeEvent(QResizeEvent *event)

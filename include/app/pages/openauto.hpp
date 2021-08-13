@@ -65,18 +65,12 @@ class OpenAutoFrame : public QWidget {
    public:
     OpenAutoFrame(QWidget *parent) : QWidget(parent) {}
 
-    inline bool is_fullscreen() { return this->fullscreen; }
-    inline void toggle_fullscreen() { this->fullscreen = !this->fullscreen; }
-
    protected:
     void mouseDoubleClickEvent(QMouseEvent *);
     inline void enterEvent(QEvent *) { this->setFocus(); }
 
-   private:
-    bool fullscreen = false;
-
    signals:
-    void double_clicked(bool fullscreen);
+    void double_clicked();
     void toggle(bool enable);
 };
 
@@ -86,7 +80,6 @@ class OpenAutoPage : public QStackedWidget, public Page {
    public:
     OpenAutoPage(Arbiter &arbiter, QWidget *parent = nullptr);
     inline void pass_key_event(QKeyEvent *event) { this->worker->send_key_event(event); }
-    void set_full_screen(bool fullscreen);
     void init() override;
     const QString &connected_icon_name() { return this->connected_icon_name_; }
     inline bool is_connected() { return this->device_connected; }
