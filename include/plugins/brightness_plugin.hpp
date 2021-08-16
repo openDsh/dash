@@ -1,10 +1,5 @@
 #pragma once
 
-#include <QObject>
-#include <QWidget>
-#include <QSlider>
-#include <QHBoxLayout>
-
 #include "plugins/plugin.hpp"
 
 class BrightnessPlugin : public Plugin {

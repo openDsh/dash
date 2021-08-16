@@ -77,6 +77,9 @@ void Arbiter::set_curr_page(Page *page)
     if (this->layout().page_id(page) < 0 || !page->enabled())
         return;
 
+    // Exit Full screen mode
+    this->send_openauto_full_screen(false);
+    
     this->layout().curr_page = page;
 
     emit curr_page_changed(page);
@@ -185,4 +188,14 @@ void Arbiter::set_action(Action *action, QString key)
     this->settings().endGroup();
 
     emit action_changed(action, key);
+}
+
+void Arbiter::send_openauto_button_press(aasdk::proto::enums::ButtonCode::Enum buttonCode, openauto::projection::WheelDirection wheelDirection)
+{
+    emit openauto_button_press(buttonCode, wheelDirection);
+}
+
+void Arbiter::send_openauto_full_screen(bool fullscreen)
+{
+    emit openauto_full_screen(fullscreen);
 }

@@ -2,7 +2,7 @@
 
 #repo addresses
 aasdkRepo="https://github.com/OpenDsh/aasdk"
-gstreamerRepo="git://anongit.freedesktop.org/gstreamer/qt-gstreamer"
+gstreamerRepo="git://github.com/GStreamer/qt-gstreamer"
 openautoRepo="https://github.com/openDsh/openauto"
 
 #Help text
@@ -70,6 +70,9 @@ else
     openauto=true
     dash=true
 fi
+
+script_path=$(dirname "$(realpath -s "$0")")
+echo "Script directory is $script_path"
 
 installArgs="-DCMAKE_BUILD_TYPE=${BUILD_TYPE} $installArgs"
 
@@ -211,7 +214,7 @@ else
     echo Aasdk install failed with code $?
     exit 1
   fi
-  cd ../../dash
+  cd $script_path
 fi
 
 
@@ -288,7 +291,7 @@ if [ $gstreamer = true ]; then
   fi
 
   sudo ldconfig
-  cd ../../dash
+  cd $script_path
 
 else
 	echo -e Skipping Gstreamer'\n'
@@ -360,7 +363,7 @@ else
     echo Openauto make install failed with error code $?
     exit 1
   fi
-  cd ../../dash
+  cd $script_path
 fi
 
 
@@ -417,11 +420,11 @@ else
       exit 1
   fi
 
-  #Setting openGL driver and GPU memory to 256mb
+  #Setting openGL driver and GPU memory to 128mb
   if $isRpi; then
-    sudo raspi-config nonint do_memory_split 256
+    sudo raspi-config nonint do_memory_split 128
     if [[ $? -eq 0 ]]; then
-      echo -e Memory set to 256mb'\n'
+      echo -e Memory set to 128mb'\n'
     else
       echo Setting memory failed with error code $? please set manually
       exit 1

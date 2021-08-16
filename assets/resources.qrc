@@ -6,6 +6,7 @@
         <file>splash.png</file>
         <file>icons/play.svg</file>
         <file>icons/pause.svg</file>
+        <file>icons/stop.svg</file>
         <file>icons/brightness_low.svg</file>
         <file>icons/play_circle_outline.svg</file>
         <file>icons/speed.svg</file>
@@ -37,11 +38,13 @@
         <file>icons/camera.svg</file>
         <file>icons/dark_mode.svg</file>
         <file>icons/android_auto.svg</file>
+        <file>icons/android_auto_color.svg</file>
         <file>icons/settings.svg</file>
         <file>icons/add.svg</file>
         <file>icons/remove.svg</file>
         <file>icons/expand_more.svg</file>
         <file>icons/climate_ref.svg</file>
+        <file>icons/chevron_left.svg</file>
         <file>icons/chevron_right.svg</file>
         <file>icons/defrost.svg</file>
         <file>icons/light/check.svg</file>

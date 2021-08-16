@@ -96,6 +96,8 @@ QLayout *OpenAutoPage::Settings::settings_widget()
     layout->addLayout(this->bluetooth_row_widget(), 1);
     layout->addLayout(this->autoconnect_row_widget(), 1);
     layout->addWidget(Session::Forge::br(), 1);
+    layout->addLayout(this->connected_indicator_widget(), 1);
+    layout->addWidget(Session::Forge::br(), 1);
     layout->addLayout(this->touchscreen_row_widget(), 1);
     layout->addLayout(this->buttons_row_widget(), 1);
 
@@ -312,6 +314,24 @@ QLayout *OpenAutoPage::Settings::autoconnect_row_widget()
     return layout;
 }
 
+QLayout *OpenAutoPage::Settings::connected_indicator_widget()
+{
+    QHBoxLayout *layout = new QHBoxLayout();
+
+    QLabel *label = new QLabel("Show connection status");
+    layout->addWidget(label, 1);
+
+    Switch *toggle = new Switch();
+    toggle->scale(this->arbiter.layout().scale);
+    toggle->setChecked(this->config->get_show_aa_connected());
+    connect(toggle, &Switch::stateChanged, [config = this->config](bool state){
+        config->set_show_aa_connected(state);
+    });
+    layout->addWidget(toggle, 1, Qt::AlignHCenter);
+
+    return layout;
+}
+
 QLayout *OpenAutoPage::Settings::touchscreen_row_widget()
 {
     QHBoxLayout *layout = new QHBoxLayout();
@@ -385,6 +405,7 @@ QLayout *OpenAutoPage::Settings::buttons_row_widget()
 OpenAutoPage::OpenAutoPage(Arbiter &arbiter, QWidget *parent)
     : QStackedWidget(parent)
     , Page(arbiter, "Android Auto", "android_auto", true, this)
+    , connected_icon_name_("android_auto_color")
 {
 }
 
@@ -403,23 +424,38 @@ void OpenAutoPage::init()
             this->frame->toggle_fullscreen();
         }
         this->setCurrentIndex(enable ? 1 : 0);
+        emit connected(enable);
     });
     connect(this->frame, &OpenAutoFrame::double_clicked, [this](bool fullscreen) {
-        if (fullscreen) {
-            emit toggle_fullscreen(this->frame);
-        }
-        else {
-            this->addWidget(frame);
-            this->setCurrentWidget(frame);
-        }
-        this->worker->update_size();
+       this->set_full_screen(fullscreen);
     });
     connect(&this->arbiter, &Arbiter::mode_changed, [this](Session::Theme::Mode mode){
         this->worker->set_night_mode(mode == Session::Theme::Dark);
     });
 
+    connect(&this->arbiter, &Arbiter::openauto_button_press, [this](aasdk::proto::enums::ButtonCode::Enum buttonCode, openauto::projection::WheelDirection wheelDirection){
+        this->worker->send_button_press(buttonCode, wheelDirection);
+        DASH_LOG(info)<<"[OpenAutoPage] Firing button press";
+    });
+
+    connect(&this->arbiter, &Arbiter::openauto_full_screen, [this](bool fullscreen) {
+        this->set_full_screen(fullscreen);
+    });
+
     this->addWidget(this->connect_msg());
     this->addWidget(this->frame);
+}
+
+void OpenAutoPage::set_full_screen(bool fullscreen)
+{
+    if (fullscreen) {
+        emit toggle_fullscreen(this->frame);
+    }
+    else {
+        this->addWidget(frame);
+        this->setCurrentWidget(frame);
+    }
+    this->worker->update_size();
 }
 
 void OpenAutoPage::resizeEvent(QResizeEvent *event)
