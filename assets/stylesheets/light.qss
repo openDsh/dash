@@ -267,7 +267,8 @@ StepMeter {
     qproperty-bar_color: palette(base);
 }
 
-ClimateState {
+ClimateState,
+VehicleState {
     qproperty-color: rgb(0, 0, 0);
 }
 

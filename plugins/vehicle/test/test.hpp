@@ -3,6 +3,7 @@
 #include <QObject>
 #include "plugins/vehicle_plugin.hpp"
 #include "app/widgets/climate.hpp"
+#include "app/widgets/vehicle_state.hpp"
 #include "canbus/socketcanbus.hpp"
 
 class Test : public QObject, VehiclePlugin {
@@ -18,4 +19,5 @@ class Test : public QObject, VehiclePlugin {
 
    private:
     Climate *climate;
+    VehicleState *vehicle;
 };

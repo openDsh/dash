@@ -12,20 +12,28 @@ Test::~Test()
 QList<QWidget *> Test::widgets()
 {
     QList<QWidget *> tabs;
-    if (this->climate)
-        tabs.append(this->climate);
+    if (this->vehicle)
+        tabs.append(this->vehicle);
     return tabs;
 }
 
 bool Test::init(ICANBus*)
 {
     if (this->arbiter) {
+        this->vehicle = new VehicleState(*this->arbiter);
+        this->vehicle->setObjectName("Vehicle");
+        this->vehicle->toggle_pressure(true);
+        this->vehicle->set_pressure_unit("psi");
+        this->vehicle->set_pressure_threshold(35);
+
         this->climate = new Climate(*this->arbiter);
         this->climate->setObjectName("Climate");
         this->climate->max_fan_speed(4);
 
         auto timer = new QTimer(this);
         connect(timer, &QTimer::timeout, [this]{
+            static bool toggle = false;
+
             switch(rand() % 50) {
                 case 0:
                     this->climate->airflow(Airflow::OFF);
@@ -53,6 +61,63 @@ bool Test::init(ICANBus*)
                     break;
                 case 8:
                     this->climate->fan_speed((rand() % 4) + 1);
+                    break;
+                case 9:
+                    this->vehicle->set_fl_sensor(rand() % 5);
+                    break;
+                case 10:
+                    this->vehicle->set_fml_sensor(rand() % 5);
+                    break;
+                case 11:
+                    this->vehicle->set_fmr_sensor(rand() % 5);
+                    break;
+                case 12:
+                    this->vehicle->set_fr_sensor(rand() % 5);
+                    break;
+                case 13:
+                    this->vehicle->set_rl_sensor(rand() % 5);
+                    break;
+                case 14:
+                    this->vehicle->set_rml_sensor(rand() % 5);
+                    break;
+                case 15:
+                    this->vehicle->set_rmr_sensor(rand() % 5);
+                    break;
+                case 16:
+                    this->vehicle->set_rr_sensor(rand() % 5);
+                    break;
+                case 17:
+                    this->vehicle->toggle_fdriver_door(toggle);
+                    break;
+                case 18:
+                    this->vehicle->toggle_rdriver_door(toggle);
+                    break;
+                case 19:
+                    this->vehicle->toggle_fpass_door(toggle);
+                    break;
+                case 20:
+                    this->vehicle->toggle_rpass_door(toggle);
+                    break;
+                case 21:
+                    this->vehicle->toggle_headlights(toggle);
+                    break;
+                case 22:
+                    this->vehicle->toggle_taillights(toggle);
+                    break;
+                case 23:
+                    this->vehicle->set_rpass_pressure((rand() % 21) + 30);
+                    break;
+                case 24:
+                    this->vehicle->set_rdriver_pressure((rand() % 21) + 30);
+                    break;
+                case 25:
+                    this->vehicle->set_fpass_pressure((rand() % 21) + 30);
+                    break;
+                case 26:
+                    this->vehicle->set_fdriver_pressure((rand() % 21) + 30);
+                    break;
+                default:
+                    toggle = !toggle;
                     break;
             }
         });
