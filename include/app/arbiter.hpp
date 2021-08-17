@@ -21,7 +21,7 @@ class Arbiter : public QObject {
     void set_mode(Session::Theme::Mode mode);
     void toggle_mode();
     void toggle_fullscreen_mode();
-    void set_fullscreen_acknowledged(bool status);
+    void set_fullscreen_acknowledged(bool persistant);
     void set_color(const QColor &color);
     void set_scale(double scale);
     void set_control_bar(bool enabled);

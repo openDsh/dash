@@ -126,7 +126,11 @@ QWidget *Dash::main_menu()
             widget->setMaximumWidth(this->menu_width);
         } else {
             if(!this->arbiter.layout().fullscreen_acknowledged) {
-                this->fullscreen_hint_dialog()->show();
+                QTimer::singleShot(0, [=]() {
+                    this->fullscreen_hint_dialog()->exec();
+                    this->arbiter.set_fullscreen_acknowledged(this->arbiter.layout().fullscreen_acknowledged);
+                    this->parentWidget()->grabKeyboard();
+                });
             }
             QPropertyAnimation *animation = new QPropertyAnimation(widget, "maximumWidth");
             animation->setDuration(this->arbiter.layout().fullscreen_delay);
@@ -162,7 +166,7 @@ Dialog *Dash::fullscreen_hint_dialog()
     QPushButton *fake_button = new QPushButton();
     fake_button->setVisible(false);
 
-    Dialog *dialog = new Dialog(this->arbiter, false, this->window());
+    auto *dialog = new Dialog(this->arbiter, true, this->window());
     dialog->set_title("Full screen mode enabled");
     dialog->set_body(body);
     dialog->set_button(fake_button);

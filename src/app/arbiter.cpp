@@ -78,9 +78,9 @@ void Arbiter::toggle_fullscreen_mode()
     emit fullscreen_mode_changed(fullscreen);
 }
 
-void Arbiter::set_fullscreen_acknowledged(bool status){
-    this->layout().fullscreen_acknowledged = status;
-    this->settings().setValue("Layout/FullscreenMode/Acknowledged", status);
+void Arbiter::set_fullscreen_acknowledged(bool persistant){
+    this->layout().fullscreen_acknowledged = true;
+    if (persistant) this->settings().setValue("Layout/FullscreenMode/Acknowledged", true);
 }
 
 void Arbiter::set_curr_quick_view(QuickView *quick_view)
