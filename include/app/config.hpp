@@ -162,13 +162,6 @@ class Config : public QObject {
         this->settings.setValue("Pages/OpenAuto/show_aa_connected", this->show_aa_connected);
     }
 
-    inline bool get_force_aa_fullscreen() { return this->force_aa_fullscreen; }
-    inline void set_force_aa_fullscreen(bool enabled)
-    {
-        this->force_aa_fullscreen = enabled;
-        this->settings.setValue("Pages/OpenAuto/force_aa_fullscreen", this->force_aa_fullscreen);
-    }
-
     inline const QStringList &get_launcher_plugins() { return this->launcher_plugins; }
     inline void set_launcher_plugin(QString plugin, bool remove = false)
     {
@@ -205,7 +198,6 @@ class Config : public QObject {
     int cam_overlay_width;
     int cam_overlay_height;
     bool show_aa_connected;
-    bool force_aa_fullscreen;
     QStringList launcher_plugins;
 
    signals:

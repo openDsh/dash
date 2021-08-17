@@ -27,7 +27,6 @@ Config::Config()
     this->cam_overlay_width = this->settings.value("Pages/Camera/Overlay/width", 100).toInt();
     this->cam_overlay_height = this->settings.value("Pages/Camera/Overlay/height", 100).toInt();
     this->show_aa_connected = this->settings.value("Pages/OpenAuto/show_aa_connected", false).toBool();
-    this->force_aa_fullscreen = this->settings.value("Pages/OpenAuto/force_aa_fullscreen", false).toBool();
     this->settings.beginGroup("Pages/Launcher");
     for (auto key : this->settings.childKeys())
         this->launcher_plugins.append(this->settings.value(key, QString()).toString());
