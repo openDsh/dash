@@ -21,6 +21,8 @@
 
 #include "app/pages/page.hpp"
 
+#include "DashLog.hpp"
+
 class Arbiter;
 
 class OpenAutoWorker : public QObject {
@@ -35,6 +37,7 @@ class OpenAutoWorker : public QObject {
     inline void update_size() { this->service_factory.resize(); }
     inline void set_night_mode(bool mode) { this->service_factory.setNightMode(mode); }
     inline void send_key_event(QKeyEvent *event) { this->service_factory.sendKeyEvent(event); }
+    inline void send_button_press(aasdk::proto::enums::ButtonCode::Enum buttonCode, openauto::projection::WheelDirection wheelDirection) { this->service_factory.sendButtonPress(buttonCode, wheelDirection); };
 
    private:
     void create_usb_workers();
@@ -82,10 +85,10 @@ class OpenAutoPage : public QStackedWidget, public Page {
 
    public:
     OpenAutoPage(Arbiter &arbiter, QWidget *parent = nullptr);
-
     inline void pass_key_event(QKeyEvent *event) { this->worker->send_key_event(event); }
-
+    void set_full_screen(bool fullscreen);
     void init() override;
+    const QString &connected_icon_name() { return this->connected_icon_name_; }
 
    protected:
     void resizeEvent(QResizeEvent *event);
@@ -110,6 +113,7 @@ class OpenAutoPage : public QStackedWidget, public Page {
         QLayout *bluetooth_row_widget();
         QLayout *autoconnect_row_widget();
         QLayout *touchscreen_row_widget();
+        QLayout *connected_indicator_widget();
         QCheckBox *button_checkbox(QString name, QString key, aasdk::proto::enums::ButtonCode::Enum code);
         QLayout *buttons_row_widget();
 
@@ -117,6 +121,7 @@ class OpenAutoPage : public QStackedWidget, public Page {
         Config *config;
     };
 
+    const QString connected_icon_name_;
     QWidget *connect_msg();
 
     Config *config;
@@ -125,4 +130,5 @@ class OpenAutoPage : public QStackedWidget, public Page {
 
    signals:
     void toggle_fullscreen(QWidget *widget);
+    void connected(bool yes);
 };

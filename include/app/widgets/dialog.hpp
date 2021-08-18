@@ -59,6 +59,9 @@ class SnackBar : public Dialog {
 
     void resizeEvent(QResizeEvent* event);
 
+   protected:
+    bool eventFilter(QObject *object, QEvent *event);
+
    private:
     QWidget *get_ref();
 };

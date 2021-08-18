@@ -142,6 +142,7 @@ class Session {
         Forge(Arbiter &arbiter);
         void iconize(QString name, QAbstractButton *button, uint8_t size, bool dynamic = false) const;
         void iconize(QString name, QString alt_name, QAbstractButton *button, uint8_t size, bool dynamic = false) const;
+        void set_icon(QString name, QAbstractButton *button, bool dynamic) const;
         QFont font(int size, bool mono = false) const;
         QWidget *brightness_slider(bool buttons = true) const;
         QWidget *volume_slider(bool buttons = true) const;

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5.1)
+cmake_minimum_required(VERSION 3.7.0)
 project(dash CXX)
 
 set(CMAKE_AUTOMOC ON)
@@ -34,7 +34,7 @@ add_definitions(-DBOOST_ALL_DYN_LINK)
 
 find_package(Boost REQUIRED COMPONENTS system log OPTIONAL_COMPONENTS unit_test_framework)
 find_package(libusb-1.0 REQUIRED)
-find_package(Qt5 COMPONENTS Multimedia MultimediaWidgets Bluetooth Qml Quick QuickWidgets SerialBus SerialPort WebSockets Xml REQUIRED)
+find_package(Qt5 COMPONENTS Multimedia MultimediaWidgets Bluetooth Qml Quick QuickWidgets SerialBus SerialPort WebSockets DBus Xml REQUIRED)
 find_package(KF5BluezQt REQUIRED)
 find_package(Protobuf REQUIRED)
 find_package(OpenSSL REQUIRED)
@@ -84,6 +84,8 @@ add_subdirectory(plugins)
 
 add_executable(dash ${source_files})
 
+include(${base_directory}/cmake_modules/gitversion.cmake)
+
 target_include_directories(dash PRIVATE
     ${CMAKE_CURRENT_BINARY_DIR}
     )
@@ -91,6 +93,7 @@ target_include_directories(dash PRIVATE
 target_include_directories(dash SYSTEM PRIVATE
     ${Qt5Xml_INCLUDE_DIRS}
     ${Qt5WebSockets_INCLUDE_DIRS}
+    ${Qt5DBus_INCLUDE_DIRS}
     ${Qt5SerialBus_INCLUDE_DIRS}
     ${Qt5SerialPort_INCLUDE_DIRS}
     ${Qt5Multimedia_INCLUDE_DIRS}
@@ -119,6 +122,7 @@ target_link_libraries(dash
     openauto
     ${Boost_LIBRARIES}
     ${Qt5Xml_LIBRARIES}
+    ${Qt5DBus_LIBRARIES}
     ${Qt5WebSockets_LIBRARIES}
     ${Qt5SerialBus_LIBRARIES}
     ${Qt5SerialPort_LIBRARIES}

@@ -91,3 +91,24 @@ class ActionsSettingsTab : public QWidget {
     Arbiter &arbiter;
     Config *config;
 };
+
+class AboutSettingsTab : public QWidget {
+    Q_OBJECT
+
+   public:
+    AboutSettingsTab(Arbiter &arbiter);
+
+   protected:
+    void resizeEvent(QResizeEvent *event);
+
+   private:
+    QWidget *load_msg();
+    QWidget *settings();
+    QWidget *action_row(Action *action);
+    QWidget *action_input(Action *action);
+
+    QLabel *logo;
+    QLabel *label1;
+    Arbiter &arbiter;
+    Config *config;
+};
