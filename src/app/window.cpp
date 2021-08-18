@@ -87,7 +87,7 @@ void Dash::init_connected_pages()
 void Dash::set_page(Page *page)
 {
     bool fullscreen = this->arbiter.layout().fullscreen_mode;
-    bool fullscreen_delay = this->arbiter.layout().fullscreen_delay;
+    int fullscreen_delay = this->arbiter.layout().fullscreen_delay;
     if (fullscreen && fullscreen_delay != 0) {
         this->arbiter.toggle_fullscreen_mode();
         this->arbiter.toggle_fullscreen_mode();
