@@ -317,7 +317,7 @@ void Session::Forge::iconize(QString name, QAbstractButton *button, uint8_t size
 void Session::Forge::set_icon(QString name, QAbstractButton *button, bool dynamic) const
 {
     button->setIcon(QIcon(QString(":/icons/%1.svg").arg(name)));
-    button->setProperty("colorized", true);
+    button->setProperty("colorized", false);
     if (dynamic)
         this->arbiter_.theme().colorize(button);
 }
