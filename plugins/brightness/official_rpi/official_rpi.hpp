@@ -6,7 +6,7 @@
 
 #include "plugins/brightness_plugin.hpp"
 
-class OfficialRPi : public QObject, BrightnessPlugin {
+class OfficialRPi : public BrightnessPlugin {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID BrightnessPlugin_iid FILE "official_rpi.json")
     Q_INTERFACES(BrightnessPlugin)

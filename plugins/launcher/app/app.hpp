@@ -100,7 +100,7 @@ class Launcher : public QWidget {
 
 };
 
-class App : public QObject, LauncherPlugin {
+class App : public LauncherPlugin {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID LauncherPlugin_iid FILE "app.json")
     Q_INTERFACES(LauncherPlugin)

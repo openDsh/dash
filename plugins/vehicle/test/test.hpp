@@ -5,7 +5,7 @@
 #include "app/widgets/climate.hpp"
 #include "canbus/socketcanbus.hpp"
 
-class Test : public QObject, VehiclePlugin {
+class Test : public VehiclePlugin {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID VehiclePlugin_iid FILE "test.json")
     Q_INTERFACES(VehiclePlugin)

@@ -6,7 +6,7 @@
 
 #include "plugins/radio_plugin.hpp"
 
-class RtlSdr : public QObject, RadioPlugin {
+class RtlSdr : public RadioPlugin {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID RadioPlugin_iid FILE "rtl_sdr.json")
     Q_INTERFACES(RadioPlugin)

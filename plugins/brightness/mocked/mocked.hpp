@@ -5,7 +5,7 @@
 
 #include "plugins/brightness_plugin.hpp"
 
-class Mocked : public QObject, BrightnessPlugin {
+class Mocked : public BrightnessPlugin {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID BrightnessPlugin_iid FILE "mocked.json")
     Q_INTERFACES(BrightnessPlugin)

@@ -3,7 +3,7 @@
 #include <QObject>
 #include "plugins/brightness_plugin.hpp"
 
-class X : public QObject, BrightnessPlugin {
+class X : public BrightnessPlugin {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID BrightnessPlugin_iid FILE "x.json")
     Q_INTERFACES(BrightnessPlugin)

@@ -7,7 +7,9 @@
 
 class Arbiter;
 
-class Plugin {
+class Plugin : public QObject {
+    Q_OBJECT
+
    public:
     Plugin() : settings(qApp->organizationName(), "plugins") {}
     virtual ~Plugin() = default;

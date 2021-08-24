@@ -32,6 +32,14 @@ LauncherPlugins::LauncherPlugins(Arbiter &arbiter, QWidget *parent)
                 plugin->dashize(&this->arbiter);
                 for (QWidget *tab : plugin->widgets())
                     this->addTab(tab, tab->objectName());
+
+
+                connect(plugin, &LauncherPlugin::widget_added, [this](QWidget *tab){
+                    this->addTab(tab, "window");
+                    qDebug() << "widget added";
+
+                });
+
                 this->active_plugins.append(plugin_loader);
                 this->active_plugins_list->addItem(key);
                 this->config->set_launcher_plugin(key);
