@@ -14,7 +14,8 @@ class LauncherPlugin : public Plugin {
 public slots:
 
     signals:
-     void widget_added(QWidget *widget);
+    
+    void widget_added(QWidget *widget);
 
    protected:
     QList<QWidget *> loaded_widgets;

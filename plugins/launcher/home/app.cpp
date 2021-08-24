@@ -28,6 +28,7 @@ XWorker::WindowProp::~WindowProp()
     }
 }
 
+//TODO: rename to XInfo. implement worker thread that monitors X windows
 XWorker::XWorker(QObject *parent) : QObject(parent)
 {
     this->display = XOpenDisplay(0);

@@ -89,13 +89,7 @@ public:
     QList<QWidget *> widgets() override;
     void remove_widget(int idx) override;
 
-    void add_widget(QWidget *widget);
-
-public slots:
-
-    signals:
-
-   // void widget_added() override;
+    //void add_widget(QWidget *widget);
 
 
 private:
