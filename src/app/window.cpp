@@ -3,6 +3,7 @@
 #include <QStackedWidget>
 
 #include "app/quick_views/quick_view.hpp"
+#include "app/utilities/icon_engine.hpp"
 #include "app/widgets/dialog.hpp"
 
 #include "app/window.hpp"
@@ -63,11 +64,11 @@ void Dash::init()
     this->body.layout->addWidget(this->control_bar());
 
     for (auto page : this->arbiter.layout().pages()) {
-        auto button = new QPushButton();
-        button->setProperty("color_hint", true);
+        auto button = page->button();
         button->setCheckable(true);
         button->setFlat(true);
-        this->arbiter.forge().iconize(page->icon_name(), button, 32, true);
+        QIcon icon(new StylizedIconEngine(this->arbiter, QString(":/icons/%1.svg").arg(page->icon_name()), true));
+        this->arbiter.forge().iconize(icon, button, 32);
 
         this->rail.group.addButton(button, this->arbiter.layout().page_id(page));
         this->rail.layout->addWidget(button);
@@ -77,24 +78,6 @@ void Dash::init()
         button->setVisible(page->enabled());
     }
     this->set_page(this->arbiter.layout().curr_page);
-    this->init_connected_pages();
-}
-
-void Dash::init_connected_pages()
-{
-    if (Config::get_instance()->get_show_aa_connected())
-    {
-        OpenAutoPage *oaPage = this->arbiter.layout().openauto_page;
-        QAbstractButton *oaButton = this->rail.group.button(this->arbiter.layout().page_id(oaPage));
-        connect(oaPage, &OpenAutoPage::connected, this, [this, oaPage, oaButton](bool connected){
-            QElapsedTimer timer;
-            timer.start();
-            if (connected)
-                this->arbiter.forge().set_icon(oaPage->connected_icon_name(), oaButton, false);
-            else 
-                this->arbiter.forge().set_icon(oaPage->icon_name(), oaButton, true);
-        });
-    }
 }
 
 void Dash::set_page(Page *page)

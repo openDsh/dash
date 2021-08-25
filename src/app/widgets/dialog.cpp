@@ -167,8 +167,6 @@ SnackBar::SnackBar(Arbiter &arbiter)
     : Dialog(arbiter, false, this->get_ref())
 {
     this->setFixedHeight(64 * this->arbiter.layout().scale);
-
-    this->installEventFilter(this);
 }
 
 void SnackBar::resizeEvent(QResizeEvent* event)
@@ -186,13 +184,9 @@ void SnackBar::resizeEvent(QResizeEvent* event)
     Dialog::resizeEvent(event);
 }
 
-bool SnackBar::eventFilter(QObject *object, QEvent *event)
+void SnackBar::mousePressEvent(QMouseEvent *event)
 {
-    if (event->type() == QEvent::MouseButtonPress) {
-      this->close();
-      return true;
-    }
-    return false;
+    this->close();
 }
 
 QWidget *SnackBar::get_ref()

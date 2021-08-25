@@ -18,6 +18,7 @@ class Page {
     const QString &icon_name() { return this->icon_name_; }
     const bool &toggleale() { return this->toggleable_; }
     QWidget *widget() { return this->widget_; }
+    QPushButton *button() { return this->button_; }
     const bool &enabled() { return this->enabled_; }
 
     virtual void init() = 0;
@@ -46,6 +47,7 @@ class Page {
     const QString icon_name_;
     const bool toggleable_;
     QWidget *widget_;
+    QPushButton *button_;
     bool enabled_;
 
     Dialog *dialog();

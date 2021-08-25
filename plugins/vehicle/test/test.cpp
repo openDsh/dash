@@ -7,6 +7,8 @@ Test::~Test()
 {
     if (this->climate)
         delete this->climate;
+    if (this->vehicle)
+        delete this->vehicle;
 }
 
 QList<QWidget *> Test::widgets()
@@ -134,6 +136,6 @@ bool Test::init(ICANBus*)
 
         return true;
     }
-    
+
     return false;
 }

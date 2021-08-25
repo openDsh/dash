@@ -34,7 +34,7 @@ add_definitions(-DBOOST_ALL_DYN_LINK)
 
 find_package(Boost REQUIRED COMPONENTS system log OPTIONAL_COMPONENTS unit_test_framework)
 find_package(libusb-1.0 REQUIRED)
-find_package(Qt5 COMPONENTS Multimedia MultimediaWidgets Bluetooth Qml Quick QuickWidgets SerialBus SerialPort WebSockets DBus Xml REQUIRED)
+find_package(Qt5 COMPONENTS Multimedia MultimediaWidgets Bluetooth Qml Quick QuickWidgets SerialBus SerialPort WebSockets DBus Xml Svg REQUIRED)
 find_package(KF5BluezQt REQUIRED)
 find_package(Protobuf REQUIRED)
 find_package(OpenSSL REQUIRED)
@@ -91,6 +91,7 @@ target_include_directories(dash PRIVATE
     )
 
 target_include_directories(dash SYSTEM PRIVATE
+    ${Qt5Svg_INCLUDE_DIRS}
     ${Qt5Xml_INCLUDE_DIRS}
     ${Qt5WebSockets_INCLUDE_DIRS}
     ${Qt5DBus_INCLUDE_DIRS}
@@ -121,6 +122,7 @@ target_link_libraries(dash
     aasdk
     openauto
     ${Boost_LIBRARIES}
+    ${Qt5Svg_LIBRARIES}
     ${Qt5Xml_LIBRARIES}
     ${Qt5DBus_LIBRARIES}
     ${Qt5WebSockets_LIBRARIES}

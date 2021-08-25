@@ -60,7 +60,7 @@ class SnackBar : public Dialog {
     void resizeEvent(QResizeEvent* event);
 
    protected:
-    bool eventFilter(QObject *object, QEvent *event);
+    void mousePressEvent(QMouseEvent *event) override;
 
    private:
     QWidget *get_ref();
