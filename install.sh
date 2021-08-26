@@ -395,7 +395,7 @@ else
   fi
 
   echo Running Dash make
-  make -j4
+  make
   if [[ $? -eq 0 ]]; then
       echo -e Dash make ok, executable can be found ../bin/dash
       echo
