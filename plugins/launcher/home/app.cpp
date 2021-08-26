@@ -28,7 +28,8 @@ XWorker::WindowProp::~WindowProp()
     }
 }
 
-//TODO: rename to XInfo. implement worker thread that monitors X windows
+//REFACTOR: create XInfo Class and implement classes for traversing the x tree, tracking newly opened
+//windows
 XWorker::XWorker(QObject *parent) : QObject(parent)
 {
     this->display = XOpenDisplay(0);
@@ -130,64 +131,75 @@ void EmbeddedApp::end()
     emit closed();
 }
 
-Launcher::Launcher(Arbiter *arbiter, QSettings &settings, int idx, App *plugin, QWidget *parent)
+ILauncherPlugin::~ILauncherPlugin() {
+
+    //TODO: delete home and close opened apps
+
+}
+
+void ILauncherPlugin::init(){
+    
+    this->loaded_widgets.push_front(new Home(this->arbiter, this->settings, 0, this));
+
+}
+
+QList<QWidget *> ILauncherPlugin::widgets()
+{
+    if(this->loaded_widgets.count() == 0) this->init();
+    return this->loaded_widgets;
+}
+
+void ILauncherPlugin::remove_widget(int idx){
+    
+    //TODO: remove apps
+  
+}
+
+void ILauncherPlugin::add_widget(QWidget *widget){
+
+    this->loaded_widgets.push_back(widget);
+    emit widget_added(widget);
+
+}
+
+Home::Home(Arbiter *arbiter, QSettings &settings, int idx, ILauncherPlugin *plugin, QWidget *parent)
     : QWidget(parent)
     , arbiter(arbiter)
     , settings(settings)
     , idx(idx)
 {
     this->plugin = plugin;
-    this->setObjectName("Home");
+    this->setup_ui();
+    
+}
 
+Home::~Home(){
+
+    //TODO: remove desktop entries
+
+}
+
+void Home::setup_ui()
+{
+    this->setObjectName("Home");
     QStackedLayout *layout = new QStackedLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
 
-    this->app = new EmbeddedApp(this->arbiter, this);
-    connect(this->app, &EmbeddedApp::opened, [layout]() { layout->setCurrentIndex(1); });
-    connect(this->app, &EmbeddedApp::closed, [layout]() { layout->setCurrentIndex(0); });
+    container = new QWidget(this);
 
-    auto launcher_app = this->settings.value(this->app_key()).toString();
-    //this->auto_launch = !launcher_app.isEmpty();
-
-    layout->addWidget(this->home_widget());
-    layout->addWidget(this->app);
-
-}
-
-Launcher::~Launcher()
-{
-    delete this->app;
-}
-
-void Launcher::update_idx(int idx)
-{
-    //TODO: reimplement
-    if (idx == this->idx)
-        return;
-
-    QString home;
-    QString app;
-    if (this->settings.contains(this->home_key()))
-        home = this->settings.value(this->home_key(), this->DEFAULT_DIR).toString();
-    if (this->settings.contains(this->app_key()))
-        app = this->settings.value(this->app_key()).toString();
-
-    this->settings.remove(QString::number(this->idx));
-    this->idx = idx;
-    if (!home.isNull())
-        this->settings.setValue(this->home_key(), home);
-    if (!app.isNull())
-        this->settings.setValue(this->app_key(), app);
-}
-
-QWidget *Launcher::home_widget()
-{
-    auto homePage = new QWidget(this);
-    auto gridLayout = new QGridLayout(homePage);
-    gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
-    gridLayout->setSizeConstraint(QLayout::SetDefaultConstraint);
-    homePage->setLayout(gridLayout);
+    entries_grid = new QGridLayout(container);
+    entries_grid->setObjectName(QString::fromUtf8("entries_grid"));
+    entries_grid->setSizeConstraint(QLayout::SetDefaultConstraint);
+    container->setLayout(entries_grid);
     auto entries = DesktopEntry::get_entries(this->arbiter, this->plugin);
+
+    QScrollArea *scroll_area = new QScrollArea(this);
+    Session::Forge::to_touch_scroller(scroll_area);
+    scroll_area->setWidgetResizable(true);
+    scroll_area->setWidget(container);
+
+    layout->addWidget(scroll_area);
+
 
     //TODO: detect width and set appropriately
     int x = 0;
@@ -198,13 +210,15 @@ QWidget *Launcher::home_widget()
         connect(entry, &DesktopEntry::clicked, [this, entry]() {
 
            EmbeddedApp *app = new EmbeddedApp(this->arbiter, this);
-           
+           app->setObjectName(entry->get_name());
+           qDebug() << entry->get_name();
            this->plugin->add_widget(app);
-          
+           
+           //TODO: startup routine - do some kind of loading animation(ie zoom out icon?) to notify user of action(loading occasionaly takes a while)
            app->start(entry->get_exec());
 
         });
-        gridLayout->addWidget(entry, y, x, 1, 1);
+        entries_grid->addWidget(entry, y, x, 1, 1);
 
         //set x & y
         if(x > 6) {
@@ -215,63 +229,24 @@ QWidget *Launcher::home_widget()
         }
 
     }
+  
+}
 
-    QScrollArea *scroll_area = new QScrollArea(this);
-    Session::Forge::to_touch_scroller(scroll_area);
-    scroll_area->setWidgetResizable(true);
-    scroll_area->setWidget(homePage);
-    return scroll_area;
+void Home::update_idx(int idx){
+
+    if (idx == this->idx)
+        return;
 
 }
 
-QWidget *Launcher::config_widget()
+QWidget *Home::config_widget()
 {
-    //TODO: why do i need this?
+    //*NOT IMPLEMENTED
     QWidget *widget = new QWidget(this);
-    //QVBoxLayout *layout = new QVBoxLayout(widget);
-
     return widget;
 }
 
-
-QList<QWidget *> App::widgets()
-{
-    if(this->_widgets.count() == 0) this->init();
-
-    return this->_widgets;
-}
-
-void App::init(){
-
-    this->_widgets.push_front(new Launcher(this->arbiter, this->settings, 0, this));
-}
-
-App::App(){
-    
-    this->settings.beginGroup("App");
-
-}
-
-void App::add_widget(QWidget *widget){
-
-    this->_widgets.push_back(widget);
-    emit widget_added(widget);
-
-}
-
-void App::remove_widget(int idx)
-{
-    LauncherPlugin::remove_widget(idx);
-
-    this->settings.remove(QString::number(idx));
-    for (int i = 0; i < this->loaded_widgets.size(); i++) {
-        if (Launcher *launcher = qobject_cast<Launcher *>(this->loaded_widgets[i]))
-            launcher->update_idx(i);
-    }
-}
-
-DesktopEntry::DesktopEntry(QString fileLocation, Arbiter *arbiter, App *plugin, QWidget *parent)
-
+DesktopEntry::DesktopEntry(QString fileLocation, Arbiter *arbiter, ILauncherPlugin *plugin, QWidget *parent)
 {
     this->arbiter = arbiter;
     this->plugin = plugin;
@@ -284,6 +259,7 @@ DesktopEntry::DesktopEntry(QString fileLocation, Arbiter *arbiter, App *plugin, 
         return;
     }
 
+    //parse desktop entry
     QTextStream stream(&inputFile);
     for (QString line = stream.readLine();
       !line.isNull();
@@ -361,7 +337,6 @@ void DesktopEntry::mousePressEvent(QMouseEvent *event){
     emit clicked();
 }
 
-
 int DesktopEntry::resolutionFromString(QString string){
 
     if(string.contains("scalable")) return 10000;
@@ -392,11 +367,14 @@ QPixmap DesktopEntry::get_pixmap(){
     as described by the index.theme file. The subdirectories are allowed to be several levels deep,
     e.g. the subdirectory "48x48/apps" in the theme "hicolor" would end up at $basedir/icons/hicolor/48x48/apps{icon_}.{png|svg}"
 
+    **Note:
+     This implementation isn't fully spec compliant. It doesn't lookup themes. 
+     The current implementation searches the icon directories for all themes and grabs the highest
+     resolution it can from the first theme it finds a match in.
     */
 
-    //return widgets ico if blank
     if(this->icon_ == "") {
-
+        //TODO: change icons on dark / light change
         QPixmap pixmap(":/icons/widgets.svg");
         QSize size(512, 512);
         auto icon_mask = pixmap.scaled(size).createMaskFromColor(Qt::transparent);
@@ -405,10 +383,10 @@ QPixmap DesktopEntry::get_pixmap(){
         QPixmap icon(size);
         icon.fill(color);
         icon.setMask(icon_mask);
-
         return icon;
 
     }
+
     //check if icon is path
     if(this->icon_.contains("/") && (this->icon_.contains(".png") || this->icon_.contains(".svg") || this->icon_.contains(".xpm"))){
         if(!QFile::exists(this->icon_)){
@@ -420,10 +398,8 @@ QPixmap DesktopEntry::get_pixmap(){
     //check in $HOME/.icons
     auto h_png_path = QDir::homePath() + "/" + this->icon_ + ".png";
     if(QFile::exists(h_png_path)) return QPixmap(h_png_path);
-
     auto h_svg_path = QDir::homePath() + "/" + this->icon_ + ".svg";
     if(QFile::exists(h_svg_path)) return QPixmap(h_svg_path);
-
     auto h_xpm_path = QDir::homePath() + "/" + this->icon_ + ".xpm";
     if(QFile::exists(h_xpm_path)) return QPixmap(h_xpm_path);
 
@@ -432,12 +408,10 @@ QPixmap DesktopEntry::get_pixmap(){
     auto xdgArr = xdg.split(":");
     for(QString dir_name : xdgArr)
     {
-
         //drop repeated dirs
         if(dir_name.endsWith("/")) continue;
-        qDebug() << "Checking Dir: " << dir_name;
 
-        //get themes from dir
+        //search themes in dir
         //TODO: prefer certain themes
         QDirIterator themes( dir_name + "/icons", QDir::Dirs | QDir::NoDotAndDotDot);
         while ( themes.hasNext() ) {
@@ -445,14 +419,12 @@ QPixmap DesktopEntry::get_pixmap(){
             QString themeDirPath = themes.next();
             QDir themeDir(themeDirPath);
             QString theme = themeDir.dirName();
-            qDebug() << "Checking Theme: " << theme;
-
-            //TODO: get resolution folders and sort by preference(scalable then size)
             QDirIterator resolutions( themeDirPath, QDir::Dirs | QDir::NoDotAndDotDot);
-            QStringList resolutionList = {};
-
+           
             int highestResolution = 0;
             QString highestResPath = "";
+
+            //get highest resolution icon possible
             while ( resolutions.hasNext() ) {
 
                 QString resolutionPath = resolutions.next();
@@ -463,7 +435,6 @@ QPixmap DesktopEntry::get_pixmap(){
 
                 //skip if higher resolution already available
                 if(highestResolution > iRes) continue;
-
                 QDirIterator subdirs( resolutionPath, QDir::Dirs | QDir::NoDotAndDotDot);
                 while ( subdirs.hasNext() ) {
 
@@ -529,7 +500,7 @@ QPixmap DesktopEntry::get_pixmap(){
     return icon;
 }
 
-QList<DesktopEntry *> DesktopEntry::get_entries(Arbiter *arbiter, App *plugin)
+QList<DesktopEntry *> DesktopEntry::get_entries(Arbiter *arbiter, ILauncherPlugin *plugin)
 {
     /*
      Desktop entry files must reside in the $XDG_DATA_DIRS/applications directory and must have a .desktop file extension.

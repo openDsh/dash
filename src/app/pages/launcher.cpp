@@ -27,15 +27,14 @@ LauncherPlugins::LauncherPlugins(Arbiter &arbiter, QWidget *parent)
         if (!key.isNull()) {
             auto plugin_loader = new QPluginLoader(this);
             plugin_loader->setFileName(this->plugins[key].absoluteFilePath());
-
+            qDebug() << this->plugins[key].absoluteFilePath();
             if (LauncherPlugin *plugin = qobject_cast<LauncherPlugin *>(plugin_loader->instance())) {
                 plugin->dashize(&this->arbiter);
                 for (QWidget *tab : plugin->widgets())
                     this->addTab(tab, tab->objectName());
 
-
                 connect(plugin, &LauncherPlugin::widget_added, [this](QWidget *tab){
-                    this->addTab(tab, "window");
+                    this->addTab(tab, tab->objectName());
                     qDebug() << "widget added";
 
                 });
@@ -45,6 +44,9 @@ LauncherPlugins::LauncherPlugins(Arbiter &arbiter, QWidget *parent)
                 this->config->set_launcher_plugin(key);
             }
             else {
+                auto p = plugin_loader->instance();
+                if(p != nullptr) qDebug() << plugin_loader->errorString();
+                qDebug() << plugin_loader->errorString();
                 delete plugin_loader;
             }
         }
@@ -67,7 +69,7 @@ LauncherPlugins::LauncherPlugins(Arbiter &arbiter, QWidget *parent)
                 this->addTab(tab, tab->objectName());
 
             connect(plugin, &LauncherPlugin::widget_added, [this](QWidget *tab){
-                this->addTab(tab, "window");
+                this->addTab(tab, tab->objectName());
                 qDebug() << "widget added";
 
             });

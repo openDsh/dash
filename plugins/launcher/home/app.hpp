@@ -31,6 +31,8 @@
 class Arbiter;
 class Config;
 class Theme;
+class DesktopEntry;
+class ILauncherPlugin;
 
 class XWorker : public QObject {
     Q_OBJECT
@@ -77,43 +79,66 @@ class EmbeddedApp : public QWidget {
     void opened();
 };
 
-
-//TODO: REFACTOR - change name to ILauncherPlugin
-class App : public LauncherPlugin {
+class ILauncherPlugin : public LauncherPlugin {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID LauncherPlugin_iid FILE "home.json")
     Q_INTERFACES(LauncherPlugin)
 
 public:
-    App();
+    ILauncherPlugin() { this->settings.beginGroup("App"); }
+    ~ILauncherPlugin();
     QList<QWidget *> widgets() override;
     void remove_widget(int idx) override;
-
-    //void add_widget(QWidget *widget);
-
+    void add_widget(QWidget *widget) override;
 
 private:
     void init();
-    QList<QWidget *> _widgets;
-
-
+    
+   
 };
+
+class Home : public QWidget {
+    Q_OBJECT
+
+   public:
+    Home(Arbiter *arbiter, QSettings &settings, int idx, ILauncherPlugin *plugin, QWidget *parent = nullptr);
+    ~Home();
+    void update_idx(int idx);
+
+   private:
+    //const QString DEFAULT_DIR = QDir().absolutePath();
+    QGridLayout *entries_grid;
+    QWidget *container;
+    QScrollArea *scroll_area;
+    QStackedLayout *layout;
+    QWidget *config_widget();//not implemented
+  
+    Arbiter *arbiter;
+    QSettings &settings;
+    ILauncherPlugin *plugin;
+    int idx;
+
+    void setup_ui();
+   
+};
+
 
 class DesktopEntry : public QWidget{
     Q_OBJECT
 
 public:
-    DesktopEntry(QString fileLocation, Arbiter *arbiter, App *plugin, QWidget *parent = nullptr);
-    QWidget *get_widget();
-    static QList<DesktopEntry *> get_entries(Arbiter *arbiter, App *plugin);
+    DesktopEntry(QString fileLocation, Arbiter *arbiter, ILauncherPlugin *plugin, QWidget *parent = nullptr);
+    
+    static QList<DesktopEntry *> get_entries(Arbiter *arbiter, ILauncherPlugin *plugin);
     static int resolutionFromString(QString string);
-   // static QList<QWidget *> get_all_widgets();
+  
     inline QString get_exec() { return this->exec_; };
     inline QString get_icon() { return this->icon_; };
     inline QString get_name() { return this->name_; };
     inline QString get_path() { return this->path_; };
     inline QList<QString> get_args() {return this->args_;};
     QPixmap get_pixmap();
+    QWidget *get_widget();
 
 public slots:
 
@@ -130,7 +155,7 @@ private:
     QLabel *nameLabel;
 
     Arbiter *arbiter;
-    App *plugin;
+    ILauncherPlugin *plugin;
     QString exec_;
     QString path_;
     QString name_;
@@ -138,40 +163,6 @@ private:
     QList<QString> args_;
 
     void setup_ui();
-
-};
-//TODO: REFACTOR - rename to home
-class Launcher : public QWidget {
-    Q_OBJECT
-
-   public:
-    Launcher(Arbiter *arbiter, QSettings &settings, int idx, App *plugin, QWidget *parent = nullptr);
-    ~Launcher();
-    void update_idx(int idx);
-
-   private:
-    const QString DEFAULT_DIR = QDir().absolutePath();
-
-//  QWidget *launcher_widget();
-   // QWidget *homepage_widget();
-    QWidget *home_widget();
-   // QWidget *app_select_widget();
-    QWidget *config_widget();
-   // void populate_dirs(QString path);
-   // void populate_apps(QString path);
-
-    inline QString home_key() { return QString("%1/home").arg(this->idx); }
-    inline QString app_key() { return QString("%1/app").arg(this->idx); }
-
-    Arbiter *arbiter;
-    QSettings &settings;
-    EmbeddedApp *app;
-    App *plugin;
-    QLabel *path_label;
-   // QListWidget *folders;
-   // QListWidget *apps;
-    int idx;
-    //bool auto_launch = false;
 
 };
 

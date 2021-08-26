@@ -10,11 +10,11 @@ class LauncherPlugin : public Plugin {
     LauncherPlugin() { this->settings.beginGroup("Launcher"); }
     virtual ~LauncherPlugin() = default;
     virtual void remove_widget(int idx) { this->loaded_widgets.removeAt(idx); }
+    virtual void add_widget(QWidget *widget){}
 
 public slots:
 
-    signals:
-    
+    signals:  
     void widget_added(QWidget *widget);
 
    protected:
