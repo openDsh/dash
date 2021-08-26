@@ -1,5 +1,6 @@
 #include <QElapsedTimer>
 #include <unistd.h>
+#include <typeinfo>
 
 #include "app/config.hpp"
 #include "app/arbiter.hpp"
@@ -291,7 +292,12 @@ void App::remove_widget(int idx)
 
     this->settings.remove(QString::number(idx));
     for (int i = 0; i < this->loaded_widgets.size(); i++) {
+        auto typeStr(typeid(this->loaded_widgets[i]).name());
+        qDebug() << typeStr;
+      
         if (Launcher *launcher = qobject_cast<Launcher *>(this->loaded_widgets[i]))
             launcher->update_idx(i);
+        
+       
     }
 }

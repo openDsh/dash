@@ -163,8 +163,6 @@ void Home::setup_ui()
     layout->setContentsMargins(0, 0, 0, 0);
     container = new QWidget(this);
     entries_grid = new QGridLayout(container);
-    entries_grid->setObjectName(QString::fromUtf8("entries_grid"));
-    entries_grid->setSizeConstraint(QLayout::SetDefaultConstraint);
     container->setLayout(entries_grid);
     auto entries = DesktopEntry::get_entries(this->arbiter, this->plugin);
     QScrollArea *scroll_area = new QScrollArea(this);
@@ -204,6 +202,8 @@ void Home::update_idx(int idx){
 
     if (idx == this->idx)
         return;
+
+    this->idx = idx;
 
 }
 

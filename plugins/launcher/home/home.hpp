@@ -47,7 +47,6 @@ class XWorker : public QObject {
     struct WindowProp {
         WindowProp(char *prop, unsigned long size);
         ~WindowProp();
-
         void *prop;
         unsigned long size;
     };
