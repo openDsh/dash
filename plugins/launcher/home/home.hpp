@@ -86,15 +86,13 @@ class ILauncherPlugin : public LauncherPlugin {
 
 public:
     ILauncherPlugin() { this->settings.beginGroup("App"); }
-    ~ILauncherPlugin();
     QList<QWidget *> widgets() override;
     void remove_widget(int idx) override;
     void add_widget(QWidget *widget) override;
 
 private:
     void init();
-    
-   
+      
 };
 
 class Home : public QWidget {
@@ -102,7 +100,6 @@ class Home : public QWidget {
 
    public:
     Home(Arbiter *arbiter, QSettings &settings, int idx, ILauncherPlugin *plugin, QWidget *parent = nullptr);
-    ~Home();
     void update_idx(int idx);
 
    private:
@@ -130,8 +127,7 @@ public:
     DesktopEntry(QString fileLocation, Arbiter *arbiter, ILauncherPlugin *plugin, QWidget *parent = nullptr);
     
     static QList<DesktopEntry *> get_entries(Arbiter *arbiter, ILauncherPlugin *plugin);
-    static int resolutionFromString(QString string);
-  
+    static int resolutionFromString(QString string); 
     inline QString get_exec() { return this->exec_; };
     inline QString get_icon() { return this->icon_; };
     inline QString get_name() { return this->name_; };
@@ -149,7 +145,7 @@ protected:
     void mousePressEvent(QMouseEvent *event) override;
 
 private:
-    QVBoxLayout *verticalLayout_3;
+    QVBoxLayout *verticalLayout;
     QHBoxLayout *horizontalLayout;
     QLabel *iconLabel;
     QLabel *nameLabel;

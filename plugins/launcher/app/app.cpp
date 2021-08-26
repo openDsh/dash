@@ -134,8 +134,7 @@ Launcher::Launcher(Arbiter &arbiter, QSettings &settings, int idx, QWidget *pare
     layout->addWidget(this->launcher_widget());
     layout->addWidget(this->app);
 
-    if (this->auto_launch)
-        //TODO: wait until fully loaded?
+    if (this->auto_launch)     
         this->app->start(launcher_app);
 }
 

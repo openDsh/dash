@@ -394,8 +394,13 @@ else
     exit 1
   fi
 
-  echo Running Dash make
-  make
+ 
+  coreQ=$(grep 'cpu cores' /proc/cpuinfo | uniq)
+  cores=${coreQ:12:1}
+  echo Running Dash make -j$cores
+  make -j$cores
+  
+  
   if [[ $? -eq 0 ]]; then
       echo -e Dash make ok, executable can be found ../bin/dash
       echo

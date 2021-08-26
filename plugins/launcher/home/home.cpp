@@ -10,7 +10,6 @@
 
 #include "home.hpp"
 
-
 XWorker::WindowProp::WindowProp(char *prop, unsigned long size)
 {
     this->size = size;
@@ -121,12 +120,6 @@ void EmbeddedApp::end()
     emit closed();
 }
 
-ILauncherPlugin::~ILauncherPlugin() {
-
-    //TODO: delete home and close opened apps
-
-}
-
 void ILauncherPlugin::init(){
     
     this->loaded_widgets.push_front(new Home(this->arbiter, this->settings, 0, this));
@@ -163,33 +156,22 @@ Home::Home(Arbiter *arbiter, QSettings &settings, int idx, ILauncherPlugin *plug
     
 }
 
-Home::~Home(){
-
-    //TODO: remove desktop entries
-
-}
-
 void Home::setup_ui()
 {
     this->setObjectName("Home");
     QStackedLayout *layout = new QStackedLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
-
     container = new QWidget(this);
-
     entries_grid = new QGridLayout(container);
     entries_grid->setObjectName(QString::fromUtf8("entries_grid"));
     entries_grid->setSizeConstraint(QLayout::SetDefaultConstraint);
     container->setLayout(entries_grid);
     auto entries = DesktopEntry::get_entries(this->arbiter, this->plugin);
-
     QScrollArea *scroll_area = new QScrollArea(this);
     Session::Forge::to_touch_scroller(scroll_area);
     scroll_area->setWidgetResizable(true);
     scroll_area->setWidget(container);
-
     layout->addWidget(scroll_area);
-
 
     //TODO: detect width and set appropriately
     int x = 0;
@@ -206,7 +188,6 @@ void Home::setup_ui()
 
         });
         entries_grid->addWidget(entry, y, x, 1, 1);
-
         //set x & y
         if(x > 6) {
             x = 0;
@@ -228,7 +209,7 @@ void Home::update_idx(int idx){
 
 QWidget *Home::config_widget()
 {
-    //*NOT IMPLEMENTED
+    //NOT IMPLEMENTED
     QWidget *widget = new QWidget(this);
     return widget;
 }
@@ -241,8 +222,7 @@ DesktopEntry::DesktopEntry(QString fileLocation, Arbiter *arbiter, ILauncherPlug
     QFile inputFile(fileLocation);
     inputFile.open(QIODevice::ReadOnly);
 
-    if (!inputFile.isOpen()) return;
-    
+    if (!inputFile.isOpen()) return;  
     //parse desktop entry
     QTextStream stream(&inputFile);
     for (QString line = stream.readLine();
@@ -280,38 +260,28 @@ DesktopEntry::DesktopEntry(QString fileLocation, Arbiter *arbiter, ILauncherPlug
 }
 
 void DesktopEntry::setup_ui(){
-
     //setup ui
-    QVBoxLayout *verticalLayout_3;
-    QHBoxLayout *horizontalLayout;
-    QLabel *iconLabel;
-    QLabel *nameLabel;
-
-    verticalLayout_3 = new QVBoxLayout(this);
-    verticalLayout_3->setObjectName(QString::fromUtf8("verticalLayout_3"));
+    verticalLayout = new QVBoxLayout(this);
+    verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
     horizontalLayout = new QHBoxLayout();
     horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
     iconLabel = new QLabel(this);
     iconLabel->setMaximumSize(QSize(64, 64));
     iconLabel->setObjectName(QString::fromUtf8("iconLabel"));
     iconLabel->setAlignment(Qt::AlignCenter);
-    //iconLabel->setPixmap(this->get_pixmap());
     iconLabel->setPixmap (this->get_pixmap().scaled(64,64,Qt::KeepAspectRatio));
     iconLabel->show();
-
     horizontalLayout->addWidget(iconLabel);
-    verticalLayout_3->addLayout(horizontalLayout);
-
+    verticalLayout->addLayout(horizontalLayout);
     nameLabel = new QLabel(this);
     QFontMetrics metrics(nameLabel->font());
     QString elidedText = metrics.elidedText(this->get_name(), Qt::ElideRight, (nameLabel->width() * 2) - 16);
     nameLabel->setObjectName(QString::fromUtf8("nameLabel"));
     nameLabel->setText(elidedText);
-    nameLabel->setMaximumSize(QSize(112, 64));
+    nameLabel->setMaximumSize(QSize(124, 64));
     nameLabel->setAlignment(Qt::AlignCenter);
     nameLabel->setWordWrap(true);
-
-    verticalLayout_3->addWidget(nameLabel);
+    verticalLayout->addWidget(nameLabel);
     this->setMaximumSize(QSize(128, 128));
 
 }
