@@ -120,6 +120,26 @@ void EmbeddedApp::end()
     emit closed();
 }
 
+ILauncherPlugin::ILauncherPlugin(){
+    this->settings.beginGroup("Home");
+    
+    window_manager = WindowManager::Create();
+    if (!window_manager) {
+        qDebug() << "[ERROR] could not load Window Manager!";
+        //TODO: remove self(plugin)
+    } else {
+        window_manager->Run();
+        if(window_manager->isRunning)
+            qDebug() << "Window manager started";
+        else
+            qDebug() << "[INFO] a window manager is already running, unable to take control";
+            qDebug() << "[TIP] start dash in a new session without a window manager to take control";
+        //TODO: connect slots / signals
+
+    }
+  
+}
+
 void ILauncherPlugin::init(){
     
     this->loaded_widgets.push_front(new Home(this->arbiter, this->settings, 0, this));

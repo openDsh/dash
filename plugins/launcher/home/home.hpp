@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QDebug>
 #include <QDir>
 #include <QProcess>
 #include <QtWidgets>
@@ -12,6 +13,10 @@
 #include <QtWidgets/QWidget>
 
 #include "plugins/launcher_plugin.hpp"
+
+#include "util.hpp"
+#include "window_manager.hpp"
+#include <cstdlib>
 
 #include <X11/Xatom.h>
 #include <X11/Xlib.h>
@@ -84,13 +89,14 @@ class ILauncherPlugin : public LauncherPlugin {
     Q_INTERFACES(LauncherPlugin)
 
 public:
-    ILauncherPlugin() { this->settings.beginGroup("App"); }
+    ILauncherPlugin();
     QList<QWidget *> widgets() override;
     void remove_widget(int idx) override;
     void add_widget(QWidget *widget) override;
 
 private:
     void init();
+    WindowManager *window_manager;
       
 };
 
