@@ -94,6 +94,7 @@ dependencies=(
 "libqt5bluetooth5-bin"
 "qtconnectivity5-dev"
 "pulseaudio"
+"pulseaudio-module-bluetooth"
 "librtaudio-dev"
 "librtaudio6"
 "libkf5bluezqt-dev"
