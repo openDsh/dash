@@ -1,65 +1,112 @@
 #include <sstream>
 
 #include <QFile>
-#include <QPointF>
+#include <QRegularExpression>
 
 #include "app/graphics/dynamic_svg.hpp"
 
 DynamicSVG::DynamicSVG(QString path, QObject *parent)
     : QObject(parent)
     , doc()
+    , size()
 {
     QFile file(path);
     if (file.open(QIODevice::ReadOnly)) {
         this->doc.setContent(&file);
 
-        auto paths = this->doc.documentElement().childNodes();
-        for (int i = 0; i < paths.length(); i++) {
-            auto element = paths.item(i).toElement();
-            if (element.hasAttribute("id"))
-                elements.insert(element.attribute("id"), element);
-        }
+        auto element = this->doc.documentElement();
+        this->size.setWidth(element.attribute("width").toInt());
+        this->size.setHeight(element.attribute("height").toInt());
+
+        this->add_elements(element.firstChildElement());
     }
 }
 
-void DynamicSVG::rotate(QString id, int16_t degree)
+bool DynamicSVG::rotate(QString id, int16_t degree)
 {
-    QString cmds = this->attribute(id, "d");
-    cmds.remove(0, cmds.indexOf('M') + 1);
-
-    char _;
-    QPointF point;
-    std::stringstream ss(cmds.toStdString());
-    ss >> point.rx() >> _ >> point.ry();
-
-    this->update(id, "transform", QString("rotate(%1 %2 %3)").arg(degree).arg(point.x()).arg(point.y()));
+    auto transform = this->attribute(id, "transform");
+    transform.replace(QRegularExpression("rotate\\(-?\\d+"), QString("rotate(%1").arg(degree));
+    return this->update(id, "transform", transform);
 }
 
-void DynamicSVG::toggle(QString id, bool toggle)
+bool DynamicSVG::scale(QString id, float factor)
 {
-    this->update(id, "visibility", toggle ? "visible" : "hidden");
+    auto transform = this->attribute(id, "transform");
+    auto transx = (1 - factor) * (this->size.width() / 2);
+    auto transy = (1 - factor) * (this->size.height() / 2);
+    transform.replace(QRegularExpression("translate\\(-?\\d+ -?\\d+"), QString("translate(%1 %2").arg(transx).arg(transy));
+    transform.replace(QRegularExpression("scale\\(\\d+"), QString("scale(%1").arg(factor));
+    return this->update(id, "transform", transform);
 }
 
-void DynamicSVG::fill(QString id, QColor color)
+bool DynamicSVG::toggle(QString id, bool toggle)
 {
-    this->update(id, "fill", color.isValid() ? color.name() : "none");
+    return this->update(id, "visibility", toggle ? "visible" : "hidden");
 }
 
-void DynamicSVG::outline(QString id, QColor color)
+bool DynamicSVG::fill(QString id, QColor color)
 {
-    this->update(id, "stroke", color.name());
+    return this->update(id, "fill", color.isValid() ? color.name() : "none");
 }
 
-void DynamicSVG::recolor(QString id, QColor color)
+bool DynamicSVG::outline(QString id, QColor color)
+{
+    return this->update(id, "stroke", color.name());
+}
+
+bool DynamicSVG::recolor(QString id, QColor color)
 {
     if (this->elements[id].hasAttribute("stroke"))
-        this->outline(id, color);
+        return this->outline(id, color);
     else if (this->elements[id].hasAttribute("fill"))
-        this->fill(id, color);
+        return this->fill(id, color);
+
+    return false;
 }
 
-void DynamicSVG::recolor(QColor color)
+bool DynamicSVG::recolor(QColor color, QStringList filter)
 {
-    for (auto id : this->elements.keys())
-        this->recolor(id, color);
+    bool changed = false;
+
+    for (auto id : this->elements.keys()) {
+        if (!filter.contains(id))
+            changed |= this->recolor(id, color);
+    }
+
+    return changed;
+}
+
+bool DynamicSVG::set_text(QString id, QString text)
+{
+    return this->update(id, text);
+}
+
+void DynamicSVG::add_elements(QDomElement element)
+{
+    if (element.hasAttribute("id"))
+        this->elements.insert(element.attribute("id"), element);
+
+    auto child = element.firstChildElement();
+    while (!child.isNull()) {
+        this->add_elements(child);
+        child = child.nextSiblingElement();
+    }
+}
+
+bool DynamicSVG::update(QString id, QString text)
+{
+    auto node = this->elements[id].firstChild();
+    if (node.nodeValue() == text)
+        return false;
+    
+    node.setNodeValue(text);
+    return true;
+}
+bool DynamicSVG::update(QString id, QString attribute, QString value)
+{
+    if (this->attribute(id, attribute) == value)
+        return false;
+
+    this->elements[id].setAttribute(attribute, value);
+    return true;
 }

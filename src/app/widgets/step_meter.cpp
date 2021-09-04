@@ -45,11 +45,11 @@ void StepMeter::paintEvent(QPaintEvent *event)
 void StepMeter::set_steps(int steps)
 {
     this->steps = steps;
-    this->repaint();
+    this->update();
 }
 
 void StepMeter::set_bars(int bars)
 {
     this->bars = std::min(std::max(0, bars), this->steps);
-    this->repaint();
+    this->update();
 }

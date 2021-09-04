@@ -23,15 +23,15 @@ QWidget *ClimateSnackBar::body()
     layout->setContentsMargins(6, 0, 6, 0);
     layout->setSpacing(0);
 
-    this->driver_temp = new QLabel(widget);
-    this->driver_temp->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
-    layout->addWidget(this->driver_temp, 1);
+    this->left_temp = new QLabel(widget);
+    this->left_temp->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+    layout->addWidget(this->left_temp, 1);
 
     layout->addLayout(this->state());
 
-    this->passenger_temp = new QLabel(widget);
-    this->passenger_temp->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-    layout->addWidget(this->passenger_temp, 1);
+    this->right_temp = new QLabel(widget);
+    this->right_temp->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+    layout->addWidget(this->right_temp, 1);
 
     return widget;
 }
@@ -51,15 +51,15 @@ QLayout *ClimateSnackBar::state()
     return layout;
 }
 
-void ClimateSnackBar::set_driver_temp(int temp)
+void ClimateSnackBar::set_left_temp(int temp)
 {
-    this->driver_temp->setText(QString("%1°").arg(temp));
+    this->left_temp->setText(QString("%1°").arg(temp));
     this->open(3000);
 }
 
-void ClimateSnackBar::set_passenger_temp(int temp)
+void ClimateSnackBar::set_right_temp(int temp)
 {
-    this->passenger_temp->setText(QString("%1°").arg(temp));
+    this->right_temp->setText(QString("%1°").arg(temp));
     this->open(3000);
 }
 
@@ -107,14 +107,14 @@ void Climate::airflow(uint8_t airflow)
     this->snack_bar->set_airflow(this->airflow_);
 }
 
-void Climate::driver_temp(int driver_temp)
+void Climate::left_temp(int left_temp)
 {
-    this->driver_temp_ = driver_temp;
-    this->snack_bar->set_driver_temp(this->driver_temp_);
+    this->left_temp_ = left_temp;
+    this->snack_bar->set_left_temp(this->left_temp_);
 }
 
-void Climate::passenger_temp(int passenger_temp)
+void Climate::right_temp(int right_temp)
 {
-    this->passenger_temp_ = passenger_temp;
-    this->snack_bar->set_passenger_temp(this->passenger_temp_);
+    this->right_temp_ = right_temp;
+    this->snack_bar->set_right_temp(this->right_temp_);
 }

@@ -65,17 +65,17 @@ void ClimateState::paintEvent(QPaintEvent *)
 void ClimateState::toggle_defrost(bool enabled)
 {
     this->defrost_state = enabled;
-    this->repaint();
+    this->update();
 }
 
 void ClimateState::toggle_body(bool enabled)
 {
     this->body_state = enabled;
-    this->repaint();
+    this->update();
 }
 
 void ClimateState::toggle_feet(bool enabled)
 {
     this->feet_state = enabled;
-    this->repaint();
+    this->update();
 }

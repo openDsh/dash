@@ -267,9 +267,16 @@ StepMeter {
     qproperty-bar_color: palette(base);
 }
 
-ClimateState,
-VehicleState {
+ClimateState {
     qproperty-color: rgb(228, 228, 228);
+}
+
+VehicleState {
+    qproperty-base_color: rgb(228, 228, 228);
+    qproperty-headlight_color: #4FC3F7;
+    qproperty-taillight_color: #E57373;
+    qproperty-indicator_color: #FFB74D;
+    qproperty-warning_color: #FF7043;
 }
 
 QDialog,

@@ -6,7 +6,9 @@
 #include <QDomElement>
 #include <QMap>
 #include <QObject>
+#include <QSize>
 #include <QString>
+#include <QStringList>
 
 class DynamicSVG : public QObject {
     Q_OBJECT
@@ -14,20 +16,25 @@ class DynamicSVG : public QObject {
    public:
     DynamicSVG(QString path, QObject *parent = nullptr);
 
-    QByteArray bytes() { return this->doc.toByteArray(); }
-    QString attribute(QString id, QString attribute) { return this->elements[id].attribute(attribute); }
-    void update(QString id, QString text) { this->elements[id].firstChild().setNodeValue(text); }
-    void update(QString id, QString attribute, QString value) { this->elements[id].setAttribute(attribute, value); }
+    bool rotate(QString id, int16_t degree);
+    bool scale(QString id, float factor);
+    bool toggle(QString id, bool hide);
+    bool fill(QString id, QColor color);
+    bool outline(QString id, QColor color);
+    bool recolor(QString id, QColor color);
+    bool recolor(QColor color, QStringList filter = {});
+    bool set_text(QString id, QString text);
 
-    void rotate(QString id, int16_t degree);
-    void toggle(QString id, bool hide);
-    void fill(QString id, QColor color);
-    void outline(QString id, QColor color);
-    void recolor(QString id, QColor color);
-    void recolor(QColor color);
+    inline QByteArray bytes() { return this->doc.toByteArray(); }
+    inline QString attribute(QString id, QString attribute) { return this->elements[id].attribute(attribute); }
 
    private:
     QDomDocument doc;
+    QSize size;
 
     QMap<QString, QDomElement> elements;
+
+    void add_elements(QDomElement element);
+    bool update(QString id, QString text);
+    bool update(QString id, QString attribute, QString value);
 };
