@@ -127,9 +127,9 @@ if [ $deps = false ]
     echo Running apt update
     sudo apt update
 
-    installString="sudo apt install -y "
+    installString="sudo apt-get install -y "
 
-    #create apt install string
+    #create apt-get install string
     for i in ${dependencies[@]}; do
       installString+=" $i"
     done
