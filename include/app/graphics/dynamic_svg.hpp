@@ -17,7 +17,6 @@ class DynamicSVG : public QObject {
     DynamicSVG(QString path, QObject *parent = nullptr);
 
     bool rotate(QString id, int16_t degree);
-    bool scale(QString id, float factor);
     bool toggle(QString id, bool hide);
     bool fill(QString id, QColor color);
     bool outline(QString id, QColor color);
@@ -27,6 +26,8 @@ class DynamicSVG : public QObject {
 
     inline QByteArray bytes() { return this->doc.toByteArray(); }
     inline QString attribute(QString id, QString attribute) { return this->elements[id].attribute(attribute); }
+    inline int width() { return this->size.width(); }
+    inline int height() { return this->size.height(); }
 
    private:
     QDomDocument doc;

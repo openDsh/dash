@@ -18,7 +18,7 @@ DynamicSVG::DynamicSVG(QString path, QObject *parent)
         this->size.setWidth(element.attribute("width").toInt());
         this->size.setHeight(element.attribute("height").toInt());
 
-        this->add_elements(element.firstChildElement());
+        this->add_elements(element);
     }
 }
 
@@ -26,16 +26,6 @@ bool DynamicSVG::rotate(QString id, int16_t degree)
 {
     auto transform = this->attribute(id, "transform");
     transform.replace(QRegularExpression("rotate\\(-?\\d+"), QString("rotate(%1").arg(degree));
-    return this->update(id, "transform", transform);
-}
-
-bool DynamicSVG::scale(QString id, float factor)
-{
-    auto transform = this->attribute(id, "transform");
-    auto transx = (1 - factor) * (this->size.width() / 2);
-    auto transy = (1 - factor) * (this->size.height() / 2);
-    transform.replace(QRegularExpression("translate\\(-?\\d+ -?\\d+"), QString("translate(%1 %2").arg(transx).arg(transy));
-    transform.replace(QRegularExpression("scale\\(\\d+"), QString("scale(%1").arg(factor));
     return this->update(id, "transform", transform);
 }
 

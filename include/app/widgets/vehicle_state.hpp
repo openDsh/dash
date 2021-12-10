@@ -73,13 +73,6 @@ class VehicleState : public QFrame {
     inline void set_pressure_threshold(uint8_t value) { this->pressure_threshold = value; }
 
    protected:
-    enum Light
-    {
-        OFF,
-        ON,
-        INDICATOR
-    };
-
     void paintEvent(QPaintEvent *event) override;
 
     void resizeEvent(QResizeEvent *event)
@@ -95,10 +88,8 @@ class VehicleState : public QFrame {
     QColor indicator_color;
     QColor warning_color;
 
-    Light l_headlight = OFF;
-    Light r_headlight = OFF;
-    Light l_taillight = OFF;
-    Light r_taillight = OFF;
+    bool headlights = false;
+    bool taillights = false;
 
     uint8_t pressure_threshold = 0;
     bool br_pressure = false;
@@ -109,12 +100,9 @@ class VehicleState : public QFrame {
     bool sensors_enabled = true;
 
     double scale;
+    int16_t rotation = 0;
 
     DynamicSVG vehicle_ref;
 
-    bool toggle_l_headlight(Light state, QColor color);
-    bool toggle_r_headlight(Light state, QColor color);
-    bool toggle_l_taillight(Light state, QColor color);
-    bool toggle_r_taillight(Light state, QColor color);
     bool set_sensor(QString sensor, uint8_t level);
 };

@@ -1,173 +1,79 @@
-<svg xmlns="http://www.w3.org/2000/svg" height="1000" viewBox="0 0 1000 1000" width="1000">
-    <g id="root" transform="translate(0 0) scale(1) rotate(0 500 500)">
-        <!-- windows -->
-        <path id="fl_window" fill="#000000" d="M380.991,381.713c3.668,21.346,8.437,50.331,9.883,64.78c2.412,24.509,1.343,65.253,1.343,65.253
-                l-15.796-11.482V381.713" />
-        <path id="bl_window" fill="#000000"
-            d="M376.263,625.171V514.644l15.479,10.41c0,0-0.792,58.078-3.639,84.074c-0.646,5.895-1.372,11.264-2.108,16.043" />
-        <path id="fr_window" fill="#000000" d="M627.05,381.713c-3.663,21.346-8.422,50.331-9.845,64.78c-2.454,24.509-1.385,65.253-1.385,65.253
-                l15.795-11.482V381.713" />
-        <path id="br_window" fill="#000000"
-            d="M631.817,625.171V514.644l-15.521,10.41c0,0,0.792,58.078,3.639,84.074c0.636,5.895,1.357,11.264,2.092,16.043" />
-        <path id="windshield" fill="#000000" d="M504.039,308.045c0,0-91.983-1.089-120.269,43.172l17.668,75.015c0,0,42.428-7.545,102.601-7.545
-                c60.096,0,102.562,7.545,102.562,7.545l17.707-75.015C595.984,306.957,504.039,308.045,504.039,308.045z" />
-        <path id="rear_windshield" fill="#000000" d="M618.102,711.067l-10.756-74.262c-0.023,0.012-0.049,0.025-0.073,0.035l-0.003-0.035
-                c-24.111,12.133-101.676,12.982-103.269,12.996c-1.592-0.014-79.156-0.863-103.268-12.996l-0.004,0.035
-                c-0.023-0.01-0.049-0.023-0.072-0.035l-10.755,74.262c27.011,22.287,84.556,28.242,114.062,28.225c0.012,0,0.025,0,0.037,0
-                c0.013,0,0.025,0,0.038,0C533.546,739.31,591.091,733.354,618.102,711.067z" />
-        <path id="sunroof" fill="#000000" d="M576.416,518.526H431.622c-6.606,0-11.983-4.906-11.983-10.953v-47.884c0-6.063,5.377-10.951,11.983-10.951h144.794
-                c6.606,0,11.945,4.889,11.945,10.951v47.884C588.361,513.62,583.022,518.526,576.416,518.526z" />
-
-        <!-- tires -->
-        <path id="fl_tire" fill="#000000"
-            d="M368.124,369.483h-3.396h-2.943h-1.261c-1.853,0-3.369-1.558-3.369-3.459V277.73c0-1.9,1.517-3.458,3.369-3.458h1.261
-                    h2.943h3.396c0.928,0,1.685,0.778,1.685,1.729v91.754C369.809,368.705,369.052,369.483,368.124,369.483z" transform="rotate(0 363.481 321.654)" />
-        <path id="fr_tire" fill="#000000" d="M639.879,369.483h3.396h2.944h1.26c1.854,0,3.37-1.558,3.37-3.459V277.73c0-1.9-1.517-3.458-3.37-3.458h-1.26
-                h-2.944h-3.396c-0.927,0-1.684,0.778-1.684,1.729v91.754C638.195,368.705,638.952,369.483,639.879,369.483z" transform="rotate(0 644.522 321.877)" />
-        <path id="bl_tire" fill="#000000" d="M367.432,732.61h-3.396h-2.942h-1.262c-1.854,0-3.369-1.557-3.369-3.457v-88.295c0-1.9,1.516-3.457,3.369-3.457h1.262
-                    h2.942h3.396c0.925,0,1.685,0.775,1.685,1.727v91.754C369.116,731.833,368.356,732.61,367.432,732.61z" />
-        <path id="br_tire" fill="#000000"
-            d="M640.572,732.61h3.396h2.942h1.262c1.853,0,3.369-1.557,3.369-3.457v-88.295c0-1.9-1.517-3.457-3.369-3.457
-                h-1.262h-2.942h-3.396c-0.925,0-1.685,0.775-1.685,1.727v91.754C638.888,731.833,639.647,732.61,640.572,732.61z" />
-
-        <!-- body -->
-        <path id="br_door" fill="none" stroke="#000000" stroke-width="4" stroke-miterlimit="10" d="M644.528,507.058
-                    c0,39.43,0,79.768,0,118.113" transform="rotate(0 644.528 507.058)" />
-        <path id="bl_door" fill="none" stroke="#000000" stroke-width="4" stroke-miterlimit="10" d="M363.475,507.058
-                    c0,39.43,0,79.768,0.001,118.113" transform="rotate(0 363.475 507.058)" />
-        <path id="fr_door" fill="none" stroke="#000000" stroke-width="4" stroke-miterlimit="10" d="M644.528,381.713
-                    c0,0,21.556,10.376,27.352,16.085c5.953,5.862,6.528,15.471,3.802,15.85c-2.799,0.361-26.409-8.573-26.409-8.573
-                    s-2.971-6.889-4.744-7.437c0,33.866,0,71.218,0,109.419" transform="rotate(0 644.528 381.713)" />
-        <path id="fl_door" fill="none" stroke="#000000" stroke-width="4" stroke-miterlimit="10" d="M363.476,381.713
-                    c0,0-21.557,10.376-27.352,16.085c-5.954,5.862-6.529,15.471-3.803,15.85c2.799,0.361,26.409-8.573,26.409-8.573
-                    s2.971-6.889,4.744-7.437c0,33.866,0,71.218,0,109.419" transform="rotate(0 363.476 381.713)" />
-        <path id="b_bumper" fill="none" stroke="#000000" stroke-width="4" stroke-miterlimit="10"
-            d="M367.091,744.841
-                    c0.33,2.441,0.684,4.58,1.059,6.313c5.182,24.223,11.627,43.703,23.732,56.246c23.412,24.225,112.157,20.893,112.157,20.893
-                    s88.665,3.332,112.079-20.893c12.182-12.543,18.588-32.023,23.812-56.246c0.37-1.732,0.719-3.871,1.044-6.313" />
-        <path id="f_bumper" fill="none" stroke="#000000" stroke-width="4" stroke-miterlimit="10" d="M644.522,262.042c0-1.603,0-3.058,0-4.35
-                    c0-16.13-2.689-38.233-26.576-53.458c-20.014-12.798-70.877-24.682-113.907-24.682c-43.07,0-93.933,11.884-113.985,24.682
-                    c-23.811,15.225-26.578,37.328-26.578,53.458c0,1.292,0,2.747,0,4.35" />
-
-        <!-- lights -->
-        <path id="l_headlight" fill="#000000" d="M392.727,208.421c-7.618,4.872-12.878,10.501-16.505,16.437c2.109-1.157,15.875-8.644,29.125-14.243
-                    c14.911-6.319,20.488-6.938,20.488-6.938l4.943-9.65C414.224,198.263,400.565,203.418,392.727,208.421z" />
-        <path id="l_taillight" fill="#000000" d="M394.484,802.706c0,0,3.243,15.914,17.005,19.805c12.737,3.602,40.817,5.99,40.817,4.146
-                    C452.307,821.716,394.484,802.706,394.484,802.706z" />
-        <path id="r_headlight" fill="#000000"
-            d="M615.276,208.421c7.619,4.872,12.879,10.501,16.505,16.437c-2.109-1.157-15.875-8.644-29.125-14.243
-                    c-14.911-6.319-20.487-6.938-20.487-6.938l-4.943-9.65C593.779,198.263,607.437,203.418,615.276,208.421z" />
-        <path id="r_taillight" fill="#000000" d="M613.52,802.706c0,0-3.243,15.914-17.005,19.805c-12.738,3.602-40.818,5.99-40.818,4.146
-                    C555.696,821.716,613.52,802.706,613.52,802.706z" />
-
-        <!-- tire pressure -->
-        <g id="fl_pressure" transform="rotate(0 310.0972 322.8672)">
-            <text id="fl_pressure_value" fill="#000000" x="310.0972" y="322.8672" text-anchor="middle" visibility="hidden"
-                font-family="'TitilliumWeb-Regular'" font-size="40">--</text>
-            <text id="fl_pressure_unit" fill="#000000" x="310.0967" y="345.7451" text-anchor="middle" visibility="hidden"
-                font-family="'Montserrat-Regular'" font-size="24">psi</text>
-        </g>
-        <g id="bl_pressure" transform="rotate(0 310.0972 686.0625)">
-            <text id="bl_pressure_value" fill="#000000" x="310.0972" y="686.0625" text-anchor="middle" visibility="hidden"
-                font-family="'TitilliumWeb-Regular'" font-size="40">--</text>
-            <text id="bl_pressure_unit" fill="#000000" x="310.0967" y="708.9404" text-anchor="middle" visibility="hidden"
-                font-family="'Montserrat-Regular'" font-size="24">psi</text>
-        </g>
-        <g id="fr_pressure" transform="rotate(0 696.7637 322.8672)">
-            <text id="fr_pressure_value" fill="#000000" x="696.7637" y="322.8672" text-anchor="middle" visibility="hidden"
-                font-family="'TitilliumWeb-Regular'" font-size="40">--</text>
-            <text id="fr_pressure_unit" fill="#000000" x="696.7637" y="345.7451" text-anchor="middle" visibility="hidden"
-                font-family="'Montserrat-Regular'" font-size="24">psi</text>
-        </g>
-        <g id="br_pressure" transform="rotate(0 696.7637 686.0625)">
-            <text id="br_pressure_value" fill="#000000" x="696.7637" y="686.0625" text-anchor="middle" visibility="hidden"
-                font-family="'TitilliumWeb-Regular'" font-size="40">--</text>
-            <text id="br_pressure_unit" fill="#000000" x="696.7637" y="708.9404" text-anchor="middle" visibility="hidden"
-                font-family="'Montserrat-Regular'" font-size="24">psi</text>
-        </g>
-        
-        <!-- sensors -->
-        <path id="fl_sensor1" fill="none" stroke="#000000" stroke-width="4" stroke-linejoin="round" stroke-miterlimit="10" visibility="hidden"
-            d="
-                        M424.463,180.634c-19.48,5.456-35.993,12.345-45.803,19.459c-19.047,13.84-25.853,32.226-28.148,48.981" />
-        <path id="fl_sensor2" fill="none" stroke="#000000" stroke-width="3" stroke-linejoin="round" stroke-miterlimit="10" visibility="hidden"
-            d="
-                        M408.948,165.121c-18.118,6.361-33.325,13.969-42.822,21.796c-16.896,13.951-25.035,31.599-28.877,48.893" />
-        <path id="fl_sensor3" fill="none" stroke="#000000" stroke-width="2" stroke-linejoin="round" stroke-miterlimit="10" visibility="hidden"
-            d="
-                        M392.096,148.268c-16.683,7.278-30.622,15.624-39.757,24.18c-15.248,14.307-24.012,31.723-29.002,49.454" />
-        <path id="fl_sensor4" fill="none" stroke="#000000" stroke-linejoin="round" stroke-miterlimit="10" visibility="hidden" d="M373.692,129.864
-                        c-15.154,8.171-27.818,17.235-36.519,26.495c-13.938,14.86-22.95,32.405-28.748,50.629" />
-        <path id="fml_sensor1" fill="none" stroke="#000000" stroke-width="4" stroke-linejoin="round" stroke-miterlimit="10" visibility="hidden"
-            d="
-                        M504.044,169.241c-26.308,0-55.258,4.58-79.581,11.393" />
-        <path id="fml_sensor2" fill="none" stroke="#000000" stroke-width="3" stroke-linejoin="round" stroke-miterlimit="10" visibility="hidden"
-            d="
-                        M504.049,148.353c-31.718,0-66.928,6.877-95.101,16.768" />
-        <path id="fml_sensor3" fill="none" stroke="#000000" stroke-width="2" stroke-linejoin="round" stroke-miterlimit="10" visibility="hidden"
-            d="
-                        M504.054,124.241c-37.707,0-79.899,10.041-111.958,24.026" />
-        <path id="fml_sensor4" fill="none" stroke="#000000" stroke-linejoin="round" stroke-miterlimit="10" visibility="hidden" d="M504.06,96.103
-                        c-44.372,0-94.39,14.363-130.368,33.762" />
-        <path id="fmr_sensor1" fill="none" stroke="#000000" stroke-width="4" stroke-linejoin="round" stroke-miterlimit="10" visibility="hidden"
-            d="
-                        M582.825,180.424c-24.154-6.697-52.769-11.183-78.781-11.183" />
-        <path id="fmr_sensor2" fill="none" stroke="#000000" stroke-width="3" stroke-linejoin="round" stroke-miterlimit="10" visibility="hidden"
-            d="
-                        M598.376,164.871c-28.036-9.757-62.907-16.518-94.327-16.518" />
-        <path id="fmr_sensor3" fill="none" stroke="#000000" stroke-width="2" stroke-linejoin="round" stroke-miterlimit="10" visibility="hidden"
-            d="
-                        M615.274,147.976c-31.957-13.833-73.813-23.735-111.221-23.735" />
-        <path id="fmr_sensor4" fill="none" stroke="#000000" stroke-linejoin="round" stroke-miterlimit="10" visibility="hidden" d="M633.728,129.531
-                        c-35.907-19.229-85.594-33.428-129.668-33.428" />
-        <path id="fr_sensor1" fill="none" stroke="#000000" stroke-width="4" stroke-linejoin="round" stroke-miterlimit="10" visibility="hidden"
-            d="
-                        M657.499,249.065c-2.276-16.753-9.055-35.136-28.159-48.973c-9.916-7.206-26.717-14.18-46.515-19.668" />
-        <path id="fr_sensor2" fill="none" stroke="#000000" stroke-width="3" stroke-linejoin="round" stroke-miterlimit="10" visibility="hidden"
-            d="
-                        M670.775,235.793c-3.826-17.288-11.956-34.929-28.901-48.876c-9.603-7.93-25.075-15.635-43.498-22.046" />
-        <path id="fr_sensor3" fill="none" stroke="#000000" stroke-width="2" stroke-linejoin="round" stroke-miterlimit="10" visibility="hidden"
-            d="
-                        M684.695,221.876c-4.979-17.722-13.744-35.129-29.033-49.429c-9.239-8.67-23.418-17.125-40.388-24.471" />
-        <path id="fr_sensor4" fill="none" stroke="#000000" stroke-linejoin="round" stroke-miterlimit="10" visibility="hidden" d="M699.613,206.953
-                        c-5.793-18.211-14.813-35.742-28.785-50.593c-8.803-9.386-21.682-18.571-37.101-26.829" />
-        <path id="rl_sensor1" fill="none" stroke="#000000" stroke-width="4" stroke-miterlimit="10" visibility="hidden" d="M357.099,754.833
-                        c5.312,24.478,12.153,44.307,23.575,57.755c11.573,13.608,37.661,20.26,62.881,23.459" />
-        <path id="rl_sensor2" fill="none" stroke="#000000" stroke-width="3" stroke-miterlimit="10" visibility="hidden" d="M344.891,767.039
-                        c5.498,25.034,12.591,45.512,23.447,60.035c10.859,14.51,33.335,22.692,56.925,27.267" />
-        <path id="rl_sensor3" fill="none" stroke="#000000" stroke-width="2" stroke-miterlimit="10" visibility="hidden" d="M331.511,780.421
-                        c5.68,25.744,12.917,47.042,23.256,62.761c10.078,15.303,29.253,24.975,50.586,31.059" />
-        <path id="rl_sensor4" fill="none" stroke="#000000" stroke-miterlimit="10" visibility="hidden" d="M316.79,795.149
-                        c5.848,26.71,13.159,49.076,23.051,66.166c9.199,15.872,25.288,26.899,43.904,34.538" />
-        <path id="bml_sensor1" fill="none" stroke="#000000" stroke-width="4" stroke-miterlimit="10" visibility="hidden" d="M443.555,836.047
-                        c30.898,3.92,60.492,2.656,60.492,2.656" />
-        <path id="bml_sensor2" fill="none" stroke="#000000" stroke-width="3" stroke-miterlimit="10" visibility="hidden" d="M425.263,854.341
-                        c37.95,7.358,78.785,5.378,78.785,5.378" />
-        <path id="bml_sensor3" fill="none" stroke="#000000" stroke-width="2" stroke-miterlimit="10" visibility="hidden" d="M405.354,874.24
-                        c44.626,12.727,98.695,9.747,98.695,9.747" />
-        <path id="bml_sensor4" fill="none" stroke="#000000" stroke-miterlimit="10" visibility="hidden" d="M383.745,895.854
-                        c50.754,20.824,120.305,16.47,120.305,16.47" />
-        <path id="bmr_sensor1" fill="none" stroke="#000000" stroke-width="4" stroke-miterlimit="10" visibility="hidden" d="M504.047,838.703
-                        c0,0,29.543,1.262,60.404-2.651" />
-        <path id="bmr_sensor2" fill="none" stroke="#000000" stroke-width="3" stroke-miterlimit="10" visibility="hidden" d="M504.048,859.719
-                        c0,0,40.782,1.979,78.698-5.374" />
-        <path id="bmr_sensor3" fill="none" stroke="#000000" stroke-width="2" stroke-miterlimit="10" visibility="hidden" d="M504.049,883.987
-                        c0,0,54.004,2.979,98.596-9.741" />
-        <path id="bmr_sensor4" fill="none" stroke="#000000" stroke-miterlimit="10" visibility="hidden"
-            d="M504.05,912.323c0,0,69.484,4.354,120.206-16.469" />
-        <path id="br_sensor1" fill="none" stroke="#000000" stroke-width="4" stroke-miterlimit="10" visibility="hidden" d="M564.451,836.052
-                        c25.212-3.197,51.303-9.849,62.883-23.464c11.491-13.446,18.311-33.271,23.645-57.744" />
-        <path id="br_sensor2" fill="none" stroke="#000000" stroke-width="3" stroke-miterlimit="10" visibility="hidden" d="M582.746,854.345
-                        c23.581-4.573,46.054-12.756,56.918-27.271c10.922-14.522,18.007-34.998,23.517-60.029" />
-        <path id="br_sensor3" fill="none" stroke="#000000" stroke-width="2" stroke-miterlimit="10" visibility="hidden" d="M602.645,874.246
-                        c21.326-6.083,40.499-15.757,50.582-31.064c10.404-15.719,17.643-37.016,23.331-62.76" />
-        <path id="br_sensor4" fill="none" stroke="#000000" stroke-miterlimit="10" visibility="hidden" d="M624.256,895.854
-                        c18.607-7.639,34.689-18.666,43.89-34.539c9.955-17.092,17.275-39.46,23.13-66.175" />
-
-        <!-- accents -->
-        <path id="_1" fill="#000000" d="M622.026,625.171c2.504,16.285,5.161,25.723,5.161,25.723l4.63-19.771v-5.951" />
-        <path id="_2" fill="#000000" d="M385.995,625.171c-2.512,16.285-5.145,25.723-5.145,25.723l-4.588-19.771v-5.951" />
-        <path id="_3" fill="#000000" d="M631.615,381.713v-25.989c0,0-2.019,11.148-4.565,25.989" />
-        <path id="_4" fill="#000000" d="M376.421,381.713v-25.989c0,0,2.019,11.148,4.57,25.989" />
+<svg id="root" xmlns="http://www.w3.org/2000/svg" height="900" viewBox="0 0 500 900" width="500">
+    <path id="fl_window" fill="#000000" d="M127.56,327.309c3.668,21.346,8.437,50.332,9.883,64.781c2.412,24.508,1.343,65.252,1.343,65.252L122.99,445.86V327.309" />
+    <path id="bl_window" fill="#000000" d="M122.832,570.768V460.24l15.479,10.41c0,0-0.792,58.077-3.639,84.073c-0.646,5.896-1.373,11.265-2.108,16.043" />
+    <path id="fr_window" fill="#000000" d="M373.619,327.309c-3.664,21.346-8.422,50.332-9.846,64.781c-2.453,24.508-1.386,65.252-1.386,65.252l15.795-11.481V327.309" />
+    <path id="br_window" fill="#000000" d="M378.387,570.768V460.24l-15.521,10.41c0,0,0.791,58.077,3.639,84.073c0.637,5.896,1.357,11.265,2.092,16.043" />
+    <path id="windshield" fill="#000000" d="M250.607,253.641c0,0-91.982-1.088-120.27,43.172l17.668,75.016c0,0,42.429-7.545,102.602-7.545c60.096,0,102.563,7.545,102.563,7.545l17.707-75.016C342.553,252.553,250.607,253.641,250.607,253.641z" />
+    <path id="rear_windshield" fill="#000000" d="M364.67,656.664l-10.756-74.262c-0.021,0.012-0.049,0.024-0.072,0.034l-0.004-0.034c-24.109,12.133-101.676,12.981-103.268,12.996c-1.592-0.015-79.156-0.863-103.269-12.996l-0.005,0.034c-0.022-0.01-0.049-0.022-0.071-0.034l-10.755,74.262c27.011,22.287,84.556,28.242,114.062,28.225c0.013,0,0.025,0,0.037,0c0.013,0,0.025,0,0.037,0C280.115,684.906,337.66,678.951,364.67,656.664z" />
+    <path id="sunroof" fill="#000000" d="M322.984,464.123H178.191c-6.606,0-11.983-4.906-11.983-10.953v-47.884c0-6.063,5.377-10.952,11.983-10.952h144.793c6.606,0,11.944,4.889,11.944,10.952v47.884C334.93,459.217,329.59,464.123,322.984,464.123z" />
+    <path id="fl_tire" fill="#000000" d="M114.693,315.08h-3.396h-2.943h-1.261c-1.854,0-3.369-1.558-3.369-3.459v-88.294c0-1.9,1.517-3.458,3.369-3.458h1.261h2.943h3.396c0.928,0,1.685,0.778,1.685,1.729v91.754C116.377,314.301,115.621,315.08,114.693,315.08z" transform="rotate(0 110.051 267.475)" />
+    <path id="fr_tire" fill="#000000" d="M386.447,315.08h3.396h2.943h1.26c1.855,0,3.371-1.558,3.371-3.459v-88.294c0-1.9-1.518-3.458-3.371-3.458h-1.26h-2.943h-3.396c-0.926,0-1.685,0.778-1.685,1.729v91.754C384.764,314.301,385.521,315.08,386.447,315.08z" transform="rotate(0 391.09 267.475)" />
+    <path id="bl_tire" fill="#000000" d="M114,678.207h-3.396h-2.942H106.4c-1.854,0-3.369-1.557-3.369-3.457v-88.295c0-1.9,1.516-3.457,3.369-3.457h1.262h2.942H114c0.926,0,1.686,0.775,1.686,1.727v91.754C115.685,677.43,114.924,678.207,114,678.207z" />
+    <path id="br_tire" fill="#000000" d="M387.141,678.207h3.396h2.94h1.263c1.854,0,3.369-1.557,3.369-3.457v-88.295c0-1.9-1.517-3.457-3.369-3.457h-1.263h-2.94h-3.396c-0.924,0-1.686,0.775-1.686,1.727v91.754C385.457,677.43,386.215,678.207,387.141,678.207z" />
+    <path id="br_door" fill="none" stroke="#000000" stroke-width="4" stroke-miterlimit="10" d="M391.098,452.654c0,39.432,0,79.77,0,118.112" transform="rotate(0 391.098 452.654)" />
+    <path id="bl_door" fill="none" stroke="#000000" stroke-width="4" stroke-miterlimit="10" d="M110.043,452.654c0,39.432,0,79.77,0.001,118.112" transform="rotate(0 110.043 452.654)" />
+    <path id="fr_door" fill="none" stroke="#000000" stroke-width="4" stroke-miterlimit="10" d="M391.098,327.309c0,0,21.556,10.377,27.353,16.086c5.953,5.861,6.526,15.471,3.801,15.85c-2.799,0.361-26.408-8.572-26.408-8.572s-2.971-6.891-4.744-7.438c0,33.865,0,71.219,0,109.418" transform="rotate(0 391.098 327.309)" />
+    <path id="fl_door" fill="none" stroke="#000000" stroke-width="4" stroke-miterlimit="10" d="M110.044,327.309c0,0-21.557,10.377-27.352,16.086c-5.954,5.861-6.529,15.471-3.803,15.85c2.799,0.361,26.409-8.572,26.409-8.572s2.971-6.891,4.743-7.438c0,33.865,0,71.219,0,109.418" transform="rotate(0 110.044 327.309)" />
+    <path id="b_bumper" fill="none" stroke="#000000" stroke-width="4" stroke-miterlimit="10" d="M113.66,690.438c0.33,2.441,0.685,4.58,1.06,6.314c5.182,24.223,11.627,43.703,23.731,56.246c23.412,24.225,112.156,20.893,112.156,20.893s88.667,3.332,112.08-20.893c12.183-12.543,18.589-32.023,23.812-56.246c0.371-1.732,0.721-3.871,1.045-6.314" />
+    <path id="f_bumper" fill="none" stroke="#000000" stroke-width="4" stroke-miterlimit="10" d="M391.09,207.639c0-1.604,0-3.059,0-4.351c0-16.13-2.688-38.233-26.574-53.458c-20.016-12.798-70.877-24.682-113.908-24.682c-43.069,0-93.933,11.884-113.984,24.682c-23.811,15.225-26.578,37.328-26.578,53.458c0,1.292,0,2.747,0,4.351" />
+    <path id="l_headlight" fill="#000000" d="M177.361,139.521c-15.567,4.143-28.657,9.153-36.739,14.313c-7.522,4.81-12.944,10.306-16.842,16.083C123.781,169.916,141.604,175.277,177.361,139.521z" />
+    <path id="fl_indicator" fill="#000000" visibility="hidden" d="M123.779,169.917c0.001,0,2.458,0.736,7.373-0.163c0.71-1.818,1.503-3.578,2.393-5.272c2.454-4.708,6.675-9.21,12.012-13.464c-1.802,0.931-3.453,1.871-4.935,2.816C133.1,158.644,127.678,164.14,123.779,169.917z" />
+    <path id="l_taillight" fill="#000000" d="M141.05,748.306c0,0,3.243,15.914,17.005,19.806c12.737,3.602,40.817,4.146,40.817,4.146L141.05,748.306z" />
+    <path id="bl_indicator" fill="#000000" visibility="hidden" d="M158.055,768.111c0.932,0.264,1.953,0.509,3.032,0.74c-3.098-2.524-5.663-5.196-7.519-8.024c-1.909-2.891-3.515-6.035-4.91-9.37l-7.597-3.146c0.007,0.045,0.013,0.09,0.02,0.136C141.429,749.981,145.029,764.428,158.055,768.111z" />
+    <path id="r_headlight" fill="#000000" d="M377.372,169.924c-3.898-5.777-9.32-11.273-16.842-16.083c-8.082-5.159-21.172-10.169-36.74-14.313C359.548,175.285,377.372,169.924,377.372,169.924z" />
+    <path id="fr_indicator" fill="#000000" visibility="hidden" d="M377.372,169.925c-0.001,0-2.458,0.736-7.373-0.163c-0.71-1.818-1.503-3.578-2.393-5.272c-2.454-4.708-6.675-9.21-12.012-13.464c1.802,0.931,3.453,1.871,4.935,2.816C368.052,158.652,373.474,164.148,377.372,169.925z" />
+    <path id="r_taillight" fill="#000000" d="M360.085,748.302c0,0-3.242,15.914-17.004,19.806c-12.738,3.602-40.817,4.146-40.817,4.146L360.085,748.302z" />
+    <path id="br_indicator" fill="#000000" visibility="hidden" d="M343.091,768.103c-0.932,0.264-1.953,0.509-3.031,0.74c3.098-2.524,5.662-5.196,7.519-8.024c1.909-2.891,3.515-6.035,4.909-9.37l7.598-3.146c-0.007,0.045-0.014,0.09-0.02,0.136C359.718,749.973,356.117,764.419,343.091,768.103z" />
+    <g id="fl_pressure" fill="#000000" visibility="hidden" transform="rotate(0 56.667 266.127)">
+        <text id="fl_pressure_value" x="56.667" y="268.4639" text-anchor="middle" font-family="'TitilliumWeb-Regular'" font-size="40">--</text>
+        <text id="fl_pressure_unit" x="56.667" y="291.3418" text-anchor="middle" font-family="'Montserrat-Regular'" font-size="24">psi</text>
     </g>
+    <g id="bl_pressure" fill="#000000" visibility="hidden" transform="rotate(0 56.667 629.322)">
+        <text id="bl_pressure_value" x="56.667" y="631.6592" text-anchor="middle" font-family="'TitilliumWeb-Regular'" font-size="40">--</text>
+        <text id="bl_pressure_unit" x="56.667" y="654.5371" text-anchor="middle" font-family="'Montserrat-Regular'" font-size="24">psi</text>
+    </g>
+    <g id="fr_pressure" fill="#000000" visibility="hidden" transform="rotate(0 443.333 266.127)">
+        <text id="fr_pressure_value" x="443.333" y="268.4639" text-anchor="middle" font-family="'TitilliumWeb-Regular'" font-size="40">--</text>
+        <text id="fr_pressure_unit" x="443.333" y="291.3418" text-anchor="middle" font-family="'Montserrat-Regular'" font-size="24">psi</text>
+    </g>
+    <g id="br_pressure" fill="#000000" visibility="hidden" transform="rotate(0 443.333 629.322)">
+        <text id="br_pressure_value" x="443.333" y="631.6592" text-anchor="middle" font-family="'TitilliumWeb-Regular'" font-size="40">--</text>
+        <text id="br_pressure_unit" x="443.333" y="654.5371" text-anchor="middle" font-family="'Montserrat-Regular'" font-size="24">psi</text>
+    </g>
+    <path id="fl_sensor1" visibility="hidden" fill="none" stroke="#000000" stroke-width="4" stroke-linejoin="round" stroke-miterlimit="10" d="M171.032,126.231c-19.479,5.455-35.993,12.345-45.803,19.459c-19.047,13.84-25.854,32.226-28.148,48.98" />
+    <path id="fl_sensor2" visibility="hidden" fill="none" stroke="#000000" stroke-width="3" stroke-linejoin="round" stroke-miterlimit="10" d="M155.517,110.717c-18.118,6.361-33.325,13.969-42.822,21.797c-16.896,13.951-25.035,31.599-28.877,48.893" />
+    <path id="fl_sensor3" visibility="hidden" fill="none" stroke="#000000" stroke-width="2" stroke-linejoin="round" stroke-miterlimit="10" d="M138.665,93.865c-16.683,7.278-30.622,15.624-39.757,24.181c-15.248,14.307-24.012,31.723-29.002,49.453" />
+    <path id="fl_sensor4" visibility="hidden" fill="none" stroke="#000000" stroke-linejoin="round" stroke-miterlimit="10" d="M120.261,75.461c-15.154,8.17-27.818,17.234-36.52,26.494c-13.938,14.859-22.95,32.405-28.748,50.629" />
+    <path id="fml_sensor1" visibility="hidden" fill="none" stroke="#000000" stroke-width="4" stroke-linejoin="round" stroke-miterlimit="10" d="M250.613,114.838c-26.308,0-55.258,4.579-79.581,11.393" />
+    <path id="fml_sensor2" visibility="hidden" fill="none" stroke="#000000" stroke-width="3" stroke-linejoin="round" stroke-miterlimit="10" d="M250.618,93.95c-31.718,0-66.928,6.877-95.101,16.768" />
+    <path id="fml_sensor3" visibility="hidden" fill="none" stroke="#000000" stroke-width="2" stroke-linejoin="round" stroke-miterlimit="10" d="M250.623,69.838c-37.707,0-79.898,10.041-111.958,24.025" />
+    <path id="fml_sensor4" visibility="hidden" fill="none" stroke="#000000" stroke-linejoin="round" stroke-miterlimit="10" d="M250.628,41.7c-44.372,0-94.39,14.363-130.367,33.762" />
+    <path id="fmr_sensor1" visibility="hidden" fill="none" stroke="#000000" stroke-width="4" stroke-linejoin="round" stroke-miterlimit="10" d="M329.395,126.02c-24.153-6.696-52.77-11.182-78.781-11.182" />
+    <path id="fmr_sensor2" visibility="hidden" fill="none" stroke="#000000" stroke-width="3" stroke-linejoin="round" stroke-miterlimit="10" d="M344.945,110.467c-28.037-9.756-62.908-16.518-94.328-16.518" />
+    <path id="fmr_sensor3" visibility="hidden" fill="none" stroke="#000000" stroke-width="2" stroke-linejoin="round" stroke-miterlimit="10" d="M361.844,93.573c-31.957-13.833-73.814-23.734-111.222-23.734" />
+    <path id="fmr_sensor4" visibility="hidden" fill="none" stroke="#000000" stroke-linejoin="round" stroke-miterlimit="10" d="M380.297,75.127C344.391,55.899,294.703,41.7,250.629,41.7" />
+    <path id="fr_sensor1" visibility="hidden" fill="none" stroke="#000000" stroke-width="4" stroke-linejoin="round" stroke-miterlimit="10" d="M404.068,194.662c-2.277-16.753-9.056-35.136-28.16-48.974c-9.916-7.205-26.717-14.18-46.515-19.668" />
+    <path id="fr_sensor2" visibility="hidden" fill="none" stroke="#000000" stroke-width="3" stroke-linejoin="round" stroke-miterlimit="10" d="M417.344,181.389c-3.826-17.287-11.955-34.928-28.899-48.875c-9.604-7.931-25.076-15.635-43.498-22.047" />
+    <path id="fr_sensor3" visibility="hidden" fill="none" stroke="#000000" stroke-width="2" stroke-linejoin="round" stroke-miterlimit="10" d="M431.264,167.473c-4.979-17.723-13.744-35.129-29.032-49.43c-9.238-8.67-23.418-17.125-40.388-24.471" />
+    <path id="fr_sensor4" visibility="hidden" fill="none" stroke="#000000" stroke-linejoin="round" stroke-miterlimit="10" d="M446.182,152.549c-5.793-18.211-14.813-35.742-28.784-50.593c-8.804-9.386-21.683-18.571-37.103-26.829" />
+    <path id="bl_sensor1" visibility="hidden" fill="none" stroke="#000000" stroke-width="4" stroke-miterlimit="10" d="M103.667,700.43c5.313,24.479,12.153,44.308,23.575,57.756c11.573,13.607,37.661,20.261,62.881,23.459" />
+    <path id="bl_sensor2" visibility="hidden" fill="none" stroke="#000000" stroke-width="3" stroke-miterlimit="10" d="M91.459,712.637c5.498,25.033,12.592,45.513,23.447,60.035c10.859,14.51,33.335,22.691,56.925,27.266" />
+    <path id="bl_sensor3" visibility="hidden" fill="none" stroke="#000000" stroke-width="2" stroke-miterlimit="10" d="M78.08,726.018c5.681,25.744,12.917,47.043,23.256,62.763c10.078,15.303,29.253,24.975,50.587,31.059" />
+    <path id="bl_sensor4" visibility="hidden" fill="none" stroke="#000000" stroke-miterlimit="10" d="M63.359,740.746c5.848,26.711,13.159,49.076,23.051,66.166c9.199,15.873,25.288,26.897,43.904,34.539" />
+    <path id="bml_sensor1" visibility="hidden" fill="none" stroke="#000000" stroke-width="4" stroke-miterlimit="10" d="M190.124,781.645c30.898,3.921,60.492,2.656,60.492,2.656" />
+    <path id="bml_sensor2" visibility="hidden" fill="none" stroke="#000000" stroke-width="3" stroke-miterlimit="10" d="M171.832,799.938c37.95,7.359,78.785,5.38,78.785,5.38" />
+    <path id="bml_sensor3" visibility="hidden" fill="none" stroke="#000000" stroke-width="2" stroke-miterlimit="10" d="M151.922,819.838c44.627,12.728,98.695,9.746,98.695,9.746" />
+    <path id="bml_sensor4" visibility="hidden" fill="none" stroke="#000000" stroke-miterlimit="10" d="M130.314,841.451c50.754,20.824,120.305,16.471,120.305,16.471" />
+    <path id="bmr_sensor1" visibility="hidden" fill="none" stroke="#000000" stroke-width="4" stroke-miterlimit="10" d="M250.616,784.301c0,0,29.542,1.263,60.403-2.651" />
+    <path id="bmr_sensor2" visibility="hidden" fill="none" stroke="#000000" stroke-width="3" stroke-miterlimit="10" d="M250.617,805.316c0,0,40.781,1.979,78.698-5.375" />
+    <path id="bmr_sensor3" visibility="hidden" fill="none" stroke="#000000" stroke-width="2" stroke-miterlimit="10" d="M250.618,829.584c0,0,54.003,2.979,98.595-9.74" />
+    <path id="bmr_sensor4" visibility="hidden" fill="none" stroke="#000000" stroke-miterlimit="10" d="M250.619,857.92c0,0,69.484,4.354,120.206-16.469" />
+    <path id="br_sensor1" visibility="hidden" fill="none" stroke="#000000" stroke-width="4" stroke-miterlimit="10" d="M311.02,781.648c25.214-3.195,51.304-9.849,62.884-23.464c11.491-13.446,18.311-33.271,23.645-57.743" />
+    <path id="br_sensor2" visibility="hidden" fill="none" stroke="#000000" stroke-width="3" stroke-miterlimit="10" d="M329.314,799.941c23.582-4.572,46.055-12.757,56.918-27.271c10.922-14.522,18.008-34.998,23.518-60.029" />
+    <path id="br_sensor3" visibility="hidden" fill="none" stroke="#000000" stroke-width="2" stroke-miterlimit="10" d="M349.213,819.844c21.326-6.084,40.5-15.758,50.582-31.063c10.404-15.72,17.646-37.017,23.332-62.761" />
+    <path id="br_sensor4" visibility="hidden" fill="none" stroke="#000000" stroke-miterlimit="10" d="M370.824,841.451c18.606-7.639,34.688-18.666,43.891-34.539c9.955-17.092,17.275-39.459,23.131-66.176" />
+    <path id="_1" fill="#000000" d="M368.596,570.768c2.504,16.285,5.16,25.726,5.16,25.726l4.631-19.771v-5.95" />
+    <path id="_2" fill="#000000" d="M132.564,570.768c-2.512,16.285-5.146,25.726-5.146,25.726l-4.588-19.771v-5.95" />
+    <path id="_3" fill="#000000" d="M378.184,327.309v-25.988c0,0-2.02,11.148-4.563,25.988" />
+    <path id="_4" fill="#000000" d="M122.99,327.309v-25.988c0,0,2.02,11.148,4.57,25.988" />
 </svg>
