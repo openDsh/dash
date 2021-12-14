@@ -27,6 +27,12 @@ class StepMeter : public QFrame {
    protected:
     void paintEvent(QPaintEvent *event) override;
 
+    void resizeEvent(QResizeEvent *event)
+    {
+        // idk why this works but oh 🐳
+        this->updateGeometry();
+    }
+
    private:
     void update_base_colors();
     void update_bar_colors();

@@ -30,6 +30,7 @@ Page::Page(Arbiter &arbiter, QString name, QString icon_name, bool toggleable, Q
     , icon_name_(icon_name)
     , toggleable_(toggleable)
     , widget_(widget)
+    , button_(new QPushButton())
     , enabled_(true)
 {
 }

@@ -18,6 +18,7 @@
 #include "app/pages/media.hpp"
 #include "app/pages/settings.hpp"
 #include "app/quick_views/combo.hpp"
+#include "app/utilities/icon_engine.hpp"
 #include "plugins/brightness_plugin.hpp"
 
 #include "app/session.hpp"
@@ -77,55 +78,6 @@ QPalette Session::Theme::palette() const
     palette.setColor(QPalette::AlternateBase, color);
 
     return palette;
-}
-
-void Session::Theme::colorize(QAbstractButton *button) const
-{
-    QSize size(512, 512);
-    auto icon_mask = button->icon().pixmap(size).createMaskFromColor(Qt::transparent);
-    QBitmap alt_icon_mask;
-    {
-        auto alt_icon = button->property("alt_icon").value<QIcon>();
-        if (!alt_icon.isNull())
-            alt_icon_mask = alt_icon.pixmap(size).createMaskFromColor(Qt::transparent);
-    }
-
-    auto base_color = this->base_color();
-    base_color.setAlpha((this->mode == Session::Theme::Light) ? 255 : 222);
-    auto accent_color = this->color();
-    accent_color.setAlpha((this->mode == Session::Theme::Light) ? 255 : 222);
-
-    QPixmap normal_on(size);
-    normal_on.fill(!button->property("color_hint").isNull() ? accent_color : base_color);
-    normal_on.setMask(!alt_icon_mask.isNull() ? alt_icon_mask : icon_mask);
-
-    QPixmap normal_off(size);
-    {
-        auto color = base_color;
-        if (!button->property("color_hint").isNull())
-            color.setAlpha((this->mode == Session::Theme::Light) ? 162 : 134);
-        normal_off.fill(color);
-        normal_off.setMask(icon_mask);
-    }
-
-    QPixmap disabled_on(size);
-    QPixmap disabled_off(size);
-    {
-        auto color = base_color;
-        color.setAlpha((this->mode == Session::Theme::Light) ? 97 : 128);
-        disabled_on.fill(color);
-        disabled_on.setMask(!alt_icon_mask.isNull() ? alt_icon_mask : icon_mask);
-        disabled_off.fill(color);
-        disabled_off.setMask(icon_mask);
-    }
-
-    QIcon colored_icon;
-    colored_icon.addPixmap(disabled_on, QIcon::Disabled, QIcon::On);
-    colored_icon.addPixmap(disabled_off, QIcon::Disabled, QIcon::Off);
-    colored_icon.addPixmap(normal_on, QIcon::Normal, QIcon::On);
-    colored_icon.addPixmap(normal_off, QIcon::Normal, QIcon::Off);
-    button->setIcon(colored_icon);
-    button->setProperty("colorized", true);
 }
 
 Session::Layout::ControlBar::ControlBar(QSettings &settings, Arbiter &arbiter)
@@ -307,25 +259,24 @@ Session::Forge::Forge(Arbiter &arbiter)
 {
 }
 
-void Session::Forge::iconize(QString name, QAbstractButton *button, uint8_t size, bool dynamic) const
+void Session::Forge::iconize(QString name, QAbstractButton *button, uint8_t size) const
+{
+    this->iconize(name, QString(), button, size);
+}
+
+void Session::Forge::iconize(QString name, QString alt_name, QAbstractButton *button, uint8_t size) const
+{
+    QIcon icon(new IconEngine(this->arbiter_, QString(":/icons/%1.svg").arg(name), false));
+    if (!alt_name.isNull())
+        icon.addFile(QString(":/icons/%1.svg").arg(alt_name), QSize(), QIcon::Normal, QIcon::On);
+    this->iconize(icon, button, size);
+}
+
+void Session::Forge::iconize(QIcon &icon, QAbstractButton *button, uint8_t size) const
 {
     auto scaled = size * this->arbiter_.layout().scale;
     button->setIconSize(QSize(scaled, scaled));
-    this->set_icon(name, button, dynamic);
-}
-
-void Session::Forge::set_icon(QString name, QAbstractButton *button, bool dynamic) const
-{
-    button->setIcon(QIcon(QString(":/icons/%1.svg").arg(name)));
-    button->setProperty("colorized",false);
-    if (dynamic)
-        this->arbiter_.theme().colorize(button);
-}
-
-void Session::Forge::iconize(QString name, QString alt_name, QAbstractButton *button, uint8_t size, bool dynamic) const
-{
-    button->setProperty("alt_icon", QVariant::fromValue(QIcon(QString(":/icons/%1.svg").arg(alt_name))));
-    this->iconize(name, button, size, dynamic);
+    button->setIcon(icon);
 }
 
 QFont Session::Forge::font(int size, bool mono) const
@@ -497,11 +448,5 @@ void Session::update()
     if (qApp) {
         qApp->setPalette(this->theme_.palette());
         qApp->setStyleSheet(this->core_.stylesheet(this->theme_.mode, this->layout_.scale));
-
-        for (QWidget *widget : qApp->allWidgets()) {
-	  if( auto button = qobject_cast<QAbstractButton*>(widget) )
-            if (button->property("colorized").toBool())
-                this->theme_.colorize(button);
-        }
     }
 }

@@ -24,6 +24,12 @@ class ClimateState : public QFrame {
    protected:
     void paintEvent(QPaintEvent *event) override;
 
+    void resizeEvent(QResizeEvent *event)
+    {
+        // idk why this works but oh 🐳
+        this->updateGeometry();
+    }
+
    private:
     QColor color = Qt::transparent;
 
