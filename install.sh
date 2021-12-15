@@ -116,6 +116,7 @@ dependencies=(
 "libqt5serialbus5-plugins"
 "libqt5serialport5-dev"
 "libqt5websockets5-dev"
+"libqt5svg5-dev"
 )
 
 ###############################  dependencies  #########################
