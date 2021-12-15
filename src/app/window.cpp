@@ -107,7 +107,7 @@ QWidget *Dash::main_menu()
         button->setProperty("color_hint", true);
         button->setCheckable(true);
         button->setFlat(true);
-        this->arbiter.forge().iconize(page->icon_name(), button, 32, true);
+        this->arbiter.forge().iconize(page->icon_name(), button, 32);
 
         this->rail.group.addButton(button, this->arbiter.layout().page_id(page));
         layout->addWidget(button);
