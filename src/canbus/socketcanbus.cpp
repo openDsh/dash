@@ -3,18 +3,38 @@
 SocketCANBus::SocketCANBus(QString canInterface)
 {
     if (QCanBus::instance()->plugins().contains(QStringLiteral("socketcan"))) {
+        QString errorString;
+        // const QList<QCanBusDeviceInfo> devices = ;
+        // if (!errorString.isEmpty()) {
+        //     DASH_LOG(error) << errorString;
+        //     return;
+        // }
+        auto devices = QCanBus::instance()->availableDevices(
+                QStringLiteral("socketcan"), &errorString);
+        DASH_LOG(info) <<"[SocketCANBus] Found socket can devices (nct): "<<devices.length();
+        for (auto device:QCanBus::instance()->availableDevices(
+            QStringLiteral("socketcan"), &errorString)) {
+            if (device.name() == "can0")
+                DASH_LOG(info) <<"[SocketCANBus] Found can0 device: "<<device.name().toStdString();
+            else
+                DASH_LOG(info) <<"[SocketCANBus] Found some other device: ";
+        }
+
         DASH_LOG(info) << "[SocketCANBus] 'socketcan' Available";
         socketCANAvailable = true;
-        QString errorString;
         bus = QCanBus::instance()->createDevice(
             QStringLiteral("socketcan"), canInterface, &errorString);
         if (!bus) {
             DASH_LOG(error) <<"[SocketCANBus] Error creating CAN device, " << errorString.toStdString();
         } else {
             DASH_LOG(info) <<"[SocketCANBus] Connecting CAN interface "<<canInterface.toStdString();
-            bus->connectDevice();
-            connect(bus, &QCanBusDevice::framesReceived,
-                     this, &SocketCANBus::framesAvailable);
+            if (bus->connectDevice()) {
+                connect(bus, &QCanBusDevice::framesReceived, this, &SocketCANBus::framesAvailable);
+                DASH_LOG(info) <<"[SocketCANBus] Connected "<<canInterface.toStdString();
+            } else {
+                DASH_LOG(error) <<"[SocketCANBus] Error connecting CAN device";
+                bus = NULL;
+            }
         }
     }
 }
@@ -29,6 +49,7 @@ SocketCANBus::~SocketCANBus()
 
 bool SocketCANBus::writeFrame(QCanBusFrame frame)
 {
+    if(bus && bus->state() != QCanBusDevice::ConnectedState) return false;
     return bus->writeFrame(frame);
 }
 
@@ -49,6 +70,7 @@ QVector<QCanBusFrame> SocketCANBus::readAllFrames(int numFrames){
 
 void SocketCANBus::framesAvailable()
 {
+    if(bus && bus->state() != QCanBusDevice::ConnectedState) return;
     int numFrames = bus->framesAvailable();
     if(numFrames>0){
         QVector<QCanBusFrame> frames =  readAllFrames(numFrames);
@@ -62,8 +84,8 @@ void SocketCANBus::framesAvailable()
             }
         }
     }
-    
-} 
+
+}
 
 
 void SocketCANBus::registerFrameHandler(int id, std::function<void(QByteArray)> callback)
