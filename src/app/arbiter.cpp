@@ -104,7 +104,6 @@ void Arbiter::set_curr_page(Page *page)
 {
     if (this->layout().page_id(page) < 0 || !page->enabled())
         return;
-
     this->layout().curr_page = page;
 
     emit curr_page_changed(page);

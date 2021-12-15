@@ -161,8 +161,8 @@ RadioPlayerTab::RadioPlayerTab(Arbiter &arbiter, QWidget *parent)
 
     auto layout = new QVBoxLayout(this);
     layout->addStretch(1);
-    layout->addWidget(this->tuner_widget(), 2);
-    layout->addWidget(this->controls_widget(), 4);
+    layout->addWidget(this->tuner_widget(), 1);
+    layout->addWidget(this->controls_widget(), 3);
     layout->addStretch(1);
 
     this->load_plugin();

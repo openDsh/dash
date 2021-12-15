@@ -46,17 +46,15 @@ class Session {
 
         Theme(QSettings &settings);
         QPalette palette() const;
-        void colorize(QAbstractButton *button) const;
 
         QColor &color(Mode mode) { return this->colors_[mode]; }
         QColor color(Mode mode) const { return this->colors_[mode]; }
         QColor &color() { return this->colors_[this->mode]; }
         QColor color() const { return this->colors_[this->mode]; }
+        QColor base_color() const { return (this->mode == Light) ? QColor(0, 0, 0) : QColor(255, 255, 255); }
 
        private:
         std::array<QColor, NUM_MODES> colors_;
-
-        QColor base_color() const { return (this->mode == Light) ? QColor(0, 0, 0) : QColor(255, 255, 255); }
     };
 
     struct Layout {
@@ -143,9 +141,9 @@ class Session {
         static void symbolize(QAbstractButton *button);
 
         Forge(Arbiter &arbiter);
-        void iconize(QString name, QAbstractButton *button, uint8_t size, bool dynamic = false) const;
-        void iconize(QString name, QString alt_name, QAbstractButton *button, uint8_t size, bool dynamic = false) const;
-        void set_icon(QString name, QAbstractButton *button, bool dynamic) const;
+        void iconize(QString name, QAbstractButton *button, uint8_t size) const;
+        void iconize(QString name, QString alt_name, QAbstractButton *button, uint8_t size) const;
+        void iconize(QIcon &icon, QAbstractButton *button, uint8_t size) const;
         QFont font(int size, bool mono = false) const;
         QWidget *brightness_slider(bool buttons = true) const;
         QWidget *volume_slider(bool buttons = true) const;

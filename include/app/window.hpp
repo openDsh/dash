@@ -41,7 +41,6 @@ class Dash : public QWidget {
     NavRail rail;
     Body body;
 
-    void init_connected_pages();
     void set_page(Page *page);
     int menu_width;
     int control_bar_height;

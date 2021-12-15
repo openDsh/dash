@@ -122,6 +122,7 @@ class OpenAutoPage : public QStackedWidget, public Page {
     Config *config;
     OpenAutoFrame *frame;
     OpenAutoWorker *worker;
+    const QString connected_icon_name;
 
    signals:
     void toggle_fullscreen(bool fullscreen);

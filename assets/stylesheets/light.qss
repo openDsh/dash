@@ -271,6 +271,14 @@ ClimateState {
     qproperty-color: rgb(0, 0, 0);
 }
 
+VehicleState {
+    qproperty-base_color: rgb(0, 0, 0);
+    qproperty-headlight_color: #03A9F4;
+    qproperty-taillight_color: #F44336;
+    qproperty-indicator_color: #FF9800;
+    qproperty-warning_color: #F4511E;
+}
+
 QDialog,
 QDialog > QFrame {
     background-color: rgb(255, 255, 255);

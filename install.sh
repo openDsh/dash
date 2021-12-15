@@ -94,6 +94,7 @@ dependencies=(
 "libqt5bluetooth5-bin"
 "qtconnectivity5-dev"
 "pulseaudio"
+"pulseaudio-module-bluetooth"
 "librtaudio-dev"
 "librtaudio6"
 "libkf5bluezqt-dev"
@@ -115,6 +116,7 @@ dependencies=(
 "libqt5serialbus5-plugins"
 "libqt5serialport5-dev"
 "libqt5websockets5-dev"
+"libqt5svg5-dev"
 )
 
 ###############################  dependencies  #########################
@@ -127,9 +129,9 @@ if [ $deps = false ]
     echo Running apt update
     sudo apt update
 
-    installString="sudo apt install -y "
+    installString="sudo apt-get install -y "
 
-    #create apt install string
+    #create apt-get install string
     for i in ${dependencies[@]}; do
       installString+=" $i"
     done

@@ -14,22 +14,21 @@ ClimateState::ClimateState(Arbiter &arbiter, QWidget *parent)
     , body(QIcon(":/icons/chevron_right.svg").pixmap(512, 512))
     , feet(QIcon(":/icons/expand_more.svg").pixmap(512, 512))
 {
-    this->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+    this->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Ignored);
 
     this->scale = arbiter.layout().scale;
 }
 
 QSize ClimateState::sizeHint() const
 {
-    int size = 52 * this->scale;
-    return QSize(size, size);
+    return QSize(this->height(), this->height());
 }
 
 void ClimateState::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
 
-    int ref_size = 52 * this->scale;
+    int ref_size = std::min(this->height(), this->width());
     int state_size = ref_size / 3;
 
     int x_offset = std::max(0, (this->width() - ref_size) / 2);
@@ -66,17 +65,17 @@ void ClimateState::paintEvent(QPaintEvent *)
 void ClimateState::toggle_defrost(bool enabled)
 {
     this->defrost_state = enabled;
-    this->repaint();
+    this->update();
 }
 
 void ClimateState::toggle_body(bool enabled)
 {
     this->body_state = enabled;
-    this->repaint();
+    this->update();
 }
 
 void ClimateState::toggle_feet(bool enabled)
 {
     this->feet_state = enabled;
-    this->repaint();
+    this->update();
 }

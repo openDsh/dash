@@ -404,7 +404,7 @@ QLayout *OpenAutoPage::Settings::buttons_row_widget()
 OpenAutoPage::OpenAutoPage(Arbiter &arbiter, QWidget *parent)
     : QStackedWidget(parent)
     , Page(arbiter, "Android Auto", "android_auto", true, this)
-    , connected_icon_name_("android_auto_color")
+    , connected_icon_name("android_auto_color")
 {
 }
 
@@ -421,6 +421,14 @@ void OpenAutoPage::init()
         DASH_LOG(info)<<"[OpenAutoPage] Connected status: "<<enable;
         this->setCurrentIndex(enable ? 1 : 0);
         this->device_connected = enable;
+        if (Config::get_instance()->get_show_aa_connected()) {
+            auto icon = this->button()->icon();
+            if (enable)
+                icon.addFile(QString(":/icons/%1.svg").arg(this->connected_icon_name), QSize(), QIcon::Active, QIcon::On);
+            else
+                icon.addFile(QString(":/icons/%1.svg").arg(this->icon_name()), QSize(), QIcon::Active, QIcon::Off);
+            this->button()->setIcon(icon);
+        }
         emit connected(enable);
     });
     connect(this->frame, &OpenAutoFrame::double_clicked, [this]() {
