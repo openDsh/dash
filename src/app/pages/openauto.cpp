@@ -418,9 +418,8 @@ void OpenAutoPage::init()
     this->worker = new OpenAutoWorker(callback, this->arbiter.theme().mode == Session::Theme::Dark, frame);
 
     connect(this->frame, &OpenAutoFrame::toggle, [this](bool enable) {
-        DASH_LOG(info)<<"[OpenAutoPage] Connected status: "<<enable;
         this->setCurrentIndex(enable ? 1 : 0);
-        this->device_connected = enable;
+
         if (Config::get_instance()->get_show_aa_connected()) {
             auto icon = this->button()->icon();
             if (enable)
