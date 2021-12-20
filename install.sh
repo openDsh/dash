@@ -108,7 +108,6 @@ dependencies=(
 "gstreamer1.0-alsa"
 "libgstreamer-plugins-base1.0-dev"
 "qtdeclarative5-dev"
-"qt5-default"
 "libgstreamer-plugins-bad1.0-dev"
 "libunwind-dev"
 "qml-module-qtmultimedia"
@@ -246,6 +245,10 @@ if [ $gstreamer = true ]; then
 
   #change into newly cloned directory
   cd qt-gstreamer
+
+  #apply 1.18 patch
+  echo Applying qt-gstreamer 1.18 patch
+  git apply $script_path/qt-gstreamer-1.18.patch
 
   #create build directory
   echo Creating Gstreamer build directory
