@@ -248,7 +248,11 @@ if [ $gstreamer = true ]; then
 
   #apply 1.18 patch
   echo Applying qt-gstreamer 1.18 patch
-  git apply $script_path/qt-gstreamer-1.18.patch
+  git apply $script_path/patches/qt-gstreamer-1.18.patch
+
+  #apply greenline patch
+  echo Apply greenline patch
+  git apply $script_patch/patches/greenline_fix.patch
 
   #create build directory
   echo Creating Gstreamer build directory

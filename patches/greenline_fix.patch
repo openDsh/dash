@@ -1,0 +1,17 @@
+diff --git a/elements/gstqtvideosink/painters/videomaterial.cpp b/elements/gstqtvideosink/painters/videomaterial.cpp
+index 7221aa5..958931d 100644
+--- a/elements/gstqtvideosink/painters/videomaterial.cpp
++++ b/elements/gstqtvideosink/painters/videomaterial.cpp
+@@ -305,10 +305,10 @@ void VideoMaterial::initYuv420PTextureInfo(bool uvSwapped, const QSize &size)
+     m_textureWidths[0] = bytesPerLine;
+     m_textureHeights[0] = size.height();
+     m_textureOffsets[0] = 0;
+-    m_textureWidths[1] = bytesPerLine2;
++    m_textureWidths[1] = bytesPerLine/2;
+     m_textureHeights[1] = size.height() / 2;
+     m_textureOffsets[1] = bytesPerLine * size.height();
+-    m_textureWidths[2] = bytesPerLine2;
++    m_textureWidths[2] = bytesPerLine/2;
+     m_textureHeights[2] = size.height() / 2;
+     m_textureOffsets[2] = bytesPerLine * size.height() + bytesPerLine2 * size.height()/2;
+ 
