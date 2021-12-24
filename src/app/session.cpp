@@ -19,6 +19,8 @@
 #include "app/pages/settings.hpp"
 #include "app/quick_views/combo.hpp"
 #include "plugins/brightness_plugin.hpp"
+#include "AAInterface.hpp"
+#include "aasdk_proto/ButtonCodeEnum.pb.h"
 
 #include "app/session.hpp"
 
@@ -411,24 +413,43 @@ Session::Core::Core(QSettings &settings, Arbiter &arbiter)
 {
     this->stylesheets_[Session::Theme::Light] = this->parse_stylesheet(":/stylesheets/light.qss");
     this->stylesheets_[Session::Theme::Dark] = this->parse_stylesheet(":/stylesheets/dark.qss");
-
+    AAInterface *aa_interface = AAInterface::get_instance();
     this->actions_ = {
-        new Action("Toggle Dark Mode", [&arbiter]{ arbiter.toggle_mode(); }, arbiter.window()),
-        new Action("Decrease Brightness", [&arbiter]{ arbiter.decrease_brightness(4); }, arbiter.window()),
-        new Action("Increase Brightness", [&arbiter]{ arbiter.increase_brightness(4); }, arbiter.window()),
-        new Action("Decrease Volume", [&arbiter]{ arbiter.decrease_volume(2); }, arbiter.window()),
-        new Action("Increase Volume", [&arbiter]{ arbiter.increase_volume(2); }, arbiter.window())
+        new Action("Android Auto Left", [&arbiter, aa_interface](Action::ActionState actionState){ aa_interface->injectButtonPressHelper(aasdk::proto::enums::ButtonCode::LEFT, actionState); }, arbiter.window()),
+        new Action("Android Auto Enter", [&arbiter, aa_interface](Action::ActionState actionState){ aa_interface->injectButtonPressHelper(aasdk::proto::enums::ButtonCode::ENTER, actionState); }, arbiter.window()),
+        new Action("Android Auto Right", [&arbiter, aa_interface](Action::ActionState actionState){ aa_interface->injectButtonPressHelper(aasdk::proto::enums::ButtonCode::RIGHT, actionState); }, arbiter.window()),
+        new Action("Android Auto Up", [&arbiter, aa_interface](Action::ActionState actionState){ aa_interface->injectButtonPressHelper(aasdk::proto::enums::ButtonCode::UP, actionState); }, arbiter.window()),
+        new Action("Android Auto Down", [&arbiter, aa_interface](Action::ActionState actionState){ aa_interface->injectButtonPressHelper(aasdk::proto::enums::ButtonCode::DOWN, actionState); }, arbiter.window()),
+        new Action("Android Auto Back", [&arbiter, aa_interface](Action::ActionState actionState){ aa_interface->injectButtonPressHelper(aasdk::proto::enums::ButtonCode::BACK, actionState); }, arbiter.window()),
+        new Action("Android Auto Home", [&arbiter, aa_interface](Action::ActionState actionState){ aa_interface->injectButtonPressHelper(aasdk::proto::enums::ButtonCode::HOME, actionState); }, arbiter.window()),
+        new Action("Android Auto Phone", [&arbiter, aa_interface](Action::ActionState actionState){ aa_interface->injectButtonPressHelper(aasdk::proto::enums::ButtonCode::PHONE, actionState); }, arbiter.window()),
+        new Action("Android Auto Call End", [&arbiter, aa_interface](Action::ActionState actionState){ aa_interface->injectButtonPressHelper(aasdk::proto::enums::ButtonCode::CALL_END, actionState); }, arbiter.window()),
+        new Action("Android Auto Play", [&arbiter, aa_interface](Action::ActionState actionState){ aa_interface->injectButtonPressHelper(aasdk::proto::enums::ButtonCode::PLAY, actionState); }, arbiter.window()),
+        new Action("Android Auto Pause", [&arbiter, aa_interface](Action::ActionState actionState){ aa_interface->injectButtonPressHelper(aasdk::proto::enums::ButtonCode::PAUSE, actionState); }, arbiter.window()),
+        new Action("Android Auto Prev Track", [&arbiter, aa_interface](Action::ActionState actionState){ aa_interface->injectButtonPressHelper(aasdk::proto::enums::ButtonCode::PREV, actionState); }, arbiter.window()),
+        new Action("Android Auto Next Track", [&arbiter, aa_interface](Action::ActionState actionState){ aa_interface->injectButtonPressHelper(aasdk::proto::enums::ButtonCode::NEXT, actionState); }, arbiter.window()),
+        new Action("Android Auto Toggle Play", [&arbiter, aa_interface](Action::ActionState actionState){ aa_interface->injectButtonPressHelper(aasdk::proto::enums::ButtonCode::TOGGLE_PLAY, actionState); }, arbiter.window()),
+        new Action("Android Auto Voice", [&arbiter, aa_interface](Action::ActionState actionState){ aa_interface->injectButtonPressHelper(aasdk::proto::enums::ButtonCode::MICROPHONE_1, actionState); }, arbiter.window()),
+        new Action("Android Auto Scroll Up", [&arbiter, aa_interface](Action::ActionState actionState){ if(actionState == Action::ActionState::Activated || actionState == Action::ActionState::Triggered) aa_interface->injectButtonPress(aasdk::proto::enums::ButtonCode::SCROLL_WHEEL, openauto::projection::WheelDirection::RIGHT); }, arbiter.window()),
+        new Action("Android Auto Scroll Down", [&arbiter, aa_interface](Action::ActionState actionState){ if(actionState == Action::ActionState::Activated || actionState == Action::ActionState::Triggered) aa_interface->injectButtonPress(aasdk::proto::enums::ButtonCode::SCROLL_WHEEL, openauto::projection::WheelDirection::LEFT); }, arbiter.window()),
+
+        new Action("Toggle Dark Mode", [&arbiter](Action::ActionState actionState){ if(actionState == Action::ActionState::Triggered || actionState == Action::ActionState::Activated) arbiter.toggle_mode(); }, arbiter.window()),
+        new Action("Decrease Brightness", [&arbiter](Action::ActionState actionState){ if(actionState == Action::ActionState::Triggered || actionState == Action::ActionState::Activated) arbiter.decrease_brightness(4); }, arbiter.window()),
+        new Action("Increase Brightness", [&arbiter](Action::ActionState actionState){ if(actionState == Action::ActionState::Triggered || actionState == Action::ActionState::Activated) arbiter.increase_brightness(4); }, arbiter.window()),
+        new Action("Decrease Volume", [&arbiter](Action::ActionState actionState){ if(actionState == Action::ActionState::Triggered || actionState == Action::ActionState::Activated) arbiter.decrease_volume(2); }, arbiter.window()),
+        new Action("Increase Volume", [&arbiter](Action::ActionState actionState){ if(actionState == Action::ActionState::Triggered || actionState == Action::ActionState::Activated) arbiter.increase_volume(2); }, arbiter.window())
     };
 
     for (auto page : arbiter.layout().pages()) {
-        auto callback = [&arbiter, page]{ arbiter.set_curr_page(page); };
+        auto callback = [&arbiter, page](Action::ActionState actionState){ if(actionState == Action::ActionState::Triggered || actionState == Action::ActionState::Activated) arbiter.set_curr_page(page); };
         this->actions_.append(new Action(QString("Show %1 Page").arg(page->name()), callback, arbiter.window()));
     }
 
     {
-        auto callback = [&arbiter]{ arbiter.set_curr_page(arbiter.layout().next_enabled_page(arbiter.layout().curr_page)); };
+        auto callback = [&arbiter](Action::ActionState actionState){ if(actionState == Action::ActionState::Triggered || actionState == Action::ActionState::Activated) arbiter.set_curr_page(arbiter.layout().next_enabled_page(arbiter.layout().curr_page)); };
         this->actions_.append(new Action("Cycle Page", callback, arbiter.window()));
     }
+
 
     settings.beginGroup("Core");
     settings.beginGroup("Action");

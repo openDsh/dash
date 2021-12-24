@@ -55,8 +55,8 @@ class Window : public QMainWindow {
 
    protected:
     void showEvent(QShowEvent *event);
-    void keyPressEvent(QKeyEvent *event);
-    void keyReleaseEvent(QKeyEvent *event);
+    // void keyPressEvent(QKeyEvent *event);
+    // void keyReleaseEvent(QKeyEvent *event);
 
    private:
     Arbiter arbiter;

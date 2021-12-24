@@ -13,6 +13,8 @@
 
 #include "app/action.hpp"
 
+#include "DashLog.hpp"
+
 const QRegExp GPIONotifier::GPIOX_REGEX("gpio\\d+");
 const QString GPIONotifier::GPIO_DIR("/sys/class/gpio");
 const QString GPIONotifier::GPIOX_DIR(GPIONotifier::GPIO_DIR + "/%1");
@@ -61,6 +63,7 @@ void ActionDialog::keyPressEvent(QKeyEvent *event)
 
 void ActionDialog::showEvent(QShowEvent *event)
 {
+    ActionEventFilter::get_instance()->disable();
     this->notifier.enable();
     this->label->setText(QString());
 
@@ -71,6 +74,7 @@ void ActionDialog::showEvent(QShowEvent *event)
 
 void ActionDialog::closeEvent(QCloseEvent *event)
 {
+    ActionEventFilter::get_instance()->enable();
     this->notifier.disable();
 
     Dialog::closeEvent(event);
@@ -89,35 +93,91 @@ Action::GPIO::~GPIO()
         value.close();
 }
 
-Action::Action(QString name, std::function<void()> action, QWidget *parent)
+Action::Action(QString name, std::function<void(ActionState)> action, QWidget *parent)
     : QObject(parent)
     , shortcut(parent)
     , gpio()
     , name_(name)
     , key_()
+    , func_(action)
 {
     connect(&this->gpio.watcher, &QFileSystemWatcher::fileChanged, [this, action](QString){
         if (this->gpio.value.isOpen()) {
             this->gpio.value.seek(0);
             if (this->gpio.active_low == this->gpio.value.read(1).at(0)) {
                 this->gpio.watcher.blockSignals(true);
-                action();
+                action(ActionState::Triggered);
                 QTimer::singleShot(300, [this]{ this->gpio.watcher.blockSignals(false); });
             }
             else {
-                qDebug() << "[Dash][Action]" << this->key_ << ": active low != value"; // temp
+                QString debugStr;
+                QDebug stream(&debugStr);
+                stream << this->key_ << ": active low != value";
+                DASH_LOG(info) << "[Action] " << debugStr.toStdString(); // temp
             }
         }
         else {
-            qDebug() << "[Dash][Action]" << this->key_ << ":" << this->gpio.value.fileName() << "is not open"; // temp
+            QString debugStr;
+            QDebug stream(&debugStr);
+            stream << this->key_ << ":" << this->gpio.value.fileName() << "is not open"; // temp
+            DASH_LOG(info) << "[Action] " << debugStr.toStdString();
         }
     });
-    connect(&this->shortcut, &QShortcut::activated, [action]{ action(); });
+    connect(&this->shortcut, &QShortcut::activated, [action]{ action(ActionState::Triggered); });
+}
+
+
+bool ActionEventFilter::eventFilter(QObject* obj, QEvent* event)
+{
+    std::lock_guard<decltype(mutex_)> lock(mutex_);
+    if(disabled) return false;
+    if(eventFilterMap.count()==0){
+        return false;
+    }
+    Action::ActionState state = Action::ActionState::Triggered;
+    switch(event->type())
+    {
+        case(QEvent::KeyPress):
+            state = Action::ActionState::Activated;
+            break;
+        case(QEvent::KeyRelease):
+            state = Action::ActionState::Deactivated;
+            break;
+        default:
+            return false;
+    }
+    QKeyEvent* key = static_cast<QKeyEvent*>(event);
+    if(!key->isAutoRepeat())
+    {
+        QMap<int, Action*>::const_iterator i = eventFilterMap.find(key->key());
+        int count = 0;
+        while (i != eventFilterMap.end() && i.key() == key->key()) {
+            i.value()->func_(state);
+            ++i;
+            ++count;
+        }
+        if(count > 0){
+            return true;
+        }
+    }
+    return false;
+}
+
+
+ActionEventFilter *ActionEventFilter::get_instance()
+{
+    static ActionEventFilter actionEventFilter;
+    return &actionEventFilter;
 }
 
 void Action::set(QString key)
 {
     this->shortcut.setKey(QKeySequence());
+
+    ActionEventFilter* actionEventFilter = ActionEventFilter::get_instance();
+    int k = actionEventFilter->eventFilterMap.key(this, -1);
+    if(k > -1)
+        actionEventFilter->eventFilterMap.remove(k);
 
     auto gpios = this->gpio.watcher.files();
     if (!gpios.isEmpty())
@@ -127,7 +187,10 @@ void Action::set(QString key)
 
     this->key_ = key;
     if (this->key_.startsWith("gpio")) {
-        qDebug() << "[Dash][Action]" << this->key_ << ": setting action as gpio"; // temp
+        QString debugStr;
+        QDebug stream(&debugStr);
+        stream << "[Action] " << this->key_ << ": setting action as gpio"; // temp
+        DASH_LOG(info) << debugStr.toStdString();
         this->gpio.value.setFileName(GPIONotifier::GPIOX_VALUE_PATH.arg(this->key_));
         if (this->gpio.value.open(QIODevice::ReadOnly)) {
             QFile active_low(GPIONotifier::GPIOX_ACTIVE_LOW_PATH.arg(this->key_), this);
@@ -137,15 +200,36 @@ void Action::set(QString key)
                 this->gpio.watcher.addPath(this->gpio.value.fileName());
             }
             else {
-                qDebug() << "[Dash][Action]" << this->key_ << ": failed to open" << active_low; // temp
+                QString debugStr;
+                QDebug stream(&debugStr);
+                stream << "[Action] " << this->key_ << ": failed to open" << active_low; // temp
+                DASH_LOG(info) << debugStr.toStdString();
             }
         }
         else {
-            qDebug() << "[Dash][Action]" << this->key_ << ": failed to open" << this->gpio.value.fileName(); // temp
+            QString debugStr;
+            QDebug stream(&debugStr);
+            stream << "[Action]" << this->key_ << ": failed to open" << this->gpio.value.fileName(); // temp
+            DASH_LOG(info) << debugStr.toStdString();
         }
     }
     else if (!this->key_.isNull()) {
-        qDebug() << "[Dash][Action]" << this->key_ << ": setting action as key"; // temp
-        this->shortcut.setKey(QKeySequence::fromString(this->key_));
+        QString debugStr;
+        QDebug stream(&debugStr);
+        stream << "[Action]" << this->key_ << ": setting action as key"; // temp
+        DASH_LOG(info) << debugStr.toStdString();
+        if(!this->key_.contains('+'))
+        {
+            QString debugStr;
+            QDebug stream(&debugStr);
+            stream << "[Action]" << this->key_ << ": single key sequence, setting via eventFilter";
+            DASH_LOG(info) << debugStr.toStdString();
+            actionEventFilter->eventFilterMap.insert(QKeySequence::fromString(this->key_)[0], this);
+
+        }
+        else
+        {
+            this->shortcut.setKey(QKeySequence::fromString(this->key_));
+        }
     }
 }
