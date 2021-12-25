@@ -415,7 +415,7 @@ QLayout *OpenAutoPage::Settings::buttons_row_widget()
 OpenAutoPage::OpenAutoPage(Arbiter &arbiter, QWidget *parent)
     : QStackedWidget(parent)
     , Page(arbiter, "Android Auto", "android_auto", true, this)
-    , connected_icon_name_("android_auto_color")
+    , connected_icon_name("android_auto_color")
 {
 }
 
@@ -428,17 +428,24 @@ void OpenAutoPage::init()
     std::function<void(bool)> callback = [frame = this->frame](bool active) { frame->toggle(active); };
     this->worker = new OpenAutoWorker(callback, this->arbiter.theme().mode == Session::Theme::Dark, frame);
 
-
-    connect(this->frame, &OpenAutoFrame::toggle, [this](bool enable) {
+    connect(this->frame, &OpenAutoFrame::toggle, [this](bool enable){
         if (!enable && this->frame->is_fullscreen()) {
             this->addWidget(frame);
             this->frame->toggle_fullscreen();
         }
         this->setCurrentIndex(enable ? 1 : 0);
-        emit connected(enable);
+
+        if (Config::get_instance()->get_show_aa_connected()) {
+            auto icon = this->button()->icon();
+            if (enable)
+                icon.addFile(QString(":/icons/%1.svg").arg(this->connected_icon_name), QSize(), QIcon::Active, QIcon::On);
+            else
+                icon.addFile(QString(":/icons/%1.svg").arg(this->icon_name()), QSize(), QIcon::Active, QIcon::Off);
+            this->button()->setIcon(icon);
+        }
     });
     connect(this->frame, &OpenAutoFrame::double_clicked, [this](bool fullscreen) {
-       this->set_full_screen(fullscreen);
+        this->set_full_screen(fullscreen);
     });
     
     AAInterface *aa_interface = AAInterface::get_instance();

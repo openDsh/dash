@@ -196,7 +196,7 @@ QWidget *Launcher::app_select_widget()
         else
             this->settings.remove(this->home_key());
     });
-    this->arbiter.forge().iconize("playlist_add", "playlist_add_check", home_button, 32, true);
+    this->arbiter.forge().iconize("playlist_add", "playlist_add_check", home_button, 32);
     layout->addWidget(home_button, 0, Qt::AlignTop);
 
     this->folders = new QListWidget(widget);

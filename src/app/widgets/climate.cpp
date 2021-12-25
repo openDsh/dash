@@ -3,6 +3,8 @@
 #include <QLabel>
 #include <QString>
 
+#include "app/arbiter.hpp"
+
 #include "app/widgets/climate.hpp"
 
 ClimateSnackBar::ClimateSnackBar(Arbiter &arbiter)
@@ -11,55 +13,53 @@ ClimateSnackBar::ClimateSnackBar(Arbiter &arbiter)
     this->setFocusPolicy(Qt::NoFocus);
     this->setAttribute(Qt::WA_TransparentForMouseEvents, true);
 
-    this->set_body(this->body_widget());
+    this->set_body(this->body());
 }
 
-QWidget *ClimateSnackBar::body_widget()
+QWidget *ClimateSnackBar::body()
 {
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
-    layout->setContentsMargins(0, 0, 0, 0);
-
-    this->driver_temp = new QLabel(widget);
-    this->driver_temp->setAlignment(Qt::AlignCenter);
-    layout->addWidget(this->driver_temp, 4);
-
-    layout->addStretch(6);
-    layout->addWidget(this->state_widget());
-    layout->addStretch(6);
-
-    this->passenger_temp = new QLabel(widget);
-    this->passenger_temp->setAlignment(Qt::AlignCenter);
-    layout->addWidget(this->passenger_temp, 4);
-
-    return widget;
-}
-
-QWidget *ClimateSnackBar::state_widget()
-{
-    QWidget *widget = new QWidget(this);
-    QHBoxLayout *layout = new QHBoxLayout(widget);
-    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setContentsMargins(6, 0, 6, 0);
     layout->setSpacing(0);
 
-    this->airflow = new ClimateState(this->arbiter, widget);
-    layout->addWidget(this->airflow);
+    this->left_temp = new QLabel(widget);
+    this->left_temp->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+    layout->addWidget(this->left_temp, 1);
 
-    this->fan_speed = new StepMeter(this->arbiter, widget);
-    layout->addWidget(this->fan_speed);
+    layout->addLayout(this->state());
+
+    this->right_temp = new QLabel(widget);
+    this->right_temp->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+    layout->addWidget(this->right_temp, 1);
 
     return widget;
 }
 
-void ClimateSnackBar::set_driver_temp(int temp)
+QLayout *ClimateSnackBar::state()
 {
-    this->driver_temp->setText(QString("%1°").arg(temp));
+    auto layout = new QHBoxLayout();
+
+    layout->addStretch();
+    this->airflow = new ClimateState(this->arbiter);
+    layout->addWidget(this->airflow, 1);
+
+    this->fan_speed = new StepMeter(this->arbiter);
+    layout->addWidget(this->fan_speed, 3);
+    layout->addStretch();
+
+    return layout;
+}
+
+void ClimateSnackBar::set_left_temp(int temp)
+{
+    this->left_temp->setText(QString("%1°").arg(temp));
     this->open(3000);
 }
 
-void ClimateSnackBar::set_passenger_temp(int temp)
+void ClimateSnackBar::set_right_temp(int temp)
 {
-    this->passenger_temp->setText(QString("%1°").arg(temp));
+    this->right_temp->setText(QString("%1°").arg(temp));
     this->open(3000);
 }
 
@@ -107,14 +107,14 @@ void Climate::airflow(uint8_t airflow)
     this->snack_bar->set_airflow(this->airflow_);
 }
 
-void Climate::driver_temp(int driver_temp)
+void Climate::left_temp(int left_temp)
 {
-    this->driver_temp_ = driver_temp;
-    this->snack_bar->set_driver_temp(this->driver_temp_);
+    this->left_temp_ = left_temp;
+    this->snack_bar->set_left_temp(this->left_temp_);
 }
 
-void Climate::passenger_temp(int passenger_temp)
+void Climate::right_temp(int right_temp)
 {
-    this->passenger_temp_ = passenger_temp;
-    this->snack_bar->set_passenger_temp(this->passenger_temp_);
+    this->right_temp_ = right_temp;
+    this->snack_bar->set_right_temp(this->right_temp_);
 }

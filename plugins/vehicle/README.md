@@ -40,14 +40,68 @@ At this time, the widget only acts as a proxy for opening a snackbar (popup wind
 
 `Climate` contains the following:
 
+```
+    Airflow
+    {
+        OFF
+        DEFROST
+        BODY
+        FEET
+    }
+```
+
 - `max_fan_speed` - should be set upon construction of the widget
 
 - `fan_speed` - should be between 0 and `max_fan_speed` (inclusive)
-
 - `airflow` - any combination of the `Airflow` enum
-- `driver_temp` - driver side temperature 
-- `passenger_temp` - passenger side temperature
+- `left_temp` - left side temperature 
+- `right_temp` - right side temperature
 
 treat these as _properties_... use `name()` to get the value and `name(value)` to set a new value
 
 Look at the test vehicle plugin for an example of using the `Climate` widget.
+
+### Vehicle Interface
+app/widgets/vehicle.hpp
+
+Another _standard_ component for vehicle plugins, the vehicle widget can display various information about your vehicle.
+
+An interface is provided for setting up and updating the state of the widget.
+
+`Vehicle` contains the following:
+```
+    Position
+    {
+        NONE
+        FRONT
+        BACK
+        LEFT
+        MIDDLE_LEFT
+        RIGHT
+        MIDDLE_RIGHT
+        FRONT_LEFT
+        FRONT_RIGHT
+        BACK_LEFT
+        BACK_RIGHT
+        FRONT_MIDDLE_LEFT
+        FRONT_MIDDLE_RIGHT
+        BACK_MIDDLE_LEFT
+        BACK_MIDDLE_RIGHT
+    }
+```
+-  `pressure_init(QString unit, uint8_t threshold)` - enable pressure
+-  `disable_sensors()` - prevent sensors from showing (increases size of widget since less space is needed)
+
+-  `rotate(int16_t degree)` - degrees to rotate the entire widget
+-  `door(Position position, bool open)` - open/close specific door (FRONT_LEFT, FRONT_RIGHT, BACK_LEFT, BACK_RIGHT)
+-  `window(Position position, bool up)` - open/close specific window (FRONT_LEFT, FRONT_RIGHT, BACK_LEFT, BACK_RIGHT)
+-  `headlights(bool on)` - toggle headlights
+-  `taillights(bool on)` - toggle taillights
+-  `indicators(Position position, bool on)` - toggle indicators (LEFT, RIGHT)
+-  `hazards(bool on)` - toggle hazards
+-  `pressure(Position position, uint8_t value)` - set pressure of specific tire (FRONT_LEFT, FRONT_RIGHT, BACK_LEFT, BACK_RIGHT)
+-  `sensor(Position position, uint8_t level)` - set level (0-4) of specific sensor (FRONT_LEFT, FRONT_RIGHT, BACK_LEFT, BACK_RIGHT, FRONT_MIDDLE_LEFT, FRONT_MIDDLE_RIGHT, BACK_MIDDLE_LEFT, BACK_MIDDLE_RIGHT)
+-  `wheel_steer(int16_t degree)` - degrees to rotate front tires (dont go too wild here)
+
+
+Look at the test vehicle plugin for an example of using the `Climate` and `Vehicle` widgets.
