@@ -247,9 +247,12 @@ if [ $gstreamer = true ]; then
   #change into newly cloned directory
   cd qt-gstreamer
 
-  #apply 1.18 patch
-  echo Applying qt-gstreamer 1.18 patch
-  git apply $script_path/patches/qt-gstreamer-1.18.patch
+  read -d . DEBIAN_VERSION < /etc/debian_version
+  if (( $DEBIAN_VERSION > 10 )); then
+   #apply 1.18 patch
+      echo Bullseye or above detected, applying qt-gstreamer 1.18 patch
+      git apply $script_path/patches/qt-gstreamer-1.18.patch
+  fi
 
   #apply greenline patch
   echo Apply greenline patch
