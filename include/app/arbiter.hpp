@@ -66,6 +66,5 @@ class Arbiter : public QObject {
     void volume_changed(uint8_t volume);
     void cursor_changed(bool enabled);
     void action_changed(Action *action, QString key);
-    void openauto_button_press(aasdk::proto::enums::ButtonCode::Enum buttonCode, openauto::projection::WheelDirection wheelDirection);
     void openauto_full_screen(bool fullscreen);
 };

@@ -218,14 +218,16 @@ void Action::set(QString key)
         QDebug stream(&debugStr);
         stream << "[Action]" << this->key_ << ": setting action as key"; // temp
         DASH_LOG(info) << debugStr.toStdString();
-        if(!this->key_.contains('+'))
+        // if + is present, it means sequence is multiple keys.
+        // I'd have implemented this by looking at the .count() of the QKeySequence
+        // but it doesn't consider modifiers (ctrl, shift, etc) to be a discrete key
+        if(!this->key_.contains('+')) 
         {
             QString debugStr;
             QDebug stream(&debugStr);
             stream << "[Action]" << this->key_ << ": single key sequence, setting via eventFilter";
             DASH_LOG(info) << debugStr.toStdString();
             actionEventFilter->eventFilterMap.insert(QKeySequence::fromString(this->key_)[0], this);
-
         }
         else
         {

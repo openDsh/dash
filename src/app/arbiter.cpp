@@ -190,10 +190,6 @@ void Arbiter::set_action(Action *action, QString key)
     emit action_changed(action, key);
 }
 
-void Arbiter::send_openauto_button_press(aasdk::proto::enums::ButtonCode::Enum buttonCode, openauto::projection::WheelDirection wheelDirection)
-{
-    emit openauto_button_press(buttonCode, wheelDirection);
-}
 
 void Arbiter::send_openauto_full_screen(bool fullscreen)
 {

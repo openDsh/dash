@@ -40,6 +40,18 @@ void AAInterface::mediaMetadataUpdate(const aasdk::proto::messages::MediaInfoCha
 }
 
 
+void AAInterface::navigationStatusUpdate(const aasdk::proto::messages::NavigationStatus& navStatus)
+{
+    emit aa_navigation_status_update(navStatus);
+}
+void AAInterface::navigationTurnEvent(const aasdk::proto::messages::NavigationTurnEvent& turnEvent)
+{
+    emit aa_navigation_turn_event(turnEvent);
+}
+void AAInterface::navigationDistanceEvent(const aasdk::proto::messages::NavigationDistanceEvent& distanceEvent)
+{
+    emit aa_navigation_distance_event(distanceEvent);
+}
 
 AAInterface *AAInterface::get_instance()
 {

@@ -16,6 +16,8 @@ MediaPage::MediaPage(Arbiter &arbiter, QWidget *parent)
     : QTabWidget(parent)
     , Page(arbiter, "Media", "play_circle_outline", true, this)
 {
+    // connect(&aa_interface, &AAInterface::aa_media_metadata_update, this->AAMetadataUpdate(metadata));
+    // connect(&aa_interface, &AAInterface::aa_media_playback_update, this->AAPlaybackUpdate(playback));
 }
 
 void MediaPage::init()
@@ -38,6 +40,7 @@ BluetoothPlayerTab::BluetoothPlayerTab(Arbiter &arbiter, QWidget *parent)
 QWidget *BluetoothPlayerTab::track_widget()
 {
     BluezQt::MediaPlayerPtr media_player = this->arbiter.system().bluetooth.get_media_player().second;
+    AAInterface* aa_interface = AAInterface::get_instance();
 
     QWidget *widget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
@@ -60,11 +63,26 @@ QWidget *BluetoothPlayerTab::track_widget()
     layout->addWidget(title_hdr);
     layout->addWidget(title);
 
+    QLabel *albumArt = new QLabel(widget);
+    layout->addWidget(albumArt);
+
     connect(&this->arbiter.system().bluetooth, &Bluetooth::media_player_track_changed, [artist, album, title](BluezQt::MediaPlayerTrack track){
         artist->setText(track.artist());
         album->setText(track.album());
         title->setText(track.title());
     });
+    connect(aa_interface, &AAInterface::aa_media_metadata_update, [artist, album, title, albumArt](const aasdk::proto::messages::MediaInfoChannelMetadataData& metadata){
+        title->setText(QString::fromStdString(metadata.track_name()));
+        if(metadata.has_artist_name()) artist->setText(QString::fromStdString(metadata.artist_name()));
+        if(metadata.has_album_name()) album->setText(QString::fromStdString(metadata.album_name()));
+        if(metadata.has_album_art()){
+            QImage art;
+            art.loadFromData(QByteArray::fromStdString(metadata.album_art()));
+            albumArt->setPixmap(QPixmap::fromImage(art));
+        }
+    
+    });
+
 
     return widget;
 }

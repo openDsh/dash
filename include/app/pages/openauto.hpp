@@ -18,6 +18,8 @@
 #include "openauto/Configuration/RecentAddressesList.hpp"
 #include "openauto/Service/AndroidAutoEntityFactory.hpp"
 #include "openauto/Service/ServiceFactory.hpp"
+#include "AAInterface.hpp"
+
 
 #include "app/pages/page.hpp"
 
@@ -35,10 +37,7 @@ class OpenAutoWorker : public QObject {
     inline void start() { this->app->waitForDevice(true); }
     inline void set_opacity(unsigned int alpha) { this->service_factory.setOpacity(alpha); }
     inline void update_size() { this->service_factory.resize(); }
-    inline void set_night_mode(bool mode) { this->service_factory.setNightMode(mode); }
     inline void send_key_event(QKeyEvent *event) { this->service_factory.sendKeyEvent(event); }
-    inline void send_button_press(aasdk::proto::enums::ButtonCode::Enum buttonCode, openauto::projection::WheelDirection wheelDirection) { this->service_factory.sendButtonPress(buttonCode, wheelDirection); };
-
    private:
     void create_usb_workers();
     void create_io_service_workers();
@@ -57,13 +56,15 @@ class OpenAutoWorker : public QObject {
     std::shared_ptr<aasdk::usb::ConnectedAccessoriesEnumerator> connected_accessories_enumerator;
     std::shared_ptr<openauto::App> app;
     std::vector<std::thread> thread_pool;
+
+
 };
 
 class OpenAutoFrame : public QWidget {
     Q_OBJECT
 
    public:
-    OpenAutoFrame(QWidget *parent) : QWidget(parent) {}
+    OpenAutoFrame(QWidget *parent);
 
     inline bool is_fullscreen() { return this->fullscreen; }
     inline void toggle_fullscreen() { this->fullscreen = !this->fullscreen; }
@@ -85,7 +86,6 @@ class OpenAutoPage : public QStackedWidget, public Page {
 
    public:
     OpenAutoPage(Arbiter &arbiter, QWidget *parent = nullptr);
-    inline void pass_key_event(QKeyEvent *event) { this->worker->send_key_event(event); }
     void set_full_screen(bool fullscreen);
     void init() override;
     const QString &connected_icon_name() { return this->connected_icon_name_; }
