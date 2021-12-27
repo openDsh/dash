@@ -20,6 +20,14 @@ display_help() {
 #location of OS details for linux
 OS_RELEASE_FILE="/etc/os-release"
 
+#determine if script is being run on bullseye or above
+BULLSEYE=false
+read -d . DEBIAN_VERSION < /etc/debian_version
+if (( $DEBIAN_VERSION > 10 )); then
+  echo Detected Debian version of Bullseye or above
+  BULLSEYE=true
+fi
+
 #check if Raspian is in the file, if not set the install Args to be false
 if grep -q "Raspbian" ${OS_RELEASE_FILE}; then
   installArgs="-DRPI_BUILD=true"
@@ -118,13 +126,18 @@ dependencies=(
 "libqt5svg5-dev"
 )
 
+
 ###############################  dependencies  #########################
 if [ $deps = false ]
   then
     echo skipping dependencies '\n'
   else
-    #loop through dependencies and install
+    if [ $BULLSEYE = false ]; then
+      echo Adding qt5-default to dependencies
+      dependencies[${#dependencies[@]}]="qt5-default"
+    fi
     echo installing dependencies
+    #loop through dependencies and install
     echo Running apt update
     sudo apt update
 
@@ -247,11 +260,10 @@ if [ $gstreamer = true ]; then
   #change into newly cloned directory
   cd qt-gstreamer
 
-  read -d . DEBIAN_VERSION < /etc/debian_version
-  if (( $DEBIAN_VERSION > 10 )); then
-   #apply 1.18 patch
-      echo Bullseye or above detected, applying qt-gstreamer 1.18 patch
-      git apply $script_path/patches/qt-gstreamer-1.18.patch
+  if [ $BULLSEYE = true]; then
+    #apply 1.18 patch
+    echo Applying qt-gstreamer 1.18 patch
+    git apply $script_path/patches/qt-gstreamer-1.18.patch
   fi
 
   #apply greenline patch
