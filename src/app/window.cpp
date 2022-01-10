@@ -40,7 +40,7 @@ Dash::Dash(Arbiter &arbiter)
     layout->addLayout(this->rail.layout);
     layout->addLayout(this->body.layout);
 
-    connect(&this->rail.group, QOverload<int>::of(&QButtonGroup::buttonPressed), [this](int id){
+    connect(&this->rail.group, &QButtonGroup::idPressed, [this](int id){
         this->arbiter.set_curr_page(id);
     });
     connect(&this->arbiter, &Arbiter::curr_page_changed, [this](Page *page){
@@ -225,7 +225,8 @@ QWidget *Dash::power_control() const
     connect(restart, &QPushButton::clicked, [this]{
         this->arbiter.settings().sync();
         sync();
-        system(Session::System::REBOOT_CMD);
+        int result = system(Session::System::REBOOT_CMD);
+        DASH_LOG(info) << "[Window] Reboot event, result:" << result;
     });
     layout->addWidget(restart);
 
@@ -235,7 +236,8 @@ QWidget *Dash::power_control() const
     connect(power_off, &QPushButton::clicked, [this]{
         this->arbiter.settings().sync();
         sync();
-        system(Session::System::SHUTDOWN_CMD);
+        int result = system(Session::System::SHUTDOWN_CMD);
+        DASH_LOG(info) << "[Window] Shutdown event, result:" << result;
     });
     layout->addWidget(power_off);
 
