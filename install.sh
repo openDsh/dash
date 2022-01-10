@@ -108,7 +108,10 @@ dependencies=(
 "gstreamer1.0-alsa"
 "libgstreamer-plugins-base1.0-dev"
 "qtdeclarative5-dev"
-"qt5-default"
+"qtbase5-dev"
+"qtchooser"
+"qt5-qmake"
+"qtbase5-dev-tools"
 "libgstreamer-plugins-bad1.0-dev"
 "libunwind-dev"
 "qml-module-qtmultimedia"
@@ -387,7 +390,7 @@ else
   cd build
 
 	echo -e Installing dash'\n'
-  echo Running CMake for dash
+  echo Running CMake for dash, ${installArgs}
   cmake ${installArgs} -DGST_BUILD=TRUE ../
   if [[ $? -eq 0 ]]; then
     echo -e Dash CMake OK'\n'

@@ -13,12 +13,7 @@ Gauge::Gauge(units_t units, QFont value_font, QFont unit_font, Gauge::Orientatio
 : QWidget(parent)
 {
     Config *config = Config::get_instance();
-    DASH_LOG(info)<<"[Gauges] Registered frame handler for id "<<(cmds[0].frame.frameId()+0x9);
     ICANBus *bus = (config->get_vehicle_can_bus())?((ICANBus *)SocketCANBus::get_instance()):((ICANBus *)elm327::get_instance());
-
-    if(!bus) {
-        DASH_LOG(info)<<"[Gauges] Could not find CAN/ELM bus";
-    }
 
     using namespace std::placeholders;
     std::function<void(QByteArray)> callback = std::bind(&Gauge::can_callback, this, std::placeholders::_1);
@@ -298,7 +293,7 @@ QWidget *DataTab::speedo_tach_widget()
 }
 
 /*  socketcan/elm327 rewrite right now only has support for one PID per gauge, so we can't calculate milage at this point.
-    This is because gauges act more as event handlers now for each PID.
+    This is because gauges act more as event handlers now for each PID. 
     Multi-PID gauges could feasibly be reimplemented if there was a helper method that stored received values, and only calls
     the gauge update once all values have been updated since last gauge update.
 
@@ -306,14 +301,14 @@ QWidget *DataTab::speedo_tach_widget()
 
 // QWidget *DataTab::mileage_data_widget()
 // {
-//     QWidget *widget = new QWidget(this);
-//	   QHBoxLayout *layout = new QHBoxLayout(widget);
-//
-//	   QFont value_font(Theme::font_36);
-//	   value_font.setFamily("Titillium Web");
-//
-//	   QFont unit_font(Theme::font_14);
-//	   unit_font.setWeight(QFont::Light);
+//     QWidget *widget = new QWidget(this);	
+//	   QHBoxLayout *layout = new QHBoxLayout(widget);	
+//		
+//	   QFont value_font(Theme::font_36);	
+//	   value_font.setFamily("Titillium Web");	
+//		
+//	   QFont unit_font(Theme::font_14);	
+//	   unit_font.setWeight(QFont::Light);	
 //	   unit_font.setItalic(true);
 //
 //     Gauge *mileage = new Gauge({"mpg", "km/L"}, value_font, unit_font,
