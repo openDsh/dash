@@ -60,24 +60,8 @@ void Dash::init()
     auto msg_ref = new QWidget();
     msg_ref->setObjectName("MsgRef");
     this->body.layout->addWidget(msg_ref);
-
     this->rail.layout->addWidget(this->main_menu());
     this->body.layout->addWidget(this->control_bar());
-
-    for (auto page : this->arbiter.layout().pages()) {
-        auto button = page->button();
-        button->setCheckable(true);
-        button->setFlat(true);
-        QIcon icon(new StylizedIconEngine(this->arbiter, QString(":/icons/%1.svg").arg(page->icon_name()), true));
-        this->arbiter.forge().iconize(icon, button, 32);
-
-        this->rail.group.addButton(button, this->arbiter.layout().page_id(page));
-        this->rail.layout->addWidget(button);
-        this->body.frame->addWidget(page->widget());
-
-        page->init();
-        button->setVisible(page->enabled());
-    }
     this->set_page(this->arbiter.layout().curr_page);
 }
 
