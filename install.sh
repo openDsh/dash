@@ -2,7 +2,7 @@
 
 #repo addresses
 aasdkRepo="https://github.com/OpenDsh/aasdk"
-gstreamerRepo="git://github.com/GStreamer/qt-gstreamer"
+gstreamerRepo="https://github.com/GStreamer/qt-gstreamer"
 openautoRepo="https://github.com/openDsh/openauto"
 
 #Help text
