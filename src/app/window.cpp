@@ -40,7 +40,7 @@ Dash::Dash(Arbiter &arbiter)
     layout->addLayout(this->rail.layout);
     layout->addLayout(this->body.layout);
 
-    connect(&this->rail.group, &QButtonGroup::idPressed, [this](int id){
+    connect(&this->rail.group, QOverload<int>::of(&QButtonGroup::buttonPressed), [this](int id){
         this->arbiter.set_curr_page(id);
     });
     connect(&this->arbiter, &Arbiter::curr_page_changed, [this](Page *page){
@@ -87,11 +87,11 @@ QWidget *Dash::main_menu()
     layout->setSpacing(0);
 
     for (auto page : this->arbiter.layout().pages()) {
-        auto button = new QPushButton();
-        button->setProperty("color_hint", true);
+        auto button = page->button();
         button->setCheckable(true);
         button->setFlat(true);
-        this->arbiter.forge().iconize(page->icon_name(), button, 32);
+        QIcon icon(new StylizedIconEngine(this->arbiter, QString(":/icons/%1.svg").arg(page->icon_name()), true));
+        this->arbiter.forge().iconize(icon, button, 32);
 
         this->rail.group.addButton(button, this->arbiter.layout().page_id(page));
         layout->addWidget(button);

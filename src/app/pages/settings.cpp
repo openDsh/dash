@@ -363,6 +363,9 @@ QWidget *LayoutSettingsTab::fullscreen_mode_widget()
     connect(toggle, &Switch::stateChanged, [this](bool state){ this->arbiter.set_fullscreen_mode(state); });
     layout->addWidget(toggle, 1, Qt::AlignHCenter);
 
+    connect(&this->arbiter, &Arbiter::fullscreen_mode_changed, [toggle, this](bool enabled) {
+       toggle->setChecked(enabled);
+    });
     return widget;
 }
 
