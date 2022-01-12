@@ -276,18 +276,21 @@ QWidget *LayoutSettingsTab::settings_widget()
     layout->addWidget(Session::Forge::br(), 1);
     layout->addWidget(this->control_bar_widget(), 1);
 
-    layout->addWidget(Session::Forge::br(), 1);
-    layout->addWidget(this->fullscreen_mode_widget(), 1);
-
-    layout->addWidget(Session::Forge::br(), 1);
-    layout->addWidget(this->fullscreen_delay_row_widget(), 1);
-
     QWidget *controls_bar_row = this->quick_view_row_widget();
     controls_bar_row->setVisible(this->arbiter.layout().control_bar.enabled);
     connect(&this->arbiter, &Arbiter::control_bar_changed, [controls_bar_row](bool enabled){
         controls_bar_row->setVisible(enabled);
     });
     layout->addWidget(controls_bar_row, 1);
+
+    layout->addWidget(Session::Forge::br(), 1);
+    layout->addWidget(fullscreen_mode_widget(), 1);
+    QWidget *fullscreen_delay_row = this->fullscreen_delay_row_widget();
+    fullscreen_delay_row->setVisible(this->arbiter.layout().fullscreen_mode);
+    connect(&this->arbiter, &Arbiter::fullscreen_mode_changed, [fullscreen_delay_row](bool enabled){
+        fullscreen_delay_row->setVisible(enabled);
+    });
+    layout->addWidget(fullscreen_delay_row, 1);
 
     layout->addWidget(Session::Forge::br(), 1);
     layout->addWidget(this->scale_row_widget(), 1);
