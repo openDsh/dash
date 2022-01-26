@@ -29,7 +29,8 @@ class Dialog : public QDialog {
     void showEvent(QShowEvent *event);
     void keyPressEvent(QKeyEvent *event);
     bool eventFilter(QObject *object, QEvent *event);
-
+    void closeEvent(QCloseEvent *event) override;
+    
    private:
     QVBoxLayout *title;
     QVBoxLayout *body;
