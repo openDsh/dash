@@ -5,19 +5,18 @@
 
 
 
-class AAInterface : public QObject, public openauto::service::IAndroidAutoInterface {
+class AAHandler : public QObject, public openauto::service::IAndroidAutoInterface {
     Q_OBJECT
 
    public:
-    AAInterface();
-    ~AAInterface();
+    AAHandler();
+    ~AAHandler();
     void mediaPlaybackUpdate(const aasdk::proto::messages::MediaInfoChannelPlaybackData& playback) override;
     void mediaMetadataUpdate(const aasdk::proto::messages::MediaInfoChannelMetadataData& metadata) override;
     void navigationStatusUpdate(const aasdk::proto::messages::NavigationStatus& navStatus) override;
     void navigationTurnEvent(const aasdk::proto::messages::NavigationTurnEvent& turnEvent) override;
     void navigationDistanceEvent(const aasdk::proto::messages::NavigationDistanceEvent& distanceEvent) override;
     void injectButtonPressHelper(aasdk::proto::enums::ButtonCode::Enum buttonCode, Action::ActionState actionState);
-    static AAInterface *get_instance();
 
    
 

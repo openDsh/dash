@@ -18,7 +18,6 @@
 #include "openauto/Configuration/RecentAddressesList.hpp"
 #include "openauto/Service/AndroidAutoEntityFactory.hpp"
 #include "openauto/Service/ServiceFactory.hpp"
-#include "AAInterface.hpp"
 
 
 #include "app/pages/page.hpp"
@@ -31,7 +30,7 @@ class OpenAutoWorker : public QObject {
     Q_OBJECT
 
    public:
-    OpenAutoWorker(std::function<void(bool)> callback, bool night_mode, QWidget *frame);
+    OpenAutoWorker(std::function<void(bool)> callback, bool night_mode, QWidget *frame, Arbiter &arbiter);
     ~OpenAutoWorker();
 
     inline void start() { this->app->waitForDevice(true); }

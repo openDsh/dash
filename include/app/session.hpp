@@ -24,6 +24,7 @@
 #include "app/quick_views/quick_view.hpp"
 #include "app/services/bluetooth.hpp"
 #include "app/services/server.hpp"
+#include "AAHandler.hpp"
 
 class Arbiter;
 
@@ -149,6 +150,12 @@ class Session {
         Arbiter &arbiter_;
     };
 
+    struct AndroidAuto {
+        AAHandler *handler;
+
+        AndroidAuto(Arbiter &arbiter);
+    };
+
     struct Core {
         bool cursor;
 
@@ -180,4 +187,5 @@ class Session {
     System system_;
     Forge forge_;
     Core core_;
+    AndroidAuto android_auto_;
 };

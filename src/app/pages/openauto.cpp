@@ -5,7 +5,7 @@
 #include "app/window.hpp"
 #include "DashLog.hpp"
 
-OpenAutoWorker::OpenAutoWorker(std::function<void(bool)> callback, bool night_mode, QWidget *frame)
+OpenAutoWorker::OpenAutoWorker(std::function<void(bool)> callback, bool night_mode, QWidget *frame, Arbiter &arbiter)
     : QObject(qApp),
       io_service(),
       work(io_service),
@@ -26,9 +26,9 @@ OpenAutoWorker::OpenAutoWorker(std::function<void(bool)> callback, bool night_mo
     this->create_io_service_workers();
 
     this->app->waitForDevice(true);
-    AAInterface* aa_interface = AAInterface::get_instance();
-    service_factory.setAndroidAutoInterface(aa_interface);
-    aa_interface->setServiceFactory(&service_factory);
+    AAHandler *aa_handler = arbiter.android_auto().handler;
+    service_factory.setAndroidAutoInterface(aa_handler);
+    aa_handler->setServiceFactory(&service_factory);
 }
 
 
@@ -426,7 +426,7 @@ void OpenAutoPage::init()
     this->frame = new OpenAutoFrame(this);
 
     std::function<void(bool)> callback = [frame = this->frame](bool active) { frame->toggle(active); };
-    this->worker = new OpenAutoWorker(callback, this->arbiter.theme().mode == Session::Theme::Dark, frame);
+    this->worker = new OpenAutoWorker(callback, this->arbiter.theme().mode == Session::Theme::Dark, frame, this->arbiter);
 
     connect(this->frame, &OpenAutoFrame::toggle, [this](bool enable){
         if (!enable && this->frame->is_fullscreen()) {
@@ -448,9 +448,9 @@ void OpenAutoPage::init()
         this->set_full_screen(fullscreen);
     });
     
-    AAInterface *aa_interface = AAInterface::get_instance();
-    connect(&this->arbiter, &Arbiter::mode_changed, [this, aa_interface](Session::Theme::Mode mode){
-        aa_interface->setNightMode(mode == Session::Theme::Dark);
+    AAHandler *aa_handler = this->arbiter.android_auto().handler;
+    connect(&this->arbiter, &Arbiter::mode_changed, [this, aa_handler](Session::Theme::Mode mode){
+        aa_handler->setNightMode(mode == Session::Theme::Dark);
     });
 
     connect(&this->arbiter, &Arbiter::openauto_full_screen, [this](bool fullscreen) {

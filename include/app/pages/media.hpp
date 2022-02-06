@@ -11,7 +11,6 @@
 #include "app/pages/page.hpp"
 #include "app/widgets/selector.hpp"
 #include "app/widgets/tuner.hpp"
-#include "AAInterface.hpp"
 
 class Arbiter;
 
