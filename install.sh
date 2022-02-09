@@ -28,8 +28,9 @@ if (( $DEBIAN_VERSION > 10 )); then
   BULLSEYE=true
 fi
 
-#check if Raspian is in the file, if not set the install Args to be false
-if grep -q "Raspbian" ${OS_RELEASE_FILE}; then
+#check if /etc/rpi-issue exists, if not set the install Args to be false
+if [ -f /etc/rpi-issue ]
+then
   installArgs="-DRPI_BUILD=true"
   isRpi=true
 else
