@@ -17,9 +17,6 @@ display_help() {
     echo
 }
 
-#location of OS details for linux
-OS_RELEASE_FILE="/etc/os-release"
-
 #determine if script is being run on bullseye or above
 BULLSEYE=false
 read -d . DEBIAN_VERSION < /etc/debian_version
