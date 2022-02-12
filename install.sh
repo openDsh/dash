@@ -4,6 +4,7 @@
 aasdkRepo="https://github.com/OpenDsh/aasdk"
 gstreamerRepo="https://github.com/GStreamer/qt-gstreamer"
 openautoRepo="https://github.com/openDsh/openauto"
+h264bitstreamRepo="https://github.com/aizvorski/h264bitstream"
 
 #Help text
 display_help() {
@@ -13,6 +14,7 @@ display_help() {
     echo "   --openauto       install and build openauto "
     echo "   --gstreamer      install and build gstreamer "
     echo "   --dash           install and build dash "
+    echo "   --h264bitstream  install and build h264bitstream"
     echo "   --debug          create a debug build "
     echo
 }
@@ -47,6 +49,7 @@ if [ $# -gt 0 ]; then
   gstreamer=false
   openauto=false
   dash=false
+  h264bitstream=false
     while [ "$1" != "" ]; do
         case $1 in
             --deps )           shift
@@ -59,6 +62,8 @@ if [ $# -gt 0 ]; then
             --openauto )       openauto=true
                                     ;;
             --dash )           dash=true
+                                    ;;
+            --h264bitstream )  h264bitstream=true
                                     ;;
             --debug )          BUILD_TYPE="Debug"
                                     ;;
@@ -77,6 +82,7 @@ else
     gstreamer=true
     openauto=true
     dash=true
+    h264bitstream=true
 fi
 
 script_path=$(dirname "$(realpath -s "$0")")
@@ -124,6 +130,10 @@ dependencies=(
 "libqt5serialport5-dev"
 "libqt5websockets5-dev"
 "libqt5svg5-dev"
+"build-essential"
+"libtool"
+"autoconf"
+"ffmpeg"
 )
 
 
@@ -231,6 +241,76 @@ else
   cd $script_path
 fi
 
+############################### h264bitstream #########################
+if [ $h264bitstream = false ]; then
+	echo -e Skipping h264bitstream '\n'
+else
+  #change to parent directory
+  cd ..
+
+  #clone aasdk
+  git clone $h264bitstreamRepo
+  if [[ $? -eq 0 ]]; then
+    echo -e h264bitstream Cloned ok '\n'
+  else
+    cd h264bitstream
+    if [[ $? -eq 0 ]]; then
+      git pull $h264bitstreamRepo
+      echo -e h264bitstream Cloned OK '\n'
+      cd ..
+    else
+      echo h264bitstream clone/pull error
+      exit 1
+    fi
+  fi
+
+  #change into folder
+  echo -e moving to h264bitstream '\n'
+  cd h264bitstream
+
+  echo Auto-reconfigure project
+  autoreconf -i
+
+  if [[ $? -eq 0 ]]; then
+    echo -e autoreconfed h264bitstream
+  else
+    echo Unable to autoreconf h264bitstream
+    exit 1
+  fi
+
+  echo Configuring h264bitstream
+
+  ./configure --prefix=/usr/local
+  if [[ $? -eq 0 ]]; then
+      echo -e h264bitstream configured successfully'\n'
+  else
+    echo h264bitstream configure failed with code $?
+    exit 1
+  fi
+
+  #beginning make
+  make
+
+  if [[ $? -eq 0 ]]; then
+    echo -e h264bitstream Make completed successfully '\n'
+  else
+    echo h264bitstream Make failed with code $?
+    exit 1
+  fi
+
+  #begin make install
+  sudo make install
+
+  if [[ $? -eq 0 ]]
+    then
+    echo -e h264bitstream installed ok'\n'
+    echo
+  else
+    echo h264bitstream install failed with code $?
+    exit 1
+  fi
+  cd $script_path
+fi
 
 ###############################  gstreamer  #########################
 #check if gstreamer install is requested
