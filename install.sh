@@ -19,9 +19,6 @@ display_help() {
     echo
 }
 
-#location of OS details for linux
-OS_RELEASE_FILE="/etc/os-release"
-
 #determine if script is being run on bullseye or above
 BULLSEYE=false
 read -d . DEBIAN_VERSION < /etc/debian_version
@@ -30,8 +27,9 @@ if (( $DEBIAN_VERSION > 10 )); then
   BULLSEYE=true
 fi
 
-#check if Raspian is in the file, if not set the install Args to be false
-if grep -q "Raspbian" ${OS_RELEASE_FILE}; then
+#check if /etc/rpi-issue exists, if not set the install Args to be false
+if [ -f /etc/rpi-issue ]
+then
   installArgs="-DRPI_BUILD=true"
   isRpi=true
 else
