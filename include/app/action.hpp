@@ -11,6 +11,8 @@
 #include <QString>
 #include <QShowEvent>
 #include <QWidget>
+#include <bits/stdc++.h>
+
 
 #include "app/widgets/dialog.hpp"
 
@@ -60,11 +62,18 @@ class Action : public QObject {
     Q_OBJECT
 
    public:
-    Action(QString name, std::function<void()> func, QWidget *parent);
+    enum ActionState
+    {
+        Activated,
+        Deactivated,
+        Triggered
+    };
+    Action(QString name, std::function<void(ActionState)> func, QWidget *parent);
     void set(QString key);
 
     QString key() const { return this->key_; }
     QString name() const { return this->name_; }
+    std::function<void(ActionState)> func_;
 
    private:
     struct GPIO {
@@ -81,4 +90,29 @@ class Action : public QObject {
 
     QString name_;
     QString key_;
+    
 };
+
+class ActionEventFilter : public QObject
+{
+    Q_OBJECT
+    public:
+        ActionEventFilter(){};
+        bool eventFilter(QObject* obj, QEvent* event);
+        static ActionEventFilter *get_instance();
+        QMap<int, Action*> eventFilterMap;
+        void disable()
+        {
+            disabled = true;
+        }
+        void enable()
+        {
+            disabled = false;
+        }
+    private:
+        std::mutex mutex_;
+        bool disabled = false;
+
+};
+
+

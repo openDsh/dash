@@ -3,6 +3,7 @@
 #include <QWindow>
 
 #include "app/window.hpp"
+#include "app/action.hpp"
 
 int main(int argc, char *argv[])
 {
@@ -10,6 +11,7 @@ int main(int argc, char *argv[])
 
     dash.setOrganizationName("openDsh");
     dash.setApplicationName("dash");
+    dash.installEventFilter(ActionEventFilter::get_instance());
 
     QStringList args = dash.arguments();
     bool use_fixed_size = (args.size() > 2);

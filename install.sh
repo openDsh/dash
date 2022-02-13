@@ -2,7 +2,7 @@
 
 #repo addresses
 aasdkRepo="https://github.com/OpenDsh/aasdk"
-gstreamerRepo="git://github.com/GStreamer/qt-gstreamer"
+gstreamerRepo="https://github.com/GStreamer/qt-gstreamer"
 openautoRepo="https://github.com/openDsh/openauto"
 
 #Help text
@@ -16,6 +16,14 @@ display_help() {
     echo "   --debug          create a debug build "
     echo
 }
+
+#determine if script is being run on bullseye or above
+BULLSEYE=false
+read -d . DEBIAN_VERSION < /etc/debian_version
+if (( $DEBIAN_VERSION > 10 )); then
+  echo Detected Debian version of Bullseye or above
+  BULLSEYE=true
+fi
 
 #check if /etc/rpi-issue exists, if not set the install Args to be false
 if [ -f /etc/rpi-issue ]
@@ -106,7 +114,6 @@ dependencies=(
 "gstreamer1.0-alsa"
 "libgstreamer-plugins-base1.0-dev"
 "qtdeclarative5-dev"
-"qt5-default"
 "libgstreamer-plugins-bad1.0-dev"
 "libunwind-dev"
 "qml-module-qtmultimedia"
@@ -117,13 +124,18 @@ dependencies=(
 "libqt5svg5-dev"
 )
 
+
 ###############################  dependencies  #########################
 if [ $deps = false ]
   then
-    echo skipping dependencies '\n'
+    echo -e skipping dependencies '\n'
   else
-    #loop through dependencies and install
+    if [ $BULLSEYE = false ]; then
+      echo Adding qt5-default to dependencies
+      dependencies[${#dependencies[@]}]="qt5-default"
+    fi
     echo installing dependencies
+    #loop through dependencies and install
     echo Running apt update
     sudo apt update
 
@@ -245,6 +257,16 @@ if [ $gstreamer = true ]; then
 
   #change into newly cloned directory
   cd qt-gstreamer
+
+  if [ $BULLSEYE = true ]; then
+    #apply 1.18 patch
+    echo Applying qt-gstreamer 1.18 patch
+    git apply $script_path/patches/qt-gstreamer-1.18.patch
+  fi
+
+  #apply greenline patch
+  echo Apply greenline patch
+  git apply $script_path/patches/greenline_fix.patch
 
   #create build directory
   echo Creating Gstreamer build directory

@@ -3,8 +3,9 @@
 #include "app/config.hpp"
 #include "app/widgets/progress.hpp"
 #include "app/window.hpp"
+#include "DashLog.hpp"
 
-OpenAutoWorker::OpenAutoWorker(std::function<void(bool)> callback, bool night_mode, QWidget *frame)
+OpenAutoWorker::OpenAutoWorker(std::function<void(bool)> callback, bool night_mode, QWidget *frame, Arbiter &arbiter)
     : QObject(qApp),
       io_service(),
       work(io_service),
@@ -25,7 +26,11 @@ OpenAutoWorker::OpenAutoWorker(std::function<void(bool)> callback, bool night_mo
     this->create_io_service_workers();
 
     this->app->waitForDevice(true);
+    AAHandler *aa_handler = arbiter.android_auto().handler;
+    service_factory.setAndroidAutoInterface(aa_handler);
+    aa_handler->setServiceFactory(&service_factory);
 }
+
 
 OpenAutoWorker::~OpenAutoWorker()
 {
@@ -56,6 +61,11 @@ void OpenAutoWorker::create_io_service_workers()
     this->thread_pool.emplace_back(worker);
     this->thread_pool.emplace_back(worker);
     this->thread_pool.emplace_back(worker);
+}
+
+OpenAutoFrame::OpenAutoFrame(QWidget *parent) : QWidget(parent)
+{
+    this->setAttribute(Qt::WA_AcceptTouchEvents);
 }
 
 void OpenAutoFrame::mouseDoubleClickEvent(QMouseEvent *)
@@ -99,7 +109,7 @@ QLayout *OpenAutoPage::Settings::settings_widget()
     layout->addLayout(this->connected_indicator_widget(), 1);
     layout->addWidget(Session::Forge::br(), 1);
     layout->addLayout(this->touchscreen_row_widget(), 1);
-    layout->addLayout(this->buttons_row_widget(), 1);
+    // layout->addLayout(this->buttons_row_widget(), 1);
 
     return layout;
 }
@@ -416,7 +426,7 @@ void OpenAutoPage::init()
     this->frame = new OpenAutoFrame(this);
 
     std::function<void(bool)> callback = [frame = this->frame](bool active) { frame->toggle(active); };
-    this->worker = new OpenAutoWorker(callback, this->arbiter.theme().mode == Session::Theme::Dark, frame);
+    this->worker = new OpenAutoWorker(callback, this->arbiter.theme().mode == Session::Theme::Dark, frame, this->arbiter);
 
     connect(this->frame, &OpenAutoFrame::toggle, [this](bool enable){
         if (!enable && this->frame->is_fullscreen()) {
@@ -437,13 +447,10 @@ void OpenAutoPage::init()
     connect(this->frame, &OpenAutoFrame::double_clicked, [this](bool fullscreen) {
         this->set_full_screen(fullscreen);
     });
-    connect(&this->arbiter, &Arbiter::mode_changed, [this](Session::Theme::Mode mode){
-        this->worker->set_night_mode(mode == Session::Theme::Dark);
-    });
-
-    connect(&this->arbiter, &Arbiter::openauto_button_press, [this](aasdk::proto::enums::ButtonCode::Enum buttonCode, openauto::projection::WheelDirection wheelDirection){
-        this->worker->send_button_press(buttonCode, wheelDirection);
-        DASH_LOG(info)<<"[OpenAutoPage] Firing button press";
+    
+    AAHandler *aa_handler = this->arbiter.android_auto().handler;
+    connect(&this->arbiter, &Arbiter::mode_changed, [this, aa_handler](Session::Theme::Mode mode){
+        aa_handler->setNightMode(mode == Session::Theme::Dark);
     });
 
     connect(&this->arbiter, &Arbiter::openauto_full_screen, [this](bool fullscreen) {

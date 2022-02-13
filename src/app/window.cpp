@@ -187,14 +187,14 @@ void Window::showEvent(QShowEvent *event)
     this->arbiter.update();
 }
 
-void Window::keyPressEvent(QKeyEvent *event)
-{
-    QMainWindow::keyPressEvent(event);
-    this->arbiter.layout().openauto_page->pass_key_event(event);
-}
+// void Window::keyPressEvent(QKeyEvent *event)
+// {
+//     QMainWindow::keyPressEvent(event);
+//     this->arbiter.layout().openauto_page->pass_key_event(event);
+// }
 
-void Window::keyReleaseEvent(QKeyEvent *event)
-{
-    QMainWindow::keyReleaseEvent(event);
-    this->arbiter.layout().openauto_page->pass_key_event(event);
-}
+// void Window::keyReleaseEvent(QKeyEvent *event)
+// {
+//     QMainWindow::keyReleaseEvent(event);
+//     this->arbiter.layout().openauto_page->pass_key_event(event);
+// }

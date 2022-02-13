@@ -1,0 +1,26 @@
+diff --git a/src/QGst/event.cpp b/src/QGst/event.cpp
+index 0530f0b..260a909 100644
+--- a/src/QGst/event.cpp
++++ b/src/QGst/event.cpp
+@@ -125,7 +125,7 @@ Segment SegmentEvent::segment() const
+ //********************************************************
+ TagEventPtr TagEvent::create(const TagList & taglist)
+ {
+-    GstEvent * e = gst_event_new_tag(gst_tag_list_copy(taglist));
++    GstEvent * e = gst_event_new_tag(gst_tag_list_copy(&taglist));
+     return TagEventPtr::wrap(e, false);
+ }
+ 
+diff --git a/src/QGst/message.cpp b/src/QGst/message.cpp
+index ae845cc..1044b88 100644
+--- a/src/QGst/message.cpp
++++ b/src/QGst/message.cpp
+@@ -157,7 +157,7 @@ QString InfoMessage::debugMessage() const
+ 
+ TagMessagePtr TagMessage::create(const ObjectPtr & source, const TagList & taglist)
+ {
+-    GstMessage *m = gst_message_new_tag(source, gst_tag_list_copy(taglist));
++    GstMessage *m = gst_message_new_tag(source, gst_tag_list_copy(&taglist));
+     return TagMessagePtr::wrap(m, false);
+ }
+ 
