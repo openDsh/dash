@@ -186,6 +186,6 @@ class Session {
     Layout layout_;
     System system_;
     Forge forge_;
-    Core core_;
     AndroidAuto android_auto_;
+    Core core_;
 };
