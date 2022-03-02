@@ -6,16 +6,40 @@
 
 #include "canbus/socketcanbus.hpp"
 #include "obd/message.hpp"
-#include "obd/command.hpp"
+#include "obd/conversions.hpp"
+
 #include "app/widgets/selector.hpp"
 #include "app/widgets/dialog.hpp"
-
 #include "app/pages/page.hpp"
 
 class Arbiter;
 
-typedef std::function<double(double, bool)> obd_decoder_t;
 typedef QPair<QString, QString> units_t;
+struct font_size_t {
+    int label;
+    int value;
+    int unit;
+};
+typedef std::function<double(double, bool)> unit_converter_t;
+
+struct GaugeConfig {
+    QString id;
+    QString description;
+    units_t units;
+    font_size_t font_size;
+    int precision;
+    unit_converter_t converter;
+};
+
+// typedef QList<Gauge> Gauges;
+struct GaugesConfig {
+    GaugeConfig LOAD;
+    GaugeConfig COOLANT_TEMP;
+    GaugeConfig RPM;
+    GaugeConfig SPEED;
+    GaugeConfig INTAKE_TEMP;
+    GaugeConfig MPG;
+};
 
 class Gauge : public QWidget {
     Q_OBJECT
@@ -23,25 +47,22 @@ class Gauge : public QWidget {
    public:
     enum Orientation { BOTTOM, RIGHT };
 
-    Gauge(units_t units, QFont value_font, QFont unit_font, Orientation orientation, int rate,
-          std::vector<Command> cmds, int precision, obd_decoder_t decoder, QWidget *parent = nullptr);
+    Gauge(GaugeConfig cfg, QFont value_font, QFont unit_font, Orientation orientation, QWidget *parent = nullptr);
 
-    inline void start() { this->timer->start(this->rate); }
-    inline void stop() { this->timer->stop(); }
-    void can_callback(QByteArray payload);
+    inline QString get_id() { return this->id; };
+    void set_value(int value);
 
    private:
     QString format_value(double value);
     QString null_value();
     QLabel *value_label;
 
-    obd_decoder_t decoder;
-    std::vector<Command> cmds;
+    unit_converter_t converter;
 
+    QString id;
     bool si;
-    int rate;
     int precision;
-    QTimer *timer;
+    units_t units;
 
    signals:
     void toggle_unit(bool si);
@@ -82,8 +103,7 @@ class DataTab : public QWidget {
     QWidget *speedo_tach_widget();
     // QWidget *mileage_data_widget();
     QWidget *engine_data_widget();
-    QWidget *coolant_temp_widget();
-    QWidget *engine_load_widget();
+    QWidget *vehicle_data_widget(GaugeConfig cfg);
 
     std::vector<Gauge *> gauges;
 };

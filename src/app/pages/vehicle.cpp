@@ -4,30 +4,43 @@
 #include "app/config.hpp"
 #include "app/pages/vehicle.hpp"
 #include "app/window.hpp"
-#include "obd/conversions.hpp"
 #include "canbus/elm327.hpp"
 #include "plugins/vehicle_plugin.hpp"
 
-Gauge::Gauge(units_t units, QFont value_font, QFont unit_font, Gauge::Orientation orientation, int rate,
-             std::vector<Command> cmds, int precision, obd_decoder_t decoder, QWidget *parent)
+GaugesConfig gauges_cfg = 
+{
+  {"load", "Calculated Engine Load", {"%", "%"}, 
+    {10, 16, 12}, 1, [](double x, bool _) { return x; }
+  },
+  {"coolant_temp", "Engine Coolant Temperature", {"°F", "°C"}, 
+    {10, 16, 12}, 1, [](double x, bool si) { return si ? x : Conversion::c_to_f(x); }
+  },
+  {"rpm", "Engine Revolutions Per Minute (RPM)", {"x1000rpm", "x1000rpm"}, 
+    {0, 24, 12}, 1, [](double x, bool _) { return x / 1000.0; }
+  },
+  {"speed", "Vehicle Speed", {"mph", "km/h"}, 
+    {0, 36, 16}, 0, [](double x, bool si) { return si ? x : Conversion::kph_to_mph(x); }
+  },
+  {"intake_temp", "Intake Air Temperature", {"°F", "°C"}, 
+    {10, 16, 12}, 1, [](double x, bool si) { return si ? x : Conversion::c_to_f(x); }
+  },
+  {"mpg", "Petrol consumption", {"mpg", "l/100km"},  
+    {10, 16, 12}, 1, [](double x, bool si) { return si ? x : Conversion::l100km_to_mpg(x); }
+  }
+};
+
+Gauge::Gauge(GaugeConfig cfg, QFont value_font, QFont unit_font, Gauge::Orientation orientation, QWidget *parent)
 : QWidget(parent)
 {
     Config *config = Config::get_instance();
-    ICANBus *bus = (config->get_vehicle_can_bus())?((ICANBus *)SocketCANBus::get_instance()):((ICANBus *)elm327::get_instance());
 
-    using namespace std::placeholders;
-    std::function<void(QByteArray)> callback = std::bind(&Gauge::can_callback, this, std::placeholders::_1);
-
-    bus->registerFrameHandler(cmds[0].frame.frameId()+0x9, callback);
-    DASH_LOG(info)<<"[Gauges] Registered frame handler for id "<<(cmds[0].frame.frameId()+0x9);
-
+    this->id = cfg.id;
     this->si = config->get_si_units();
 
-    this->rate = rate;
-    this->precision = precision;
+    this->precision = cfg.precision;
 
-    this->cmds = cmds;
-    this->decoder = decoder;
+    this->units = cfg.units;
+    this->converter = cfg.converter;
 
     QBoxLayout *layout;
     if (orientation == BOTTOM)
@@ -39,20 +52,13 @@ Gauge::Gauge(units_t units, QFont value_font, QFont unit_font, Gauge::Orientatio
     value_label->setFont(value_font);
     value_label->setAlignment(Qt::AlignCenter);
 
-    QLabel *unit_label = new QLabel(this->si ? units.second : units.first, this);
+    QLabel *unit_label = new QLabel(this->si ? this->units.second : this->units.first, this);
     unit_label->setFont(unit_font);
     unit_label->setAlignment(Qt::AlignCenter);
 
-    this->timer = new QTimer(this);
-    connect(this->timer, &QTimer::timeout, [this, bus, cmds]() {
-        for (auto cmd : cmds) {
-            bus->writeFrame(cmd.frame);
-        }
-    });
-
-    connect(config, &Config::si_units_changed, [this, units, unit_label](bool si) {
+    connect(config, &Config::si_units_changed, [this, unit_label](bool si) {
         this->si = si;
-        unit_label->setText(this->si ? units.second : units.first);
+        unit_label->setText(this->si ? this->units.second : this->units.first);
         value_label->setText(this->null_value());
     });
 
@@ -63,13 +69,9 @@ Gauge::Gauge(units_t units, QFont value_font, QFont unit_font, Gauge::Orientatio
     layout->addStretch(4);
 }
 
-void Gauge::can_callback(QByteArray payload){
-    Response resp = Response(payload);
-    for(auto cmd : cmds){
-        if(cmd.frame.payload().at(2) == resp.PID){
-            value_label->setText(this->format_value(this->decoder(cmd.decoder(resp), this->si)));
-        }
-    }
+void Gauge::set_value(int value){
+    DASH_LOG(debug)<<"[Gauges] set_value: "<<std::to_string(value);
+    value_label->setText(this->format_value(this->converter(value, this->si)));
 }
 
 QString Gauge::format_value(double value)
@@ -249,8 +251,16 @@ DataTab::DataTab(Arbiter &arbiter, QWidget *parent)
     QSizePolicy sp_right(QSizePolicy::Preferred, QSizePolicy::Preferred);
     sp_right.setHorizontalStretch(2);
     engine_data->setSizePolicy(sp_right);
-    for (auto &gauge : this->gauges)
-        gauge->start();
+
+    connect(&this->arbiter, &Arbiter::vehicle_update_data, [this](QString gauge_id, int value){
+        // DASH_LOG(info)<<"[Gauges] arbiter update: "<<qPrintable(gauge_id)<<" to "<< std::to_string(value);
+        for (auto &gauge : this->gauges) {
+            if(gauge->get_id() == gauge_id){
+                // DASH_LOG(info)<<"[Gauges] Found: "<<gauge->get_id();
+                gauge->set_value(value);
+            }
+        }
+    });
 }
 
 QWidget *DataTab::speedo_tach_widget()
@@ -260,33 +270,9 @@ QWidget *DataTab::speedo_tach_widget()
     layout->setContentsMargins(0, 0, 0, 0);
 
     layout->addStretch(3);
-
-    QFont speed_value_font(this->arbiter.forge().font(36, true));
-
-    QFont speed_unit_font(this->arbiter.forge().font(16));
-    speed_unit_font.setWeight(QFont::Light);
-    speed_unit_font.setItalic(true);
-
-    Gauge *speed = new Gauge({"mph", "km/h"}, speed_value_font, speed_unit_font,
-                             Gauge::BOTTOM, 100, {cmds.SPEED}, 0,
-                             [](double x, bool si) { return si ? x : kph_to_mph(x); }, widget);
-    layout->addWidget(speed);
-    this->gauges.push_back(speed);
-
+    layout->addWidget(this->vehicle_data_widget(gauges_cfg.SPEED));
     layout->addStretch(2);
-
-    QFont tach_value_font(this->arbiter.forge().font(24, true));
-
-    QFont tach_unit_font(this->arbiter.forge().font(12));
-    tach_unit_font.setWeight(QFont::Light);
-    tach_unit_font.setItalic(true);
-
-    Gauge *rpm = new Gauge({"x1000rpm", "x1000rpm"}, tach_value_font,
-                           tach_unit_font, Gauge::BOTTOM, 100, {cmds.RPM}, 1,
-                           [](double x, bool _) { return x / 1000.0; }, widget);
-    layout->addWidget(rpm);
-    this->gauges.push_back(rpm);
-
+    layout->addWidget(this->vehicle_data_widget(gauges_cfg.RPM));
     layout->addStretch(1);
 
     return widget;
@@ -312,7 +298,7 @@ QWidget *DataTab::speedo_tach_widget()
 //	   unit_font.setItalic(true);
 //
 //     Gauge *mileage = new Gauge({"mpg", "km/L"}, value_font, unit_font,
-//                                Gauge::BOTTOM, 100, {cmds.SPEED, cmds.MAF}, 1,
+//                                Gauge::BOTTOM, 100, {gauges_cfg.SPEED, gauges_cfg.MAF}, 1,
 //                                [](std::vector<double> x, bool si) {
 //                                    return (si ? x[0] : kph_to_mph(x[0])) / (si ? gps_to_lph(x[1]) : gps_to_gph(x[1]));
 //                                },
@@ -331,71 +317,47 @@ QWidget *DataTab::engine_data_widget()
     layout->setSpacing(0);
 
     layout->addStretch();
-    layout->addWidget(this->coolant_temp_widget());
+    layout->addWidget(this->vehicle_data_widget(gauges_cfg.COOLANT_TEMP));
     layout->addStretch();
     layout->addWidget(Session::Forge::br());
     layout->addStretch();
-    layout->addWidget(this->engine_load_widget());
+    layout->addWidget(this->vehicle_data_widget(gauges_cfg.LOAD));
+    layout->addStretch();
+    layout->addWidget(Session::Forge::br());
+    layout->addStretch();
+    layout->addWidget(this->vehicle_data_widget(gauges_cfg.MPG));
     layout->addStretch();
 
     return widget;
 }
 
-QWidget *DataTab::coolant_temp_widget()
+QWidget *DataTab::vehicle_data_widget(GaugeConfig cfg)
 {
     QWidget *widget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
 
-    QFont value_font(this->arbiter.forge().font(16, true));
+    QFont value_font(this->arbiter.forge().font(cfg.font_size.value, true));
 
-    QFont unit_font(this->arbiter.forge().font(12));
+    QFont unit_font(this->arbiter.forge().font(cfg.font_size.unit));
     unit_font.setWeight(QFont::Light);
     unit_font.setItalic(true);
 
-    Gauge *coolant_temp = new Gauge(
-        {"°F", "°C"}, value_font, unit_font, Gauge::RIGHT, 5000,
-        {cmds.COOLANT_TEMP}, 1, [](double x, bool si) { return si ? x : c_to_f(x); }, widget);
-    layout->addWidget(coolant_temp);
-    this->gauges.push_back(coolant_temp);
+    Gauge *gauge = new Gauge(cfg,
+        value_font, unit_font, Gauge::RIGHT, widget);
+    layout->addWidget(gauge);
+    this->gauges.push_back(gauge);
 
-    QFont label_font(this->arbiter.forge().font(10));
-    label_font.setWeight(QFont::Light);
+    if (cfg.font_size.label > 0) {
+        QFont label_font(this->arbiter.forge().font(cfg.font_size.label));
+        label_font.setWeight(QFont::Light);
 
-    QLabel *coolant_temp_label = new QLabel("coolant", widget);
-    coolant_temp_label->setFont(label_font);
-    coolant_temp_label->setAlignment(Qt::AlignHCenter);
-    layout->addWidget(coolant_temp_label);
+        QLabel *gauge_label = new QLabel(cfg.description, widget);
+        gauge_label->setFont(label_font);
+        gauge_label->setAlignment(Qt::AlignHCenter);
+        layout->addWidget(gauge_label);
+    }
 
-    return widget;
-}
-
-QWidget *DataTab::engine_load_widget()
-{
-    QWidget *widget = new QWidget(this);
-    QVBoxLayout *layout = new QVBoxLayout(widget);
-    layout->setContentsMargins(0, 0, 0, 0);
-    layout->setSpacing(0);
-
-    QFont value_font(this->arbiter.forge().font(16, true));
-
-    QFont unit_font(this->arbiter.forge().font(12));
-    unit_font.setWeight(QFont::Light);
-    unit_font.setItalic(true);
-
-    Gauge *engine_load =
-        new Gauge({"%", "%"}, value_font, unit_font, Gauge::RIGHT,
-                  500, {cmds.LOAD}, 1, [](double x, bool _) { return x; }, widget);
-    layout->addWidget(engine_load);
-    this->gauges.push_back(engine_load);
-
-    QFont label_font(this->arbiter.forge().font(10));
-    label_font.setWeight(QFont::Light);
-
-    QLabel *engine_load_label = new QLabel("load", widget);
-    engine_load_label->setFont(label_font);
-    engine_load_label->setAlignment(Qt::AlignHCenter);
-    layout->addWidget(engine_load_label);
     return widget;
 }

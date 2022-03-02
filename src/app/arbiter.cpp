@@ -192,3 +192,8 @@ void Arbiter::send_openauto_full_screen(bool fullscreen)
 {
     emit openauto_full_screen(fullscreen);
 }
+
+void Arbiter::send_vehicle_data(QString gauge_id, int value)
+{
+    emit vehicle_update_data(gauge_id, value);
+}

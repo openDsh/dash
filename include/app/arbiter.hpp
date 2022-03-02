@@ -39,6 +39,7 @@ class Arbiter : public QObject {
     void set_action(Action *action, QString key);
     void send_openauto_button_press(aasdk::proto::enums::ButtonCode::Enum buttonCode, openauto::projection::WheelDirection wheelDirection = openauto::projection::WheelDirection::NONE);
     void send_openauto_full_screen(bool fullscreen = true);
+    void send_vehicle_data(QString gauge_id, int value);
 
     QMainWindow *window() { return this->window_; }
     QSettings &settings() { return this->session_.settings_; }
@@ -68,4 +69,5 @@ class Arbiter : public QObject {
     void cursor_changed(bool enabled);
     void action_changed(Action *action, QString key);
     void openauto_full_screen(bool fullscreen);
+    void vehicle_update_data(QString gauge_id, int value);
 };
