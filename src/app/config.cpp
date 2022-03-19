@@ -14,7 +14,10 @@ Config::Config()
     this->radio_plugin = this->settings.value("Pages/Media/Radio/plugin", "unloader").toString();
     this->media_home = this->settings.value("Pages/Media/Local/home", QDir().absolutePath()).toString();
     this->si_units = this->settings.value("Pages/Vehicle/si_units", false).toBool();
-    this->vehicle_can_bus = this->settings.value("Pages/Vehicle/can_bus", false).toBool();
+    // 0 - SocketCAN
+    // 1 - Elm 327 USB
+    // 2 - Elm 327 Bluetooth
+    this->vehicle_can_bus = this->settings.value("Pages/Vehicle/can_bus", 0).toInt();
     this->vehicle_interface = this->settings.value("Pages/Vehicle/interface", "disabled").toString();
     this->vehicle_plugin = this->settings.value("Pages/Vehicle/plugin", "unloader").toString();
     this->cam_network_url = this->settings.value("Pages/Camera/stream_url", QString()).toString();

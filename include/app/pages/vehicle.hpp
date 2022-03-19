@@ -66,6 +66,8 @@ class VehiclePage : public QTabWidget, public Page {
     QMap<QString, QFileInfo> plugins;
     QStringList can_devices;
     QStringList serial_devices;
+    QStringList paired_bt_names;
+    QStringList paired_bt_addresses;
     QPluginLoader *active_plugin;
     Selector *plugin_selector;
     Config *config;
