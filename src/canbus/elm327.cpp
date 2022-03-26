@@ -4,6 +4,7 @@ elm327::elm327(QString canInterface, bool bluetooth)
 {
     DASH_LOG(info)<<"[ElM327] Attempting to connect to elm device: "<<canInterface.toStdString();
     if(bluetooth){
+        this->adapterType = BT;
         btSocket = new QBluetoothSocket(QBluetoothServiceInfo::RfcommProtocol);
         QObject::connect(btSocket, &QBluetoothSocket::connected, this, &elm327::btConnected);
         QObject::connect(btSocket, &QBluetoothSocket::stateChanged, this, &elm327::socketChanged);
@@ -37,7 +38,6 @@ elm327 *elm327::get_bt_instance()
 
 void elm327::btConnected()
 {
-    this->adapterType = BT; 
     this->connected=true;
     this->initialize();
 }
@@ -66,7 +66,8 @@ int elm327::_write(std::string str)
 {
     str += '\r';
     int size;
-    if ((size = (adapterType==BT)?(::send(btSocket->socketDescriptor(), str.c_str(), str.length(),0)):(write(this->fd, str.c_str(), str.length()))) < 0) {
+    if ((size = (adapterType==BT)?(::send(btSocket->socketDescriptor(), str.c_str(), str.length(), 0)):(write(this->fd, str.c_str(), str.length()))) < 0)
+    {
         DASH_LOG(error) << "[ELM327] failed write" << std::endl;
         this->connected = false;
         return 0;
@@ -127,7 +128,7 @@ bool elm327::writeFrame(QCanBusFrame frame)
         
     //this is an obd message, so we can send it with the elm327
     if(frame.frameId() == 0x7df){
-        ss << std::hex << std::setfill('0');
+        ss << std::hex << std::uppercase << std::setfill('0');
         for(int i = 1; i<=frame.payload().at(0); i++){
             ss << std::setw(2) << static_cast<unsigned>(frame.payload().at(i));
         }
@@ -166,7 +167,6 @@ QCanBusFrame elm327::receive()
 {
     QCanBusFrame *retFrame = new QCanBusFrame();
     std::string resp_str = this->_read();
-
 
     if (is_failed_response(resp_str)){
         retFrame->setFrameType(QCanBusFrame::ErrorFrame);
@@ -213,16 +213,18 @@ std::string elm327::_read()
     std::string str;
 
     while (true) {
-        if ((adapterType==BT)?(::recv(btSocket->socketDescriptor(), (void *) buf, 1, 0)):(read(this->fd, (void *)buf, 1)) != 1) {
-            DASH_LOG(error) << "[ELM327] failed read";
+        if (((adapterType==BT)?(::recv(btSocket->socketDescriptor(), (void *) buf, 1, 0)):(read(this->fd, (void *)buf, 1))) != 1)
+        {
             if(adapterType != BT)
             {
+                DASH_LOG(error) << "[ELM327] failed read";
                 this->connected = false;
                 return "";
             }
             else
             {
                 continue;
+                //return "";
             }
         }
         if (buf[0] == '>')

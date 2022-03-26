@@ -210,7 +210,13 @@ QWidget *VehiclePage::dialog_body()
     });
     connect(&this->arbiter.system().bluetooth, &Bluetooth::init, [this, interface_selector]{
         interface_selector->setVisible((this->can_devices.size() > 0) || (this->serial_devices.size() > 0) || (this->paired_bt_names.size() > 0));
-        if(this->config->get_vehicle_can_bus()==2) interface_selector->set_options(this->paired_bt_names);
+        if(this->config->get_vehicle_can_bus()==2){
+            QString current = this->config->get_vehicle_interface();
+            interface_selector->set_options(this->paired_bt_names);
+            if(current != "disabled")
+                interface_selector->set_current(this->paired_bt_names[this->paired_bt_addresses.indexOf(current)]);
+
+        }
     });
     layout->addWidget(interface_selector, 1);
 
