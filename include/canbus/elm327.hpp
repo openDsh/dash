@@ -23,7 +23,7 @@
 #include "canbus/ICANBus.hpp"
 #include "app/config.hpp"
 
-class elm327 : public QObject, public ICANBus
+class elm327 : public ICANBus
 {
     Q_OBJECT
     public:

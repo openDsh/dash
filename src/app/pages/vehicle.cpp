@@ -16,15 +16,15 @@ Gauge::Gauge(units_t units, QFont value_font, QFont unit_font, Gauge::Orientatio
     ICANBus *bus;
     switch(config->get_vehicle_can_bus()){
         //ELM327 USB
-        case 1:
+        case ICANBus::VehicleBusType::ELM327USB:
             bus = (ICANBus *)elm327::get_usb_instance();
             break;
         //ELM327 Bluetooth
-        case 2:
+        case ICANBus::VehicleBusType::ELM327BT:
             bus = (ICANBus *)elm327::get_bt_instance();
             break;
         //SocketCAN
-        case 0:
+        case ICANBus::VehicleBusType::SocketCAN:
         default:
             bus = (ICANBus *)SocketCANBus::get_instance();
             break;
@@ -127,8 +127,7 @@ void VehiclePage::init()
         for (auto device: this->arbiter.system().bluetooth.get_devices())
         {
             if(device->isPaired()){
-                this->paired_bt_names.append(device->name());
-                this->paired_bt_addresses.append(device->address());
+                this->paired_bt_devices.insert(device->name(), device->address());
             }
         }
     });
@@ -165,26 +164,26 @@ QWidget *VehiclePage::dialog_body()
     QStringList devices;
     switch(config->get_vehicle_can_bus()){
         //ELM327 USB
-        case 1:
+        case ICANBus::VehicleBusType::ELM327USB:
             devices = this->serial_devices;
             break;
         //ELM327 Bluetooth
-        case 2:
+        case ICANBus::VehicleBusType::ELM327BT:
             
             break;
         //SocketCAN
-        case 0:
+        case ICANBus::VehicleBusType::SocketCAN:
         default:
             devices = this->can_devices;
             break;
     }
    
     Selector *interface_selector = new Selector(devices, this->config->get_vehicle_interface(), this->arbiter.forge().font(14), this->arbiter, widget, "disabled");
-    interface_selector->setVisible((this->can_devices.size() > 0) || (this->serial_devices.size() > 0) || (this->paired_bt_names.size() > 0));
+    interface_selector->setVisible((this->can_devices.size() > 0) || (this->serial_devices.size() > 0) || (this->paired_bt_devices.size() > 0));
     connect(interface_selector, &Selector::item_changed, [config = this->config, this](QString item){
-        if(config->get_vehicle_can_bus()==2 && item != QString("disabled"))
+        if(config->get_vehicle_can_bus()==ICANBus::VehicleBusType::ELM327BT && item != QString("disabled"))
         {
-            config->set_vehicle_interface(this->paired_bt_addresses[this->paired_bt_names.indexOf(item)]);
+            config->set_vehicle_interface(this->paired_bt_devices[item]);
         }
         else
         {
@@ -194,27 +193,27 @@ QWidget *VehiclePage::dialog_body()
     connect(this->config, &Config::vehicle_can_bus_changed, [this, interface_selector](int state){
         switch(state){
             //ELM327 USB
-            case 1:
+            case ICANBus::VehicleBusType::ELM327USB:
                 interface_selector->set_options(this->serial_devices);
                 break;
             //ELM327 Bluetooth
-            case 2:
-                interface_selector->set_options(this->paired_bt_names);
+            case ICANBus::VehicleBusType::ELM327BT:
+                interface_selector->set_options(this->paired_bt_devices.keys());
                 break;
             //SocketCAN
-            case 0:
+            case ICANBus::VehicleBusType::SocketCAN:
             default:
                 interface_selector->set_options(this->can_devices);
                 break;
         }
     });
     connect(&this->arbiter.system().bluetooth, &Bluetooth::init, [this, interface_selector]{
-        interface_selector->setVisible((this->can_devices.size() > 0) || (this->serial_devices.size() > 0) || (this->paired_bt_names.size() > 0));
-        if(this->config->get_vehicle_can_bus()==2){
+        interface_selector->setVisible((this->can_devices.size() > 0) || (this->serial_devices.size() > 0) || (this->paired_bt_devices.size() > 0));
+        if(this->config->get_vehicle_can_bus()==ICANBus::VehicleBusType::ELM327BT){
             QString current = this->config->get_vehicle_interface();
-            interface_selector->set_options(this->paired_bt_names);
+            interface_selector->set_options(this->paired_bt_devices.keys());
             if(current != "disabled")
-                interface_selector->set_current(this->paired_bt_names[this->paired_bt_addresses.indexOf(current)]);
+                interface_selector->set_current(this->paired_bt_devices.key(current));
 
         }
     });
@@ -237,31 +236,31 @@ QWidget *VehiclePage::can_bus_toggle_row()
     QGroupBox *group = new QGroupBox();
     QVBoxLayout *group_layout = new QVBoxLayout(group);
 
-    int can_bus_selected = this->config->get_vehicle_can_bus();
+    ICANBus::VehicleBusType can_bus_selected = this->config->get_vehicle_can_bus();
     QRadioButton *socketcan_button = new QRadioButton("SocketCAN", group);
-    socketcan_button->setChecked(can_bus_selected==0);
+    socketcan_button->setChecked(can_bus_selected==ICANBus::VehicleBusType::SocketCAN);
     socketcan_button->setEnabled(this->can_devices.size() > 0);
     connect(socketcan_button, &QRadioButton::clicked, [config = this->config]{
-        config->set_vehicle_can_bus(0);
+        config->set_vehicle_can_bus(ICANBus::VehicleBusType::SocketCAN);
     });
     group_layout->addWidget(socketcan_button);
 
     QRadioButton *elm_usb_button = new QRadioButton("ELM327 (USB)", group);
-    elm_usb_button->setChecked(can_bus_selected==1);
+    elm_usb_button->setChecked(can_bus_selected==ICANBus::VehicleBusType::ELM327USB);
     elm_usb_button->setEnabled(this->serial_devices.size() > 0);
     connect(elm_usb_button, &QRadioButton::clicked, [config = this->config]{
-        config->set_vehicle_can_bus(1);
+        config->set_vehicle_can_bus(ICANBus::VehicleBusType::ELM327USB);
     });
     group_layout->addWidget(elm_usb_button);
 
     QRadioButton *elm_bt_button = new QRadioButton("ELM327 (Bluetooth)", group);
-    elm_bt_button->setChecked(can_bus_selected==2);
+    elm_bt_button->setChecked(can_bus_selected==ICANBus::VehicleBusType::ELM327BT);
     elm_bt_button->setEnabled(false);
     connect(elm_bt_button, &QRadioButton::clicked, [config = this->config]{
-        config->set_vehicle_can_bus(2);
+        config->set_vehicle_can_bus(ICANBus::VehicleBusType::ELM327BT);
     });
     connect(&this->arbiter.system().bluetooth, &Bluetooth::init, [this, elm_bt_button]{
-            elm_bt_button->setEnabled(this->paired_bt_names.size() > 0);
+            elm_bt_button->setEnabled(this->paired_bt_devices.size() > 0);
     });
     group_layout->addWidget(elm_bt_button);
 
@@ -308,15 +307,15 @@ void VehiclePage::load_plugin()
             plugin->dashize(&this->arbiter);
             switch(config->get_vehicle_can_bus()){
                 //ELM327 USB
-                case 1:
+                case ICANBus::VehicleBusType::ELM327USB:
                     plugin->init((ICANBus *)elm327::get_usb_instance());
                     break;
                 //ELM327 Bluetooth
-                case 2:
+                case ICANBus::VehicleBusType::ELM327BT:
                     plugin->init((ICANBus *)elm327::get_bt_instance());
                     break;
                 //SocketCAN
-                case 0:
+                case ICANBus::VehicleBusType::SocketCAN:
                 default:
                     plugin->init((ICANBus *)SocketCANBus::get_instance());
                     break;

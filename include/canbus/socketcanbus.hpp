@@ -9,7 +9,7 @@
 #include "canbus/ICANBus.hpp"
 #include "app/config.hpp"
 
-class SocketCANBus : public QObject, public ICANBus
+class SocketCANBus : public ICANBus
 {
     Q_OBJECT
     public:

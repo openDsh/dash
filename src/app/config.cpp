@@ -17,7 +17,7 @@ Config::Config()
     // 0 - SocketCAN
     // 1 - Elm 327 USB
     // 2 - Elm 327 Bluetooth
-    this->vehicle_can_bus = this->settings.value("Pages/Vehicle/can_bus", 0).toInt();
+    this->vehicle_can_bus = (ICANBus::VehicleBusType)(this->settings.value("Pages/Vehicle/can_bus", ICANBus::VehicleBusType::SocketCAN).toInt());
     this->vehicle_interface = this->settings.value("Pages/Vehicle/interface", "disabled").toString();
     this->vehicle_plugin = this->settings.value("Pages/Vehicle/plugin", "unloader").toString();
     this->cam_network_url = this->settings.value("Pages/Camera/stream_url", QString()).toString();
