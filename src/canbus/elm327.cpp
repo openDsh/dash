@@ -211,7 +211,10 @@ std::string elm327::_read()
 {
     char buf[1];
     std::string str;
-    int failure_count = 0;
+    
+    QTimer* bluetooth_watchdog = new QTimer(this);
+    if(adapterType==BT)
+        bluetooth_watchdog->start(5000);
 
     while (true) {
 
@@ -225,9 +228,9 @@ std::string elm327::_read()
             }
             else
             {
-                if(failure_count++ > 15)
+                if(bluetooth_watchdog->remainingTime() == 0)
                 {
-                    DASH_LOG(error) << "[ELM327] Bluetooth device failed read 15 times in a row, disconnecting";
+                    DASH_LOG(error) << "[ELM327] Bluetooth watchdog expired, disconnecting";
                     this->connected = false;
                     return "";
                 }
@@ -238,6 +241,9 @@ std::string elm327::_read()
             break;
         else
             str += buf[0];
+        // feed watchdog
+        if(adapterType==BT)
+            bluetooth_watchdog->start(5000);
     }
 
     return str;

@@ -7,6 +7,7 @@
 #include <QVector>
 #include <QByteArray>
 #include <QVariant>
+#include <QTimer>
 #include <termios.h>
 #include <fcntl.h>
 #include <unistd.h>
