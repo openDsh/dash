@@ -211,8 +211,10 @@ std::string elm327::_read()
 {
     char buf[1];
     std::string str;
+    int failure_count = 0;
 
     while (true) {
+
         if (((adapterType==BT)?(::recv(btSocket->socketDescriptor(), (void *) buf, 1, 0)):(read(this->fd, (void *)buf, 1))) != 1)
         {
             if(adapterType != BT)
@@ -223,8 +225,13 @@ std::string elm327::_read()
             }
             else
             {
+                if(failure_count++ > 15)
+                {
+                    DASH_LOG(error) << "[ELM327] Bluetooth device failed read 15 times in a row, disconnecting";
+                    this->connected = false;
+                    return "";
+                }
                 continue;
-                //return "";
             }
         }
         if (buf[0] == '>')
