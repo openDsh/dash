@@ -1,9 +1,11 @@
 #pragma once
 
 #include <QButtonGroup>
+#include <QGestureRecognizer>
 #include <QKeyEvent>
 #include <QMainWindow>
 #include <QObject>
+#include <QPointF>
 #include <QShowEvent>
 #include <QStackedLayout>
 #include <QVBoxLayout>
@@ -49,6 +51,16 @@ class Dash : public QWidget {
     QWidget *power_control() const;
 };
 
+class PanGestureRecognizer : public QGestureRecognizer
+{
+  QPointF startpoint;
+  bool panning;
+public:
+  PanGestureRecognizer() : panning(false){}
+  QGesture *create(QObject *target);
+  Result recognize(QGesture *state, QObject *watched, QEvent *event);
+};
+
 class Window : public QMainWindow {
     Q_OBJECT
 
@@ -56,6 +68,7 @@ class Window : public QMainWindow {
     Window();
 
    protected:
+    bool event(QEvent *event) override;
     void showEvent(QShowEvent *event);
     // void keyPressEvent(QKeyEvent *event);
     // void keyReleaseEvent(QKeyEvent *event);

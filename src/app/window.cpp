@@ -198,23 +198,112 @@ QWidget *Dash::power_control() const
     return widget;
 }
 
+QGesture *PanGestureRecognizer::create(QObject *target)
+{
+  return  new QPanGesture();
+}
+
+QGestureRecognizer::Result PanGestureRecognizer::recognize(QGesture *state, QObject *, QEvent *event)
+{
+  QMouseEvent * mouse = dynamic_cast<QMouseEvent*>(event);
+  if(mouse != 0)
+  {
+    if(mouse->type() == QMouseEvent::MouseButtonPress)
+    {
+      QPanGesture * gesture = dynamic_cast<QPanGesture*>(state);
+      if(gesture != 0)
+      {
+        panning = true;
+        startpoint = mouse->pos();
+        gesture->setLastOffset(QPointF());
+        gesture->setOffset(QPointF());
+        return TriggerGesture;
+      }
+    }
+    if(panning && (mouse->type() == QMouseEvent::MouseMove))
+    {
+      QPanGesture * gesture = dynamic_cast<QPanGesture*>(state);
+      if(gesture != 0)
+      {
+        gesture->setLastOffset(gesture->offset());
+        gesture->setOffset(mouse->pos() - startpoint);
+        return TriggerGesture;
+      }
+    }
+    if(mouse->type() == QMouseEvent::MouseButtonRelease)
+    {
+      QPanGesture * gesture = dynamic_cast<QPanGesture*>(state);
+      if(gesture != 0)
+      {
+        QPointF endpoint = mouse->pos();
+        if(startpoint == endpoint)
+        {
+          return CancelGesture;
+        }
+        panning = false;
+        gesture->setLastOffset(gesture->offset());
+        gesture->setOffset(mouse->pos() - startpoint);
+        return FinishGesture;
+      }
+    }
+    if(mouse->type() == QMouseEvent::MouseButtonDblClick)
+    {
+      panning = false;
+      return CancelGesture;
+    }
+    return Ignore;
+  }
+}
+
 Window::Window()
     : QMainWindow()
     , arbiter(this)
 {
     this->setAttribute(Qt::WA_TranslucentBackground, true);
+    QGestureRecognizer::registerRecognizer(new PanGestureRecognizer());
+    this->grabGesture(Qt::TapGesture);
+    this->grabGesture(Qt::TapAndHoldGesture);
+    this->grabGesture(Qt::PanGesture);
+    this->grabGesture(Qt::PinchGesture);
+    this->grabGesture(Qt::SwipeGesture);
 
+    qDebug() << "A";
     auto stack = new QStackedWidget();
+    qDebug() << "B";
     this->setCentralWidget(stack);
+    qDebug() << "C";
 
     auto dash = new Dash(this->arbiter);
+    qDebug() << "D";
     stack->addWidget(dash);
+    qDebug() << "E";
     dash->init();
+    qDebug() << "F";
 
     connect(this->arbiter.layout().openauto_page, &OpenAutoPage::toggle_fullscreen, [stack](QWidget *widget){
         stack->addWidget(widget);
         stack->setCurrentWidget(widget);
     });
+}
+
+bool Window::event(QEvent *event)
+{
+    if (event->type() == QEvent::Gesture)
+    {
+        qDebug() << "gesture:" << event;
+        if (auto *Tap = static_cast<QGestureEvent *>(event)->gesture(Qt::TapGesture))
+            qDebug() << "Tap:" << Tap;
+        if (auto *TapAndHold = static_cast<QGestureEvent *>(event)->gesture(Qt::TapAndHoldGesture))
+            qDebug() << "TapAndHold:" << TapAndHold;
+        if (auto *Pan = static_cast<QGestureEvent *>(event)->gesture(Qt::PanGesture))
+            qDebug() << "Pan:" << Pan;
+        if (auto *Pinch = static_cast<QGestureEvent *>(event)->gesture(Qt::PinchGesture))
+            qDebug() << "Pinch:" << Pinch;
+        if (auto *Swipe = static_cast<QGestureEvent *>(event)->gesture(Qt::SwipeGesture))
+            qDebug() << "Swipe:" << Swipe;
+    }
+
+    return QWidget::event(event);
 }
 
 void Window::showEvent(QShowEvent *event)

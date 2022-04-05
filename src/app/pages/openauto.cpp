@@ -457,8 +457,8 @@ void OpenAutoPage::init()
         this->set_full_screen(fullscreen);
     });
 
-    this->addWidget(this->connect_msg());
     this->addWidget(this->frame);
+    this->addWidget(this->connect_msg());
 }
 
 void OpenAutoPage::set_full_screen(bool fullscreen)
