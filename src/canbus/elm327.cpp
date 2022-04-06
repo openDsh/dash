@@ -9,6 +9,7 @@ elm327::elm327(QString canInterface, bool bluetooth)
         QObject::connect(btSocket, &QBluetoothSocket::connected, this, &elm327::btConnected);
         QObject::connect(btSocket, &QBluetoothSocket::stateChanged, this, &elm327::socketChanged);
         btSocket->connectToService(QBluetoothAddress(canInterface), QBluetoothUuid(QString("00001101-0000-1000-8000-00805F9B34FB")), QIODevice::ReadWrite);
+        bluetooth_watchdog = new QTimer(this);
     }
     else{
         this->connect(canInterface, B115200);
@@ -212,7 +213,6 @@ std::string elm327::_read()
     char buf[1];
     std::string str;
     
-    QTimer* bluetooth_watchdog = new QTimer(this);
     if(adapterType==BT)
         bluetooth_watchdog->start(5000);
 

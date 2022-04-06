@@ -46,6 +46,7 @@ class elm327 : public ICANBus
         int fd;
         std::mutex elm_mutex;
         std::map<int, std::vector<std::function<void(QByteArray)>>> callbacks;
+        QTimer* bluetooth_watchdog;
 
         void connect(std::string dev_path, speed_t baudrate);
         void handleFrame(QCanBusFrame frame);

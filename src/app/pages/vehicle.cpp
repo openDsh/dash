@@ -180,14 +180,14 @@ QWidget *VehiclePage::dialog_body()
    
     Selector *interface_selector = new Selector(devices, this->config->get_vehicle_interface(), this->arbiter.forge().font(14), this->arbiter, widget, "disabled");
     interface_selector->setVisible((this->can_devices.size() > 0) || (this->serial_devices.size() > 0) || (this->paired_bt_devices.size() > 0));
-    connect(interface_selector, &Selector::item_changed, [config = this->config, this](QString item){
-        if(config->get_vehicle_can_bus()==ICANBus::VehicleBusType::ELM327BT && item != QString("disabled"))
+    connect(interface_selector, &Selector::item_changed, [this](QString item){
+        if(this->config->get_vehicle_can_bus()==ICANBus::VehicleBusType::ELM327BT && item != QString("disabled"))
         {
-            config->set_vehicle_interface(this->paired_bt_devices[item]);
+            this->config->set_vehicle_interface(this->paired_bt_devices[item]);
         }
         else
         {
-            config->set_vehicle_interface(item);
+            this->config->set_vehicle_interface(item);
         }
     });
     connect(this->config, &Config::vehicle_can_bus_changed, [this, interface_selector](int state){
