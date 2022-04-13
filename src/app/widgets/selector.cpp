@@ -5,7 +5,7 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QList>
-
+#include "DashLog.hpp"
 #include "app/arbiter.hpp"
 #include "app/widgets/selector.hpp"
 
@@ -25,6 +25,14 @@ Selector::Selector(QList<QString> options, QString current, QFont font, Arbiter 
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->addLayout(this->selector());
+}
+
+void Selector::set_current(QString current)
+{
+    this->current_idx = std::max(0, this->options.indexOf(current));
+    this->update_label();
+    emit item_changed(this->get_current());
+    emit idx_changed(this->current_idx);
 }
 
 QSize Selector::sizeHint() const

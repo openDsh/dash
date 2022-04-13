@@ -1,6 +1,7 @@
 #pragma once
 
 #include "openauto/Configuration/Configuration.hpp"
+#include "canbus/ICANBus.hpp"
 
 #include <QObject>
 #include <QSettings>
@@ -63,8 +64,8 @@ class Config : public QObject {
         emit si_units_changed(this->si_units);
     }
 
-    inline bool get_vehicle_can_bus() { return this->vehicle_can_bus; }
-    inline void set_vehicle_can_bus(bool vehicle_can_bus)
+    inline ICANBus::VehicleBusType get_vehicle_can_bus() { return this->vehicle_can_bus; }
+    inline void set_vehicle_can_bus(ICANBus::VehicleBusType vehicle_can_bus)
     {
         this->vehicle_can_bus = vehicle_can_bus;
         this->settings.setValue("Pages/Vehicle/can_bus", this->vehicle_can_bus);
@@ -185,7 +186,7 @@ class Config : public QObject {
     QString radio_plugin;
     QString media_home;
     bool si_units;
-    bool vehicle_can_bus;
+    ICANBus::VehicleBusType vehicle_can_bus;
     QString vehicle_interface;
     QString vehicle_plugin;
     QString cam_network_url;
@@ -204,6 +205,6 @@ class Config : public QObject {
     void si_units_changed(bool si_units);
     void cam_autoconnect_changed(bool enabled);
     void cam_overlay_changed(bool enabled);
-    void vehicle_can_bus_changed(bool state);
+    void vehicle_can_bus_changed(ICANBus::VehicleBusType state);
     void vehicle_interface_changed(QString interface);
 };

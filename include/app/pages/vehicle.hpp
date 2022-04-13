@@ -3,6 +3,7 @@
 #include <QPair>
 #include <QtWidgets>
 #include <QPluginLoader>
+#include <QMap>
 
 #include "canbus/socketcanbus.hpp"
 #include "obd/message.hpp"
@@ -66,6 +67,7 @@ class VehiclePage : public QTabWidget, public Page {
     QMap<QString, QFileInfo> plugins;
     QStringList can_devices;
     QStringList serial_devices;
+    QMap<QString, QString> paired_bt_devices;
     QPluginLoader *active_plugin;
     Selector *plugin_selector;
     Config *config;

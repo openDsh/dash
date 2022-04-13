@@ -23,6 +23,7 @@ class Selector : public QWidget {
         emit item_changed(this->get_current());
         emit idx_changed(this->current_idx - (this->placeholder.isNull() ? 0 : 1));
     }
+    void set_current(QString current);
 
    protected:
     QSize sizeHint() const override;

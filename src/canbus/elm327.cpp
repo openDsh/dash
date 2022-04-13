@@ -1,10 +1,20 @@
 #include "canbus/elm327.hpp"
 
-elm327::elm327(QString canInterface)
+elm327::elm327(QString canInterface, bool bluetooth)
 {
-    DASH_LOG(info)<<"[ELM327] Connecting elm "<<canInterface.toStdString();
-    this->connect(canInterface, B115200);
-    if (this->connected) this->initialize();
+    DASH_LOG(info)<<"[ElM327] Attempting to connect to elm device: "<<canInterface.toStdString();
+    if(bluetooth){
+        this->adapterType = BT;
+        btSocket = new QBluetoothSocket(QBluetoothServiceInfo::RfcommProtocol);
+        QObject::connect(btSocket, &QBluetoothSocket::connected, this, &elm327::btConnected);
+        QObject::connect(btSocket, &QBluetoothSocket::stateChanged, this, &elm327::socketChanged);
+        btSocket->connectToService(QBluetoothAddress(canInterface), QBluetoothUuid(QString("00001101-0000-1000-8000-00805F9B34FB")), QIODevice::ReadWrite);
+        bluetooth_watchdog = new QTimer(this);
+    }
+    else{
+        this->connect(canInterface, B115200);
+        if (this->connected) this->initialize();
+    }
 
 }
 elm327::~elm327()
@@ -15,17 +25,50 @@ elm327::~elm327()
     this->connected = false;
 }
 
-elm327 *elm327::get_instance()
+elm327 *elm327::get_usb_instance()
 {
-    static elm327 elm(Config::get_instance()->get_vehicle_interface());
-    return &elm;
+    static elm327 elm_usb(Config::get_instance()->get_vehicle_interface());
+    return &elm_usb;
+}
+
+elm327 *elm327::get_bt_instance()
+{
+    static elm327 elm_bt(Config::get_instance()->get_vehicle_interface(), true);
+    return &elm_bt;
+}
+
+void elm327::btConnected()
+{
+    this->connected=true;
+    this->initialize();
+}
+
+void elm327::socketChanged(QBluetoothSocket::SocketState state)
+{
+    switch(state){
+        case(QBluetoothSocket::UnconnectedState):
+            DASH_LOG(info)<<"[ElM327][Bluetooth] Unconnected";
+            break;
+        case(QBluetoothSocket::ConnectingState):
+            DASH_LOG(info)<<"[ElM327][Bluetooth] Connecting";
+            break;
+        case(QBluetoothSocket::ConnectedState):
+            DASH_LOG(info)<<"[ElM327][Bluetooth] Connected";
+            break;
+        case(QBluetoothSocket::ServiceLookupState):
+            DASH_LOG(info)<<"[ElM327][Bluetooth] Looking up Services";
+            break;
+        default:
+            DASH_LOG(info)<<"[ElM327][Bluetooth] Unimplemented";
+    }
 }
 
 int elm327::_write(std::string str)
 {
     str += '\r';
     int size;
-    if ((size = write(this->fd, str.c_str(), str.length())) < 0) {
+    if ((size = (adapterType==BT)?(::send(btSocket->socketDescriptor(), str.c_str(), str.length(), 0)):(write(this->fd, str.c_str(), str.length()))) < 0)
+    {
         DASH_LOG(error) << "[ELM327] failed write" << std::endl;
         this->connected = false;
         return 0;
@@ -86,7 +129,7 @@ bool elm327::writeFrame(QCanBusFrame frame)
         
     //this is an obd message, so we can send it with the elm327
     if(frame.frameId() == 0x7df){
-        ss << std::hex << std::setfill('0');
+        ss << std::hex << std::uppercase << std::setfill('0');
         for(int i = 1; i<=frame.payload().at(0); i++){
             ss << std::setw(2) << static_cast<unsigned>(frame.payload().at(i));
         }
@@ -125,7 +168,6 @@ QCanBusFrame elm327::receive()
 {
     QCanBusFrame *retFrame = new QCanBusFrame();
     std::string resp_str = this->_read();
-
 
     if (is_failed_response(resp_str)){
         retFrame->setFrameType(QCanBusFrame::ErrorFrame);
@@ -170,17 +212,38 @@ std::string elm327::_read()
 {
     char buf[1];
     std::string str;
+    
+    if(adapterType==BT)
+        bluetooth_watchdog->start(5000);
 
     while (true) {
-        if (read(this->fd, (void *)buf, 1) != 1) {
-            DASH_LOG(error) << "[ELM327] failed read";
-            this->connected = false;
-            return "";
+
+        if (((adapterType==BT)?(::recv(btSocket->socketDescriptor(), (void *) buf, 1, 0)):(read(this->fd, (void *)buf, 1))) != 1)
+        {
+            if(adapterType != BT)
+            {
+                DASH_LOG(error) << "[ELM327] failed read";
+                this->connected = false;
+                return "";
+            }
+            else
+            {
+                if(bluetooth_watchdog->remainingTime() == 0)
+                {
+                    DASH_LOG(error) << "[ELM327] Bluetooth watchdog expired, disconnecting";
+                    this->connected = false;
+                    return "";
+                }
+                continue;
+            }
         }
         if (buf[0] == '>')
             break;
         else
             str += buf[0];
+        // feed watchdog
+        if(adapterType==BT)
+            bluetooth_watchdog->start(5000);
     }
 
     return str;
