@@ -68,4 +68,5 @@ class Arbiter : public QObject {
     void cursor_changed(bool enabled);
     void action_changed(Action *action, QString key);
     void openauto_full_screen(bool fullscreen);
+    void openauto_connection_changed(bool connected);
 };

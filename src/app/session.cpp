@@ -23,6 +23,7 @@
 #include "aasdk_proto/ButtonCodeEnum.pb.h"
 
 #include "app/session.hpp"
+#include "app/quick_views/media.hpp"
 
 QDir Session::plugin_dir(QString plugin)
 {
@@ -89,7 +90,8 @@ Session::Layout::ControlBar::ControlBar(QSettings &settings, Arbiter &arbiter)
         new NullQuickView(arbiter),
         new VolumeQuickView(arbiter),
         new BrightnessQuickView(arbiter),
-        new ComboQuickView(arbiter)
+        new ComboQuickView(arbiter),
+        new MediaQuickView(arbiter)
     };
 
     this->curr_quick_view = this->quick_views_.value(settings.value("Layout/ControlBar/quick_view", 0).toInt());

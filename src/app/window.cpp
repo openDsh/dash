@@ -107,8 +107,6 @@ QWidget *Dash::control_bar() const
         quick_views->setCurrentWidget(quick_view->widget());
     });
 
-    layout->addStretch();
-
     auto dialog = new Dialog(this->arbiter, true, this->arbiter.window());
     dialog->set_title("Power Off");
     dialog->set_body(this->power_control());
