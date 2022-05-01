@@ -22,6 +22,7 @@ class Arbiter : public QObject {
     void toggle_mode();
     void set_color(const QColor &color);
     void set_scale(double scale);
+    void set_status_bar(bool enabled);
     void set_control_bar(bool enabled);
     void set_curr_quick_view(QuickView *quick_view);
     void set_curr_quick_view(int id);
@@ -58,6 +59,7 @@ class Arbiter : public QObject {
     void mode_changed(Session::Theme::Mode mode);
     void color_changed(QColor color);
     void scale_changed(float scale);
+    void status_bar_changed(bool enabled);
     void control_bar_changed(bool enabled);
     void curr_quick_view_changed(QuickView *quick_view);
     void curr_page_changed(Page *page);

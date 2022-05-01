@@ -1,4 +1,5 @@
 #include <QHBoxLayout>
+#include <QLocale>
 #include <QPushButton>
 #include <QStackedWidget>
 
@@ -18,13 +19,25 @@ Dash::NavRail::NavRail()
 
 Dash::Body::Body()
     : layout(new QVBoxLayout())
+    , status_bar(new QVBoxLayout())
     , frame(new QStackedLayout())
+    , control_bar(new QVBoxLayout())
 {
     this->layout->setContentsMargins(0, 0, 0, 0);
     this->layout->setSpacing(0);
 
+    this->status_bar->setContentsMargins(0, 0, 0, 0);
+    this->layout->addLayout(this->status_bar);
+
     this->frame->setContentsMargins(0, 0, 0, 0);
     this->layout->addLayout(this->frame, 1);
+
+    auto msg_ref = new QWidget();
+    msg_ref->setObjectName("MsgRef");
+    this->layout->addWidget(msg_ref);
+
+    this->control_bar->setContentsMargins(0, 0, 0, 0);
+    this->layout->addLayout(this->control_bar);
 }
 
 Dash::Dash(Arbiter &arbiter)
@@ -57,11 +70,7 @@ Dash::Dash(Arbiter &arbiter)
 
 void Dash::init()
 {
-    auto msg_ref = new QWidget();
-    msg_ref->setObjectName("MsgRef");
-    this->body.layout->addWidget(msg_ref);
-
-    this->body.layout->addWidget(this->control_bar());
+    this->body.status_bar->addWidget(this->status_bar());
 
     for (auto page : this->arbiter.layout().pages()) {
         auto button = page->button();
@@ -78,6 +87,8 @@ void Dash::init()
         button->setVisible(page->enabled());
     }
     this->set_page(this->arbiter.layout().curr_page);
+
+    this->body.control_bar->addWidget(this->control_bar());
 }
 
 void Dash::set_page(Page *page)
@@ -85,6 +96,31 @@ void Dash::set_page(Page *page)
     auto id = this->arbiter.layout().page_id(page);
     this->rail.group.button(id)->setChecked(true);
     this->body.frame->setCurrentWidget(page->widget());
+}
+
+QWidget *Dash::status_bar() const
+{
+    auto widget = new QWidget();
+    widget->setObjectName("StatusBar");
+    auto layout = new QHBoxLayout(widget);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setSpacing(0);
+
+    auto clock = new QLabel();
+    clock->setFont(this->arbiter.forge().font(10, true));
+    clock->setAlignment(Qt::AlignCenter);
+    layout->addWidget(clock);
+
+    connect(&this->arbiter.system().clock, &Clock::ticked, [clock](QTime time){
+        clock->setText(QLocale().toString(time, QLocale::ShortFormat));
+    });
+
+    widget->setVisible(this->arbiter.layout().status_bar);
+    connect(&this->arbiter, &Arbiter::status_bar_changed, [widget](bool enabled){
+        widget->setVisible(enabled);
+    });
+
+    return widget;
 }
 
 QWidget *Dash::control_bar() const

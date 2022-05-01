@@ -272,6 +272,8 @@ QWidget *LayoutSettingsTab::settings_widget()
 
     layout->addWidget(this->pages_widget());
     layout->addWidget(Session::Forge::br(), 1);
+    layout->addWidget(this->status_bar_widget(), 1);
+    layout->addWidget(Session::Forge::br(), 1);
     layout->addWidget(this->control_bar_widget(), 1);
 
     QWidget *controls_bar_row = this->quick_view_row_widget();
@@ -320,6 +322,23 @@ QWidget *LayoutSettingsTab::pages_widget()
     });
 
     layout->addWidget(group, 1, Qt::AlignHCenter);
+
+    return widget;
+}
+
+QWidget *LayoutSettingsTab::status_bar_widget()
+{
+    QWidget *widget = new QWidget(this);
+    QHBoxLayout *layout = new QHBoxLayout(widget);
+
+    QLabel *label = new QLabel("Status Bar", widget);
+    layout->addWidget(label, 1);
+
+    Switch *toggle = new Switch(widget);
+    toggle->scale(this->arbiter.layout().scale);
+    toggle->setChecked(this->arbiter.layout().status_bar);
+    connect(toggle, &Switch::stateChanged, [this](bool state){ this->arbiter.set_status_bar(state); });
+    layout->addWidget(toggle, 1, Qt::AlignHCenter);
 
     return widget;
 }

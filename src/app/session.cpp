@@ -97,6 +97,7 @@ Session::Layout::ControlBar::ControlBar(QSettings &settings, Arbiter &arbiter)
 
 Session::Layout::Layout(QSettings &settings, Arbiter &arbiter)
     : scale(settings.value("Layout/scale", 1.0).toDouble())
+    , status_bar(settings.value("Layout/status_bar", false).toBool())
     , control_bar(settings, arbiter)
     , openauto_page(new OpenAutoPage(arbiter))
     , curr_page(nullptr)
@@ -209,7 +210,8 @@ const QList<QString> &Session::System::Brightness::plugins() const
 }
 
 Session::System::System(QSettings &settings, Arbiter &arbiter)
-    : server(arbiter)
+    : clock()
+    , server(arbiter)
     , bluetooth(arbiter)
     , brightness(settings)
     , volume(settings.value("System/volume", 50).toUInt())

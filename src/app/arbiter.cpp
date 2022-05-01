@@ -47,6 +47,14 @@ void Arbiter::set_scale(double scale)
     emit scale_changed(scale);
 }
 
+void Arbiter::set_status_bar(bool enabled)
+{
+    this->layout().status_bar = enabled;
+    this->settings().setValue("Layout/status_bar", enabled);
+
+    emit status_bar_changed(enabled);
+}
+
 void Arbiter::set_control_bar(bool enabled)
 {
     this->layout().control_bar.enabled = enabled;
