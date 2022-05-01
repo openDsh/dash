@@ -140,19 +140,23 @@ void MediaWidget::paintEvent(QPaintEvent *event)
     painter.drawPixmap(prev_rect,prev_pixmap);
 
     /*** PLAY/PAUSE BUTTON ***/
-    QPen progressBGPen = QPen(QColor(70,70,70),4);
-    painter.setPen(progressBGPen);
-    painter.drawArc(play_rect,1440,5760);
-
-    if(this->playback_.has_track_progress() && connected){
-        if(metadata_.has_track_length() && metadata_.track_length() != 0){
-
-            QPen progressPen = QPen(arbiter.theme().color(),4);
-            painter.setPen(progressPen);  
-            int step =  5760 / metadata_.track_length();
-            int val = step * playback_.track_progress();
-            painter.drawArc(play_rect,1440,val);
-        }
+    if(this->playback_.has_track_progress() && connected &&
+                metadata_.has_track_length() && metadata_.track_length() != 0){
+            
+        QPen progressBGPen = QPen(arbiter.theme().color(),4);
+        painter.setPen(progressBGPen);
+        painter.drawArc(play_rect,1440,5760);
+        QPen progressPen = QPen(QColor(70,70,70),4);
+        painter.setPen(progressPen);  
+        int step =  5760 / metadata_.track_length();
+        int invVal = metadata_.track_length() - playback_.track_progress();
+        int val = step * invVal;
+        painter.drawArc(play_rect,1440,val);
+        
+    } else {
+        QPen progressPen = QPen(QColor(70,70,70),4);
+        painter.setPen(progressPen);  
+        painter.drawArc(play_rect,1440,5760);
     }
 
     if(playback_.has_playback_state() && playback_.playback_state() == aasdk::proto::messages::MediaInfoChannelPlaybackData_PlaybackState_PLAY){
@@ -160,7 +164,6 @@ void MediaWidget::paintEvent(QPaintEvent *event)
         QPixmap pause = icon.pixmap(QSize(128,128));
         painter.drawPixmap(play_rect,pause);
        
-
     } else {
         QIcon icon(new IconEngine(this->arbiter, QString("://icons/play.svg"), true));
         QPixmap play = icon.pixmap(QSize(128,128));
