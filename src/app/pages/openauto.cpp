@@ -24,7 +24,7 @@ OpenAutoWorker::OpenAutoWorker(std::function<void(bool)> callback, bool night_mo
 {
     this->create_usb_workers();
     this->create_io_service_workers();
-
+    
     this->app->waitForDevice(true);
     AAHandler *aa_handler = arbiter.android_auto().handler;
     service_factory.setAndroidAutoInterface(aa_handler);
@@ -427,8 +427,10 @@ void OpenAutoPage::init()
 
     std::function<void(bool)> callback = [frame = this->frame](bool active) { frame->toggle(active); };
     this->worker = new OpenAutoWorker(callback, this->arbiter.theme().mode == Session::Theme::Dark, frame, this->arbiter);
-
+    
     connect(this->frame, &OpenAutoFrame::toggle, [this](bool enable){
+        emit arbiter.openauto_connection_changed(enable);
+
         if (!enable && this->frame->is_fullscreen()) {
             this->addWidget(frame);
             this->frame->toggle_fullscreen();
