@@ -15,6 +15,9 @@ display_help() {
     echo "   --gstreamer      install and build gstreamer "
     echo "   --dash           install and build dash "
     echo "   --h264bitstream  install and build h264bitstream"
+    echo "   --pulseaudio     install and build pulseaudio to fix raspberry pi bluetooth HFP"
+    echo "   --bluez          install and build bluez to fix raspberry pi bluetooth outbound connection"
+    echo "   --ofono          install and configure ofono to allow bluetooth HFP"
     echo "   --debug          create a debug build "
     echo
 }
@@ -48,6 +51,9 @@ if [ $# -gt 0 ]; then
   openauto=false
   dash=false
   h264bitstream=false
+  pulseaudio=false
+  bluez=false
+  ofono=false
     while [ "$1" != "" ]; do
         case $1 in
             --deps )           shift
@@ -62,6 +68,12 @@ if [ $# -gt 0 ]; then
             --dash )           dash=true
                                     ;;
             --h264bitstream )  h264bitstream=true
+                                    ;;
+            --pulseaudio )     pulseaudio=true
+                                    ;;
+            --bluez )          bluez=true
+                                    ;;
+            --ofono )          ofono=true
                                     ;;
             --debug )          BUILD_TYPE="Debug"
                                     ;;
@@ -81,6 +93,14 @@ else
     openauto=true
     dash=true
     h264bitstream=true
+    pulseaudio=false
+    bluez=false
+    ofono=false
+    if [ $isRpi = true ]; then
+      pulseaudio=true
+      bluez=true
+      ofono=true
+    fi
 fi
 
 script_path=$(dirname "$(realpath -s "$0")")
@@ -166,6 +186,73 @@ if [ $deps = false ]
     fi
 fi
 
+############################### pulseaudio #########################
+if [ $pulseaudio = false ]
+  then
+    echo -e skipping pulseaudio '\n'
+  else
+    echo Preparing to compile and install pulseaudio
+    echo Grabbing pulseaudio deps
+    sed -i 's/#deb-src/deb-src/g' /etc/apt/sources.list
+    sudo apt-get update -y
+    git clone git://anongit.freedesktop.org/pulseaudio/pulseaudio
+    apt-get install -y autopoint
+    cd pulseaudio
+    git checkout tags/v12.99.3
+    echo Applying imtu patch
+    sed -i 's/*imtu = 48;/*imtu = 60;/g' src/modules/bluetooth/backend-native.c
+    sed -i 's/*imtu = 48;/*imtu = 60;/g' src/modules/bluetooth/backend-ofono.c
+    sudo apt-get build-dep -y pulseaudio
+    ./bootstrap.sh
+    make -j4
+    sudo make install
+    sudo ldconfig
+    # copy configs and force an exit 0 just in case files are identical (we don't care but it will make pimod exit)
+    sudo cp /usr/share/pulseaudio/alsa-mixer/profile-sets/* /usr/local/share/pulseaudio/alsa-mixer/profile-sets/
+    cd ..
+fi
+
+
+###############################  ofono  #########################
+if [ $ofono = false ]
+  then
+    echo -e skipping ofono '\n'
+  else
+    echo Installing ofono
+    sudo apt-get install -y ofono
+    if [[ $? -eq 0 ]]; then
+        echo -e ofono Installed ok '\n'
+    else
+        echo Package failed to install with error code $?, quitting check logs above
+        exit 1
+    fi
+    sed -i 's/load-module module-bluetooth-discover/load-module module-bluetooth-discover headset=ofono/g' /usr/local/etc/pulse/default.pa
+    cat <<EOT >> /usr/local/etc/pulse/default.pa
+    ### Echo cancel and noise reduction
+    .ifexists module-echo-cancel.so
+    load-module module-echo-cancel aec_method=webrtc source_name=ec_out sink_name=ec_ref
+    set-default-source ec_out
+    set-default-sink ec_ref
+    .endif
+EOT
+fi
+
+###############################  bluez  #########################
+if [ $bluez = false ]
+  then
+    echo -e skipping bluez '\n'
+  else
+    echo Installing bluez
+    sudo apt-get install -y libdbus-1-dev libudev-dev libical-dev libreadline-dev libjson-c-dev
+    wget www.kernel.org/pub/linux/bluetooth/bluez-5.63.tar.xz
+    tar -xvf bluez-5.63.tar.xz bluez-5.63/
+    rm bluez-5.63.tar.xz
+    cd bluez-5.63
+    ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var --enable-library --disable-manpages --enable-deprecated
+    make
+    sudo make install
+    cd ..
+fi
 
 ###############################  AASDK #########################
 if [ $aasdk = false ]; then
@@ -540,6 +627,10 @@ else
       exit 1
     fi
 
+    echo enabling krnbt to speed up boot and improve stability
+    cat <<EOT >> /boot/config.txt
+      dtparam=krnbt
+EOT
   fi
 
 
