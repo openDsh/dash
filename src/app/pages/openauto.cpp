@@ -1,6 +1,7 @@
 #include "app/pages/openauto.hpp"
 
 #include "app/config.hpp"
+#include "app/widgets/fullscreen_toggle.hpp"
 #include "app/widgets/progress.hpp"
 #include "app/window.hpp"
 #include "DashLog.hpp"
@@ -428,6 +429,12 @@ void OpenAutoPage::init()
     std::function<void(bool)> callback = [frame = this->frame](bool active) { frame->toggle(active); };
     this->worker = new OpenAutoWorker(callback, this->arbiter.theme().mode == Session::Theme::Dark, frame, this->arbiter);
 
+    this->fullscreen_toggle = new FullscreenToggle(this->arbiter);
+    connect(this->fullscreen_toggle, &QDialog::finished, [this](int){
+        this->set_full_screen(false);
+        this->frame->toggle_fullscreen();
+    });
+
     connect(this->frame, &OpenAutoFrame::toggle, [this](bool enable){
         if (!enable && this->frame->is_fullscreen()) {
             this->addWidget(frame);
@@ -465,10 +472,12 @@ void OpenAutoPage::set_full_screen(bool fullscreen)
 {
     if (fullscreen) {
         emit toggle_fullscreen(this->frame);
+        this->fullscreen_toggle->open();
     }
     else {
         this->addWidget(frame);
         this->setCurrentWidget(frame);
+        this->fullscreen_toggle->close();
     }
     this->worker->update_size();
 }

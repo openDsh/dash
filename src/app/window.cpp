@@ -260,12 +260,12 @@ Window::Window()
     , arbiter(this)
 {
     this->setAttribute(Qt::WA_TranslucentBackground, true);
-    QGestureRecognizer::registerRecognizer(new PanGestureRecognizer());
-    this->grabGesture(Qt::TapGesture);
-    this->grabGesture(Qt::TapAndHoldGesture);
-    this->grabGesture(Qt::PanGesture);
-    this->grabGesture(Qt::PinchGesture);
-    this->grabGesture(Qt::SwipeGesture);
+    // QGestureRecognizer::registerRecognizer(new PanGestureRecognizer());
+    // this->grabGesture(Qt::TapGesture);
+    // this->grabGesture(Qt::TapAndHoldGesture);
+    // this->grabGesture(Qt::PanGesture);
+    // this->grabGesture(Qt::PinchGesture);
+    // this->grabGesture(Qt::SwipeGesture);
 
     qDebug() << "A";
     auto stack = new QStackedWidget();

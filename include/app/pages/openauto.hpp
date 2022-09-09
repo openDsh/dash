@@ -25,6 +25,7 @@
 #include "DashLog.hpp"
 
 class Arbiter;
+class FullscreenToggle;
 
 class OpenAutoWorker : public QObject {
     Q_OBJECT
@@ -55,8 +56,6 @@ class OpenAutoWorker : public QObject {
     std::shared_ptr<aasdk::usb::ConnectedAccessoriesEnumerator> connected_accessories_enumerator;
     std::shared_ptr<openauto::App> app;
     std::vector<std::thread> thread_pool;
-
-
 };
 
 class OpenAutoFrame : public QWidget {
@@ -124,6 +123,7 @@ class OpenAutoPage : public QStackedWidget, public Page {
     Config *config;
     OpenAutoFrame *frame;
     OpenAutoWorker *worker;
+    FullscreenToggle *fullscreen_toggle;
     const QString connected_icon_name;
 
    signals:
