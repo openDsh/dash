@@ -7,17 +7,23 @@ FullscreenToggle::FullscreenToggle(Arbiter &arbiter)
     : Dialog(arbiter, false, nullptr)
     , p()
     , last_pos()
+    , touch_start()
 {
-    auto label = new QLabel("X");
-    this->set_body(label);
+    this->set_body(new QLabel("X"));
 
-    this->setWindowOpacity(.5);
+    connect(&this->arbiter, &Arbiter::fullscreen_changed, [this](bool fullscreen){
+        if (fullscreen)
+            this->open();
+        else
+            this->close();
+    });
 }
 
 void FullscreenToggle::showEvent(QShowEvent *event)
 {
     QWidget::showEvent(event);
 
+    this->shadow();
     this->move(this->last_pos);
 }
 
@@ -32,20 +38,25 @@ void FullscreenToggle::mousePressEvent(QMouseEvent *event)
 {
     this->setWindowOpacity(1);
     this->p = event->pos();
+    this->touch_start = QTime::currentTime();
 }
 
 void FullscreenToggle::mouseReleaseEvent(QMouseEvent *event)
 {
-    this->setWindowOpacity(.5);
-}
-
-void FullscreenToggle::mouseDoubleClickEvent(QMouseEvent *event)
-{
-    Dialog::mouseDoubleClickEvent(event);
-    this->accept();
+    if (this->touch_start.msecsTo(QTime::currentTime()) < 100)
+        this->arbiter.toggle_fullscreen(false);
+    else
+        QTimer::singleShot(100, this, &FullscreenToggle::shadow);
 }
 
 void FullscreenToggle::mouseMoveEvent(QMouseEvent *event)
 {
     this->move(event->globalX() - this->p.x(), event->globalY() - this->p.y());
+}
+
+void FullscreenToggle::shadow()
+{
+    this->arbiter.window()->activateWindow();
+    this->arbiter.window()->grabKeyboard();
+    this->setWindowOpacity(.5);
 }

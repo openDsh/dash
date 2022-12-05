@@ -1,7 +1,6 @@
 #include "app/pages/openauto.hpp"
 
 #include "app/config.hpp"
-#include "app/widgets/fullscreen_toggle.hpp"
 #include "app/widgets/progress.hpp"
 #include "app/window.hpp"
 #include "DashLog.hpp"
@@ -67,12 +66,6 @@ void OpenAutoWorker::create_io_service_workers()
 OpenAutoFrame::OpenAutoFrame(QWidget *parent) : QWidget(parent)
 {
     this->setAttribute(Qt::WA_AcceptTouchEvents);
-}
-
-void OpenAutoFrame::mouseDoubleClickEvent(QMouseEvent *)
-{
-    this->toggle_fullscreen();
-    emit double_clicked(this->fullscreen);
 }
 
 OpenAutoPage::Settings::Settings(Arbiter &arbiter, QWidget *parent)
@@ -429,17 +422,7 @@ void OpenAutoPage::init()
     std::function<void(bool)> callback = [frame = this->frame](bool active) { frame->toggle(active); };
     this->worker = new OpenAutoWorker(callback, this->arbiter.theme().mode == Session::Theme::Dark, frame, this->arbiter);
 
-    this->fullscreen_toggle = new FullscreenToggle(this->arbiter);
-    connect(this->fullscreen_toggle, &QDialog::finished, [this](int){
-        this->set_full_screen(false);
-        this->frame->toggle_fullscreen();
-    });
-
     connect(this->frame, &OpenAutoFrame::toggle, [this](bool enable){
-        if (!enable && this->frame->is_fullscreen()) {
-            this->addWidget(frame);
-            this->frame->toggle_fullscreen();
-        }
         this->setCurrentIndex(enable ? 1 : 0);
 
         if (Config::get_instance()->get_show_aa_connected()) {
@@ -451,35 +434,14 @@ void OpenAutoPage::init()
             this->button()->setIcon(icon);
         }
     });
-    connect(this->frame, &OpenAutoFrame::double_clicked, [this](bool fullscreen) {
-        this->set_full_screen(fullscreen);
-    });
     
     AAHandler *aa_handler = this->arbiter.android_auto().handler;
     connect(&this->arbiter, &Arbiter::mode_changed, [this, aa_handler](Session::Theme::Mode mode){
         aa_handler->setNightMode(mode == Session::Theme::Dark);
     });
 
-    connect(&this->arbiter, &Arbiter::openauto_full_screen, [this](bool fullscreen) {
-        this->set_full_screen(fullscreen);
-    });
-
-    this->addWidget(this->frame);
     this->addWidget(this->connect_msg());
-}
-
-void OpenAutoPage::set_full_screen(bool fullscreen)
-{
-    if (fullscreen) {
-        emit toggle_fullscreen(this->frame);
-        this->fullscreen_toggle->open();
-    }
-    else {
-        this->addWidget(frame);
-        this->setCurrentWidget(frame);
-        this->fullscreen_toggle->close();
-    }
-    this->worker->update_size();
+    this->addWidget(this->frame);
 }
 
 void OpenAutoPage::resizeEvent(QResizeEvent *event)

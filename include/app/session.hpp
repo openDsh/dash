@@ -79,6 +79,7 @@ class Session {
         ControlBar control_bar;
         OpenAutoPage *openauto_page;
         Page *curr_page;
+        bool fullscreen;
 
         Layout(QSettings &settings, Arbiter &arbiter);
         Page *next_enabled_page(Page *page) const;

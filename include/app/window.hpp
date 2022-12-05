@@ -1,21 +1,24 @@
 #pragma once
 
 #include <QButtonGroup>
-#include <QGestureRecognizer>
 #include <QKeyEvent>
 #include <QMainWindow>
 #include <QObject>
 #include <QPointF>
 #include <QShowEvent>
 #include <QStackedLayout>
+#include <QElapsedTimer>
 #include <QVBoxLayout>
 #include <QWidget>
+#include <QStackedWidget>
 
 #include "app/config.hpp"
 #include "app/pages/openauto.hpp"
 #include "app/pages/page.hpp"
 
 #include "app/arbiter.hpp"
+
+class FullscreenToggle;
 
 class Dash : public QWidget {
     Q_OBJECT
@@ -27,6 +30,7 @@ class Dash : public QWidget {
    private:
     struct NavRail {
         QButtonGroup group;
+        QElapsedTimer timer;
         QVBoxLayout *layout;
 
         NavRail();
@@ -51,28 +55,19 @@ class Dash : public QWidget {
     QWidget *power_control() const;
 };
 
-class PanGestureRecognizer : public QGestureRecognizer
-{
-  QPointF startpoint;
-  bool panning;
-public:
-  PanGestureRecognizer() : panning(false){}
-  QGesture *create(QObject *target);
-  Result recognize(QGesture *state, QObject *watched, QEvent *event);
-};
-
-class Window : public QMainWindow {
+class MainWindow : public QMainWindow {
     Q_OBJECT
 
    public:
-    Window();
+    MainWindow();
+    void set_fullscreen(Page *page);
 
    protected:
-    bool event(QEvent *event) override;
-    void showEvent(QShowEvent *event);
-    // void keyPressEvent(QKeyEvent *event);
-    // void keyReleaseEvent(QKeyEvent *event);
+    void showEvent(QShowEvent *event) override;
+    void keyPressEvent(QKeyEvent *event) override;
 
    private:
     Arbiter arbiter;
+    FullscreenToggle *fullscreen_toggle;
+    QStackedWidget *stack;
 };

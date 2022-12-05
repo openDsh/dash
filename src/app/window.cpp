@@ -1,16 +1,17 @@
 #include <QHBoxLayout>
 #include <QLocale>
 #include <QPushButton>
-#include <QStackedWidget>
 
 #include "app/quick_views/quick_view.hpp"
 #include "app/utilities/icon_engine.hpp"
 #include "app/widgets/dialog.hpp"
+#include "app/widgets/fullscreen_toggle.hpp"
 
 #include "app/window.hpp"
 
 Dash::NavRail::NavRail()
     : group()
+    , timer()
     , layout(new QVBoxLayout())
 {
     this->layout->setContentsMargins(0, 0, 0, 0);
@@ -55,6 +56,11 @@ Dash::Dash(Arbiter &arbiter)
 
     connect(&this->rail.group, QOverload<int>::of(&QButtonGroup::buttonPressed), [this](int id){
         this->arbiter.set_curr_page(id);
+        this->rail.timer.start();
+    });
+    connect(&this->rail.group, QOverload<int>::of(&QButtonGroup::buttonReleased), [this](int id){
+        if (this->rail.timer.hasExpired(1000))
+            this->arbiter.toggle_fullscreen(true);
     });
     connect(&this->arbiter, &Arbiter::curr_page_changed, [this](Page *page){
         this->set_page(page);
@@ -81,7 +87,7 @@ void Dash::init()
 
         this->rail.group.addButton(button, this->arbiter.layout().page_id(page));
         this->rail.layout->addWidget(button);
-        this->body.frame->addWidget(page->widget());
+        this->body.frame->addWidget(page->container());
 
         page->init();
         button->setVisible(page->enabled());
@@ -95,7 +101,7 @@ void Dash::set_page(Page *page)
 {
     auto id = this->arbiter.layout().page_id(page);
     this->rail.group.button(id)->setChecked(true);
-    this->body.frame->setCurrentWidget(page->widget());
+    this->body.frame->setCurrentWidget(page->container());
 }
 
 QWidget *Dash::status_bar() const
@@ -198,128 +204,41 @@ QWidget *Dash::power_control() const
     return widget;
 }
 
-QGesture *PanGestureRecognizer::create(QObject *target)
-{
-  return  new QPanGesture();
-}
-
-QGestureRecognizer::Result PanGestureRecognizer::recognize(QGesture *state, QObject *, QEvent *event)
-{
-  QMouseEvent * mouse = dynamic_cast<QMouseEvent*>(event);
-  if(mouse != 0)
-  {
-    if(mouse->type() == QMouseEvent::MouseButtonPress)
-    {
-      QPanGesture * gesture = dynamic_cast<QPanGesture*>(state);
-      if(gesture != 0)
-      {
-        panning = true;
-        startpoint = mouse->pos();
-        gesture->setLastOffset(QPointF());
-        gesture->setOffset(QPointF());
-        return TriggerGesture;
-      }
-    }
-    if(panning && (mouse->type() == QMouseEvent::MouseMove))
-    {
-      QPanGesture * gesture = dynamic_cast<QPanGesture*>(state);
-      if(gesture != 0)
-      {
-        gesture->setLastOffset(gesture->offset());
-        gesture->setOffset(mouse->pos() - startpoint);
-        return TriggerGesture;
-      }
-    }
-    if(mouse->type() == QMouseEvent::MouseButtonRelease)
-    {
-      QPanGesture * gesture = dynamic_cast<QPanGesture*>(state);
-      if(gesture != 0)
-      {
-        QPointF endpoint = mouse->pos();
-        if(startpoint == endpoint)
-        {
-          return CancelGesture;
-        }
-        panning = false;
-        gesture->setLastOffset(gesture->offset());
-        gesture->setOffset(mouse->pos() - startpoint);
-        return FinishGesture;
-      }
-    }
-    if(mouse->type() == QMouseEvent::MouseButtonDblClick)
-    {
-      panning = false;
-      return CancelGesture;
-    }
-    return Ignore;
-  }
-}
-
-Window::Window()
+MainWindow::MainWindow()
     : QMainWindow()
     , arbiter(this)
+    , fullscreen_toggle(new FullscreenToggle(this->arbiter))
+    , stack(new QStackedWidget())
 {
     this->setAttribute(Qt::WA_TranslucentBackground, true);
-    // QGestureRecognizer::registerRecognizer(new PanGestureRecognizer());
-    // this->grabGesture(Qt::TapGesture);
-    // this->grabGesture(Qt::TapAndHoldGesture);
-    // this->grabGesture(Qt::PanGesture);
-    // this->grabGesture(Qt::PinchGesture);
-    // this->grabGesture(Qt::SwipeGesture);
 
-    qDebug() << "A";
-    auto stack = new QStackedWidget();
-    qDebug() << "B";
-    this->setCentralWidget(stack);
-    qDebug() << "C";
+    this->setCentralWidget(this->stack);
 
     auto dash = new Dash(this->arbiter);
-    qDebug() << "D";
-    stack->addWidget(dash);
-    qDebug() << "E";
+    this->stack->addWidget(dash);
     dash->init();
-    qDebug() << "F";
-
-    connect(this->arbiter.layout().openauto_page, &OpenAutoPage::toggle_fullscreen, [stack](QWidget *widget){
-        stack->addWidget(widget);
-        stack->setCurrentWidget(widget);
-    });
 }
 
-bool Window::event(QEvent *event)
-{
-    if (event->type() == QEvent::Gesture)
-    {
-        qDebug() << "gesture:" << event;
-        if (auto *Tap = static_cast<QGestureEvent *>(event)->gesture(Qt::TapGesture))
-            qDebug() << "Tap:" << Tap;
-        if (auto *TapAndHold = static_cast<QGestureEvent *>(event)->gesture(Qt::TapAndHoldGesture))
-            qDebug() << "TapAndHold:" << TapAndHold;
-        if (auto *Pan = static_cast<QGestureEvent *>(event)->gesture(Qt::PanGesture))
-            qDebug() << "Pan:" << Pan;
-        if (auto *Pinch = static_cast<QGestureEvent *>(event)->gesture(Qt::PinchGesture))
-            qDebug() << "Pinch:" << Pinch;
-        if (auto *Swipe = static_cast<QGestureEvent *>(event)->gesture(Qt::SwipeGesture))
-            qDebug() << "Swipe:" << Swipe;
-    }
-
-    return QWidget::event(event);
-}
-
-void Window::showEvent(QShowEvent *event)
+void MainWindow::showEvent(QShowEvent *event)
 {
     QWidget::showEvent(event);
     this->arbiter.update();
 }
 
-// void Window::keyPressEvent(QKeyEvent *event)
-// {
-//     QMainWindow::keyPressEvent(event);
-//     this->arbiter.layout().openauto_page->pass_key_event(event);
-// }
+void MainWindow::keyPressEvent(QKeyEvent *event)
+{
+    if (event->key() == Qt::Key_Escape) {
+        if (this->arbiter.layout().fullscreen)
+            this->arbiter.toggle_fullscreen(false);
+    }
+    else {
+        QMainWindow::keyPressEvent(event);
+    }
+}
 
-// void Window::keyReleaseEvent(QKeyEvent *event)
-// {
-//     QMainWindow::keyReleaseEvent(event);
-//     this->arbiter.layout().openauto_page->pass_key_event(event);
-// }
+void MainWindow::set_fullscreen(Page *page)
+{
+    auto widget = page->container()->take();
+    this->stack->addWidget(widget);
+    this->stack->setCurrentWidget(widget);
+}

@@ -1,8 +1,9 @@
 #include "app/session.hpp"
+#include "app/window.hpp"
 
 #include "app/arbiter.hpp"
 
-Arbiter::Arbiter(QMainWindow *window)
+Arbiter::Arbiter(MainWindow *window)
     : QObject()
     , window_(window)
     , session_(*this)
@@ -84,8 +85,14 @@ void Arbiter::set_curr_page(Page *page)
 {
     if (this->layout().page_id(page) < 0 || !page->enabled())
         return;
-    
+
+    if (this->layout().fullscreen)
+        this->layout().curr_page->container()->reset();
+
     this->layout().curr_page = page;
+
+    if (this->layout().fullscreen)
+        this->window_->set_fullscreen(page);
 
     emit curr_page_changed(page);
 }
@@ -109,6 +116,19 @@ void Arbiter::set_page(Page *page, bool enabled)
     this->settings().endGroup();
 
     emit page_changed(page, enabled);
+}
+
+void Arbiter::toggle_fullscreen(bool fullscreen)
+{
+    this->layout().fullscreen = fullscreen;
+
+    auto page = this->layout().curr_page;
+    if (fullscreen)
+        this->window_->set_fullscreen(page);
+    else
+        page->container()->reset(); // reinserts widget into container, removing it from window stack
+
+    emit fullscreen_changed(fullscreen);
 }
 
 void Arbiter::set_brightness_plugin(QString plugin)
@@ -195,8 +215,7 @@ void Arbiter::set_action(Action *action, QString key)
     emit action_changed(action, key);
 }
 
-
-void Arbiter::send_openauto_full_screen(bool fullscreen)
+QMainWindow *Arbiter::window()
 {
-    emit openauto_full_screen(fullscreen);
+    return this->window_;
 }

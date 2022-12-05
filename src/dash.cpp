@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
     splash.show();
     dash.processEvents();
 
-    Window window;
+    MainWindow window;
     window.setWindowIcon(QIcon(":/logo.png"));
     window.setWindowFlags(Qt::FramelessWindowHint);
     if (!use_fixed_size)
