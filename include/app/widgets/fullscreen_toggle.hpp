@@ -7,7 +7,7 @@
 
 class Arbiter;
 
-class FullscreenToggle : public QDialog {
+class FullscreenToggle : public Dialog {
     Q_OBJECT
 
    public:
@@ -21,7 +21,6 @@ class FullscreenToggle : public QDialog {
     void mouseMoveEvent(QMouseEvent *event) override;
 
    private:
-    Arbiter &arbiter;
     QPoint p;
     QPoint last_pos;
     QTime touch_start;

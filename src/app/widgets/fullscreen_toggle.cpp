@@ -4,16 +4,12 @@
 #include "app/arbiter.hpp"
 
 FullscreenToggle::FullscreenToggle(Arbiter &arbiter)
-    : QDialog(nullptr, Qt::FramelessWindowHint)
-    , arbiter(arbiter)
+    : Dialog(arbiter, false, nullptr)
     , p()
     , last_pos()
     , touch_start()
 {
-    QHBoxLayout *layout = new QHBoxLayout(this);
-    layout->setContentsMargins(0, 0, 0, 0);
-    layout->setSpacing(0);
-    layout->addWidget(new QLabel("X"));
+    this->set_body(new QLabel("X"));
 
     connect(&this->arbiter, &Arbiter::fullscreen_changed, [this](bool fullscreen){
         if (fullscreen)
@@ -25,7 +21,7 @@ FullscreenToggle::FullscreenToggle(Arbiter &arbiter)
 
 void FullscreenToggle::showEvent(QShowEvent *event)
 {
-    QWidget::showEvent(event);
+    Dialog::showEvent(event);
 
     this->setWindowOpacity(.5);
     this->move(this->last_pos);
@@ -35,7 +31,7 @@ void FullscreenToggle::closeEvent(QCloseEvent *event)
 {
     this->last_pos = this->pos();
 
-    QDialog::closeEvent(event);
+    Dialog::closeEvent(event);
 }
 
 void FullscreenToggle::mousePressEvent(QMouseEvent *event)
