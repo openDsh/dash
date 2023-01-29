@@ -1,13 +1,12 @@
 #include <QTime>
 
 #include <QDebug>
-
-#include "app/widgets/dialog.hpp"
+#include <QDialog>
 
 
 class Arbiter;
 
-class FullscreenToggle : public Dialog {
+class FullscreenToggle : public QDialog {
     Q_OBJECT
 
    public:
@@ -21,7 +20,9 @@ class FullscreenToggle : public Dialog {
     void mouseMoveEvent(QMouseEvent *event) override;
 
    private:
+    Arbiter &arbiter;
     QPoint p;
     QPoint last_pos;
     QTime touch_start;
+    QLabel *label;
 };

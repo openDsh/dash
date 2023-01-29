@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
 
     MainWindow window;
     window.setWindowIcon(QIcon(":/logo.png"));
-    window.setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
+    window.setWindowFlags(Qt::FramelessWindowHint);
     if (!use_fixed_size)
         window.setWindowState(Qt::WindowFullScreen);
 
