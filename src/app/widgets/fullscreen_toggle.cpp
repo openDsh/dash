@@ -42,8 +42,7 @@ void FullscreenToggle::showEvent(QShowEvent *event)
 void FullscreenToggle::closeEvent(QCloseEvent *event)
 {
     this->last_pos = this->pos();
-
-    QDialog::closeEvent(event);
+    this->arbiter.window()->activateWindow();
 }
 
 void FullscreenToggle::mousePressEvent(QMouseEvent *event)
