@@ -4,7 +4,7 @@
 #include "app/arbiter.hpp"
 
 FullscreenToggle::FullscreenToggle(Arbiter &arbiter)
-    : Dialog(arbiter, false, nullptr)
+    : Dialog(arbiter, false, arbiter.window())
     , p()
     , last_pos()
     , touch_start()
