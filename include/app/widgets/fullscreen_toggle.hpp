@@ -20,20 +20,8 @@ class FullscreenToggle : public Dialog {
     void mouseReleaseEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
 
-    void focusInEvent(QFocusEvent *event) override
-    {
-        qDebug() << "focus in" << event;
-    }
-
-    void focusOutEvent(QFocusEvent *event) override
-    {
-        qDebug() << "focus out" << event;
-    }
-
    private:
     QPoint p;
     QPoint last_pos;
     QTime touch_start;
-
-    void shadow();
 };

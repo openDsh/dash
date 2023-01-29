@@ -23,7 +23,7 @@ void FullscreenToggle::showEvent(QShowEvent *event)
 {
     QWidget::showEvent(event);
 
-    this->shadow();
+    this->setWindowOpacity(.5);
     this->move(this->last_pos);
 }
 
@@ -46,17 +46,10 @@ void FullscreenToggle::mouseReleaseEvent(QMouseEvent *event)
     if (this->touch_start.msecsTo(QTime::currentTime()) < 100)
         this->arbiter.toggle_fullscreen(false);
     else
-        QTimer::singleShot(100, this, &FullscreenToggle::shadow);
+        QTimer::singleShot(100, this, [this]{ this->setWindowOpacity(.5); });
 }
 
 void FullscreenToggle::mouseMoveEvent(QMouseEvent *event)
 {
     this->move(event->globalX() - this->p.x(), event->globalY() - this->p.y());
-}
-
-void FullscreenToggle::shadow()
-{
-    this->arbiter.window()->activateWindow();
-    this->arbiter.window()->grabKeyboard();
-    this->setWindowOpacity(.5);
 }
