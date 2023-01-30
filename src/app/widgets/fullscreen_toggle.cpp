@@ -9,7 +9,7 @@ FullscreenToggle::FullscreenToggle(Arbiter &arbiter)
     , p()
     , last_pos()
     , touch_start()
-    , label(new QLabel("X"))
+    , label(new QLabel(" X "))
 {
     this->setAttribute(Qt::WA_TranslucentBackground, true);
     this->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -25,9 +25,9 @@ FullscreenToggle::FullscreenToggle(Arbiter &arbiter)
 
     connect(&this->arbiter, &Arbiter::fullscreen_changed, [this](bool fullscreen){
         if (fullscreen)
-            this->setVisible(true);
+            this->show();
         else
-            this->setVisible(false);
+            this->close();
     });
 }
 
@@ -49,7 +49,7 @@ void FullscreenToggle::mousePressEvent(QMouseEvent *event)
 {
     this->setWindowOpacity(1);
     QFont f = this->label->font();
-    f.setPointSize(f.pointSize() * 2);
+    f.setPointSize(f.pointSize() * 1.5);
     this->label->setFont(f);
     this->p = event->pos();
     this->touch_start = QTime::currentTime();
@@ -59,7 +59,7 @@ void FullscreenToggle::mouseReleaseEvent(QMouseEvent *event)
 {
     this->setWindowOpacity(.5);
     QFont f = this->label->font();
-    f.setPointSize(f.pointSize() / 2);
+    f.setPointSize(f.pointSize() / 1.5);
     this->label->setFont(f);
 
     if (this->touch_start.msecsTo(QTime::currentTime()) < 100)
