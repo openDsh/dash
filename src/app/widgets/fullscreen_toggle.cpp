@@ -25,9 +25,9 @@ FullscreenToggle::FullscreenToggle(Arbiter &arbiter)
 
     connect(&this->arbiter, &Arbiter::fullscreen_changed, [this](bool fullscreen){
         if (fullscreen)
-            this->open();
+            this->setVisible(true);
         else
-            this->close();
+            this->setVisible(false);
     });
 }
 
