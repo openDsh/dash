@@ -212,7 +212,21 @@ MainWindow::MainWindow()
 {
     this->setAttribute(Qt::WA_TranslucentBackground, true);
 
-    this->setCentralWidget(this->stack);
+    auto frame = new QFrame();
+    auto layout = new QVBoxLayout(frame);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setSpacing(0);
+
+    layout->addWidget(this->stack);
+
+    auto bar = FullscreenToggle::bar(this->arbiter);
+    bar->setVisible(this->arbiter.layout().fullscreen);
+    connect(&this->arbiter, &Arbiter::fullscreen_changed, [bar](bool fullscreen){
+        bar->setVisible(fullscreen);
+    });
+    layout->addWidget(bar);
+
+    this->setCentralWidget(frame);
 
     auto dash = new Dash(this->arbiter);
     this->stack->addWidget(dash);

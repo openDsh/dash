@@ -29,14 +29,43 @@ FullscreenToggle::FullscreenToggle(Arbiter &arbiter)
         else
             this->close();
     });
+    connect(&this->arbiter, &Arbiter::brightness_changed, [this](uint8_t brightness){
+        this->setWindowOpacity(brightness / 510.0);
+    });
+}
+
+QWidget *FullscreenToggle::bar(Arbiter &arbiter)
+{
+    auto widget = new QWidget();
+    auto layout = new QHBoxLayout(widget);
+    layout->setContentsMargins(0, 0, 0, 0);
+
+    auto bar = new QPushButton();
+    connect(bar, &QPushButton::clicked, [&arbiter]{ arbiter.toggle_fullscreen(false); });
+    bar->setFixedHeight(8);
+    bar->setObjectName("FullscreenBar");
+
+    layout->addStretch(4);
+    layout->addWidget(bar, 2);
+    layout->addStretch(4);
+
+    return widget;
 }
 
 void FullscreenToggle::showEvent(QShowEvent *event)
 {
     QDialog::showEvent(event);
 
-    this->setWindowOpacity(.5);
+    this->setWindowOpacity(this->arbiter.system().brightness.value / 510.0);
     this->move(this->last_pos);
+}
+
+void FullscreenToggle::keyPressEvent(QKeyEvent *event)
+{
+    if (event->key() == Qt::Key_Escape)
+        this->arbiter.toggle_fullscreen(false);
+    else
+        QDialog::keyPressEvent(event);
 }
 
 void FullscreenToggle::closeEvent(QCloseEvent *event)
@@ -47,7 +76,7 @@ void FullscreenToggle::closeEvent(QCloseEvent *event)
 
 void FullscreenToggle::mousePressEvent(QMouseEvent *event)
 {
-    this->setWindowOpacity(1);
+    this->setWindowOpacity(this->arbiter.system().brightness.value / 255.0);
     QFont f = this->label->font();
     f.setPointSize(f.pointSize() * 1.5);
     this->label->setFont(f);
@@ -57,7 +86,8 @@ void FullscreenToggle::mousePressEvent(QMouseEvent *event)
 
 void FullscreenToggle::mouseReleaseEvent(QMouseEvent *event)
 {
-    this->setWindowOpacity(.5);
+    this->arbiter.window()->activateWindow();
+    this->setWindowOpacity(this->arbiter.system().brightness.value / 510.0);
     QFont f = this->label->font();
     f.setPointSize(f.pointSize() / 1.5);
     this->label->setFont(f);
