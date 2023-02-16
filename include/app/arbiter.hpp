@@ -31,6 +31,7 @@ class Arbiter : public QObject {
     void set_curr_page(int id);
     void set_page(Page *page, bool enabled);
     void toggle_fullscreen(bool fullscreen);
+    void set_fullscreen_toggler(Session::Layout::Fullscreen::Toggler toggler);
     void set_brightness_plugin(QString plugin);
     void set_brightness(uint8_t brightness);
     void decrease_brightness(uint8_t val);
@@ -66,6 +67,7 @@ class Arbiter : public QObject {
     void curr_page_changed(Page *page);
     void page_changed(Page *page, bool enabled);
     void fullscreen_changed(bool fullscreen);
+    void fullscreen_toggler_changed(Session::Layout::Fullscreen::Toggler toggler);
     void brightness_plugin_changed(QString plugin);
     void brightness_changed(uint8_t brightness);
     void volume_changed(uint8_t volume);

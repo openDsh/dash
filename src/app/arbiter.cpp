@@ -86,12 +86,12 @@ void Arbiter::set_curr_page(Page *page)
     if (this->layout().page_id(page) < 0 || !page->enabled())
         return;
 
-    if (this->layout().fullscreen)
+    if (this->layout().fullscreen.enabled)
         this->layout().curr_page->container()->reset();
 
     this->layout().curr_page = page;
 
-    if (this->layout().fullscreen)
+    if (this->layout().fullscreen.enabled)
         this->window_->set_fullscreen(page);
 
     emit curr_page_changed(page);
@@ -120,7 +120,7 @@ void Arbiter::set_page(Page *page, bool enabled)
 
 void Arbiter::toggle_fullscreen(bool fullscreen)
 {
-    this->layout().fullscreen = fullscreen;
+    this->layout().fullscreen.enabled = fullscreen;
 
     auto page = this->layout().curr_page;
     if (fullscreen)
@@ -129,6 +129,13 @@ void Arbiter::toggle_fullscreen(bool fullscreen)
         page->container()->reset(); // reinserts widget into container, removing it from window stack
 
     emit fullscreen_changed(fullscreen);
+}
+
+void Arbiter::set_fullscreen_toggler(Session::Layout::Fullscreen::Toggler toggler)
+{
+    this->layout().fullscreen.toggler = toggler;
+
+    emit fullscreen_toggler_changed(toggler);
 }
 
 void Arbiter::set_brightness_plugin(QString plugin)

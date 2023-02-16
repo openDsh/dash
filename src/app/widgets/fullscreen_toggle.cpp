@@ -24,7 +24,15 @@ FullscreenToggle::FullscreenToggle(Arbiter &arbiter)
     layout->addWidget(label);
 
     connect(&this->arbiter, &Arbiter::fullscreen_changed, [this](bool fullscreen){
-        if (fullscreen)
+        if (fullscreen && (this->arbiter.layout().fullscreen.toggler == Session::Layout::Fullscreen::Button))
+            this->show();
+        else
+            this->close();
+    });
+    connect(&this->arbiter, &Arbiter::fullscreen_toggler_changed, [this](Session::Layout::Fullscreen::Toggler toggler){
+        // this->setVisible(this->arbiter.layout().fullscreen.enabled && (toggler == Session::Layout::Fullscreen::Button));
+
+        if (this->arbiter.layout().fullscreen.enabled && (toggler == Session::Layout::Fullscreen::Button))
             this->show();
         else
             this->close();
@@ -42,7 +50,7 @@ QWidget *FullscreenToggle::bar(Arbiter &arbiter)
 
     auto bar = new QPushButton();
     connect(bar, &QPushButton::clicked, [&arbiter]{ arbiter.toggle_fullscreen(false); });
-    bar->setFixedHeight(8);
+    bar->setFixedHeight(10 * arbiter.layout().scale);
     bar->setObjectName("FullscreenBar");
 
     layout->addStretch(4);

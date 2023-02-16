@@ -74,12 +74,25 @@ class Session {
             QList<QuickView *> quick_views_;
         };
 
+        struct Fullscreen {
+            enum Toggler {
+                None = 0,
+                Button,
+                Bar
+            };
+
+            bool enabled;
+            Toggler toggler;
+
+            Fullscreen(QSettings &settings);
+        };
+
         double scale;
         bool status_bar;
+        Fullscreen fullscreen;
         ControlBar control_bar;
         OpenAutoPage *openauto_page;
         Page *curr_page;
-        bool fullscreen;
 
         Layout(QSettings &settings, Arbiter &arbiter);
         Page *next_enabled_page(Page *page) const;
