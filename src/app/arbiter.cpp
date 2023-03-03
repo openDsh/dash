@@ -118,24 +118,49 @@ void Arbiter::set_page(Page *page, bool enabled)
     emit page_changed(page, enabled);
 }
 
-void Arbiter::toggle_fullscreen(bool fullscreen)
+void Arbiter::set_fullscreen(bool fullscreen)
 {
     this->layout().fullscreen.enabled = fullscreen;
 
     auto page = this->layout().curr_page;
-    if (fullscreen)
+
+    if (fullscreen) {
         this->window_->set_fullscreen(page);
-    else
+        this->layout().fullscreen.curr_toggler->enable();
+    }
+    else {
+        this->layout().fullscreen.curr_toggler->disable();
         page->container()->reset(); // reinserts widget into container, removing it from window stack
+    }
 
     emit fullscreen_changed(fullscreen);
 }
 
-void Arbiter::set_fullscreen_toggler(Session::Layout::Fullscreen::Toggler toggler)
+void Arbiter::toggle_fullscreen()
 {
-    this->layout().fullscreen.toggler = toggler;
+    this->set_fullscreen(!this->layout().fullscreen.enabled);
+}
 
-    emit fullscreen_toggler_changed(toggler);
+void Arbiter::set_curr_fullscreen_toggler(FullscreenToggler *toggler)
+{
+    auto id = this->layout().fullscreen.toggler_id(toggler);
+    if (id < 0)
+        return;
+
+    this->layout().fullscreen.curr_toggler->disable();
+
+    this->layout().fullscreen.curr_toggler = toggler;
+    this->settings().setValue("Layout/Fullscreen/toggler", id);
+
+    if (this->layout().fullscreen.enabled)
+        this->layout().fullscreen.curr_toggler->enable();
+
+    emit curr_fullscreen_toggler_changed(toggler);
+}
+
+void Arbiter::set_curr_fullscreen_toggler(int id)
+{
+    this->set_curr_fullscreen_toggler(this->layout().fullscreen.toggler(id));
 }
 
 void Arbiter::set_brightness_plugin(QString plugin)

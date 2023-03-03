@@ -25,6 +25,7 @@
 #include "app/services/bluetooth.hpp"
 #include "app/services/clock.hpp"
 #include "app/services/server.hpp"
+#include "app/widgets/fullscreen_toggler.hpp"
 #include "AAHandler.hpp"
 
 class Arbiter;
@@ -75,16 +76,17 @@ class Session {
         };
 
         struct Fullscreen {
-            enum Toggler {
-                None = 0,
-                Button,
-                Bar
-            };
-
             bool enabled;
-            Toggler toggler;
+            FullscreenToggler *curr_toggler;
 
-            Fullscreen(QSettings &settings);
+            Fullscreen(QSettings &settings, Arbiter &arbiter);
+
+            const QList<FullscreenToggler *> &togglers() const { return this->togglers_; }
+            FullscreenToggler *toggler(int id) const { return this->togglers_.value(id, nullptr); }
+            int toggler_id(FullscreenToggler *toggler) const { return this->togglers_.indexOf(toggler); }
+
+           private:
+            QList<FullscreenToggler *> togglers_;
         };
 
         double scale;

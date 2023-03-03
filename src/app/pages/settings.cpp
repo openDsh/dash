@@ -336,10 +336,12 @@ QWidget *LayoutSettingsTab::fullscreen_widget()
     QLabel *label = new QLabel("Fullscreen Toggler", widget);
     layout->addWidget(label, 1);
 
-    QStringList togglers{"none", "button", "bar"}; // these idxs need to match Session::Layout::Fullscreen::Toggler
-    Selector *selector = new Selector(togglers, togglers[this->arbiter.layout().fullscreen.toggler], this->arbiter.forge().font(14), this->arbiter, widget);
+    QStringList togglers;
+    for (auto toggler : this->arbiter.layout().fullscreen.togglers())
+        togglers.append(toggler->name());
+    Selector *selector = new Selector(togglers, this->arbiter.layout().fullscreen.curr_toggler->name(), this->arbiter.forge().font(14), this->arbiter, widget);
     connect(selector, &Selector::idx_changed, [this](int idx){
-        this->arbiter.set_fullscreen_toggler(static_cast<Session::Layout::Fullscreen::Toggler>(idx));
+        this->arbiter.set_curr_fullscreen_toggler(idx);
     });
     layout->addWidget(selector, 1);
 

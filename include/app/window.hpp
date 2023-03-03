@@ -4,7 +4,6 @@
 #include <QKeyEvent>
 #include <QMainWindow>
 #include <QObject>
-#include <QPointF>
 #include <QShowEvent>
 #include <QStackedLayout>
 #include <QElapsedTimer>
@@ -64,10 +63,8 @@ class MainWindow : public QMainWindow {
 
    protected:
     void showEvent(QShowEvent *event) override;
-    void keyPressEvent(QKeyEvent *event) override;
 
    private:
     Arbiter arbiter;
-    FullscreenToggle *fullscreen_toggle;
     QStackedWidget *stack;
 };

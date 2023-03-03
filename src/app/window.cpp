@@ -5,7 +5,6 @@
 #include "app/quick_views/quick_view.hpp"
 #include "app/utilities/icon_engine.hpp"
 #include "app/widgets/dialog.hpp"
-#include "app/widgets/fullscreen_toggle.hpp"
 
 #include "app/window.hpp"
 
@@ -60,7 +59,7 @@ Dash::Dash(Arbiter &arbiter)
     });
     connect(&this->rail.group, QOverload<int>::of(&QButtonGroup::buttonReleased), [this](int id){
         if (this->rail.timer.hasExpired(1000))
-            this->arbiter.toggle_fullscreen(true);
+            this->arbiter.set_fullscreen(true);
     });
     connect(&this->arbiter, &Arbiter::curr_page_changed, [this](Page *page){
         this->set_page(page);
@@ -207,7 +206,6 @@ QWidget *Dash::power_control() const
 MainWindow::MainWindow()
     : QMainWindow()
     , arbiter(this)
-    , fullscreen_toggle(new FullscreenToggle(this->arbiter))
     , stack(new QStackedWidget())
 {
     this->setAttribute(Qt::WA_TranslucentBackground, true);
@@ -218,16 +216,7 @@ MainWindow::MainWindow()
     layout->setSpacing(0);
 
     layout->addWidget(this->stack);
-
-    auto bar = FullscreenToggle::bar(this->arbiter);
-    bar->setVisible(this->arbiter.layout().fullscreen.enabled && (this->arbiter.layout().fullscreen.toggler == Session::Layout::Fullscreen::Bar));
-    connect(&this->arbiter, &Arbiter::fullscreen_changed, [&arbiter = this->arbiter, bar](bool fullscreen){
-        bar->setVisible(fullscreen && (arbiter.layout().fullscreen.toggler == Session::Layout::Fullscreen::Bar));
-    });
-    connect(&this->arbiter, &Arbiter::fullscreen_toggler_changed, [&arbiter = this->arbiter, bar](Session::Layout::Fullscreen::Toggler toggler){
-        bar->setVisible(arbiter.layout().fullscreen.enabled && (toggler == Session::Layout::Fullscreen::Bar));
-    });
-    layout->addWidget(bar);
+    layout->addWidget(this->arbiter.layout().fullscreen.toggler(1)->widget());
 
     this->setCentralWidget(frame);
 
@@ -240,17 +229,6 @@ void MainWindow::showEvent(QShowEvent *event)
 {
     QWidget::showEvent(event);
     this->arbiter.update();
-}
-
-void MainWindow::keyPressEvent(QKeyEvent *event)
-{
-    if (event->key() == Qt::Key_Escape) {
-        if (this->arbiter.layout().fullscreen.enabled)
-            this->arbiter.toggle_fullscreen(false);
-    }
-    else {
-        QMainWindow::keyPressEvent(event);
-    }
 }
 
 void MainWindow::set_fullscreen(Page *page)
