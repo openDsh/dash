@@ -69,7 +69,7 @@ void ActionDialog::showEvent(QShowEvent *event)
 
     Dialog::showEvent(event);
 
-    // this->label->setFocus();
+    this->label->setFocus();
 }
 
 void ActionDialog::closeEvent(QCloseEvent *event)

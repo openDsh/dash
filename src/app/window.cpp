@@ -223,6 +223,8 @@ MainWindow::MainWindow()
     auto dash = new Dash(this->arbiter);
     this->stack->addWidget(dash);
     dash->init();
+
+    this->arbiter.system().brightness.set();
 }
 
 void MainWindow::showEvent(QShowEvent *event)

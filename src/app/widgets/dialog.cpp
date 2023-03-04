@@ -10,7 +10,7 @@
 #include "app/widgets/dialog.hpp"
 
 Dialog::Dialog(Arbiter &arbiter, bool fullscreen, QWidget *parent)
-    : QDialog(parent, Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint)
+    : QDialog(parent, Qt::FramelessWindowHint)
     , arbiter(arbiter)
 {
     this->setAttribute(Qt::WA_TranslucentBackground, true);
@@ -35,7 +35,7 @@ void Dialog::open(int timeout)
 {
     this->show();
     this->raise();
-    // this->activateWindow();
+    this->activateWindow();
     if (timeout > 0)
         this->timer->start(timeout);
 }

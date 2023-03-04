@@ -177,7 +177,6 @@ Session::System::Brightness::Brightness(QSettings &settings)
     std::sort(this->plugin_infos_.begin(), this->plugin_infos_.end());
 
     this->load();
-    this->set();
 }
 
 void Session::System::Brightness::load()
