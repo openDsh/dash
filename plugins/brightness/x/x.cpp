@@ -11,14 +11,7 @@ X::X()
 
 bool X::supported()
 {
-    if (this->screen != nullptr) {
-        // Check that we can execute xrandr
-        QProcess process(this);
-        process.start(QString("xrandr --version"));
-        process.waitForFinished();
-        return process.exitCode() == 0;
-    }
-    return false;
+    return true;
 }
 
 uint8_t X::priority()
@@ -30,7 +23,7 @@ void X::set(int brightness)
 {
     if (this->screen != nullptr) {
         QProcess process(this);
-        process.start(QString("xrandr --output %1 --brightness %2").arg(this->screen->name()).arg(brightness / 255.0));
+        process.start(QString("/home/gioele/RPi-USB-Brightness/64/lite/Raspi_USB_Backlight_nogui -b %1").arg((int)(brightness / 25.5)));
         process.waitForFinished();
     }
 }
