@@ -193,10 +193,10 @@ if [ $pulseaudio = false ]
   else
     echo Preparing to compile and install pulseaudio
     echo Grabbing pulseaudio deps
-    sed -i 's/#deb-src/deb-src/g' /etc/apt/sources.list
+    sudo sed -i 's/#deb-src/deb-src/g' /etc/apt/sources.list
     sudo apt-get update -y
     git clone git://anongit.freedesktop.org/pulseaudio/pulseaudio
-    apt-get install -y autopoint
+    sudo apt-get install -y autopoint
     cd pulseaudio
     git checkout tags/v12.99.3
     echo Applying imtu patch
