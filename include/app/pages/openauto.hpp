@@ -55,8 +55,6 @@ class OpenAutoWorker : public QObject {
     std::shared_ptr<aasdk::usb::ConnectedAccessoriesEnumerator> connected_accessories_enumerator;
     std::shared_ptr<openauto::App> app;
     std::vector<std::thread> thread_pool;
-
-
 };
 
 class OpenAutoFrame : public QWidget {
@@ -65,18 +63,10 @@ class OpenAutoFrame : public QWidget {
    public:
     OpenAutoFrame(QWidget *parent);
 
-    inline bool is_fullscreen() { return this->fullscreen; }
-    inline void toggle_fullscreen() { this->fullscreen = !this->fullscreen; }
-
    protected:
-    void mouseDoubleClickEvent(QMouseEvent *);
     inline void enterEvent(QEvent *) { this->setFocus(); }
 
-   private:
-    bool fullscreen = false;
-
    signals:
-    void double_clicked(bool fullscreen);
     void toggle(bool enable);
 };
 
@@ -85,7 +75,6 @@ class OpenAutoPage : public QStackedWidget, public Page {
 
    public:
     OpenAutoPage(Arbiter &arbiter, QWidget *parent = nullptr);
-    void set_full_screen(bool fullscreen);
     void init() override;
 
    protected:
@@ -125,7 +114,4 @@ class OpenAutoPage : public QStackedWidget, public Page {
     OpenAutoFrame *frame;
     OpenAutoWorker *worker;
     const QString connected_icon_name;
-
-   signals:
-    void toggle_fullscreen(QWidget *widget);
 };

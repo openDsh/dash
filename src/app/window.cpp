@@ -1,7 +1,6 @@
 #include <QHBoxLayout>
 #include <QLocale>
 #include <QPushButton>
-#include <QStackedWidget>
 
 #include "app/quick_views/quick_view.hpp"
 #include "app/utilities/icon_engine.hpp"
@@ -11,6 +10,7 @@
 
 Dash::NavRail::NavRail()
     : group()
+    , timer()
     , layout(new QVBoxLayout())
 {
     this->layout->setContentsMargins(0, 0, 0, 0);
@@ -55,6 +55,11 @@ Dash::Dash(Arbiter &arbiter)
 
     connect(&this->rail.group, QOverload<int>::of(&QButtonGroup::buttonPressed), [this](int id){
         this->arbiter.set_curr_page(id);
+        this->rail.timer.start();
+    });
+    connect(&this->rail.group, QOverload<int>::of(&QButtonGroup::buttonReleased), [this](int id){
+        if (this->rail.timer.hasExpired(1000))
+            this->arbiter.set_fullscreen(true);
     });
     connect(&this->arbiter, &Arbiter::curr_page_changed, [this](Page *page){
         this->set_page(page);
@@ -81,7 +86,7 @@ void Dash::init()
 
         this->rail.group.addButton(button, this->arbiter.layout().page_id(page));
         this->rail.layout->addWidget(button);
-        this->body.frame->addWidget(page->widget());
+        this->body.frame->addWidget(page->container());
 
         page->init();
         button->setVisible(page->enabled());
@@ -95,7 +100,7 @@ void Dash::set_page(Page *page)
 {
     auto id = this->arbiter.layout().page_id(page);
     this->rail.group.button(id)->setChecked(true);
-    this->body.frame->setCurrentWidget(page->widget());
+    this->body.frame->setCurrentWidget(page->container());
 }
 
 QWidget *Dash::status_bar() const
@@ -198,39 +203,39 @@ QWidget *Dash::power_control() const
     return widget;
 }
 
-Window::Window()
+MainWindow::MainWindow()
     : QMainWindow()
     , arbiter(this)
+    , stack(new QStackedWidget())
 {
     this->setAttribute(Qt::WA_TranslucentBackground, true);
 
-    auto stack = new QStackedWidget();
-    this->setCentralWidget(stack);
+    auto frame = new QFrame();
+    auto layout = new QVBoxLayout(frame);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setSpacing(0);
+
+    layout->addWidget(this->stack);
+    layout->addWidget(this->arbiter.layout().fullscreen.toggler(1)->widget());
+
+    this->setCentralWidget(frame);
 
     auto dash = new Dash(this->arbiter);
-    stack->addWidget(dash);
+    this->stack->addWidget(dash);
     dash->init();
 
-    connect(this->arbiter.layout().openauto_page, &OpenAutoPage::toggle_fullscreen, [stack](QWidget *widget){
-        stack->addWidget(widget);
-        stack->setCurrentWidget(widget);
-    });
+    this->arbiter.system().brightness.set();
 }
 
-void Window::showEvent(QShowEvent *event)
+void MainWindow::showEvent(QShowEvent *event)
 {
     QWidget::showEvent(event);
     this->arbiter.update();
 }
 
-// void Window::keyPressEvent(QKeyEvent *event)
-// {
-//     QMainWindow::keyPressEvent(event);
-//     this->arbiter.layout().openauto_page->pass_key_event(event);
-// }
-
-// void Window::keyReleaseEvent(QKeyEvent *event)
-// {
-//     QMainWindow::keyReleaseEvent(event);
-//     this->arbiter.layout().openauto_page->pass_key_event(event);
-// }
+void MainWindow::set_fullscreen(Page *page)
+{
+    auto widget = page->container()->take();
+    this->stack->addWidget(widget);
+    this->stack->setCurrentWidget(widget);
+}

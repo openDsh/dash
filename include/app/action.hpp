@@ -90,29 +90,24 @@ class Action : public QObject {
 
     QString name_;
     QString key_;
-    
 };
 
 class ActionEventFilter : public QObject
 {
     Q_OBJECT
-    public:
-        ActionEventFilter(){};
-        bool eventFilter(QObject* obj, QEvent* event);
-        static ActionEventFilter *get_instance();
-        QMap<int, Action*> eventFilterMap;
-        void disable()
-        {
-            disabled = true;
-        }
-        void enable()
-        {
-            disabled = false;
-        }
-    private:
-        std::mutex mutex_;
-        bool disabled = false;
 
+   public:
+    ActionEventFilter(){};
+    bool eventFilter(QObject* obj, QEvent* event);
+    static ActionEventFilter *get_instance();
+    QMap<int, Action*> eventFilterMap;
+
+    void enable() { this->disabled = false; }
+    void disable() { this->disabled = true; }
+
+   private:
+    std::mutex mutex_;
+    bool disabled = false;
 };
 
 

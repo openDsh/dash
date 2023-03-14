@@ -95,12 +95,26 @@ Session::Layout::ControlBar::ControlBar(QSettings &settings, Arbiter &arbiter)
     this->curr_quick_view = this->quick_views_.value(settings.value("Layout/ControlBar/quick_view", 0).toInt());
 }
 
+Session::Layout::Fullscreen::Fullscreen(QSettings &settings, Arbiter &arbiter)
+    : enabled(false)
+    , curr_toggler(nullptr)
+{
+    this->togglers_ = {
+        new NullFullscreenToggler(arbiter),
+        new BarFullscreenToggler(arbiter),
+        new ButtonFullscreenToggler(arbiter)
+    };
+
+    this->curr_toggler = this->togglers_.value(settings.value("Layout/Fullscreen/toggler", 0).toInt());
+}
+
 Session::Layout::Layout(QSettings &settings, Arbiter &arbiter)
     : scale(settings.value("Layout/scale", 1.0).toDouble())
     , status_bar(settings.value("Layout/status_bar", false).toBool())
     , control_bar(settings, arbiter)
     , openauto_page(new OpenAutoPage(arbiter))
     , curr_page(nullptr)
+    , fullscreen(settings, arbiter)
 {
     this->pages_ = {
         this->openauto_page,
@@ -163,7 +177,6 @@ Session::System::Brightness::Brightness(QSettings &settings)
     std::sort(this->plugin_infos_.begin(), this->plugin_infos_.end());
 
     this->load();
-    this->set();
 }
 
 void Session::System::Brightness::load()
@@ -395,13 +408,14 @@ Session::Core::Core(QSettings &settings, Arbiter &arbiter)
         new Action("Decrease Brightness", [&arbiter](Action::ActionState actionState){ if(actionState == Action::ActionState::Triggered || actionState == Action::ActionState::Activated) arbiter.decrease_brightness(4); }, arbiter.window()),
         new Action("Increase Brightness", [&arbiter](Action::ActionState actionState){ if(actionState == Action::ActionState::Triggered || actionState == Action::ActionState::Activated) arbiter.increase_brightness(4); }, arbiter.window()),
         new Action("Decrease Volume", [&arbiter](Action::ActionState actionState){ if(actionState == Action::ActionState::Triggered || actionState == Action::ActionState::Activated) arbiter.decrease_volume(2); }, arbiter.window()),
-        new Action("Increase Volume", [&arbiter](Action::ActionState actionState){ if(actionState == Action::ActionState::Triggered || actionState == Action::ActionState::Activated) arbiter.increase_volume(2); }, arbiter.window())
+        new Action("Increase Volume", [&arbiter](Action::ActionState actionState){ if(actionState == Action::ActionState::Triggered || actionState == Action::ActionState::Activated) arbiter.increase_volume(2); }, arbiter.window()),
+        new Action("Toggle Fullscreen", [&arbiter](Action::ActionState actionState){ if(actionState == Action::ActionState::Triggered || actionState == Action::ActionState::Activated) arbiter.toggle_fullscreen(); }, arbiter.window())
     };
 
     for (auto page : arbiter.layout().pages()) {
-        auto callback = [&arbiter, page](Action::ActionState actionState){ 
-            if(actionState == Action::ActionState::Triggered || actionState == Action::ActionState::Activated) {
-                QMetaObject::invokeMethod(&arbiter, [&arbiter, page](){
+        auto callback = [&arbiter, page](Action::ActionState actionState){
+            if (actionState == Action::ActionState::Triggered || actionState == Action::ActionState::Activated) {
+                QMetaObject::invokeMethod(&arbiter, [&arbiter, page]{
                     arbiter.set_curr_page(page);
                 }, Qt::QueuedConnection);
             }
@@ -410,9 +424,9 @@ Session::Core::Core(QSettings &settings, Arbiter &arbiter)
     }
 
     {
-        auto callback = [&arbiter](Action::ActionState actionState){ 
-            if(actionState == Action::ActionState::Triggered || actionState == Action::ActionState::Activated){
-                QMetaObject::invokeMethod(&arbiter, [&arbiter](){
+        auto callback = [&arbiter](Action::ActionState actionState){
+            if (actionState == Action::ActionState::Triggered || actionState == Action::ActionState::Activated) {
+                QMetaObject::invokeMethod(&arbiter, [&arbiter]{
                     arbiter.set_curr_page(arbiter.layout().next_enabled_page(arbiter.layout().curr_page));
                 }, Qt::QueuedConnection);
             }
