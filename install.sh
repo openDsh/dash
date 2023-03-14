@@ -226,8 +226,8 @@ if [ $ofono = false ]
         echo Package failed to install with error code $?, quitting check logs above
         exit 1
     fi
-    sed -i 's/load-module module-bluetooth-discover/load-module module-bluetooth-discover headset=ofono/g' /usr/local/etc/pulse/default.pa
-    cat <<EOT >> /usr/local/etc/pulse/default.pa
+    sudo sed -i 's/load-module module-bluetooth-discover/load-module module-bluetooth-discover headset=ofono/g' /usr/local/etc/pulse/default.pa
+    sudo cat <<EOT >> /usr/local/etc/pulse/default.pa
     ### Echo cancel and noise reduction
     .ifexists module-echo-cancel.so
     load-module module-echo-cancel aec_method=webrtc source_name=ec_out sink_name=ec_ref
