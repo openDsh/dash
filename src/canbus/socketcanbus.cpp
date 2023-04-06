@@ -44,7 +44,7 @@ SocketCANBus::~SocketCANBus()
          bus->disconnectDevice();
      }*/
 
-    this->socket.close();
+    //this->socket.close();
 }
 
 bool SocketCANBus::writeFrame(QCanBusFrame frame)
@@ -93,7 +93,7 @@ void SocketCANBus::framesAvailable()
 
 void SocketCANBus::registerFrameHandler(int id, std::function<void(QByteArray)> callback)
 {
-
+/*
     QStringList list;
     while (this->socket.canReadLine())
     {
@@ -102,7 +102,7 @@ void SocketCANBus::registerFrameHandler(int id, std::function<void(QByteArray)> 
         list.append(data);
     }
 
-    /*
+    
         callbacks[id].push_back(callback);
         QCanBusDevice::Filter filter;
         filter.frameId = id;
