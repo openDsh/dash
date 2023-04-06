@@ -97,12 +97,12 @@ void SocketCANBus::registerFrameHandler(int id, std::function<void(QByteArray)> 
 {
 
     //QStringList list;
-    while (this->socket.canReadLine())
-    {
-        QString data = QString(this->socket.readLine());
+    //while (this->socket.canReadLine())
+    //{
+        QString data = "QString(this->socket.readLine())";
         DASH_LOG(info) << data;
         //list.append(data);
-    }
+    //}
 
     /*
         callbacks[id].push_back(callback);
