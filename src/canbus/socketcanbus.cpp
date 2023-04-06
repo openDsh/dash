@@ -33,25 +33,25 @@ SocketCANBus::SocketCANBus(QString canInterface)
         {
             DASH_LOG(error) << "[SocketCANBus] Errore di connessione a Carberry";
         }
-
     }
 }
 
 SocketCANBus::~SocketCANBus()
 {
     DASH_LOG(info) << "[SocketCANBus] Disconnessione da Carberry";
-   /* if (bus->state() == QCanBusDevice::ConnectedState)
-    {
-        bus->disconnectDevice();
-    }*/
+    /* if (bus->state() == QCanBusDevice::ConnectedState)
+     {
+         bus->disconnectDevice();
+     }*/
 
     this->socket.close();
 }
 
 bool SocketCANBus::writeFrame(QCanBusFrame frame)
 {
-    //return bus->writeFrame(frame);
-    this->socket.write(frame.toString());
+    // return bus->writeFrame(frame);
+    //this->socket.write(frame.toString());
+    return true;
 }
 
 SocketCANBus *SocketCANBus::get_instance()
@@ -98,17 +98,18 @@ void SocketCANBus::registerFrameHandler(int id, std::function<void(QByteArray)> 
     while (this->socket.canReadLine())
     {
         QString data = QString(this->socket.readLine());
-         DASH_LOG(info) << data;
+        DASH_LOG(info) << data;
         list.append(data);
-    }     
+    }
 
-/*
-    callbacks[id].push_back(callback);
-    QCanBusDevice::Filter filter;
-    filter.frameId = id;
-    filter.frameIdMask = 0xFFF;
-    filter.format = QCanBusDevice::Filter::MatchBaseAndExtendedFormat;
-    filter.type = QCanBusFrame::InvalidFrame;
-    filterList.append(filter);
-    bus->setConfigurationParameter(QCanBusDevice::RawFilterKey, QVariant::fromValue(filterList));*/
+    /*
+        callbacks[id].push_back(callback);
+        QCanBusDevice::Filter filter;
+        filter.frameId = id;
+        filter.frameIdMask = 0xFFF;
+        filter.format = QCanBusDevice::Filter::MatchBaseAndExtendedFormat;
+        filter.type = QCanBusFrame::InvalidFrame;
+        filterList.append(filter);
+        bus->setConfigurationParameter(QCanBusDevice::RawFilterKey, QVariant::fromValue(filterList));
+    */
 }
