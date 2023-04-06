@@ -1,4 +1,6 @@
 #include <QTcpSocket>
+#include <QStringList>
+#include <QString>
 #include "canbus/socketcanbus.hpp"
 
 SocketCANBus::SocketCANBus(QString canInterface)
