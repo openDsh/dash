@@ -1,5 +1,5 @@
 #include <QTcpSocket>
-//#include <QStringList>
+#include <QStringList>
 #include <QString>
 #include "canbus/socketcanbus.hpp"
 
@@ -29,6 +29,21 @@ SocketCANBus::SocketCANBus(QString canInterface)
 
         if (this->socket.state() == QAbstractSocket::ConnectedState)
         {
+            QString allineamento = "CAN USER ALIGN RIGHT\r\n";
+            this->socket.write(allineamento.toUtf8());
+
+            QString apertura = "CAN USER OPEN CH1 95K2\r\n";
+            this->socket.write(apertura.toUtf8());
+            
+            QString maschera = "CAN USER MASK CH1 0FFF\r\n";
+            this->socket.write(maschera.toUtf8());
+
+            QString filtro10 = "CAN USER FILTER CH1 0 0206\r\n";
+            this->socket.write(filtro0.toUtf8());
+
+            QString filtro11 = "CAN USER FILTER CH1 1 0450\r\n";
+            this->socket.write(filtro1.toUtf8());
+
             DASH_LOG(info) << "[SocketCANBus] Connesso a Carberry";
         }
         else
@@ -52,8 +67,9 @@ SocketCANBus::~SocketCANBus()
 bool SocketCANBus::writeFrame(QCanBusFrame frame)
 {
     // return bus->writeFrame(frame);
-    if(this->socket.write("p")>0) //maggiore di frame.lenght
-        return true;
+    if(this->socket.write("p")<0) //maggiore di frame.lenght
+        return false;
+    return true;
 }
 
 SocketCANBus *SocketCANBus::get_instance()
