@@ -66,9 +66,8 @@ SocketCANBus::~SocketCANBus()
 
 bool SocketCANBus::writeFrame(QCanBusFrame frame)
 {
-    // return bus->writeFrame(frame);
-    if(this->socket.write("p")<0) //maggiore di frame.lenght
-        return false;
+    //if(this->socket.write("p")<0) //maggiore di frame.lenght
+        //return false;
     return true;
 }
 
