@@ -52,7 +52,7 @@ SocketCANBus::~SocketCANBus()
 bool SocketCANBus::writeFrame(QCanBusFrame frame)
 {
     // return bus->writeFrame(frame);
-    //this->socket.write(frame.toString());
+    this->socket.write(frame.toString());
     return true;
 }
 
