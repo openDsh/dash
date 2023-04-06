@@ -39,10 +39,10 @@ SocketCANBus::SocketCANBus(QString canInterface)
             this->socket.write(maschera.toUtf8());
 
             QString filtro10 = "CAN USER FILTER CH1 0 0206\r\n";
-            this->socket.write(filtro0.toUtf8());
+            this->socket.write(filtro10.toUtf8());
 
             QString filtro11 = "CAN USER FILTER CH1 1 0450\r\n";
-            this->socket.write(filtro1.toUtf8());
+            this->socket.write(filtro11.toUtf8());
 
             DASH_LOG(info) << "[SocketCANBus] Connesso a Carberry";
         }
