@@ -1,5 +1,5 @@
 #include <QTcpSocket>
-#include <QStringList>
+//#include <QStringList>
 #include <QString>
 #include "canbus/socketcanbus.hpp"
 
@@ -96,12 +96,12 @@ void SocketCANBus::framesAvailable()
 void SocketCANBus::registerFrameHandler(int id, std::function<void(QByteArray)> callback)
 {
 
-    QStringList list;
+    //QStringList list;
     while (this->socket.canReadLine())
     {
         QString data = QString(this->socket.readLine());
         DASH_LOG(info) << data;
-        list.append(data);
+        //list.append(data);
     }
 
     /*
