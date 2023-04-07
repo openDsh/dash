@@ -4,7 +4,6 @@
 #include "app/config.hpp"
 #include "app/pages/vehicle.hpp"
 #include "app/window.hpp"
-#include "canbus/elm327.hpp"
 #include "plugins/vehicle_plugin.hpp"
 
 GaugesConfig gauges_cfg = 
@@ -175,14 +174,6 @@ QWidget *VehiclePage::can_bus_toggle_row()
     });
     group_layout->addWidget(socketcan_button);
 
-    QRadioButton *elm_button = new QRadioButton("ELM327 (USB)", group);
-    elm_button->setChecked(!this->config->get_vehicle_can_bus());
-    elm_button->setEnabled(this->serial_devices.size() > 0);
-    connect(elm_button, &QRadioButton::clicked, [config = this->config]{
-        config->set_vehicle_can_bus(false);
-    });
-    group_layout->addWidget(elm_button);
-
     layout->addWidget(group, 1, Qt::AlignHCenter);
 
     return widget;
@@ -224,7 +215,7 @@ void VehiclePage::load_plugin()
 
         if (VehiclePlugin *plugin = qobject_cast<VehiclePlugin *>(this->active_plugin->instance())) {
             plugin->dashize(&this->arbiter);
-            plugin->init((config->get_vehicle_can_bus())?((ICANBus *)SocketCANBus::get_instance()):((ICANBus *)elm327::get_instance()));
+            plugin->init(((ICANBus *)SocketCANBus::get_instance()));
             for (QWidget *tab : plugin->widgets())
                 this->addTab(tab, tab->objectName());
         }
