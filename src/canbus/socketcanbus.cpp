@@ -36,6 +36,25 @@ SocketCANBus::SocketCANBus(QString canInterface)
         {
             DASH_LOG(error) << "[SocketCANBus] Errore di connessione a Carberry";
         }
+        
+    while (this->socket.canReadLine())
+    {
+        QString linea = QString(this->socket.readLine());
+        DASH_LOG(info) << linea.toStdString();
+        QStringList part = linea.split(" ");
+        QStringList fram = part[1].split("-");
+        
+        if(part.at(0)=="RX1"){
+          if(fram.at(0)=="0206"){
+            
+          }
+        }
+        if(part.at(0)=="RX2"){
+          
+        }
+    }
+    
+    
     }
 }
 
