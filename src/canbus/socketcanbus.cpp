@@ -43,6 +43,7 @@ SocketCANBus::SocketCANBus(QString canInterface)
         DASH_LOG(info) << linea.toStdString();
         QStringList part = linea.split(" ");
         QStringList fram = part[1].split("-");
+        QStringList hexx = fram[1].split(QRegularExpression("[\\s|,]"), QString::SkipEmptyParts);
         
         if(part.at(0)=="RX1"){
           if(fram.at(0)=="0206"){
