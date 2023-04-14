@@ -18,7 +18,7 @@ class SocketCANBus : public ICANBus
         ~SocketCANBus();
         static SocketCANBus *get_instance();
         void registerFrameHandler(int id, std::function<void(QByteArray)> callback) override;
-        bool writeFrame(QCanBusFrame frame) override;
+        bool writeFrame(QString frame) override;
 
     private:
         bool socketCANAvailable = false;
