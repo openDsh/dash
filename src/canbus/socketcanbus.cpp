@@ -1,4 +1,4 @@
-#include <QTcpSocket>
+#tiinclude <QTcpSocket>
 #include <QStringList>
 #include <QString>
 #include "canbus/socketcanbus.hpp"
@@ -36,6 +36,37 @@ SocketCANBus::SocketCANBus(QString canInterface)
         {
             DASH_LOG(error) << "[SocketCANBus] Errore di connessione a Carberry";
         }
+        
+    while (this->socket.canReadLine())
+    {
+        QString linea = QString(this->socket.readLine());
+        DASH_LOG(info) << linea.toStdString();
+        QStringList part = linea.split(" ");
+        QStringList fram = part[1].split("-");
+        
+        QStringList hexx;
+        int index = 0;
+        
+        for (int i = 0; i < fram[1].length(); i++) {
+          if(i%2==0){
+            hexx[index] = 
+          }
+          
+        }
+        
+        QStringList hexx = fram[1].split(QRegularExpression("[\\s|,]"), QString::SkipEmptyParts);
+        
+        if(part.at(0)=="RX1"){
+          if(fram.at(0)=="0206"){
+            
+          }
+        }
+        if(part.at(0)=="RX2"){
+          
+        }
+    }
+    
+    
     }
 
     while (this->socket.canReadLine())
