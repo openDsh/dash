@@ -1,4 +1,4 @@
-#tiinclude <QTcpSocket>
+#include <QTcpSocket>
 #include <QStringList>
 #include <QString>
 #include "canbus/socketcanbus.hpp"
