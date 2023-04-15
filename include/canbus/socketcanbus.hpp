@@ -24,12 +24,5 @@ class SocketCANBus : public ICANBus
         QTcpSocket socket;
         QCanBusDevice *bus;
         std::map<int, std::vector<std::function<void(QByteArray)>>> callbacks;
-        //QList<QCanBusDevice::Filter> filterList;
-
-        //QVector<QCanBusFrame> readAllFrames(int numFrames);
-
-
-    //private slots:
-        //void framesAvailable();
 };
 

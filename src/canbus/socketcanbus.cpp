@@ -41,6 +41,9 @@ SocketCANBus::SocketCANBus(QString canInterface)
 
         while (this->socket.canReadLine())
         {
+
+            DASH_LOG(info) << "[SocketCANBus] Comincio a leggere i CANBUS";
+
             QString linea = QString(this->socket.readLine());
             DASH_LOG(info) << linea.toStdString();
             QStringList part = linea.split(" ");

@@ -142,7 +142,7 @@ bool Test::init(ICANBus*)
                 this->climate->right_temp((rand() % 20) + 60);
             }
         });
-        timer2->start(1000);
+        timer2->start(100000);
 
         return true;
     }
