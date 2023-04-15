@@ -53,7 +53,7 @@ SocketCANBus::SocketCANBus(QString canInterface)
             {
                 if (i % 2 == 0)
                 {
-                    hexx[index] = fram[1].sliced(i - 2, 2);
+                    hexx[index] = fram[1].mid(i - 2, 2);
                     index++;
                 }
             }
