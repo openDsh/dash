@@ -6,7 +6,7 @@
 #include <QByteArray>
 #include <QVariant>
 #include <QTcpSocket>
-#include <QAbstractSocket>
+//#include <QAbstractSocket>
 #include "DashLog.hpp"
 #include "canbus/ICANBus.hpp"
 #include "app/config.hpp"
