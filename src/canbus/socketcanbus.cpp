@@ -66,8 +66,7 @@ void SocketCANBus::readFrame()
 {
 
     DASH_LOG(info) << socket;
-QBuffer* buffer = buffers.value(socket);
-DASH_LOG(info) << buffer;
+
 
     while (this->socket.canReadLine())
     {
