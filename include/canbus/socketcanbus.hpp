@@ -11,11 +11,11 @@
 #include "canbus/ICANBus.hpp"
 #include "app/config.hpp"
 
-class SocketCANBus : public ICANBus
+class SocketCANBus : public ICANBus//, public QObject
 {
     Q_OBJECT
 public:
-    SocketCANBus(QString canInterface = "can0");
+    SocketCANBus(QObject *parent = 0, QString canInterface = "can0");
     ~SocketCANBus();
     static SocketCANBus *get_instance();
     bool writeFrame(QString frame) override;

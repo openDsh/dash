@@ -3,7 +3,7 @@
 #include <QString>
 #include "canbus/socketcanbus.hpp"
 
-SocketCANBus::SocketCANBus(QString canInterface)
+SocketCANBus::SocketCANBus(QObject *parent, QString canInterface)
 {
     if (QCanBus::instance()->plugins().contains(QStringLiteral("socketcan")))
     {
@@ -61,7 +61,7 @@ SocketCANBus *SocketCANBus::get_instance()
     return &bus;
 }
 
-void readyRead()
+void SocketCANBus::readyRead()
 {
 
     while (this->socket.canReadLine())
