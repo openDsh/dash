@@ -75,7 +75,7 @@ void SocketCANBus::readFrame()
         QString id = linea.split(" ")[1].split("-")[0];
         QString data = linea.split(" ")[1].split("-")[1];
 
-        if (data.length > 1)
+        if (data.length() > 1)
         {
 
             QStringList dataHex;
