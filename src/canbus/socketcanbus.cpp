@@ -75,125 +75,130 @@ void SocketCANBus::readFrame()
         QString id = linea.split(" ")[1].split("-")[0];
         QString data = linea.split(" ")[1].split("-")[1];
 
-        QStringList dataHex;
-
-        QString duo;
-
-        for (int i = 0; i < data.length(); i++)
-        {
-            if (i % 2 == 0 && i != 0){
-                dataHex.append(duo);
-                duo = "";
-            }
-            duo.append(data[i]);
-        }
-
-        // MS-CAN
-
-        if (canbus == "RX1")
+        if (data.length > 1)
         {
 
-            // Esempio RX1 0206-008401
+            QStringList dataHex;
 
-            if (id == "0206")
+            QString duo;
+
+            for (int i = 0; i < data.length(); i++)
             {
-                if (dataHex.at(0) == "00")
+                if (i % 2 == 0 && i != 0)
                 {
-                    bool ok;
-
-                    uint temprem = dataHex[2].toUInt(&ok, 16);
-
-                    if (ok == true && temprem > 64)
-                    {
-                        if (dataHex.at(1) == "81")
-                            DASH_LOG(info) << "PREMUTO pulsante in alto a sinistra\r\n";
-                        if (dataHex.at(1) == "82")
-                            DASH_LOG(info) << "PREMUTO Pulsante giù a sinistra\r\n";
-                        if (dataHex.at(1) == "84")
-                            DASH_LOG(info) << "PREMUTO Pulsante manopola sinistra\r\n";
-                        if (dataHex.at(1) == "91")
-                            DASH_LOG(info) << "PREMUTO Pulsante destro in alto (successivo)\r\n";
-                        if (dataHex.at(1) == "92")
-                            DASH_LOG(info) << "PREMUTO Pulsante in basso a destra\r\n";
-                    }
-                    else
-                    {
-                        if (dataHex.at(1) == "81")
-                            DASH_LOG(info) << "pulsante in alto a sinistra\r\n";
-                        if (dataHex.at(1) == "82")
-                            DASH_LOG(info) << "Pulsante giù a sinistra\r\n";
-                        if (dataHex.at(1) == "84")
-                            DASH_LOG(info) << "Pulsante manopola sinistra\r\n";
-                        if (dataHex.at(1) == "91")
-                            DASH_LOG(info) << "Pulsante destro in alto (successivo)\r\n";
-                        if (dataHex.at(1) == "92")
-                            DASH_LOG(info) << "Pulsante in basso a destra\r\n";
-                    }
+                    dataHex.append(duo);
+                    duo = "";
                 }
-                if (dataHex.at(0) == "08")
+                duo.append(data[i]);
+            }
+
+            // MS-CAN
+
+            if (canbus == "RX1")
+            {
+
+                // Esempio RX1 0206-008401
+
+                if (id == "0206")
                 {
-                    if (dataHex.at(1) == "83")
+                    if (dataHex.at(0) == "00")
                     {
-                        if (dataHex.at(2).at(1) == "F")
+                        bool ok;
+
+                        uint temprem = dataHex[2].toUInt(&ok, 16);
+
+                        if (ok == true && temprem > 64)
                         {
-                            DASH_LOG(info) << "Manopola sinistra SU\r\n";
+                            if (dataHex.at(1) == "81")
+                                DASH_LOG(info) << "PREMUTO pulsante in alto a sinistra\r\n";
+                            if (dataHex.at(1) == "82")
+                                DASH_LOG(info) << "PREMUTO Pulsante giù a sinistra\r\n";
+                            if (dataHex.at(1) == "84")
+                                DASH_LOG(info) << "PREMUTO Pulsante manopola sinistra\r\n";
+                            if (dataHex.at(1) == "91")
+                                DASH_LOG(info) << "PREMUTO Pulsante destro in alto (successivo)\r\n";
+                            if (dataHex.at(1) == "92")
+                                DASH_LOG(info) << "PREMUTO Pulsante in basso a destra\r\n";
                         }
                         else
                         {
-                            DASH_LOG(info) << "Manopola sinistra GIU\r\n";
+                            if (dataHex.at(1) == "81")
+                                DASH_LOG(info) << "pulsante in alto a sinistra\r\n";
+                            if (dataHex.at(1) == "82")
+                                DASH_LOG(info) << "Pulsante giù a sinistra\r\n";
+                            if (dataHex.at(1) == "84")
+                                DASH_LOG(info) << "Pulsante manopola sinistra\r\n";
+                            if (dataHex.at(1) == "91")
+                                DASH_LOG(info) << "Pulsante destro in alto (successivo)\r\n";
+                            if (dataHex.at(1) == "92")
+                                DASH_LOG(info) << "Pulsante in basso a destra\r\n";
                         }
                     }
-
-                    if (dataHex.at(1) == "93")
+                    if (dataHex.at(0) == "08")
                     {
-                        if (dataHex.at(2).at(1) == "F")
+                        if (dataHex.at(1) == "83")
                         {
-                            DASH_LOG(info) << "Manopola destra (Volume) GIU\r\n";
+                            if (dataHex.at(2).at(1) == "F")
+                            {
+                                DASH_LOG(info) << "Manopola sinistra SU\r\n";
+                            }
+                            else
+                            {
+                                DASH_LOG(info) << "Manopola sinistra GIU\r\n";
+                            }
+                        }
+
+                        if (dataHex.at(1) == "93")
+                        {
+                            if (dataHex.at(2).at(1) == "F")
+                            {
+                                DASH_LOG(info) << "Manopola destra (Volume) GIU\r\n";
+                            }
+                            else
+                            {
+                                DASH_LOG(info) << "Manopola destra (Volume) SU\r\n";
+                            }
+                        }
+                    }
+                }
+
+                // Esempio RX1 0450-460706FF
+
+                if (id == "0450")
+                {
+                    bool okk;
+
+                    uint luminosita_nuova = dataHex[3].toUInt(&okk, 16);
+                    int valore_ws = (int)(luminosita_nuova / 25.5);
+
+                    if (valore_ws != lumws)
+                    {
+                        /*
+                        char query[73]; // 71
+
+                        sprintf(query, "/home/gioele/RPi-USB-Brightness/64/lite/Raspi_USB_Backlight_nogui -b %d", valore_ws);
+
+                        if (system(query) == 0)
+                        {
+                            printf("%s\r\n", query);
                         }
                         else
                         {
-                            DASH_LOG(info) << "Manopola destra (Volume) SU\r\n";
-                        }
+                            printf("==== ERRORE LUMINOSITA ====\r\n");
+                        }*/
+
+                        DASH_LOG(info) << "NUOVA LUMINOSITA:" << QString::number(valore_ws).toStdString() << "\r\n";
+
+                        lumws = valore_ws;
                     }
                 }
             }
 
-            // Esempio RX1 0450-460706FF
+            // HS-CAN
 
-            if (id == "0450")
+            if (canbus == "RX2")
             {
-                bool okk;
-
-                uint luminosita_nuova = dataHex[3].toUInt(&okk, 16);
-                int valore_ws = (int)(luminosita_nuova / 25.5);
-
-                if (valore_ws != lumws)
-                {
-                    /*
-                    char query[73]; // 71
-
-                    sprintf(query, "/home/gioele/RPi-USB-Brightness/64/lite/Raspi_USB_Backlight_nogui -b %d", valore_ws);
-
-                    if (system(query) == 0)
-                    {
-                        printf("%s\r\n", query);
-                    }
-                    else
-                    {
-                        printf("==== ERRORE LUMINOSITA ====\r\n");
-                    }*/
-
-                    DASH_LOG(info) << "NUOVA LUMINOSITA:" << QString::number(valore_ws).toStdString() << "\r\n";
-
-                    lumws = valore_ws;
-                }
             }
-        }
-
-        // HS-CAN
-
-        if (canbus == "RX2")
-        {
         }
     }
 }
