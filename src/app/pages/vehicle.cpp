@@ -215,7 +215,7 @@ void VehiclePage::load_plugin()
 
         if (VehiclePlugin *plugin = qobject_cast<VehiclePlugin *>(this->active_plugin->instance())) {
             plugin->dashize(&this->arbiter);
-            //plugin->init(((ICANBus *)SocketCANBus::get_instance()));
+            plugin->init(((SocketCANBus *)SocketCANBus::get_instance()));
             for (QWidget *tab : plugin->widgets())
                 this->addTab(tab, tab->objectName());
         }

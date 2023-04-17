@@ -15,7 +15,7 @@ class Test : public QObject, VehiclePlugin {
     Test() {};
     ~Test();
     QList<QWidget *> widgets() override;
-    bool init(ICANBus*) override;
+    bool init(SocketCANBus*) override;
 
    private:
     Climate *climate;

@@ -19,7 +19,7 @@ QList<QWidget *> Test::widgets()
     return tabs;
 }
 
-bool Test::init(ICANBus*)
+bool Test::init(SocketCANBus*)
 {
     if (this->arbiter) {
         this->vehicle = new Vehicle(*this->arbiter);
