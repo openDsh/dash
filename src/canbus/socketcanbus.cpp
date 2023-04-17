@@ -65,12 +65,16 @@ SocketCANBus *SocketCANBus::get_instance()
 void SocketCANBus::readFrame()
 {
 
-    while (socket.canReadLine())
+    DASH_LOG(info) << socket;
+QBuffer* buffer = buffers.value(socket);
+DASH_LOG(info) << buffer;
+
+    while (this->socket.canReadLine())
     {
 
         DASH_LOG(info) << "[SocketCANBus] CAN-BUS = ";
 
-        QString linea = QString(socket.readLine());
+        QString linea = QString(this->socket.readLine());
         DASH_LOG(info) << linea.toStdString() << "\n";
         QStringList part = linea.split(" ");
         QStringList fram = part[1].split("-");
