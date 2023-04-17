@@ -17,6 +17,7 @@ class SocketCANBus : public QObject
 public:
     SocketCANBus(QObject *parent = 0, QString canInterface = "can0");
     ~SocketCANBus();
+    static SocketCANBus *get_instance();
     bool writeFrame(QString frame);
 
 private:
