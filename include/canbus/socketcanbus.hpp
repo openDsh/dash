@@ -11,7 +11,7 @@
 #include "canbus/ICANBus.hpp"
 #include "app/config.hpp"
 
-class SocketCANBus : public ICANBus, public QObject
+class SocketCANBus : public ICANBus//, public QObject
 {
     Q_OBJECT
 public:
