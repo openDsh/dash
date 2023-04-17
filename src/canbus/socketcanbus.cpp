@@ -4,7 +4,7 @@
 #include "canbus/socketcanbus.hpp"
 #include <QAbstractSocket>
 
-SocketCANBus::SocketCANBus(QObject *parent, QString canInterface)
+SocketCANBus::SocketCANBus(QObject *parent, QString canInterface): QObject(parent), socket(this)
 {
     if (QCanBus::instance()->plugins().contains(QStringLiteral("socketcan")))
     {
@@ -38,7 +38,8 @@ SocketCANBus::SocketCANBus(QObject *parent, QString canInterface)
             DASH_LOG(error) << "[SocketCANBus] Errore di connessione a Carberry";
         }
 
-        connect(socket, SIGNAL(readyRead()), this, SLOT(readyRead()));
+        //connect(socket, SIGNAL(readyRead()), this, SLOT(readyRead()));
+        QObject::connect(&socket, &QTcpSocket::readyRead, this, &SocketCANBus::readFrame);
     }
 }
 
@@ -62,7 +63,7 @@ SocketCANBus *SocketCANBus::get_instance()
     return &bus;
 }
 
-void SocketCANBus::readyRead()
+void SocketCANBus::readFrame()
 {
 
     while (this->socket.canReadLine())

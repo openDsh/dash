@@ -11,7 +11,7 @@
 #include "canbus/ICANBus.hpp"
 #include "app/config.hpp"
 
-class SocketCANBus : public ICANBus//, public QObject
+class SocketCANBus : public ICANBus
 {
     Q_OBJECT
 public:
@@ -29,5 +29,5 @@ private:
 signals:
 
 private slots:
-    void readyRead();
+    void readFrame();
 };
