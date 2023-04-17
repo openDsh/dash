@@ -59,7 +59,7 @@ bool SocketCANBus::writeFrame(QString frame)
 
 SocketCANBus *SocketCANBus::get_instance()
 {
-    static SocketCANBus bus(Config::get_instance()->get_vehicle_interface());
+    static SocketCANBus bus(0, Config::get_instance()->get_vehicle_interface());
     return &bus;
 }
 
