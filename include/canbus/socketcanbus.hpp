@@ -6,7 +6,7 @@
 #include <QByteArray>
 #include <QVariant>
 #include <QTcpSocket>
-// #include <QAbstractSocket>
+#include <QAbstractSocket>
 #include "DashLog.hpp"
 #include "canbus/ICANBus.hpp"
 #include "app/config.hpp"
@@ -17,7 +17,6 @@ class SocketCANBus : public QObject
 public:
     SocketCANBus(QObject *parent = 0, QString canInterface = "can0");
     ~SocketCANBus();
-    static SocketCANBus *get_instance();
     bool writeFrame(QString frame);
 
 private:
