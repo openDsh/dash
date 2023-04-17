@@ -4,7 +4,7 @@
 #include "canbus/socketcanbus.hpp"
 #include <QAbstractSocket>
 
-SocketCANBus::SocketCANBus(QObject *parent, QString canInterface): QObject(parent), socket(this)
+SocketCANBus::SocketCANBus(QObject *parent, QString canInterface) : QObject(parent), socket(this)
 {
     if (QCanBus::instance()->plugins().contains(QStringLiteral("socketcan")))
     {
@@ -78,12 +78,11 @@ void SocketCANBus::readFrame()
 
         for (int i = 0; i < fram[1].length(); i++)
         {
+            hexx[index].append(fram.at(1).at(i));
+            DASH_LOG(info) << "NUMER" << hexx[index].toStdString();
+
             if (i % 2 == 0)
-            {
-                DASH_LOG(info) << "NUMER" << fram[1].toStdString();
-                hexx[index] = fram[1].mid(i - 1, 2);
                 index++;
-            }
         }
 
         // MS-CAN
