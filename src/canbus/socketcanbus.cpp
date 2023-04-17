@@ -80,7 +80,7 @@ void SocketCANBus::readFrame()
         {
             if (i % 2 == 0)
             {
-                DASH_LOG(info) << "NUMER" << fram[1].mid(i - 1, 2).toStdString();
+                DASH_LOG(info) << "NUMER" << fram[1].toStdString();
                 hexx[index] = fram[1].mid(i - 1, 2);
                 index++;
             }
