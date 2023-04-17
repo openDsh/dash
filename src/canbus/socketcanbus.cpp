@@ -71,7 +71,7 @@ void SocketCANBus::readFrame()
         QString linea = QString(this->socket.readLine());
         DASH_LOG(info) << "[SocketCANBus] CAN-BUS = " << linea.toStdString() << "\n";
 
-        if (linea.contains(" ") && linea.contains("-")) // senza controlli split fa crashare tutto se la stringa non contiene i caratteri richiesti
+        if (linea.contains(" ") == true && linea.contains("-") == true) // senza controlli split fa crashare tutto se la stringa non contiene i caratteri richiesti
         {
 
             QString canbus = linea.split(" ")[0];
