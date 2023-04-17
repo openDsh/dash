@@ -73,6 +73,8 @@ void SocketCANBus::readFrame()
         QStringList part = linea.split(" ");
         QStringList fram = part[1].split("-");
 
+        DASH_LOG(info) << "DOPO SPLIT";
+
         QStringList hexx;
         int index = 0;
 
@@ -84,6 +86,8 @@ void SocketCANBus::readFrame()
                 index++;
             }
         }
+
+                DASH_LOG(info) << "DOPO HEXX";
 
         // MS-CAN
 
