@@ -37,7 +37,7 @@ SocketCANBus::SocketCANBus(QString canInterface)
             DASH_LOG(error) << "[SocketCANBus] Errore di connessione a Carberry";
         }
 
-        this->connect(socket, SIGNAL(readyRead()), this, SLOT(readyRead()));
+        connect(socket, SIGNAL(readyRead()), SLOT(readyRead()));
     }
 }
 
@@ -63,8 +63,6 @@ SocketCANBus *SocketCANBus::get_instance()
 
 void SocketCANBus::readyRead()
 {
-
-    int lumws = 10;
 
     while (this->socket.canReadLine())
     {

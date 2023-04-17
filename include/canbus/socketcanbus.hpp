@@ -6,7 +6,7 @@
 #include <QByteArray>
 #include <QVariant>
 #include <QTcpSocket>
-//#include <QAbstractSocket>
+// #include <QAbstractSocket>
 #include "DashLog.hpp"
 #include "canbus/ICANBus.hpp"
 #include "app/config.hpp"
@@ -24,7 +24,7 @@ private:
     bool socketCANAvailable = false;
     QTcpSocket socket;
     QCanBusDevice *bus;
-    std::map<int, std::vector<std::function<void(QByteArray)>>> callbacks;
+    int lumws = 10;
 
 signals:
 
