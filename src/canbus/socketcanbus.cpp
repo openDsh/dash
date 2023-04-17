@@ -85,9 +85,7 @@ void SocketCANBus::readFrame()
                 dataHex.append(duo);
                 duo = "";
             }
-            
             duo.append(data[i]);
-            DASH_LOG(info) << "DUO = " << duo.toStdString()<< "\n";  
         }
 
         // MS-CAN
