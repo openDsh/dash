@@ -77,16 +77,15 @@ void SocketCANBus::readFrame()
 
         QStringList dataHex;
 
-        int index = 0;
         QString duo;
 
         for (int i = 0; i < data.length(); i++)
         {
             if (i % 2 == 0 && i != 0){
-                dataHex[index] = duo;
-                index++; 
+                dataHex.append(duo);
+                duo = "";
             }
-                
+            
             duo.append(data[i]);
             DASH_LOG(info) << "DUO = " << duo.toStdString()<< "\n";  
         }
