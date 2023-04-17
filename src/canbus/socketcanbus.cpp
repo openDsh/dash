@@ -2,6 +2,7 @@
 #include <QStringList>
 #include <QString>
 #include "canbus/socketcanbus.hpp"
+#include <QAbstractSocket>
 
 SocketCANBus::SocketCANBus(QObject *parent, QString canInterface)
 {
