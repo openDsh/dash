@@ -78,11 +78,12 @@ void SocketCANBus::readFrame()
 
         for (int i = 0; i < fram[1].length(); i++)
         {
-            hexx[index].append(fram.at(1).at(i));
-            DASH_LOG(info) << "NUMER" << hexx[index].toStdString();
-
-            if (i % 2 == 0)
+            if (i % 2 == 0 && i != 0)
                 index++;
+
+            DASH_LOG(info) << "NUMER" << fram.at(1).at(i).toStdString();
+            hexx[index].append(fram.at(1).at(i));
+            DASH_LOG(info) << "NUMER" << hexx[index].toStdString();  
         }
 
         // MS-CAN
