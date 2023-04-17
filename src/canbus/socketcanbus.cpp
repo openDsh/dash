@@ -160,7 +160,7 @@ void SocketCANBus::readFrame()
 
             // Esempio RX1 0450-460706FF
 
-            if (fram.at(0) == "0450")
+            if (id == "0450")
             {
                 bool okk;
 
@@ -192,7 +192,7 @@ void SocketCANBus::readFrame()
 
         // HS-CAN
 
-        if (part.at(0) == "RX2")
+        if (canbus == "RX2")
         {
         }
     }
