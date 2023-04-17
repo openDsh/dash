@@ -7,11 +7,12 @@
 #include <QVariant>
 #include <QTcpSocket>
 #include <QAbstractSocket>
+#include <QObject>
 #include "DashLog.hpp"
 #include "canbus/ICANBus.hpp"
 #include "app/config.hpp"
 
-class SocketCANBus : public QObject
+class SocketCANBus : public ICANBus
 {
     Q_OBJECT
 public:
