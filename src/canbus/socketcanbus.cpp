@@ -37,7 +37,7 @@ SocketCANBus::SocketCANBus(QString canInterface)
             DASH_LOG(error) << "[SocketCANBus] Errore di connessione a Carberry";
         }
 
-        QObject::connect(socket, SIGNAL(readyRead()), this, SLOT(readyRead()));
+        ::connect(socket, SIGNAL(readyRead()), this, SLOT(readyRead()));
     }
 }
 
