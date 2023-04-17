@@ -65,11 +65,8 @@ SocketCANBus *SocketCANBus::get_instance()
 void SocketCANBus::readFrame()
 {
 
-    DASH_LOG(info) << socket;
-
-
-    while (this->socket.canReadLine())
-    {
+    //while (this->socket.canReadLine())
+    //{
 
         DASH_LOG(info) << "[SocketCANBus] CAN-BUS = ";
 
@@ -197,5 +194,5 @@ void SocketCANBus::readFrame()
         if (part.at(0) == "RX2")
         {
         }
-    }
+    //}
 }
