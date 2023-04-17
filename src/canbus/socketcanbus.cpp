@@ -66,6 +66,8 @@ SocketCANBus *SocketCANBus::get_instance()
 void SocketCANBus::readFrame()
 {
 
+DASH_LOG(info) << "[SocketCANBus] Comincio a leggere i CANBUS";
+/*
     while (this->socket.canReadLine())
     {
 
@@ -169,19 +171,7 @@ void SocketCANBus::readFrame()
 
                 if (valore_ws != lumws)
                 {
-                    /*
-                    char query[73]; // 71
-
-                    sprintf(query, "/home/gioele/RPi-USB-Brightness/64/lite/Raspi_USB_Backlight_nogui -b %d", valore_ws);
-
-                    if (system(query) == 0)
-                    {
-                        printf("%s\r\n", query);
-                    }
-                    else
-                    {
-                        printf("==== ERRORE LUMINOSITA ====\r\n");
-                    }*/
+                    
 
                     DASH_LOG(info) << "NUOVA LUMINOSITA:" << QString::number(valore_ws).toStdString() << "\r\n";
 
@@ -196,4 +186,5 @@ void SocketCANBus::readFrame()
         {
         }
     }
+    */
 }
