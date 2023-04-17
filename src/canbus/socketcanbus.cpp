@@ -38,7 +38,6 @@ SocketCANBus::SocketCANBus(QObject *parent, QString canInterface): QObject(paren
             DASH_LOG(error) << "[SocketCANBus] Errore di connessione a Carberry";
         }
 
-        //connect(socket, SIGNAL(readyRead()), this, SLOT(readyRead()));
         QObject::connect(&socket, &QTcpSocket::readyRead, this, &SocketCANBus::readFrame);
     }
 }
@@ -63,18 +62,16 @@ SocketCANBus *SocketCANBus::get_instance()
     return &bus;
 }
 
-void SocketCANBus::readFrame()
+void SocketCANBus::readFrame(), socket(this)
 {
 
-DASH_LOG(info) << "[SocketCANBus] Comincio a leggere i CANBUS";
-/*
     while (this->socket.canReadLine())
     {
 
-        DASH_LOG(info) << "[SocketCANBus] Comincio a leggere i CANBUS";
+        DASH_LOG(info) << "[SocketCANBus] CAN-BUS = ";
 
         QString linea = QString(this->socket.readLine());
-        DASH_LOG(info) << linea.toStdString();
+        DASH_LOG(info) << linea.toStdString() << "\n";
         QStringList part = linea.split(" ");
         QStringList fram = part[1].split("-");
 
@@ -171,7 +168,19 @@ DASH_LOG(info) << "[SocketCANBus] Comincio a leggere i CANBUS";
 
                 if (valore_ws != lumws)
                 {
-                    
+                    /*
+                    char query[73]; // 71
+
+                    sprintf(query, "/home/gioele/RPi-USB-Brightness/64/lite/Raspi_USB_Backlight_nogui -b %d", valore_ws);
+
+                    if (system(query) == 0)
+                    {
+                        printf("%s\r\n", query);
+                    }
+                    else
+                    {
+                        printf("==== ERRORE LUMINOSITA ====\r\n");
+                    }*/
 
                     DASH_LOG(info) << "NUOVA LUMINOSITA:" << QString::number(valore_ws).toStdString() << "\r\n";
 
@@ -186,5 +195,4 @@ DASH_LOG(info) << "[SocketCANBus] Comincio a leggere i CANBUS";
         {
         }
     }
-    */
 }
