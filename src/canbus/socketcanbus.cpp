@@ -65,8 +65,8 @@ SocketCANBus *SocketCANBus::get_instance()
 void SocketCANBus::readFrame()
 {
 
-    //while (this->socket.canReadLine())
-    //{
+    while (this->socket.canReadLine())
+    {
 
         QString linea = QString(this->socket.readLine());
         DASH_LOG(info) << "[SocketCANBus] CAN-BUS = " << linea.toStdString() << "\n";
@@ -192,5 +192,5 @@ void SocketCANBus::readFrame()
         if (part.at(0) == "RX2")
         {
         }
-    //}
+    }
 }
