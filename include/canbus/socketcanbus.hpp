@@ -8,6 +8,8 @@
 #include <QTcpSocket>
 #include <QAbstractSocket>
 #include <QObject>
+#include <QCanBus>
+#include <functional>
 #include "DashLog.hpp"
 #include "app/config.hpp"
 
