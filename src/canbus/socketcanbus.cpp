@@ -70,68 +70,71 @@ void SocketCANBus::readFrame()
 
         QString linea = QString(this->socket.readLine());
         DASH_LOG(info) << "[SocketCANBus] CAN-BUS = " << linea.toStdString() << "\n";
-        QStringList part = linea.split(" ");
-        QStringList fram = part[1].split("-");
 
-        QStringList hexx;
+        QString canbus = linea.split(" ")[0];
+        QString id = linea.split(" ")[1].split("-")[0];
+        QString data = linea.split(" ")[1].split("-")[1];
+
+        QStringList dataHex;
+
         int index = 0;
 
-        for (int i = 0; i < fram[1].length(); i++)
+        for (int i = 0; i < data.length(); i++)
         {
             if (i % 2 == 0 && i != 0)
                 index++;
 
-            hexx[index].append(fram[1][i]);
-            DASH_LOG(info) << "NUMER" << hexx[index].toStdString();  
+            dataHex[index].append(data[i]);
+            DASH_LOG(info) << "NUMER" << dataHex[index].toStdString();  
         }
 
         // MS-CAN
 
-        if (part.at(0) == "RX1")
+        if (canbus == "RX1")
         {
 
             // Esempio RX1 0206-008401
 
-            if (fram.at(0) == "0206")
+            if (id == "0206")
             {
-                if (hexx.at(0) == "00")
+                if (dataHex.at(0) == "00")
                 {
                     bool ok;
 
-                    uint temprem = hexx[2].toUInt(&ok, 16);
+                    uint temprem = dataHex[2].toUInt(&ok, 16);
 
                     if (ok == true && temprem > 64)
                     {
-                        if (hexx.at(1) == "81")
+                        if (dataHex.at(1) == "81")
                             DASH_LOG(info) << "PREMUTO pulsante in alto a sinistra\r\n";
-                        if (hexx.at(1) == "82")
+                        if (dataHex.at(1) == "82")
                             DASH_LOG(info) << "PREMUTO Pulsante giù a sinistra\r\n";
-                        if (hexx.at(1) == "84")
+                        if (dataHex.at(1) == "84")
                             DASH_LOG(info) << "PREMUTO Pulsante manopola sinistra\r\n";
-                        if (hexx.at(1) == "91")
+                        if (dataHex.at(1) == "91")
                             DASH_LOG(info) << "PREMUTO Pulsante destro in alto (successivo)\r\n";
-                        if (hexx.at(1) == "92")
+                        if (dataHex.at(1) == "92")
                             DASH_LOG(info) << "PREMUTO Pulsante in basso a destra\r\n";
                     }
                     else
                     {
-                        if (hexx.at(1) == "81")
+                        if (dataHex.at(1) == "81")
                             DASH_LOG(info) << "pulsante in alto a sinistra\r\n";
-                        if (hexx.at(1) == "82")
+                        if (dataHex.at(1) == "82")
                             DASH_LOG(info) << "Pulsante giù a sinistra\r\n";
-                        if (hexx.at(1) == "84")
+                        if (dataHex.at(1) == "84")
                             DASH_LOG(info) << "Pulsante manopola sinistra\r\n";
-                        if (hexx.at(1) == "91")
+                        if (dataHex.at(1) == "91")
                             DASH_LOG(info) << "Pulsante destro in alto (successivo)\r\n";
-                        if (hexx.at(1) == "92")
+                        if (dataHex.at(1) == "92")
                             DASH_LOG(info) << "Pulsante in basso a destra\r\n";
                     }
                 }
-                if (hexx.at(0) == "08")
+                if (dataHex.at(0) == "08")
                 {
-                    if (hexx.at(1) == "83")
+                    if (dataHex.at(1) == "83")
                     {
-                        if (hexx.at(2).at(1) == "F")
+                        if (dataHex.at(2).at(1) == "F")
                         {
                             DASH_LOG(info) << "Manopola sinistra SU\r\n";
                         }
@@ -141,9 +144,9 @@ void SocketCANBus::readFrame()
                         }
                     }
 
-                    if (hexx.at(1) == "93")
+                    if (dataHex.at(1) == "93")
                     {
-                        if (hexx.at(2).at(1) == "F")
+                        if (dataHex.at(2).at(1) == "F")
                         {
                             DASH_LOG(info) << "Manopola destra (Volume) GIU\r\n";
                         }
@@ -161,7 +164,7 @@ void SocketCANBus::readFrame()
             {
                 bool okk;
 
-                uint luminosita_nuova = hexx[3].toUInt(&okk, 16);
+                uint luminosita_nuova = dataHex[3].toUInt(&okk, 16);
                 int valore_ws = (int)(luminosita_nuova / 25.5);
 
                 if (valore_ws != lumws)
