@@ -3,6 +3,7 @@
 #include <QString>
 #include "canbus/socketcanbus.hpp"
 #include <QAbstractSocket>
+#include "app/arbiter.hpp"
 
 SocketCANBus::SocketCANBus(QObject *parent, QString canInterface) : QObject(parent), socket(this)
 {
