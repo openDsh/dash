@@ -13,7 +13,6 @@
 #include "DashLog.hpp"
 #include "app/config.hpp"
 #include "app/arbiter.hpp"
-#include "openauto/Service/InputService.hpp"
 
 class SocketCANBus : public QObject
 {
@@ -23,6 +22,7 @@ public:
     ~SocketCANBus();
     static SocketCANBus *get_instance();
     bool writeFrame(QString frame);
+    Arbiter arbiter;
 
 private:
     bool socketCANAvailable = false;
