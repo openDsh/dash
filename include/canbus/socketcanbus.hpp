@@ -12,6 +12,7 @@
 #include <functional>
 #include "DashLog.hpp"
 #include "app/config.hpp"
+#include "app/arbiter.hpp"
 
 class SocketCANBus : public QObject
 {
@@ -27,6 +28,7 @@ private:
     QTcpSocket socket;
     QCanBusDevice *bus;
     int lumws = 10;
+    Arbiter arbiter;
 
 signals:
 
