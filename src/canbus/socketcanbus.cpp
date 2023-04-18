@@ -156,6 +156,7 @@ void SocketCANBus::readFrame()
                             }
                             else
                             {
+                                arbiter.increase_brightness(18);
                                 DASH_LOG(info) << "Manopola destra (Volume) SU\r\n";
                             }
                         }
