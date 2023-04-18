@@ -13,6 +13,7 @@
 #include "DashLog.hpp"
 #include "app/config.hpp"
 #include "app/arbiter.hpp"
+#include "openauto/Service/InputService.hpp"
 
 class SocketCANBus : public QObject
 {
