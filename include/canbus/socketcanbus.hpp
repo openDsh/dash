@@ -12,7 +12,6 @@
 #include <functional>
 #include "DashLog.hpp"
 #include "app/config.hpp"
-#include "app/arbiter.hpp"
 
 class Arbiter;
 
@@ -30,7 +29,7 @@ private:
     QTcpSocket socket;
     QCanBusDevice *bus;
     int lumws = 10;
-    Arbiter arbiter;
+    Arbiter &arbiter;
 
 signals:
 
