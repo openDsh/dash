@@ -39,7 +39,7 @@ SocketCANBus::SocketCANBus(Arbiter &arbiter, QObject *parent, QString canInterfa
             DASH_LOG(error) << "[SocketCANBus] Errore di connessione a Carberry";
         }
 
-        QObject::connect(&socket, &QTcpSocket::readyRead, this, &SocketCANBus::readFrame(*arbiter));
+        QObject::connect(&socket, &QTcpSocket::readyRead, this, &SocketCANBus::readFrame(arbiter));
     }
 }
 
