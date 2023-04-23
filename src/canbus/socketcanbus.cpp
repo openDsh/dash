@@ -63,7 +63,7 @@ SocketCANBus *SocketCANBus::get_instance()
     return &bus;
 }
 
-void SocketCANBus::readFrame(), arbiter(this)
+void SocketCANBus::readFrame(), arbiter(0)
 {
 
     while (this->socket.canReadLine())
