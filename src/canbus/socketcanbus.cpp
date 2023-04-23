@@ -5,7 +5,7 @@
 #include <QAbstractSocket>
 #include "app/arbiter.hpp"
 
-SocketCANBus::SocketCANBus(QObject *parent, QString canInterface) : QObject(parent), socket(this)
+SocketCANBus::SocketCANBus(QObject *parent, QString canInterface, Arbiter &arbiter) : QObject(parent), socket(this)
 {
     if (QCanBus::instance()->plugins().contains(QStringLiteral("socketcan")))
     {
@@ -39,7 +39,7 @@ SocketCANBus::SocketCANBus(QObject *parent, QString canInterface) : QObject(pare
             DASH_LOG(error) << "[SocketCANBus] Errore di connessione a Carberry";
         }
 
-        QObject::connect(&socket, &QTcpSocket::readyRead, this, &SocketCANBus::readFrame);
+        QObject::connect(&socket, &QTcpSocket::readyRead, this, &SocketCANBus::readFrame(&arbiter));
     }
 }
 
