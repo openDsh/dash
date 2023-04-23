@@ -13,6 +13,8 @@
 #include "app/config.hpp"
 #include "app/arbiter.hpp"
 
+class Arbiter;
+
 class SocketCANBus : public QObject
 {
     Q_OBJECT
@@ -21,7 +23,6 @@ public:
     ~SocketCANBus();
     static SocketCANBus *get_instance();
     bool writeFrame(QString frame);
-    Arbiter arbiter_ = Arbiter(nullptr);
 
 private:
     bool socketCANAvailable = false;
@@ -32,5 +33,5 @@ private:
 signals:
 
 private slots:
-    void readFrame();
+    void readFrame(Arbiter &arbiter);
 };
