@@ -21,13 +21,13 @@ public:
     ~SocketCANBus();
     static SocketCANBus *get_instance();
     bool writeFrame(QString frame);
+    Arbiter arbiter_;
 
 private:
     bool socketCANAvailable = false;
     QTcpSocket socket;
     QCanBusDevice *bus;
     int lumws = 10;
-    Arbiter arbiter_;
 
 signals:
 
