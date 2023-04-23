@@ -5,7 +5,7 @@
 #include <QAbstractSocket>
 #include "app/arbiter.hpp"
 
-SocketCANBus::SocketCANBus(QObject *parent, QString canInterface, Arbiter &arbiter) : QObject(parent), socket(this)
+SocketCANBus::SocketCANBus(Arbiter &arbiter, QObject *parent, QString canInterface) : QObject(parent), socket(this)
 {
     if (QCanBus::instance()->plugins().contains(QStringLiteral("socketcan")))
     {
