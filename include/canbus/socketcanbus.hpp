@@ -27,7 +27,7 @@ private:
     QTcpSocket socket;
     QCanBusDevice *bus;
     int lumws = 10;
-    Arbiter arbiter;
+    Arbiter arbiter_;
 
 signals:
 

@@ -63,7 +63,7 @@ SocketCANBus *SocketCANBus::get_instance()
     return &bus;
 }
 
-void SocketCANBus::readFrame(), arbiter(0)
+void SocketCANBus::readFrame(), arbiter_(0)
 {
 
     while (this->socket.canReadLine())
@@ -157,7 +157,7 @@ void SocketCANBus::readFrame(), arbiter(0)
                             }
                             else
                             {
-                                this->arbiter.vehicle_update_data("mpg", 18.5); 
+                                this->arbiter_.vehicle_update_data("mpg", 18.5); 
                                 //this->arbiter->increase_brightness(18);
                                 DASH_LOG(info) << "Manopola destra (Volume) SU\r\n";
                             }
