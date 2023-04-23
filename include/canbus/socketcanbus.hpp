@@ -21,7 +21,7 @@ public:
     ~SocketCANBus();
     static SocketCANBus *get_instance();
     bool writeFrame(QString frame);
-    Arbiter arbiter_ = new Arbiter(nullptr);
+    Arbiter* arbiter_ = Arbiter(nullptr);
 
 private:
     bool socketCANAvailable = false;
