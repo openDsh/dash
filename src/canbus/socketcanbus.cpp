@@ -39,7 +39,7 @@ SocketCANBus::SocketCANBus(Arbiter &arbiter, QObject *parent, QString canInterfa
             DASH_LOG(error) << "[SocketCANBus] Errore di connessione a Carberry";
         }
 
-        QObject::connect(&socket, &QTcpSocket::readyRead, this, &SocketCANBus::readFrame(&arbiter));
+        QObject::connect(&socket, &QTcpSocket::readyRead, this, &SocketCANBus::readFrame);
     }
 }
 
@@ -63,7 +63,7 @@ SocketCANBus *SocketCANBus::get_instance()
     return &bus;
 }
 
-void SocketCANBus::readFrame(Arbiter &arbiter)
+void SocketCANBus::readFrame()
 {
 
     while (this->socket.canReadLine())
@@ -157,7 +157,7 @@ void SocketCANBus::readFrame(Arbiter &arbiter)
                             }
                             else
                             {
-                                arbiter.vehicle_update_data("mpg", 18.5); 
+                                this->arbiter.vehicle_update_data("mpg", 18.5); 
                                 //this->arbiter->increase_brightness(18);
                                 DASH_LOG(info) << "Manopola destra (Volume) SU\r\n";
                             }

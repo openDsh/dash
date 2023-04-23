@@ -33,5 +33,5 @@ private:
 signals:
 
 private slots:
-    void readFrame(Arbiter &arbiter);
+    void readFrame();
 };
