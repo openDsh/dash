@@ -160,7 +160,7 @@ void SocketCANBus::readFrame()
                             else
                             {
                                 DASH_LOG(info) << "Manopola destra (Volume) SU\r\n";
-                                this->arbiter.vehicle_update_data("mpg", 18.5); 
+                                arbiter->vehicle_update_data("mpg", 18.5); 
                                 //this->arbiter->increase_brightness(18);
                             }
                         }

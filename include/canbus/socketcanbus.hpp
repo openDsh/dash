@@ -13,7 +13,6 @@
 #include "app/config.hpp"
 #include "app/arbiter.hpp"
 
-class Arbiter;
 
 class SocketCANBus : public QObject
 {
