@@ -23,6 +23,13 @@ public:
     static SocketCANBus *get_instance();
     bool writeFrame(QString frame);
     Arbiter &arbiter;
+    Arbiter *arbiter_;
+
+    inline void dashize(Arbiter *arbiter)
+    {
+        if (!this->arbiter_)
+            this->arbiter_ = arbiter;
+    }
 
 private:
     bool socketCANAvailable = false;
