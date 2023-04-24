@@ -22,7 +22,7 @@ public:
     ~SocketCANBus();
     static SocketCANBus *get_instance();
     bool writeFrame(QString frame);
-    Arbiter *arbiter;
+    Arbiter &arbiter;
 
 private:
     bool socketCANAvailable = false;
