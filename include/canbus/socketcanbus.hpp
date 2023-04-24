@@ -19,11 +19,11 @@ class SocketCANBus : public QObject
 {
     Q_OBJECT
 public:
-    SocketCANBus(Arbiter &arbiter, QObject *parent = 0, QString canInterface = "can0");
+    SocketCANBus(QObject *parent = 0, QString canInterface = "can0");
     ~SocketCANBus();
     static SocketCANBus *get_instance();
     bool writeFrame(QString frame);
-    Arbiter &arbiter;
+    Arbiter *arbiter = nullptr;
 
 private:
     bool socketCANAvailable = false;

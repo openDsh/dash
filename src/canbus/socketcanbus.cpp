@@ -5,7 +5,7 @@
 #include <QAbstractSocket>
 #include "app/arbiter.hpp"
 
-SocketCANBus::SocketCANBus(Arbiter &arbiter, QObject *parent, QString canInterface) : QObject(parent), socket(this)
+SocketCANBus::SocketCANBus(QObject *parent, QString canInterface) : QObject(parent), socket(this)
 {
     if (QCanBus::instance()->plugins().contains(QStringLiteral("socketcan")))
     {
@@ -59,7 +59,7 @@ bool SocketCANBus::writeFrame(QString frame)
 
 SocketCANBus *SocketCANBus::get_instance()
 {
-    static SocketCANBus bus(nullptr, 0, Config::get_instance()->get_vehicle_interface());
+    static SocketCANBus bus(0, Config::get_instance()->get_vehicle_interface());
     return &bus;
 }
 
@@ -157,7 +157,7 @@ void SocketCANBus::readFrame()
                             }
                             else
                             {
-                                this->arbiter.vehicle_update_data("mpg", 18.5); 
+                                arbiter.vehicle_update_data("mpg", 18.5); 
                                 //this->arbiter->increase_brightness(18);
                                 DASH_LOG(info) << "Manopola destra (Volume) SU\r\n";
                             }
