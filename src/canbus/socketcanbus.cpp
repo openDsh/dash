@@ -154,13 +154,13 @@ void SocketCANBus::readFrame()
                             if (dataHex.at(2).at(1) == "F")
                             {
                                 DASH_LOG(info) << "Manopola destra (Volume) GIU\r\n";
-                                this->arbiter->vehicle_update_data("mpg", 18.5); 
+                                this->arbiter.vehicle_update_data("mpg", 18.5); 
 
                             }
                             else
                             {
                                 DASH_LOG(info) << "Manopola destra (Volume) SU\r\n";
-                                this->arbiter->vehicle_update_data("mpg", 18.5); 
+                                this->arbiter.vehicle_update_data("mpg", 18.5); 
                                 //this->arbiter->increase_brightness(18);
                             }
                         }
