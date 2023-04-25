@@ -22,6 +22,8 @@ public:
     ~SocketCANBus();
     static SocketCANBus *get_instance();
     bool writeFrame(QString frame);
+    virtual bool init(SocketCANBus*);
+
 
 private:
     bool socketCANAvailable = false;
