@@ -3,9 +3,8 @@
 #include <QString>
 #include "canbus/socketcanbus.hpp"
 #include <QAbstractSocket>
-#include "app/arbiter.hpp"
 
-SocketCANBus::SocketCANBus(QObject *parent, QString canInterface) : socket(this), arbiter(parent), QObject(parent)
+SocketCANBus::SocketCANBus(QObject *parent, QString canInterface) : socket(this), QObject(parent)
 {
     if (QCanBus::instance()->plugins().contains(QStringLiteral("socketcan")))
     {
@@ -38,8 +37,6 @@ SocketCANBus::SocketCANBus(QObject *parent, QString canInterface) : socket(this)
         {
             DASH_LOG(error) << "[SocketCANBus] Errore di connessione a Carberry";
         }
-
-        dashize(&this->arbiter);
 
         QObject::connect(&socket, &QTcpSocket::readyRead, this, &SocketCANBus::readFrame);
     }
@@ -156,13 +153,13 @@ void SocketCANBus::readFrame()
                             if (dataHex.at(2).at(1) == "F")
                             {
                                 DASH_LOG(info) << "Manopola destra (Volume) GIU\r\n";
-                                arbiter_->increase_brightness(18); 
+                                this->arbiter.increase_brightness(18); 
 
                             }
                             else
                             {
                                 DASH_LOG(info) << "Manopola destra (Volume) SU\r\n";
-                                arbiter_->vehicle_update_data("mpg", 18.5); 
+                                this->arbiter->vehicle_update_data("mpg", 18.5); 
                                 //this->arbiter->increase_brightness(18);
                             }
                         }

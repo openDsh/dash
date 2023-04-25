@@ -11,7 +11,7 @@
 #include <functional>
 #include "DashLog.hpp"
 #include "app/config.hpp"
-#include "app/arbiter.hpp"
+#include "plugins/vehicle_plugin.hpp"
 
 
 class SocketCANBus : public QObject
@@ -22,14 +22,6 @@ public:
     ~SocketCANBus();
     static SocketCANBus *get_instance();
     bool writeFrame(QString frame);
-    Arbiter &arbiter;
-    Arbiter *arbiter_;
-
-    inline void dashize(Arbiter *arbiter)
-    {
-        if (!this->arbiter_)
-            this->arbiter_ = arbiter;
-    }
 
 private:
     bool socketCANAvailable = false;
