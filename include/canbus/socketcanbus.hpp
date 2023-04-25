@@ -11,6 +11,7 @@
 #include <functional>
 #include "DashLog.hpp"
 #include "app/config.hpp"
+#include "app/arbiter.hpp"
 #include "plugins/plugin.hpp"
 
 
