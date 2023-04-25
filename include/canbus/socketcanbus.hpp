@@ -11,7 +11,7 @@
 #include <functional>
 #include "DashLog.hpp"
 #include "app/config.hpp"
-#include "plugins/vehicle_plugin.hpp"
+//#include "plugins/vehicle_plugin.hpp"
 
 
 class SocketCANBus : public QObject
