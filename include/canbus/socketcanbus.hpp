@@ -12,8 +12,7 @@
 #include "DashLog.hpp"
 #include "app/config.hpp"
 #include "app/arbiter.hpp"
-#include "plugins/plugin.hpp"
-
+#include "plugins/vehicle_plugin.hpp"
 
 class SocketCANBus : public QObject
 {
