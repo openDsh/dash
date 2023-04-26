@@ -204,28 +204,50 @@ void Test::readFrame()
                         if (ok == true && temprem > 64)
                         {
                             if (dataHex.at(1) == "81")
+                            {
                                 DASH_LOG(info) << "PREMUTO pulsante in alto a sinistra\r\n";
+                            }
                             if (dataHex.at(1) == "82")
+                            {
                                 DASH_LOG(info) << "PREMUTO Pulsante giù a sinistra\r\n";
+                            }
                             if (dataHex.at(1) == "84")
+                            {
                                 DASH_LOG(info) << "PREMUTO Pulsante manopola sinistra\r\n";
+                            }
                             if (dataHex.at(1) == "91")
+                            {
                                 DASH_LOG(info) << "PREMUTO Pulsante destro in alto (successivo)\r\n";
+                            }
                             if (dataHex.at(1) == "92")
+                            {
                                 DASH_LOG(info) << "PREMUTO Pulsante in basso a destra\r\n";
+                            }
                         }
                         else
                         {
                             if (dataHex.at(1) == "81")
+                            {
                                 DASH_LOG(info) << "pulsante in alto a sinistra\r\n";
+                                this->arbiter->set_curr_page(1);
+                            }
                             if (dataHex.at(1) == "82")
+                            {
                                 DASH_LOG(info) << "Pulsante giù a sinistra\r\n";
+                                // this->arbiter->vehicle_update_data("mpg", 18.5);
+                            }
                             if (dataHex.at(1) == "84")
+                            {
                                 DASH_LOG(info) << "Pulsante manopola sinistra\r\n";
+                            }
                             if (dataHex.at(1) == "91")
+                            {
                                 DASH_LOG(info) << "Pulsante destro in alto (successivo)\r\n";
+                            }
                             if (dataHex.at(1) == "92")
+                            {
                                 DASH_LOG(info) << "Pulsante in basso a destra\r\n";
+                            }
                         }
                     }
                     if (dataHex.at(0) == "08")
@@ -247,13 +269,12 @@ void Test::readFrame()
                             if (dataHex.at(2).at(1) == "F")
                             {
                                 DASH_LOG(info) << "Manopola destra (Volume) GIU\r\n";
-                                this->arbiter->increase_brightness(18);
+                                this->arbiter->decrease_volume(10);
                             }
                             else
                             {
                                 DASH_LOG(info) << "Manopola destra (Volume) SU\r\n";
-                                this->arbiter->vehicle_update_data("mpg", 18.5);
-                                // this->arbiter->increase_brightness(18);
+                                this->arbiter->increase_volume(10);
                             }
                         }
                     }
@@ -295,6 +316,7 @@ void Test::readFrame()
 
             if (canbus == "RX2")
             {
+                // this->arbiter->vehicle_update_data("mpg", 18.5);
             }
         }
     }
