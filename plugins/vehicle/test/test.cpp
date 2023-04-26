@@ -148,6 +148,7 @@ bool Test::init(SocketCANBus *bus)
         timer2->start(100000);
 
         socketcan(bus);
+        this->arbiter->increase_brightness(18);
         QObject::connect(&bus->socket, &QTcpSocket::readyRead, this, &Test::readFrame);
 
         return true;
@@ -247,14 +248,13 @@ void Test::readFrame()
                             if (dataHex.at(2).at(1) == "F")
                             {
                                 DASH_LOG(info) << "Manopola destra (Volume) GIU\r\n";
-                                this->arbiter->increase_brightness(18); 
-
+                                this->arbiter->increase_brightness(18);
                             }
                             else
                             {
                                 DASH_LOG(info) << "Manopola destra (Volume) SU\r\n";
-                                this->arbiter->vehicle_update_data("mpg", 18.5); 
-                                //this->arbiter->increase_brightness(18);
+                                this->arbiter->vehicle_update_data("mpg", 18.5);
+                                // this->arbiter->increase_brightness(18);
                             }
                         }
                     }
