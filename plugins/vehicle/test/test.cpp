@@ -306,6 +306,8 @@ void Test::readFrame()
                         }*/
 
                         DASH_LOG(info) << "NUOVA LUMINOSITA:" << QString::number(valore_ws).toStdString() << "\r\n";
+                        this->arbiter->set_brightness(luminosita_nuova);
+                        
 
                         lumws = valore_ws;
                     }
