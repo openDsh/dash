@@ -23,10 +23,6 @@ QList<QWidget *> Test::widgets()
 
 bool Test::init(SocketCANBus *bus)
 {
-
-    QObject::connect(&bus->socket, &QTcpSocket::readyRead, this, &Test::readFrame(bus));
-
-    /*
     if (this->arbiter)
     {
         this->vehicle = new Vehicle(*this->arbiter);
@@ -151,11 +147,12 @@ bool Test::init(SocketCANBus *bus)
             } });
         timer2->start(100000);
 
+        QObject::connect(&bus->socket, &QTcpSocket::readyRead, this, &Test::readFrame(&&bus));
+
         return true;
     }
-    */
 
-    return true;//false;
+    return false;
 }
 
 void Test::readFrame(SocketCANBus *bus)
