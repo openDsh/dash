@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QObject>
+#include <QDebug>
 #include <boost/log/trivial.hpp>
 #include "plugins/brightness_plugin.hpp"
 
