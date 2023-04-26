@@ -229,7 +229,7 @@ void Test::readFrame()
                             if (dataHex.at(1) == "81")
                             {
                                 DASH_LOG(info) << "pulsante in alto a sinistra\r\n";
-                                this->arbiter->set_curr_page(1);
+                                //this->arbiter->set_curr_page(1);
                             }
                             if (dataHex.at(1) == "82")
                             {
@@ -291,24 +291,8 @@ void Test::readFrame()
 
                     if (valore_ws != lumws)
                     {
-                        /*
-                        char query[73]; // 71
-
-                        sprintf(query, "/home/gioele/RPi-USB-Brightness/64/lite/Raspi_USB_Backlight_nogui -b %d", valore_ws);
-
-                        if (system(query) == 0)
-                        {
-                            printf("%s\r\n", query);
-                        }
-                        else
-                        {
-                            printf("==== ERRORE LUMINOSITA ====\r\n");
-                        }*/
-
-                        DASH_LOG(info) << "NUOVA LUMINOSITA:" << QString::number(valore_ws).toStdString() << "\r\n";
+                        //DASH_LOG(info) << "NUOVA LUMINOSITA:" << QString::number(valore_ws).toStdString() << "\r\n";
                         this->arbiter->set_brightness(luminosita_nuova);
-                        
-
                         lumws = valore_ws;
                     }
                 }

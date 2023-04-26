@@ -2,8 +2,6 @@
 #include <QProcess>
 #include <QScreen>
 #include <QString>
-#include <QDebug>
-#include <boost/log/trivial.hpp>
 
 #include "x.hpp"
 
@@ -26,8 +24,6 @@ void X::set(int brightness)
 {
     if (this->screen != nullptr) {
         QProcess process(this);
-        QString stampa = QStringLiteral("[LUM] BARRA = %1 RISULTATO %2 \n").arg(brightness).arg((int)(brightness / 25.5));
-        qDebug() << "stringa: " << stampa;
         process.start(QString("/home/gioele/RPi-USB-Brightness/64/lite/Raspi_USB_Backlight_nogui -b %1").arg((int)(brightness / 25.5)));
         process.waitForFinished();
     }
