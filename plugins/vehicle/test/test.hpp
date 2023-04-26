@@ -27,5 +27,5 @@ private:
 signals:
 
 private slots:
-    void readFrame(SocketCANBus *bus);
+    void readFrame(SocketCANBus &bus);
 };
