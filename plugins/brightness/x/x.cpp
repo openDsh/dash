@@ -23,6 +23,7 @@ void X::set(int brightness)
 {
     if (this->screen != nullptr) {
         QProcess process(this);
+        DASH_LOG(info) << "[LUM] BARRA = " << brightness.toStdString() << " RISULTATO" << (int)(brightness / 25.5).toStdString() << "\n";
         process.start(QString("/home/gioele/RPi-USB-Brightness/64/lite/Raspi_USB_Backlight_nogui -b %1").arg((int)(brightness / 25.5)));
         process.waitForFinished();
     }
