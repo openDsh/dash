@@ -6,6 +6,7 @@
 #include "app/widgets/climate.hpp"
 #include "app/widgets/vehicle.hpp"
 #include "canbus/socketcanbus.hpp"
+#include "app/arbiter.hpp"
 
 class Test : public QObject, VehiclePlugin
 {
