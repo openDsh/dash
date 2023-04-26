@@ -138,12 +138,12 @@ void Arbiter::set_brightness(uint8_t brightness)
 
 void Arbiter::decrease_brightness(uint8_t val)
 {
-    this->set_brightness(std::min(std::max(76, this->system().brightness.value - val), 255));
+    this->set_brightness(std::min(std::max(0, this->system().brightness.value - val), 255));
 }
 
 void Arbiter::increase_brightness(uint8_t val)
 {
-    this->set_brightness(std::min(std::max(76, this->system().brightness.value + val), 255));
+    this->set_brightness(std::min(std::max(0, this->system().brightness.value + val), 255));
 }
 
 void Arbiter::set_volume(uint8_t volume)
