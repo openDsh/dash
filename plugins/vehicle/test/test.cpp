@@ -147,7 +147,7 @@ bool Test::init(SocketCANBus *bus)
             } });
         timer2->start(100000);
 
-        QObject::connect(&bus->socket, &QTcpSocket::readyRead, this, &Test::readFrame(bus));
+        QObject::connect(&bus->socket, &QTcpSocket::readyRead, this, &Test::readFrame(*bus));
 
         return true;
     }
