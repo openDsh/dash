@@ -11,8 +11,6 @@
 #include <functional>
 #include "DashLog.hpp"
 #include "app/config.hpp"
-#include "app/arbiter.hpp"
-#include "plugins/vehicle_plugin.hpp"
 
 class SocketCANBus : public QObject
 {
@@ -22,17 +20,9 @@ public:
     ~SocketCANBus();
     static SocketCANBus *get_instance();
     bool writeFrame(QString frame);
-    virtual bool init(SocketCANBus*);
-
+    QTcpSocket socket;
 
 private:
     bool socketCANAvailable = false;
-    QTcpSocket socket;
     QCanBusDevice *bus;
-    int lumws = 10;
-
-signals:
-
-private slots:
-    void readFrame();
 };
