@@ -19,13 +19,20 @@ public:
     QList<QWidget *> widgets() override;
     bool init(SocketCANBus *bus) override;
 
+    inline void socketcan(SocketCANBus *bus)
+    {
+        if (!this->bus)
+            this->bus = bus;
+    }
+
 private:
     Climate *climate;
     Vehicle *vehicle;
     int lumws = 10;
+    SocketCANBus *bus = nullptr;
 
 signals:
 
 private slots:
-    void readFrame(SocketCANBus &bus);
+    void readFrame();
 };
