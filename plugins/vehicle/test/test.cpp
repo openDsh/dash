@@ -24,7 +24,7 @@ QList<QWidget *> Test::widgets()
 bool Test::init(SocketCANBus *bus)
 {
 
-    QObject::connect(&socket, &QTcpSocket::readyRead, this, &Test::readFrame(&bus));
+    QObject::connect(&bus->socket, &QTcpSocket::readyRead, this, &Test::readFrame(bus));
 
     /*
     if (this->arbiter)
@@ -249,7 +249,7 @@ void Test::readFrame(SocketCANBus *bus)
                             if (dataHex.at(2).at(1) == "F")
                             {
                                 DASH_LOG(info) << "Manopola destra (Volume) GIU\r\n";
-                                this->arbiter.increase_brightness(18); 
+                                this->arbiter->increase_brightness(18); 
 
                             }
                             else

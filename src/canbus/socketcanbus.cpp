@@ -4,7 +4,7 @@
 #include "canbus/socketcanbus.hpp"
 #include <QAbstractSocket>
 
-SocketCANBus::SocketCANBus(QObject *parent, QString canInterface) : socket(this), QObject(parent)
+SocketCANBus::SocketCANBus(QObject *parent, QString canInterface) : QObject(parent), socket(this)
 {
     if (QCanBus::instance()->plugins().contains(QStringLiteral("socketcan")))
     {
