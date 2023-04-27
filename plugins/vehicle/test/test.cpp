@@ -32,122 +32,122 @@ bool Test::init(SocketCANBus *bus)
 
         this->climate = new Climate(*this->arbiter);
         this->climate->max_fan_speed(7);
-/*
-        auto timer = new QTimer(this);
-        connect(timer, &QTimer::timeout, [this]
-                {
-            static bool toggle = false;
+        /*
+                auto timer = new QTimer(this);
+                connect(timer, &QTimer::timeout, [this]
+                        {
+                    static bool toggle = false;
 
-            switch(rand() % 50) {
-                case 0:
-                    this->climate->airflow(Airflow::OFF);
-                    break;
-                case 1:
-                    this->climate->airflow(Airflow::DEFROST);
-                    break;
-                case 2:
-                    this->climate->airflow(Airflow::BODY);
-                    break;
-                case 3:
-                    this->climate->airflow(Airflow::FEET);
-                    break;
-                case 4:
-                    this->climate->airflow(Airflow::DEFROST | Airflow::BODY);
-                    break;
-                case 5:
-                    this->climate->airflow(Airflow::DEFROST | Airflow::FEET);
-                    break;
-                case 6:
-                    this->climate->airflow(Airflow::BODY | Airflow::FEET);
-                    break;
-                case 7:
-                    this->climate->airflow(Airflow::DEFROST | Airflow::BODY | Airflow::FEET);
-                    break;
-                case 8:
-                    this->climate->fan_speed((rand() % 4) + 1);
-                    break;
-                case 9:
-                    this->vehicle->sensor(Position::FRONT_LEFT, rand() % 5);
-                    break;
-                case 10:
-                    this->vehicle->sensor(Position::FRONT_MIDDLE_LEFT, rand() % 5);
-                    break;
-                case 11:
-                    this->vehicle->sensor(Position::FRONT_MIDDLE_RIGHT, rand() % 5);
-                    break;
-                case 12:
-                    this->vehicle->sensor(Position::FRONT_RIGHT, rand() % 5);
-                    break;
-                case 13:
-                    this->vehicle->sensor(Position::BACK_LEFT, rand() % 5);
-                    break;
-                case 14:
-                    this->vehicle->sensor(Position::BACK_MIDDLE_LEFT, rand() % 5);
-                    break;
-                case 15:
-                    this->vehicle->sensor(Position::BACK_MIDDLE_RIGHT, rand() % 5);
-                    break;
-                case 16:
-                    this->vehicle->sensor(Position::BACK_RIGHT, rand() % 5);
-                    break;
-                case 17:
-                    this->vehicle->door(Position::FRONT_LEFT, toggle);
-                    break;
-                case 18:
-                    this->vehicle->door(Position::BACK_LEFT, toggle);
-                    break;
-                case 19:
-                    this->vehicle->door(Position::FRONT_RIGHT, toggle);
-                    break;
-                case 20:
-                    this->vehicle->door(Position::BACK_RIGHT, toggle);
-                    break;
-                case 21:
-                    this->vehicle->headlights(toggle);
-                    break;
-                case 22:
-                    this->vehicle->taillights(toggle);
-                    break;
-                case 23:
-                    this->vehicle->pressure(Position::BACK_RIGHT, (rand() % 21) + 30);
-                    break;
-                case 24:
-                    this->vehicle->pressure(Position::BACK_LEFT, (rand() % 21) + 30);
-                    break;
-                case 25:
-                    this->vehicle->pressure(Position::FRONT_RIGHT, (rand() % 21) + 30);
-                    break;
-                case 26:
-                    this->vehicle->pressure(Position::FRONT_LEFT, (rand() % 21) + 30);
-                    break;
-                case 27:
-                    this->vehicle->wheel_steer((rand() % 10) * ((rand() % 2) ? 1 : -1));
-                    break;
-                case 28:
-                    this->vehicle->indicators(Position::LEFT, toggle);
-                    break;
-                case 29:
-                    this->vehicle->indicators(Position::RIGHT, toggle);
-                    break;
-                case 30:
-                    this->vehicle->hazards(toggle);
-                    break;
-                default:
-                    toggle = !toggle;
-                    break;
-            } });
-            
-        timer->start(1000);
+                    switch(rand() % 50) {
+                        case 0:
+                            this->climate->airflow(Airflow::OFF);
+                            break;
+                        case 1:
+                            this->climate->airflow(Airflow::DEFROST);
+                            break;
+                        case 2:
+                            this->climate->airflow(Airflow::BODY);
+                            break;
+                        case 3:
+                            this->climate->airflow(Airflow::FEET);
+                            break;
+                        case 4:
+                            this->climate->airflow(Airflow::DEFROST | Airflow::BODY);
+                            break;
+                        case 5:
+                            this->climate->airflow(Airflow::DEFROST | Airflow::FEET);
+                            break;
+                        case 6:
+                            this->climate->airflow(Airflow::BODY | Airflow::FEET);
+                            break;
+                        case 7:
+                            this->climate->airflow(Airflow::DEFROST | Airflow::BODY | Airflow::FEET);
+                            break;
+                        case 8:
+                            this->climate->fan_speed((rand() % 4) + 1);
+                            break;
+                        case 9:
+                            this->vehicle->sensor(Position::FRONT_LEFT, rand() % 5);
+                            break;
+                        case 10:
+                            this->vehicle->sensor(Position::FRONT_MIDDLE_LEFT, rand() % 5);
+                            break;
+                        case 11:
+                            this->vehicle->sensor(Position::FRONT_MIDDLE_RIGHT, rand() % 5);
+                            break;
+                        case 12:
+                            this->vehicle->sensor(Position::FRONT_RIGHT, rand() % 5);
+                            break;
+                        case 13:
+                            this->vehicle->sensor(Position::BACK_LEFT, rand() % 5);
+                            break;
+                        case 14:
+                            this->vehicle->sensor(Position::BACK_MIDDLE_LEFT, rand() % 5);
+                            break;
+                        case 15:
+                            this->vehicle->sensor(Position::BACK_MIDDLE_RIGHT, rand() % 5);
+                            break;
+                        case 16:
+                            this->vehicle->sensor(Position::BACK_RIGHT, rand() % 5);
+                            break;
+                        case 17:
+                            this->vehicle->door(Position::FRONT_LEFT, toggle);
+                            break;
+                        case 18:
+                            this->vehicle->door(Position::BACK_LEFT, toggle);
+                            break;
+                        case 19:
+                            this->vehicle->door(Position::FRONT_RIGHT, toggle);
+                            break;
+                        case 20:
+                            this->vehicle->door(Position::BACK_RIGHT, toggle);
+                            break;
+                        case 21:
+                            this->vehicle->headlights(toggle);
+                            break;
+                        case 22:
+                            this->vehicle->taillights(toggle);
+                            break;
+                        case 23:
+                            this->vehicle->pressure(Position::BACK_RIGHT, (rand() % 21) + 30);
+                            break;
+                        case 24:
+                            this->vehicle->pressure(Position::BACK_LEFT, (rand() % 21) + 30);
+                            break;
+                        case 25:
+                            this->vehicle->pressure(Position::FRONT_RIGHT, (rand() % 21) + 30);
+                            break;
+                        case 26:
+                            this->vehicle->pressure(Position::FRONT_LEFT, (rand() % 21) + 30);
+                            break;
+                        case 27:
+                            this->vehicle->wheel_steer((rand() % 10) * ((rand() % 2) ? 1 : -1));
+                            break;
+                        case 28:
+                            this->vehicle->indicators(Position::LEFT, toggle);
+                            break;
+                        case 29:
+                            this->vehicle->indicators(Position::RIGHT, toggle);
+                            break;
+                        case 30:
+                            this->vehicle->hazards(toggle);
+                            break;
+                        default:
+                            toggle = !toggle;
+                            break;
+                    } });
 
-        auto timer2 = new QTimer(this);
-        connect(timer2, &QTimer::timeout, [this]
-                {
-            if (rand() % 10 == 1) {
-                this->climate->left_temp((rand() % 20) + 60);
-                this->climate->right_temp((rand() % 20) + 60);
-            } });
-        timer2->start(100000);
-*/
+                timer->start(1000);
+
+                auto timer2 = new QTimer(this);
+                connect(timer2, &QTimer::timeout, [this]
+                        {
+                    if (rand() % 10 == 1) {
+                        this->climate->left_temp((rand() % 20) + 60);
+                        this->climate->right_temp((rand() % 20) + 60);
+                    } });
+                timer2->start(100000);
+        */
         socketcan(bus);
         QObject::connect(&bus->socket, &QTcpSocket::readyRead, this, &Test::readFrame);
 
@@ -206,61 +206,56 @@ void Test::readFrame()
                         {
                             if (dataHex.at(1) == "81")
                             {
-                                //ok AA
                                 this->arbiter->android_auto().handler->injectButtonPressHelper(aasdk::proto::enums::ButtonCode::ENTER, Action::ActionState::Triggered);
-                                DASH_LOG(info) << "PREMUTO pulsante in alto a sinistra\r\n";
+                                // DASH_LOG(info) << "PREMUTO pulsante in alto a sinistra\r\n";
                             }
                             if (dataHex.at(1) == "82")
                             {
-                                //DASH_LOG(info) << "PREMUTO Pulsante giù a sinistra\r\n";
                                 this->arbiter->set_curr_page(3);
+                                // DASH_LOG(info) << "PREMUTO Pulsante giù a sinistra\r\n";
                             }
                             if (dataHex.at(1) == "84")
                             {
-                                //non usare temp
+                                // non usare temp
                                 DASH_LOG(info) << "PREMUTO Pulsante manopola sinistra\r\n";
                             }
                             if (dataHex.at(1) == "91")
                             {
-                                //traccia succ AA
                                 this->arbiter->android_auto().handler->injectButtonPressHelper(aasdk::proto::enums::ButtonCode::NEXT, Action::ActionState::Triggered);
-                                DASH_LOG(info) << "PREMUTO Pulsante destro in alto (successivo)\r\n";
+                                // DASH_LOG(info) << "PREMUTO Pulsante destro in alto (successivo)\r\n";
                             }
                             if (dataHex.at(1) == "92")
                             {
-                                //traccia prec AA
                                 this->arbiter->android_auto().handler->injectButtonPressHelper(aasdk::proto::enums::ButtonCode::PREV, Action::ActionState::Triggered);
-                                DASH_LOG(info) << "PREMUTO Pulsante in basso a destra\r\n";
+                                // DASH_LOG(info) << "PREMUTO Pulsante in basso a destra\r\n";
                             }
                         }
                         else
                         {
                             if (dataHex.at(1) == "81")
                             {
-                                //DASH_LOG(info) << "pulsante in alto a sinistra\r\n";
+                                // DASH_LOG(info) << "pulsante in alto a sinistra\r\n";
                                 this->arbiter->set_curr_page(0);
                             }
                             if (dataHex.at(1) == "82")
                             {
-                                //DASH_LOG(info) << "Pulsante giù a sinistra\r\n";
+                                // DASH_LOG(info) << "Pulsante giù a sinistra\r\n";
                                 this->arbiter->set_curr_page(this->arbiter->layout().next_enabled_page(this->arbiter->layout().curr_page));
                             }
                             if (dataHex.at(1) == "84")
                             {
-                                //non usare temp
+                                // non usare temp
                                 DASH_LOG(info) << "Pulsante manopola sinistra\r\n";
                             }
                             if (dataHex.at(1) == "91")
                             {
-                                //destra AA
                                 this->arbiter->android_auto().handler->injectButtonPressHelper(aasdk::proto::enums::ButtonCode::RIGHT, Action::ActionState::Triggered);
-                                DASH_LOG(info) << "Pulsante destro in alto (successivo)\r\n";
+                                //DASH_LOG(info) << "Pulsante destro in alto (successivo)\r\n";
                             }
                             if (dataHex.at(1) == "92")
                             {
-                                //sinistra AA
                                 this->arbiter->android_auto().handler->injectButtonPressHelper(aasdk::proto::enums::ButtonCode::LEFT, Action::ActionState::Triggered);
-                                DASH_LOG(info) << "Pulsante in basso a destra\r\n";
+                                //DASH_LOG(info) << "Pulsante in basso a destra\r\n";
                             }
                         }
                     }
@@ -271,12 +266,12 @@ void Test::readFrame()
                             if (dataHex.at(2).at(1) == "F")
                             {
                                 this->arbiter->android_auto().handler->injectButtonPress(aasdk::proto::enums::ButtonCode::SCROLL_WHEEL, openauto::projection::WheelDirection::RIGHT);
-                                //DASH_LOG(info) << "Manopola sinistra SU\r\n";
+                                // DASH_LOG(info) << "Manopola sinistra SU\r\n";
                             }
                             else
                             {
                                 this->arbiter->android_auto().handler->injectButtonPress(aasdk::proto::enums::ButtonCode::SCROLL_WHEEL, openauto::projection::WheelDirection::LEFT);
-                                //DASH_LOG(info) << "Manopola sinistra GIU\r\n";
+                                // DASH_LOG(info) << "Manopola sinistra GIU\r\n";
                             }
                         }
 
@@ -284,12 +279,12 @@ void Test::readFrame()
                         {
                             if (dataHex.at(2).at(1) == "F")
                             {
-                                //DASH_LOG(info) << "Manopola destra (Volume) GIU\r\n";
+                                // DASH_LOG(info) << "Manopola destra (Volume) GIU\r\n";
                                 this->arbiter->decrease_volume(10);
                             }
                             else
                             {
-                                //DASH_LOG(info) << "Manopola destra (Volume) SU\r\n";
+                                // DASH_LOG(info) << "Manopola destra (Volume) SU\r\n";
                                 this->arbiter->increase_volume(10);
                             }
                         }
@@ -307,7 +302,7 @@ void Test::readFrame()
 
                     if (valore_ws != lumws)
                     {
-                        //DASH_LOG(info) << "NUOVA LUMINOSITA:" << QString::number(valore_ws).toStdString() << "\r\n";
+                        // DASH_LOG(info) << "NUOVA LUMINOSITA:" << QString::number(valore_ws).toStdString() << "\r\n";
                         this->arbiter->set_brightness(luminosita_nuova);
                         lumws = valore_ws;
                     }
