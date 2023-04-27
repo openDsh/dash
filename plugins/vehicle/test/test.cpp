@@ -227,7 +227,7 @@ void Test::readFrame()
                             if (dataHex.at(1) == "92")
                             {
                                 //traccia prec AA
-                                this->arbiter->send_openauto_button_press(aasdk::proto::enums::ButtonCode::NEXT, Action::ActionState::Triggered);
+                                //this->arbiter->send_openauto_button_press(aasdk::proto::enums::ButtonCode::SCROLL_WHEEL, openauto::projection::WheelDirection::RIGHT);
                                 DASH_LOG(info) << "PREMUTO Pulsante in basso a destra\r\n";
                             }
                         }
@@ -251,6 +251,7 @@ void Test::readFrame()
                             if (dataHex.at(1) == "91")
                             {
                                 //destra AA
+                                this->arbiter->send_openauto_button_press(aasdk::proto::enums::ButtonCode::SCROLL_WHEEL, openauto::projection::WheelDirection::RIGHT);
                                 DASH_LOG(info) << "Pulsante destro in alto (successivo)\r\n";
                             }
                             if (dataHex.at(1) == "92")
