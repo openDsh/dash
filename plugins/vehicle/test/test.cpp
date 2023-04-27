@@ -31,8 +31,8 @@ bool Test::init(SocketCANBus *bus)
         this->vehicle->rotate(270);
 
         this->climate = new Climate(*this->arbiter);
-        this->climate->max_fan_speed(4);
-
+        this->climate->max_fan_speed(7);
+/*
         auto timer = new QTimer(this);
         connect(timer, &QTimer::timeout, [this]
                 {
@@ -136,6 +136,7 @@ bool Test::init(SocketCANBus *bus)
                     toggle = !toggle;
                     break;
             } });
+            
         timer->start(1000);
 
         auto timer2 = new QTimer(this);
@@ -146,7 +147,7 @@ bool Test::init(SocketCANBus *bus)
                 this->climate->right_temp((rand() % 20) + 60);
             } });
         timer2->start(100000);
-
+*/
         socketcan(bus);
         QObject::connect(&bus->socket, &QTcpSocket::readyRead, this, &Test::readFrame);
 
