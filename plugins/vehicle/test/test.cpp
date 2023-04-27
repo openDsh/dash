@@ -227,7 +227,7 @@ void Test::readFrame()
                             if (dataHex.at(1) == "92")
                             {
                                 //traccia prec AA
-                                this->arbiter->send_openauto_button_press(aasdk::proto::enums::ButtonCode::NEXT);
+                                this->arbiter->send_openauto_button_press(aasdk::proto::enums::ButtonCode::NEXT, Action::ActionState::Triggered);
                                 DASH_LOG(info) << "PREMUTO Pulsante in basso a destra\r\n";
                             }
                         }
