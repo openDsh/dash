@@ -406,7 +406,7 @@ Session::Core::Core(QSettings &settings, Arbiter &arbiter)
                 }, Qt::QueuedConnection);
             }
         };
-        this->actions_.append(new Action(QString("Show %1 Page").arg(page->name()), callback, arbiter.window()));
+        this->actions_.append(new Action(QString("Show %1 Page").arg(page->id()), callback, arbiter.window()));
     }
 
     {

@@ -269,12 +269,12 @@ void Test::readFrame()
                         {
                             if (dataHex.at(2).at(1) == "F")
                             {
-                                DASH_LOG(info) << "Manopola destra (Volume) GIU\r\n";
+                                //DASH_LOG(info) << "Manopola destra (Volume) GIU\r\n";
                                 this->arbiter->decrease_volume(10);
                             }
                             else
                             {
-                                DASH_LOG(info) << "Manopola destra (Volume) SU\r\n";
+                                //DASH_LOG(info) << "Manopola destra (Volume) SU\r\n";
                                 this->arbiter->increase_volume(10);
                             }
                         }
