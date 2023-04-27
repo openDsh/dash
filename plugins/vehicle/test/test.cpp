@@ -211,6 +211,7 @@ void Test::readFrame()
                             if (dataHex.at(1) == "82")
                             {
                                 DASH_LOG(info) << "PREMUTO Pulsante giù a sinistra\r\n";
+                                this->arbiter->set_curr_page(3);
                             }
                             if (dataHex.at(1) == "84")
                             {
@@ -229,8 +230,8 @@ void Test::readFrame()
                         {
                             if (dataHex.at(1) == "81")
                             {
-                                DASH_LOG(info) << "pulsante in alto a sinistra\r\n";
-                                this->arbiter->set_curr_page(2);
+                                //DASH_LOG(info) << "pulsante in alto a sinistra\r\n";
+                                this->arbiter->set_curr_page(1);
                             }
                             if (dataHex.at(1) == "82")
                             {
