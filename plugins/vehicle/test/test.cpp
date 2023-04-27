@@ -207,6 +207,7 @@ void Test::readFrame()
                             if (dataHex.at(1) == "81")
                             {
                                 //ok AA
+                                this->arbiter->android_auto().handler->injectButtonPressHelper(aasdk::proto::enums::ButtonCode::ENTER);
                                 DASH_LOG(info) << "PREMUTO pulsante in alto a sinistra\r\n";
                             }
                             if (dataHex.at(1) == "82")
@@ -222,12 +223,13 @@ void Test::readFrame()
                             if (dataHex.at(1) == "91")
                             {
                                 //traccia succ AA
+                                this->arbiter->android_auto().handler->injectButtonPressHelper(aasdk::proto::enums::ButtonCode::NEXT, actionState);
                                 DASH_LOG(info) << "PREMUTO Pulsante destro in alto (successivo)\r\n";
                             }
                             if (dataHex.at(1) == "92")
                             {
                                 //traccia prec AA
-                                //this->arbiter->send_openauto_button_press(aasdk::proto::enums::ButtonCode::SCROLL_WHEEL, openauto::projection::WheelDirection::RIGHT);
+                                this->arbiter->android_auto().handler->injectButtonPressHelper(aasdk::proto::enums::ButtonCode::PREV);
                                 DASH_LOG(info) << "PREMUTO Pulsante in basso a destra\r\n";
                             }
                         }
@@ -251,12 +253,13 @@ void Test::readFrame()
                             if (dataHex.at(1) == "91")
                             {
                                 //destra AA
-                                //this->arbiter->send_openauto_button_press(aasdk::proto::enums::ButtonCode::SCROLL_WHEEL, openauto::projection::WheelDirection::RIGHT);
+                                this->arbiter->android_auto().handler->injectButtonPressHelper(aasdk::proto::enums::ButtonCode::RIGHT);
                                 DASH_LOG(info) << "Pulsante destro in alto (successivo)\r\n";
                             }
                             if (dataHex.at(1) == "92")
                             {
                                 //sinistra AA
+                                this->arbiter->android_auto().handler->injectButtonPressHelper(aasdk::proto::enums::ButtonCode::LEFT);
                                 DASH_LOG(info) << "Pulsante in basso a destra\r\n";
                             }
                         }
@@ -267,14 +270,13 @@ void Test::readFrame()
                         {
                             if (dataHex.at(2).at(1) == "F")
                             {
-                                //su AA
                                 this->arbiter->android_auto().handler->injectButtonPress(aasdk::proto::enums::ButtonCode::SCROLL_WHEEL, openauto::projection::WheelDirection::RIGHT);
-                                DASH_LOG(info) << "Manopola sinistra SU\r\n";
+                                //DASH_LOG(info) << "Manopola sinistra SU\r\n";
                             }
                             else
                             {
-                                //giu AA
-                                DASH_LOG(info) << "Manopola sinistra GIU\r\n";
+                                this->arbiter->android_auto().handler->injectButtonPress(aasdk::proto::enums::ButtonCode::SCROLL_WHEEL, openauto::projection::WheelDirection::LEFT);
+                                //DASH_LOG(info) << "Manopola sinistra GIU\r\n";
                             }
                         }
 
