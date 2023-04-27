@@ -206,23 +206,28 @@ void Test::readFrame()
                         {
                             if (dataHex.at(1) == "81")
                             {
+                                //ok AA
                                 DASH_LOG(info) << "PREMUTO pulsante in alto a sinistra\r\n";
                             }
                             if (dataHex.at(1) == "82")
                             {
-                                DASH_LOG(info) << "PREMUTO Pulsante giù a sinistra\r\n";
+                                //DASH_LOG(info) << "PREMUTO Pulsante giù a sinistra\r\n";
                                 this->arbiter->set_curr_page(3);
                             }
                             if (dataHex.at(1) == "84")
                             {
+                                //non usare temp
                                 DASH_LOG(info) << "PREMUTO Pulsante manopola sinistra\r\n";
                             }
                             if (dataHex.at(1) == "91")
                             {
+                                //traccia succ AA
                                 DASH_LOG(info) << "PREMUTO Pulsante destro in alto (successivo)\r\n";
                             }
                             if (dataHex.at(1) == "92")
                             {
+                                //traccia prec AA
+                                this->arbiter->send_openauto_button_press(aasdk::proto::enums::ButtonCode::NEXT);
                                 DASH_LOG(info) << "PREMUTO Pulsante in basso a destra\r\n";
                             }
                         }
@@ -240,14 +245,17 @@ void Test::readFrame()
                             }
                             if (dataHex.at(1) == "84")
                             {
+                                //non usare temp
                                 DASH_LOG(info) << "Pulsante manopola sinistra\r\n";
                             }
                             if (dataHex.at(1) == "91")
                             {
+                                //destra AA
                                 DASH_LOG(info) << "Pulsante destro in alto (successivo)\r\n";
                             }
                             if (dataHex.at(1) == "92")
                             {
+                                //sinistra AA
                                 DASH_LOG(info) << "Pulsante in basso a destra\r\n";
                             }
                         }
@@ -258,10 +266,12 @@ void Test::readFrame()
                         {
                             if (dataHex.at(2).at(1) == "F")
                             {
+                                //su AA
                                 DASH_LOG(info) << "Manopola sinistra SU\r\n";
                             }
                             else
                             {
+                                //giu AA
                                 DASH_LOG(info) << "Manopola sinistra GIU\r\n";
                             }
                         }
