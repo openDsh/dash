@@ -202,7 +202,7 @@ void Test::readFrame()
 
                         uint temprem = dataHex[2].toUInt(&ok, 16);
 
-                        if (ok == true && temprem > 64)
+                        if (ok == true && temprem > 4)
                         {
                             if (dataHex.at(1) == "81")
                             {
@@ -231,7 +231,7 @@ void Test::readFrame()
                             if (dataHex.at(1) == "81")
                             {
                                 //DASH_LOG(info) << "pulsante in alto a sinistra\r\n";
-                                this->arbiter->set_curr_page(1);
+                                this->arbiter->set_curr_page(0);
                             }
                             if (dataHex.at(1) == "82")
                             {
