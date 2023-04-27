@@ -251,7 +251,7 @@ void Test::readFrame()
                             if (dataHex.at(1) == "91")
                             {
                                 //destra AA
-                                this->arbiter->send_openauto_button_press(aasdk::proto::enums::ButtonCode::SCROLL_WHEEL, openauto::projection::WheelDirection::RIGHT);
+                                //this->arbiter->send_openauto_button_press(aasdk::proto::enums::ButtonCode::SCROLL_WHEEL, openauto::projection::WheelDirection::RIGHT);
                                 DASH_LOG(info) << "Pulsante destro in alto (successivo)\r\n";
                             }
                             if (dataHex.at(1) == "92")
@@ -268,6 +268,7 @@ void Test::readFrame()
                             if (dataHex.at(2).at(1) == "F")
                             {
                                 //su AA
+                                this->arbiter->android_auto().handler->injectButtonPress(aasdk::proto::enums::ButtonCode::SCROLL_WHEEL, openauto::projection::WheelDirection::RIGHT);
                                 DASH_LOG(info) << "Manopola sinistra SU\r\n";
                             }
                             else
