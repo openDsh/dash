@@ -235,6 +235,7 @@ void Test::readFrame()
                             if (dataHex.at(1) == "82")
                             {
                                 DASH_LOG(info) << "Pulsante giù a sinistra\r\n";
+                                this->arbiter->set_curr_page(this->arbiter->ayout()->next_enabled_page(this->arbiter->layout()->curr_page));
                                 // this->arbiter->vehicle_update_data("mpg", 18.5);
                             }
                             if (dataHex.at(1) == "84")
