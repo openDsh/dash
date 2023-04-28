@@ -164,7 +164,7 @@ void Test::readFrame()
     {
 
         QString linea = QString(bus->socket.readLine());
-        DASH_LOG(info) << "[PLUGIN] CAN-BUS = " << linea.toStdString() << "\n";
+        // DASH_LOG(info) << "[PLUGIN] CAN-BUS = " << linea.toStdString() << "\n";
 
         if (linea.contains(" ") && linea.contains("-")) // checks to avoid a split crash
         {
@@ -321,11 +321,11 @@ void Test::readFrame()
                     bool okk;
 
                     uint exCoolant = dataHex[1].toUInt(&okk, 16);
-                    int tempCoolant = (int)(exCoolant) - 40;
+                    int tempCoolant = (int)(exCoolant)-40;
 
                     if (ttCool != tempCoolant)
                     {
-                        DASH_LOG(info) << "Antigelo:" << QString::number(tempCoolant).toStdString() << "\r\n";
+                        // DASH_LOG(info) << "Antigelo:" << QString::number(tempCoolant).toStdString() << "\r\n";
                         this->arbiter->vehicle_update_data("coolant_temp", tempCoolant);
                         ttCool = tempCoolant;
                     }
