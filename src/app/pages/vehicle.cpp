@@ -8,7 +8,7 @@
 
 GaugesConfig gauges_cfg = 
 {
-  {"load", "Calculated Engine Load", {"%", "%"}, 
+  {"voltage", "Tensione Batteria", {"V", "V"}, 
     {10, 16, 12}, 1, [](double x, bool _) { return x; }
   },
   {"coolant_temp", "Engine Coolant Temperature", {"°F", "°C"}, 
