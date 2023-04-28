@@ -33,7 +33,7 @@ struct GaugeConfig {
 
 // typedef QList<Gauge> Gauges;
 struct GaugesConfig {
-    GaugeConfig LOAD;
+    GaugeConfig VOLTAGE;
     GaugeConfig COOLANT_TEMP;
     GaugeConfig RPM;
     GaugeConfig SPEED;

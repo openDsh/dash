@@ -313,7 +313,23 @@ void Test::readFrame()
 
             if (canbus == "RX2")
             {
-                // this->arbiter->vehicle_update_data("mpg", 18.5);
+
+                // Esempio RX2 0510-0442432E
+
+                if (id == "0510")
+                {
+                    bool okk;
+
+                    uint exCoolant = dataHex[1].toUInt(&okk, 16);
+                    int tempCoolant = (int)(exCoolant) - 40;
+
+                    if (ttCool != tempCoolant)
+                    {
+                        DASH_LOG(info) << "Antigelo:" << QString::number(tempCoolant).toStdString() << "\r\n";
+                        this->arbiter->vehicle_update_data("coolant_temp", tempCoolant);
+                        ttCool = tempCoolant;
+                    }
+                }
             }
         }
     }

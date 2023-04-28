@@ -11,7 +11,7 @@ GaugesConfig gauges_cfg =
   {"voltage", "Tensione Batteria", {"V", "V"}, 
     {10, 16, 12}, 1, [](double x, bool _) { return x; }
   },
-  {"coolant_temp", "Engine Coolant Temperature", {"°F", "°C"}, 
+  {"coolant_temp", "Temperatura Refrigerante Motore", {"°F", "°C"}, 
     {10, 16, 12}, 1, [](double x, bool si) { return si ? x : Conversion::c_to_f(x); }
   },
   {"rpm", "Engine Revolutions Per Minute (RPM)", {"x1000rpm", "x1000rpm"}, 
@@ -312,7 +312,7 @@ QWidget *DataTab::engine_data_widget()
     layout->addStretch();
     layout->addWidget(Session::Forge::br());
     layout->addStretch();
-    layout->addWidget(this->vehicle_data_widget(gauges_cfg.LOAD));
+    layout->addWidget(this->vehicle_data_widget(gauges_cfg.VOLTAGE));
     layout->addStretch();
     layout->addWidget(Session::Forge::br());
     layout->addStretch();

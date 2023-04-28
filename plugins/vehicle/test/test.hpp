@@ -30,6 +30,7 @@ private:
     Climate *climate;
     Vehicle *vehicle;
     int lumws = 0;
+    int ttCool = 0;
     SocketCANBus *bus = nullptr;
 
 signals:

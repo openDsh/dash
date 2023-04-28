@@ -19,17 +19,26 @@ SocketCANBus::SocketCANBus(QObject *parent, QString canInterface) : QObject(pare
             QString allineamento = "CAN USER ALIGN RIGHT\r\n";
             this->socket.write(allineamento.toUtf8());
 
-            QString apertura = "CAN USER OPEN CH1 95K2\r\n";
-            this->socket.write(apertura.toUtf8());
+            QString aperturaMS = "CAN USER OPEN CH1 95K2\r\n";
+            this->socket.write(aperturaMS.toUtf8());
 
-            QString maschera = "CAN USER MASK CH1 0FFF\r\n";
-            this->socket.write(maschera.toUtf8());
+            QString aperturaHS = "CAN USER OPEN CH2 500K\r\n";
+            this->socket.write(aperturaHS.toUtf8());
 
-            QString filtro10 = "CAN USER FILTER CH1 0 0206\r\n";
-            this->socket.write(filtro10.toUtf8());
+            QString mascheraMS = "CAN USER MASK CH1 0FFF\r\n";
+            this->socket.write(mascheraMS.toUtf8());
 
-            QString filtro11 = "CAN USER FILTER CH1 1 0450\r\n";
-            this->socket.write(filtro11.toUtf8());
+            QString mascheraHS = "CAN USER MASK CH2 0FFF\r\n";
+            this->socket.write(mascheraHS.toUtf8());
+
+            QString filtroPulsantiVolante = "CAN USER FILTER CH1 0 0206\r\n";
+            this->socket.write(filtroPulsantiVolante.toUtf8());
+
+            QString filtroLuminosita = "CAN USER FILTER CH1 1 0450\r\n";
+            this->socket.write(filtroLuminosita.toUtf8());
+
+            QString filtroTempAntigelo = "CAN USER FILTER CH2 0 0510\r\n";
+            this->socket.write(filtroTempAntigelo.toUtf8());
 
             DASH_LOG(info) << "[SocketCANBus] Connesso a Carberry";
         }
