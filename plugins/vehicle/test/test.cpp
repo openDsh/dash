@@ -317,19 +317,20 @@ void Test::readFrame()
                     uint due = dataHex[1].toUInt(&okk, 16);
                     uint tre = dataHex[2].toUInt(&okk, 16);
                     uint quattro = dataHex[3].toUInt(&okk, 16);
-                    int valore_km = (int)((tre & 255) | (due << 8)); //(data[3] & 255) | (data[2] << 8)
-
-                    DASH_LOG(info) << "NUOVA AUTONOMIA:" << QString::number(valore_km).toStdString() << "\r\n";
+                    int valore_km = 0;
 
                     if (tre == 0x10)
+                    {
                         valore_km = quattro / 2;
-
-                    if (tre != 0x10)
+                    }
+                    else
+                    {
                         valore_km = (int)(((tre << 8) + quattro) / 2);
+                    }
 
                     if (valore_km != kmsalvati)
                     {
-                        DASH_LOG(info) << "NUOVA AUTONOMIA:" << QString::number(valore_km).toStdString() << "\r\n";
+                        // DASH_LOG(info) << "NUOVA AUTONOMIA:" << QString::number(valore_km).toStdString() << "\r\n";
                         this->arbiter->vehicle_update_data("autonomia", valore_km);
                         kmsalvati = valore_km;
                     }
