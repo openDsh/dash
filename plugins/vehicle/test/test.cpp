@@ -307,6 +307,33 @@ void Test::readFrame()
                         lumws = valore_ws;
                     }
                 }
+
+                // Esempio RX1 04EE-46030130
+
+                if (id == "04EE")
+                {
+                    bool okk;
+
+                    uint due = dataHex[1].toUInt(&okk, 16);
+                    uint tre = dataHex[2].toUInt(&okk, 16);
+                    uint quattro = dataHex[3].toUInt(&okk, 16);
+                    int valore_km = (int)((tre & 255) | (due << 8)); //(data[3] & 255) | (data[2] << 8)
+
+                    DASH_LOG(info) << "NUOVA AUTONOMIA:" << QString::number(valore_km).toStdString() << "\r\n";
+
+                    if (tre == 0x10)
+                        valore_km = quattro / 2;
+
+                    if (tre != 0x10)
+                        valore_km = (int)(((tre << 8) + quattro) / 2);
+
+                    if (valore_km != kmsalvati)
+                    {
+                        DASH_LOG(info) << "NUOVA AUTONOMIA:" << QString::number(valore_km).toStdString() << "\r\n";
+                        this->arbiter->vehicle_update_data("autonomia", valore_km);
+                        kmsalvati = valore_km;
+                    }
+                }
             }
 
             // HS-CAN

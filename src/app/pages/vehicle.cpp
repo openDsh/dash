@@ -17,7 +17,7 @@ GaugesConfig gauges_cfg =
   {"rpm", "Engine Revolutions Per Minute (RPM)", {"x1000rpm", "x1000rpm"}, 
     {0, 24, 12}, 1, [](double x, bool _) { return x / 1000.0; }
   },
-  {"speed", "Vehicle Speed", {"mph", "km/h"}, 
+  {"autonomia", "Autonomia", {"miles", "km"}, 
     {0, 36, 16}, 0, [](double x, bool si) { return si ? x : Conversion::kph_to_mph(x); }
   },
   {"intake_temp", "Intake Air Temperature", {"°F", "°C"}, 
@@ -261,7 +261,7 @@ QWidget *DataTab::speedo_tach_widget()
     layout->setContentsMargins(0, 0, 0, 0);
 
     layout->addStretch(3);
-    layout->addWidget(this->vehicle_data_widget(gauges_cfg.SPEED));
+    layout->addWidget(this->vehicle_data_widget(gauges_cfg.AUTONOMIA));
     layout->addStretch(2);
     layout->addWidget(this->vehicle_data_widget(gauges_cfg.RPM));
     layout->addStretch(1);

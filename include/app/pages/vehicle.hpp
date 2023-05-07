@@ -36,7 +36,7 @@ struct GaugesConfig {
     GaugeConfig VOLTAGE;
     GaugeConfig COOLANT_TEMP;
     GaugeConfig RPM;
-    GaugeConfig SPEED;
+    GaugeConfig AUTONOMIA;
     GaugeConfig INTAKE_TEMP;
     GaugeConfig MPG;
 };
