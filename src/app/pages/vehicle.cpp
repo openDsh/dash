@@ -6,30 +6,23 @@
 #include "app/window.hpp"
 #include "plugins/vehicle_plugin.hpp"
 
-GaugesConfig gauges_cfg = 
-{
-  {"voltage", "Tensione Batteria", {"V", "V"}, 
-    {10, 16, 12}, 1, [](double x, bool _) { return x; }
-  },
-  {"coolant_temp", "Temperatura Refrigerante Motore", {"°F", "°C"}, 
-    {10, 16, 12}, 1, [](double x, bool si) { return si ? x : Conversion::c_to_f(x); }
-  },
-  {"rpm", "Engine Revolutions Per Minute (RPM)", {"x1000rpm", "x1000rpm"}, 
-    {0, 24, 12}, 1, [](double x, bool _) { return x / 1000.0; }
-  },
-  {"autonomia", "Autonomia", {"miles", "km"}, 
-    {0, 36, 16}, 0, [](double x, bool si) { return si ? x : Conversion::kph_to_mph(x); }
-  },
-  {"intake_temp", "Intake Air Temperature", {"°F", "°C"}, 
-    {10, 16, 12}, 1, [](double x, bool si) { return si ? x : Conversion::c_to_f(x); }
-  },
-  {"mpg", "Petrol consumption", {"mpg", "l/100km"},  
-    {10, 16, 12}, 1, [](double x, bool si) { return si ? x : Conversion::l100km_to_mpg(x); }
-  }
-};
+GaugesConfig gauges_cfg =
+    {
+        {"voltage", "Tensione Batteria", {"V", "V"}, {10, 16, 12}, 1, [](double x, bool _)
+         { return x; }},
+        {"coolant_temp", "Temperatura Refrigerante Motore", {"°F", "°C"}, {10, 16, 12}, 1, [](double x, bool si)
+         { return si ? x : Conversion::c_to_f(x); }},
+        {"rpm", "Engine Revolutions Per Minute (RPM)", {"x1000rpm", "x1000rpm"}, {0, 24, 12}, 1, [](double x, bool _)
+         { return x / 1000.0; }},
+        {"autonomia", "Autonomia", {"miles", "km"}, {0, 36, 16}, 0, [](double x, bool si)
+         { return si ? x : Conversion::kph_to_mph(x); }},
+        {"intake_temp", "Intake Air Temperature", {"°F", "°C"}, {10, 16, 12}, 1, [](double x, bool si)
+         { return si ? x : Conversion::c_to_f(x); }},
+        {"mpg", "Petrol consumption", {"mpg", "l/100km"}, {10, 16, 12}, 1, [](double x, bool si)
+         { return si ? x : Conversion::l100km_to_mpg(x); }}};
 
 Gauge::Gauge(GaugeConfig cfg, QFont value_font, QFont unit_font, Gauge::Orientation orientation, QWidget *parent)
-: QWidget(parent)
+    : QWidget(parent)
 {
     Config *config = Config::get_instance();
 
@@ -55,11 +48,11 @@ Gauge::Gauge(GaugeConfig cfg, QFont value_font, QFont unit_font, Gauge::Orientat
     unit_label->setFont(unit_font);
     unit_label->setAlignment(Qt::AlignCenter);
 
-    connect(config, &Config::si_units_changed, [this, unit_label](bool si) {
+    connect(config, &Config::si_units_changed, [this, unit_label](bool si)
+            {
         this->si = si;
         unit_label->setText(this->si ? this->units.second : this->units.first);
-        value_label->setText(this->null_value());
-    });
+        value_label->setText(this->null_value()); });
 
     layout->addStretch(6);
     layout->addWidget(value_label);
@@ -68,8 +61,9 @@ Gauge::Gauge(GaugeConfig cfg, QFont value_font, QFont unit_font, Gauge::Orientat
     layout->addStretch(4);
 }
 
-void Gauge::set_value(int value){
-    DASH_LOG(debug)<<"[Gauges] set_value: "<<std::to_string(value);
+void Gauge::set_value(int value)
+{
+    DASH_LOG(debug) << "[Gauges] set_value: " << std::to_string(value);
     value_label->setText(this->format_value(this->converter(value, this->si)));
 }
 
@@ -93,8 +87,7 @@ QString Gauge::null_value()
 }
 
 VehiclePage::VehiclePage(Arbiter &arbiter, QWidget *parent)
-    : QTabWidget(parent)
-    , Page(arbiter, "Vehicle", "directions_car", true, this)
+    : QTabWidget(parent), Page(arbiter, "Vehicle", "directions_car", true, this)
 {
 }
 
@@ -114,13 +107,15 @@ void VehiclePage::init()
     Dialog *dialog = new Dialog(this->arbiter, true, this->window());
     dialog->set_body(this->dialog_body());
     QPushButton *load_button = new QPushButton("load");
-    connect(load_button, &QPushButton::clicked, [this]() { this->load_plugin(); });
+    connect(load_button, &QPushButton::clicked, [this]()
+            { this->load_plugin(); });
     dialog->set_button(load_button);
 
     QPushButton *settings_button = new QPushButton(this);
     settings_button->setFlat(true);
     this->arbiter.forge().iconize("settings", settings_button, 24);
-    connect(settings_button, &QPushButton::clicked, [dialog]() { dialog->open(); });
+    connect(settings_button, &QPushButton::clicked, [dialog]()
+            { dialog->open(); });
     this->setCornerWidget(settings_button);
 
     this->load_plugin();
@@ -141,12 +136,10 @@ QWidget *VehiclePage::dialog_body()
     QStringList devices = this->config->get_vehicle_can_bus() ? this->can_devices : this->serial_devices;
     Selector *interface_selector = new Selector(devices, this->config->get_vehicle_interface(), this->arbiter.forge().font(14), this->arbiter, widget, "disabled");
     interface_selector->setVisible((this->can_devices.size() > 0) || (this->serial_devices.size() > 0));
-    connect(interface_selector, &Selector::item_changed, [config = this->config](QString item){
-        config->set_vehicle_interface(item);
-    });
-    connect(this->config, &Config::vehicle_can_bus_changed, [this, interface_selector](bool state){
-        interface_selector->set_options(state ? this->can_devices : this->serial_devices);
-    });
+    connect(interface_selector, &Selector::item_changed, [config = this->config](QString item)
+            { config->set_vehicle_interface(item); });
+    connect(this->config, &Config::vehicle_can_bus_changed, [this, interface_selector](bool state)
+            { interface_selector->set_options(state ? this->can_devices : this->serial_devices); });
     layout->addWidget(interface_selector, 1);
 
     layout->addWidget(Session::Forge::br(), 1);
@@ -169,9 +162,8 @@ QWidget *VehiclePage::can_bus_toggle_row()
     QRadioButton *socketcan_button = new QRadioButton("SocketCAN", group);
     socketcan_button->setChecked(this->config->get_vehicle_can_bus());
     socketcan_button->setEnabled(this->can_devices.size() > 0);
-    connect(socketcan_button, &QRadioButton::clicked, [config = this->config]{
-        config->set_vehicle_can_bus(true);
-    });
+    connect(socketcan_button, &QRadioButton::clicked, [config = this->config]
+            { config->set_vehicle_can_bus(true); });
     group_layout->addWidget(socketcan_button);
 
     layout->addWidget(group, 1, Qt::AlignHCenter);
@@ -190,7 +182,8 @@ QWidget *VehiclePage::si_units_row_widget()
     Switch *toggle = new Switch(widget);
     toggle->scale(this->arbiter.layout().scale);
     toggle->setChecked(this->config->get_si_units());
-    connect(toggle, &Switch::stateChanged, [config = this->config](bool state) { config->set_si_units(state); });
+    connect(toggle, &Switch::stateChanged, [config = this->config](bool state)
+            { config->set_si_units(state); });
     layout->addWidget(toggle, 1, Qt::AlignHCenter);
 
     return widget;
@@ -198,7 +191,8 @@ QWidget *VehiclePage::si_units_row_widget()
 
 void VehiclePage::get_plugins()
 {
-    for (const QFileInfo &plugin : Session::plugin_dir("vehicle").entryInfoList(QDir::Files)) {
+    for (const QFileInfo &plugin : Session::plugin_dir("vehicle").entryInfoList(QDir::Files))
+    {
         if (QLibrary::isLibrary(plugin.absoluteFilePath()))
             this->plugins[Session::fmt_plugin(plugin.baseName())] = plugin;
     }
@@ -210,10 +204,12 @@ void VehiclePage::load_plugin()
         this->active_plugin->unload();
 
     QString key = this->plugin_selector->get_current();
-    if (!key.isNull()) {
+    if (!key.isNull())
+    {
         this->active_plugin->setFileName(this->plugins[key].absoluteFilePath());
 
-        if (VehiclePlugin *plugin = qobject_cast<VehiclePlugin *>(this->active_plugin->instance())) {
+        if (VehiclePlugin *plugin = qobject_cast<VehiclePlugin *>(this->active_plugin->instance()))
+        {
             plugin->dashize(&this->arbiter);
             plugin->init(((SocketCANBus *)SocketCANBus::get_instance()));
             for (QWidget *tab : plugin->widgets())
@@ -224,8 +220,7 @@ void VehiclePage::load_plugin()
 }
 
 DataTab::DataTab(Arbiter &arbiter, QWidget *parent)
-    : QWidget(parent)
-    , arbiter(arbiter)
+    : QWidget(parent), arbiter(arbiter)
 {
     QHBoxLayout *layout = new QHBoxLayout(this);
 
@@ -243,15 +238,15 @@ DataTab::DataTab(Arbiter &arbiter, QWidget *parent)
     sp_right.setHorizontalStretch(2);
     engine_data->setSizePolicy(sp_right);
 
-    connect(&this->arbiter, &Arbiter::vehicle_update_data, [this](QString gauge_id, int value){
+    connect(&this->arbiter, &Arbiter::vehicle_update_data, [this](QString gauge_id, int value)
+            {
         // DASH_LOG(info)<<"[Gauges] arbiter update: "<<qPrintable(gauge_id)<<" to "<< std::to_string(value);
         for (auto &gauge : this->gauges) {
             if(gauge->get_id() == gauge_id){
                 // DASH_LOG(info)<<"[Gauges] Found: "<<gauge->get_id();
                 gauge->set_value(value);
             }
-        }
-    });
+        } });
 }
 
 QWidget *DataTab::speedo_tach_widget()
@@ -270,35 +265,37 @@ QWidget *DataTab::speedo_tach_widget()
 }
 
 /*  socketcan/elm327 rewrite right now only has support for one PID per gauge, so we can't calculate milage at this point.
-    This is because gauges act more as event handlers now for each PID. 
+    This is because gauges act more as event handlers now for each PID.
     Multi-PID gauges could feasibly be reimplemented if there was a helper method that stored received values, and only calls
     the gauge update once all values have been updated since last gauge update.
 
 */
 
-// QWidget *DataTab::mileage_data_widget()
-// {
-//     QWidget *widget = new QWidget(this);	
-//	   QHBoxLayout *layout = new QHBoxLayout(widget);	
-//		
-//	   QFont value_font(Theme::font_36);	
-//	   value_font.setFamily("Titillium Web");	
-//		
-//	   QFont unit_font(Theme::font_14);	
-//	   unit_font.setWeight(QFont::Light);	
-//	   unit_font.setItalic(true);
-//
-//     Gauge *mileage = new Gauge({"mpg", "km/L"}, value_font, unit_font,
-//                                Gauge::BOTTOM, 100, {gauges_cfg.SPEED, gauges_cfg.MAF}, 1,
-//                                [](std::vector<double> x, bool si) {
-//                                    return (si ? x[0] : kph_to_mph(x[0])) / (si ? gps_to_lph(x[1]) : gps_to_gph(x[1]));
-//                                },
-//                                widget);
-//     layout->addWidget(mileage);
-//     this->gauges.push_back(mileage);
+QWidget *DataTab::mileage_data_widget()
+{
+    QWidget *widget = new QWidget(this);
+    QHBoxLayout *layout = new QHBoxLayout(widget);
 
-//     return widget;
-// }
+    QFont value_font(Theme::font_36);
+    value_font.setFamily("Titillium Web");
+
+    QFont unit_font(Theme::font_14);
+    unit_font.setWeight(QFont::Light);
+    unit_font.setItalic(true);
+
+    Gauge *mileage = new Gauge(
+        {"mpg", "km/L"}, value_font, unit_font,
+        Gauge::BOTTOM, 100, {gauges_cfg.SPEED, gauges_cfg.MAF}, 1,
+        [](std::vector<double> x, bool si)
+        {
+            return (si ? x[0] : kph_to_mph(x[0])) / (si ? gps_to_lph(x[1]) : gps_to_gph(x[1]));
+        },
+        widget);
+    layout->addWidget(mileage);
+    this->gauges.push_back(mileage);
+
+    return widget;
+}
 
 QWidget *DataTab::engine_data_widget()
 {
@@ -336,11 +333,12 @@ QWidget *DataTab::vehicle_data_widget(GaugeConfig cfg)
     unit_font.setItalic(true);
 
     Gauge *gauge = new Gauge(cfg,
-        value_font, unit_font, Gauge::RIGHT, widget);
+                             value_font, unit_font, Gauge::RIGHT, widget);
     layout->addWidget(gauge);
     this->gauges.push_back(gauge);
 
-    if (cfg.font_size.label > 0) {
+    if (cfg.font_size.label > 0)
+    {
         QFont label_font(this->arbiter.forge().font(cfg.font_size.label));
         label_font.setWeight(QFont::Light);
 

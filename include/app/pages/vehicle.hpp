@@ -101,7 +101,7 @@ class DataTab : public QWidget {
    private:
     Arbiter &arbiter;
     QWidget *speedo_tach_widget();
-    // QWidget *mileage_data_widget();
+    QWidget *mileage_data_widget();
     QWidget *engine_data_widget();
     QWidget *vehicle_data_widget(GaugeConfig cfg);
 
