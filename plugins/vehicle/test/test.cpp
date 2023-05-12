@@ -195,6 +195,25 @@ void Test::readFrame()
             if (canbus == "RX1")
             {
 
+                // Esempio RX1 04E8-460F0D18000001
+
+                if (id == "04E8")
+                {
+                    int rpm = (int)(((canMsg[2]<<8)+canMsg[3])>>2); //tachometer=((2_byte<<8)+3_byte)>>2
+                    int velocita = (int)(((canMsg[5]<<1)&0xFE)+((canMsg[6]>>7)&0x01)); //speed=((5_bytes<<1)&0xFE)+((6_bytes>>7)&0x01)
+
+                    if (velocita != velsalvata)
+                    {
+                        this->arbiter->vehicle_update_data("speed", velocita);
+                        velsalvata = velocita;
+                    }
+                    if (rpm != rpmsalvati)
+                    {
+                        this->arbiter->vehicle_update_data("rpm", rpm);
+                        rpmsalvati = rpm;
+                    }
+                }
+
                 // Esempio RX1 0206-008401
 
                 if (id == "0206")

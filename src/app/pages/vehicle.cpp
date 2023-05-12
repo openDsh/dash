@@ -14,7 +14,7 @@ GaugesConfig gauges_cfg =
   {"coolant_temp", "Temperatura Refrigerante Motore", {"°F", "°C"}, 
     {10, 16, 12}, 1, [](double x, bool si) { return si ? x : Conversion::c_to_f(x); }
   },
-  {"rpm", "Engine Revolutions Per Minute (RPM)", {"x1000rpm", "x1000rpm"}, 
+  {"rpm", "Engine Revolutions Per Minute (RPM)", {"rpm", "rpm"}, 
     {0, 24, 12}, 1, [](double x, bool _) { return x / 1000.0; }
   },
   {"speed", "Velocità", {"mph", "km/h"}, 

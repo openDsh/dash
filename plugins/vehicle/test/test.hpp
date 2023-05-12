@@ -32,6 +32,8 @@ private:
     int lumws = 0;
     int ttCool = 0;
     int kmsalvati = 0;
+    int rpmsalvati = 0;
+    int velsalvata = 0;
     SocketCANBus *bus = nullptr;
 
 signals:
