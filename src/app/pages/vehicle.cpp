@@ -15,7 +15,7 @@ GaugesConfig gauges_cfg =
     {10, 16, 12}, 1, [](double x, bool si) { return si ? x : Conversion::c_to_f(x); }
   },
   {"rpm", "Engine Revolutions Per Minute (RPM)", {"rpm", "rpm"}, 
-    {0, 24, 12}, 1, [](double x, bool _) { return x}
+    {0, 24, 12}, 1, [](double x, bool _) { return x; }
   },
   {"speed", "Velocità", {"mph", "km/h"}, 
     {0, 36, 16}, 0, [](double x, bool si) { return si ? x : Conversion::kph_to_mph(x); }
