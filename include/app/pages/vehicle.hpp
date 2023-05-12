@@ -33,10 +33,10 @@ struct GaugeConfig {
 
 // typedef QList<Gauge> Gauges;
 struct GaugesConfig {
-    GaugeConfig VOLTAGE;
+    GaugeConfig AUTONOMIA;
     GaugeConfig COOLANT_TEMP;
     GaugeConfig RPM;
-    GaugeConfig AUTONOMIA;
+    GaugeConfig SPEED;
     GaugeConfig INTAKE_TEMP;
     GaugeConfig MPG;
 };
