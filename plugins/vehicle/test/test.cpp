@@ -200,7 +200,7 @@ void Test::readFrame()
                 if (id == "04E8")
                 {
                     int rpm = (int)(((canMsg[2]<<8)+canMsg[3])>>2); //tachometer=((2_byte<<8)+3_byte)>>2
-                    int velocita = (int)(((canMsg[5]<<1)&0xFE)+((canMsg[6]>>7)&0x01)); //speed=((5_bytes<<1)&0xFE)+((6_bytes>>7)&0x01)
+                    int velocita = (int)(((canMsg[4]<<1)&0xFE)+((canMsg[5]>>7)&0x01)); //speed=((5_bytes<<1)&0xFE)+((6_bytes>>7)&0x01)
 
                     if (velocita != velsalvata)
                     {
@@ -212,6 +212,9 @@ void Test::readFrame()
                         this->arbiter->vehicle_update_data("rpm", rpm);
                         rpmsalvati = rpm;
                     }
+
+                    DASH_LOG(info) << "VELOCITA:" << QString::number(velocita).toStdString() << "\r\n";
+                    DASH_LOG(info) << "RPM:" << QString::number(rpm).toStdString() << "\r\n";
                 }
 
                 // Esempio RX1 0206-008401
