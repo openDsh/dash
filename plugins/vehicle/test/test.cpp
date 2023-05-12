@@ -201,7 +201,7 @@ void Test::readFrame()
                 {
                     if (canMsg[0] == 0x00)
                     {
-                        if (ok == true && canMsg[2] > 4)
+                        if (canMsg[2] > 4)
                         {
                             switch (canMsg[1])
                             {
@@ -294,7 +294,7 @@ void Test::readFrame()
                     if (valore_ws != lumws)
                     {
                         // DASH_LOG(info) << "NUOVA LUMINOSITA:" << QString::number(valore_ws).toStdString() << "\r\n";
-                        this->arbiter->set_brightness(luminosita_nuova);
+                        this->arbiter->set_brightness(canMsg[3]);
                         lumws = valore_ws;
                     }
                 }
