@@ -173,16 +173,19 @@ void Test::readFrame()
             QString id = linea.split(" ")[1].split("-")[0];
             QString data = linea.split(" ")[1].split("-")[1];
 
-            QStringList dataHex;
+            uint8_t canMsg[8];
 
             QString duo;
 
+            int j = 0;
+            bool ok;
             for (int i = 0; i < data.length(); i++)
             {
                 if (i % 2 == 0 && i != 0)
                 {
-                    dataHex.append(duo);
+                    canMsg[j] = duo.toUInt(&ok, 16);
                     duo = "";
+                    j++;
                 }
                 duo.append(data[i]);
             }
@@ -196,74 +199,65 @@ void Test::readFrame()
 
                 if (id == "0206")
                 {
-                    if (dataHex.at(0) == "00")
+                    if (canMsg[0] == 0x00)
                     {
-                        bool ok;
-
-                        uint temprem = dataHex[2].toUInt(&ok, 16);
-
-                        if (ok == true && temprem > 4)
+                        if (ok == true && canMsg[2] > 4)
                         {
-                            if (dataHex.at(1) == "81")
+                            switch (canMsg[1])
                             {
+                            case 0x81:
                                 this->arbiter->set_curr_page(0);
                                 // DASH_LOG(info) << "PREMUTO pulsante in alto a sinistra\r\n";
-                            }
-                            if (dataHex.at(1) == "82")
-                            {
+                                break;
+                            case 0x82:
                                 this->arbiter->set_curr_page(3);
                                 // DASH_LOG(info) << "PREMUTO Pulsante giù a sinistra\r\n";
-                            }
-                            if (dataHex.at(1) == "84")
-                            {
+                                break;
+                            case 0x84:
                                 // non usare temp
                                 DASH_LOG(info) << "PREMUTO Pulsante manopola sinistra\r\n";
-                            }
-                            if (dataHex.at(1) == "91")
-                            {
+                                break;
+                            case 0x91:
                                 this->arbiter->android_auto().handler->injectButtonPressHelper(aasdk::proto::enums::ButtonCode::MICROPHONE_1, Action::ActionState::Triggered);
                                 // DASH_LOG(info) << "PREMUTO Pulsante destro in alto (successivo)\r\n";
-                            }
-                            if (dataHex.at(1) == "92")
-                            {
+                                break;
+                            case 0x92:
                                 this->arbiter->android_auto().handler->injectButtonPressHelper(aasdk::proto::enums::ButtonCode::TOGGLE_PLAY, Action::ActionState::Triggered);
                                 // DASH_LOG(info) << "PREMUTO Pulsante in basso a destra\r\n";
+                                break;
                             }
                         }
                         else
                         {
-                            if (dataHex.at(1) == "81")
+                            switch (canMsg[1])
                             {
+                            case 0x81:
                                 // DASH_LOG(info) << "pulsante in alto a sinistra\r\n";
                                 this->arbiter->android_auto().handler->injectButtonPressHelper(aasdk::proto::enums::ButtonCode::ENTER, Action::ActionState::Triggered);
-                            }
-                            if (dataHex.at(1) == "82")
-                            {
-                                // DASH_LOG(info) << "Pulsante giù a sinistra\r\n";
+                                break;
+                            case 0x82: // DASH_LOG(info) << "Pulsante giù a sinistra\r\n";
                                 this->arbiter->set_curr_page(this->arbiter->layout().next_enabled_page(this->arbiter->layout().curr_page));
-                            }
-                            if (dataHex.at(1) == "84")
-                            {
+                                break;
+                            case 0x84:
                                 // non usare temp
                                 DASH_LOG(info) << "Pulsante manopola sinistra\r\n";
-                            }
-                            if (dataHex.at(1) == "91")
-                            {
+                                break;
+                            case 0x91:
                                 this->arbiter->android_auto().handler->injectButtonPressHelper(aasdk::proto::enums::ButtonCode::NEXT, Action::ActionState::Triggered);
                                 // DASH_LOG(info) << "Pulsante destro in alto (successivo)\r\n";
-                            }
-                            if (dataHex.at(1) == "92")
-                            {
+                                break;
+                            case 0x92:
                                 this->arbiter->android_auto().handler->injectButtonPressHelper(aasdk::proto::enums::ButtonCode::PREV, Action::ActionState::Triggered);
                                 // DASH_LOG(info) << "Pulsante in basso a destra\r\n";
+                                break;
                             }
                         }
                     }
-                    if (dataHex.at(0) == "08")
+                    if (canMsg[0] == 0x08)
                     {
-                        if (dataHex.at(1) == "83")
+                        if (canMsg[1] == 0x83)
                         {
-                            if (dataHex.at(2).at(1) == "F")
+                            if (canMsg[2] == 0xFF)
                             {
                                 this->arbiter->android_auto().handler->injectButtonPress(aasdk::proto::enums::ButtonCode::SCROLL_WHEEL, openauto::projection::WheelDirection::RIGHT);
                                 // DASH_LOG(info) << "Manopola sinistra SU\r\n";
@@ -275,9 +269,9 @@ void Test::readFrame()
                             }
                         }
 
-                        if (dataHex.at(1) == "93")
+                        if (canMsg[1] == 0x93)
                         {
-                            if (dataHex.at(2).at(1) == "F")
+                            if (canMsg[2] == 0xFF)
                             {
                                 // DASH_LOG(info) << "Manopola destra (Volume) GIU\r\n";
                                 this->arbiter->decrease_volume(10);
@@ -295,10 +289,7 @@ void Test::readFrame()
 
                 if (id == "0450")
                 {
-                    bool okk;
-
-                    uint luminosita_nuova = dataHex[3].toUInt(&okk, 16);
-                    int valore_ws = (int)(luminosita_nuova / 25.5);
+                    int valore_ws = (int)(canMsg[3] / 25.5);
 
                     if (valore_ws != lumws)
                     {
@@ -312,20 +303,15 @@ void Test::readFrame()
 
                 if (id == "04EE")
                 {
-                    bool okk;
-
-                    uint due = dataHex[1].toUInt(&okk, 16);
-                    uint tre = dataHex[2].toUInt(&okk, 16);
-                    uint quattro = dataHex[3].toUInt(&okk, 16);
                     int valore_km = 0;
 
-                    if (tre == 0x10)
+                    if (canMsg[2] == 0x10)
                     {
-                        valore_km = quattro / 2;
+                        valore_km = canMsg[3] / 2;
                     }
                     else
                     {
-                        valore_km = (int)(((tre << 8) + quattro) / 2);
+                        valore_km = (int)(((canMsg[2] << 8) + canMsg[3]) / 2);
                     }
 
                     if (valore_km != kmsalvati)
@@ -346,10 +332,8 @@ void Test::readFrame()
 
                 if (id == "0510")
                 {
-                    bool okk;
 
-                    uint exCoolant = dataHex[1].toUInt(&okk, 16);
-                    int tempCoolant = (int)(exCoolant)-40;
+                    int tempCoolant = (int)(canMsg[1]) - 40;
 
                     if (ttCool != tempCoolant)
                     {
