@@ -348,7 +348,7 @@ void Test::readFrame()
 
                 if (id == "0682")
                 {
-                    int temp = (int) canMsg[2];
+                    int temp = ((int) canMsg[2])/2-40;
 
                     if (temp != tempsalvata)
                     {
