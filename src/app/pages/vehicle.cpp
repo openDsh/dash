@@ -9,10 +9,10 @@
 GaugesConfig gauges_cfg = 
 {
   {"autonomia", "Autonomia", {"Miles", "Km"}, 
-    {10, 16, 12}, 1, [](double x, bool _) { return x; }
+    {10, 16, 12}, 0, [](double x, bool _) { return x; }
   },
   {"coolant_temp", "Temperatura Refrigerante Motore", {"°F", "°C"}, 
-    {10, 16, 12}, 1, [](double x, bool si) { return si ? x : Conversion::c_to_f(x); }
+    {10, 16, 12}, 0, [](double x, bool si) { return si ? x : Conversion::c_to_f(x); }
   },
   {"rpm", "Giri al Minuto (RPM)", {"rpm", "rpm"}, 
     {0, 24, 12}, 0, [](double x, bool _) { return x; }

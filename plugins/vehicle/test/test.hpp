@@ -30,8 +30,8 @@ private:
     Climate *climate;
     Vehicle *vehicle;
     int lumws = 0;
-    double ttCoolRX2 = 0;
-    double ttCoolRX1 = 0;
+    int ttCoolRX2 = 0;
+    int ttCoolRX1 = 0;
     int kmsalvati = 0;
     int rpmsalvati = 0;
     int velsalvata = 0;

@@ -363,7 +363,7 @@ void Test::readFrame()
                 if (id == "04EC")
                 {
 
-                    double tempCoolant = ((double)canMsg[2]) - 40;
+                    int tempCoolant = ((int)canMsg[2]) - 40;
 
                     if (ttCoolRX1 != tempCoolant)
                     {
@@ -384,7 +384,7 @@ void Test::readFrame()
                 if (id == "0510")
                 {
 
-                    double tempCoolant = ((double)canMsg[1]) - 40;
+                    int tempCoolant = ((int)canMsg[1]) - 40;
 
                     if (ttCoolRX2 != tempCoolant)
                     {
