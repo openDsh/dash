@@ -243,7 +243,7 @@ DataTab::DataTab(Arbiter &arbiter, QWidget *parent)
     sp_right.setHorizontalStretch(2);
     engine_data->setSizePolicy(sp_right);
 
-    connect(&this->arbiter, &Arbiter::vehicle_update_data, [this](QString gauge_id, int value){
+    connect(&this->arbiter, &Arbiter::vehicle_update_data, [this](QString gauge_id, double value){
         // DASH_LOG(info)<<"[Gauges] arbiter update: "<<qPrintable(gauge_id)<<" to "<< std::to_string(value);
         for (auto &gauge : this->gauges) {
             if(gauge->get_id() == gauge_id){
