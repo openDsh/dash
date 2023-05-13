@@ -375,7 +375,6 @@ void Test::readFrame()
                         case 0x50: // fan set. canMsg[3] = canMsg[4] = ascii
                             fanAC = canMsg[3] - 0x30;
                             this->climate->fan_speed(fanAC);
-                            DASH_LOG(info) << "VENTOLE:" << QString::number(fanAC).toStdString() << "\r\n";
                             break;
                         }
                         break;
