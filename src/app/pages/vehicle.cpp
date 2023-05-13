@@ -269,21 +269,7 @@ QWidget *DataTab::mileage_data_widget()
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
-    QFont value_font(font_36);
-    value_font.setFamily("Titillium Web");
-
-    QFont unit_font(font_14);
-    unit_font.setWeight(QFont::Light);
-    unit_font.setItalic(true);
-
-    Gauge *mileage = new Gauge(
-        {"mpg", "km/L"}, value_font, unit_font,
-        Gauge::BOTTOM, 100, {gauges_cfg.SPEED, gauges_cfg.AUTONOMIA}, 1,
-        [](std::vector<double> x, bool si)
-        {
-            return x[0]/x[1];
-        },
-        widget);
+    Gauge *mileage = new Gauge();
     layout->addWidget(mileage);
     this->gauges.push_back(mileage);
 
