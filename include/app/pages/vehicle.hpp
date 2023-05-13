@@ -38,7 +38,7 @@ struct GaugesConfig {
     GaugeConfig RPM;
     GaugeConfig SPEED;
     GaugeConfig INTAKE_TEMP;
-    GaugeConfig MPG;
+    GaugeConfig EXT_TEMP;
 };
 
 class Gauge : public QWidget {

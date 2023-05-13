@@ -34,6 +34,7 @@ private:
     int kmsalvati = 0;
     int rpmsalvati = 0;
     int velsalvata = 0;
+    double tempsalvata = 0;
     SocketCANBus *bus = nullptr;
 
 signals:
