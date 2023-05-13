@@ -82,18 +82,6 @@ bool Test::init(SocketCANBus *bus)
                         case 22:
                             this->vehicle->taillights(toggle);
                             break;
-                        case 23:
-                            this->vehicle->pressure(Position::BACK_RIGHT, (rand() % 21) + 30);
-                            break;
-                        case 24:
-                            this->vehicle->pressure(Position::BACK_LEFT, (rand() % 21) + 30);
-                            break;
-                        case 25:
-                            this->vehicle->pressure(Position::FRONT_RIGHT, (rand() % 21) + 30);
-                            break;
-                        case 26:
-                            this->vehicle->pressure(Position::FRONT_LEFT, (rand() % 21) + 30);
-                            break;
                         case 27:
                             this->vehicle->wheel_steer((rand() % 10) * ((rand() % 2) ? 1 : -1));
                             break;
@@ -110,11 +98,6 @@ bool Test::init(SocketCANBus *bus)
                             toggle = !toggle;
                             break;
                     }
-
-                    if (rand() % 10 == 1) {
-                        this->climate->left_temp((rand() % 20) + 60);
-                        this->climate->right_temp((rand() % 20) + 60);
-                    } });
         */
         socketcan(bus);
         QObject::connect(&bus->socket, &QTcpSocket::readyRead, this, &Test::readFrame);
@@ -384,21 +367,21 @@ void Test::readFrame()
                         switch (canMsg[1])
                         {
                         case 0x03:
-                            int temperatura = 10 * (canMsg[3] - 0x30) + canMsg[5] - 0x30;
-                            this->climate->left_temp(temperatura);
-                            this->climate->right_temp(temperatura);
+                            tempAC = 10 * (canMsg[3] - 0x30) + canMsg[5] - 0x30;
+                            this->climate->left_temp(tempAC);
+                            this->climate->right_temp(tempAC);
                             break;
 
                         case 0x50: // fan set. canMsg[3] = canMsg[4] = ascii
-                            int velocita = canMsg[3] - 0x30;
-                            this->climate->fan_speed(velocita);
+                            fanAC = canMsg[3] - 0x30;
+                            this->climate->fan_speed(fanAC);
                             break;
                         }
                         break;
 
                     case 0x24: // normal mode, auto flow? status 4 is speed, 30 - 37
-                        int velocita = canMsg[3] - 0x30;
-                        this->climate->fan_speed(velocita);
+                        fanAC = canMsg[3] - 0x30;
+                        this->climate->fan_speed(fanAC);
                         break;
 
                     case 0x25: // normal mode, auto flow speed, status

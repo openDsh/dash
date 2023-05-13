@@ -30,6 +30,8 @@ private:
     Climate *climate;
     Vehicle *vehicle;
     int lumws = 0;
+    int tempAC = 0;
+    int fanAC = 0;
     int ttCoolRX2 = 0;
     int ttCoolRX1 = 0;
     int kmsalvati = 0;
