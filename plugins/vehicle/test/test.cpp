@@ -367,7 +367,7 @@ void Test::readFrame()
                         switch (canMsg[1])
                         {
                         case 0x03:
-                            tempAC = 10 * (canMsg[3] - 0x30) + canMsg[5] - 0x30;
+                            tempAC = 10 * (canMsg[3] - 0x30) + (canMsg[5] - 0x30);
                             this->climate->left_temp(tempAC);
                             this->climate->right_temp(tempAC);
                             break;
@@ -375,13 +375,15 @@ void Test::readFrame()
                         case 0x50: // fan set. canMsg[3] = canMsg[4] = ascii
                             fanAC = canMsg[3] - 0x30;
                             this->climate->fan_speed(fanAC);
-                            break;
+                            DASH_LOG(info) << "VENTOLE:" << QString::number(fanAC).toStdString() << "\r\n";
+                            F break;
                         }
                         break;
 
                     case 0x24: // normal mode, auto flow? status 4 is speed, 30 - 37
-                        fanAC = canMsg[3] - 0x30;
-                        this->climate->fan_speed(fanAC);
+                        /*fanAC = canMsg[3] - 0x30;
+                        DASH_LOG(info) << "VENTOLE:" << QString::number(fanAC).toStdString() << "\r\n";
+                        this->climate->fan_speed(fanAC);*/
                         break;
 
                     case 0x25: // normal mode, auto flow speed, status
