@@ -177,6 +177,8 @@ void Test::readFrame()
                     {
                         premuto = true;
 
+                        DASH_LOG(info) << "STATO PREMUTO " << premuto <<"\r\n";
+
                         switch (canMsg[1])
                         {
                         case 0x81:
