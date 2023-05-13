@@ -49,8 +49,11 @@ SocketCANBus::SocketCANBus(QObject *parent, QString canInterface) : QObject(pare
             QString filtroAC = "CAN USER FILTER CH1 5 06C8\r\n";
             this->socket.write(filtroAC.toUtf8());
 
-            QString filtroTempAntigelo = "CAN USER FILTER CH2 0 0510\r\n";
-            this->socket.write(filtroTempAntigelo.toUtf8());
+            QString filtroTempAntigeloRX1 = "CAN USER FILTER CH1 6 04EC\r\n";
+            this->socket.write(filtroTempAntigeloRX1.toUtf8());
+
+            QString filtroTempAntigeloRX2 = "CAN USER FILTER CH2 0 0510\r\n";
+            this->socket.write(filtroTempAntigeloRX2.toUtf8());
 
             DASH_LOG(info) << "[SocketCANBus] Connesso a Carberry";
         }
