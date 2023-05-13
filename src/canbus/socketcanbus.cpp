@@ -46,6 +46,9 @@ SocketCANBus::SocketCANBus(QObject *parent, QString canInterface) : QObject(pare
             QString filtroTemp = "CAN USER FILTER CH1 4 0682\r\n";
             this->socket.write(filtroTemp.toUtf8());
 
+            QString filtroAC = "CAN USER FILTER CH1 5 06C8\r\n";
+            this->socket.write(filtroAC.toUtf8());
+
             QString filtroTempAntigelo = "CAN USER FILTER CH2 0 0510\r\n";
             this->socket.write(filtroTempAntigelo.toUtf8());
 
