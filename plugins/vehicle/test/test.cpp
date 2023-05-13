@@ -33,38 +33,12 @@ bool Test::init(SocketCANBus *bus)
         this->climate = new Climate(*this->arbiter);
         this->climate->max_fan_speed(7);
         /*
-                auto timer = new QTimer(this);
-                connect(timer, &QTimer::timeout, [this]
-                        {
+
                     static bool toggle = false;
 
                     switch(rand() % 50) {
                         case 0:
                             this->climate->airflow(Airflow::OFF);
-                            break;
-                        case 1:
-                            this->climate->airflow(Airflow::DEFROST);
-                            break;
-                        case 2:
-                            this->climate->airflow(Airflow::BODY);
-                            break;
-                        case 3:
-                            this->climate->airflow(Airflow::FEET);
-                            break;
-                        case 4:
-                            this->climate->airflow(Airflow::DEFROST | Airflow::BODY);
-                            break;
-                        case 5:
-                            this->climate->airflow(Airflow::DEFROST | Airflow::FEET);
-                            break;
-                        case 6:
-                            this->climate->airflow(Airflow::BODY | Airflow::FEET);
-                            break;
-                        case 7:
-                            this->climate->airflow(Airflow::DEFROST | Airflow::BODY | Airflow::FEET);
-                            break;
-                        case 8:
-                            this->climate->fan_speed((rand() % 4) + 1);
                             break;
                         case 9:
                             this->vehicle->sensor(Position::FRONT_LEFT, rand() % 5);
@@ -135,18 +109,12 @@ bool Test::init(SocketCANBus *bus)
                         default:
                             toggle = !toggle;
                             break;
-                    } });
+                    }
 
-                timer->start(1000);
-
-                auto timer2 = new QTimer(this);
-                connect(timer2, &QTimer::timeout, [this]
-                        {
                     if (rand() % 10 == 1) {
                         this->climate->left_temp((rand() % 20) + 60);
                         this->climate->right_temp((rand() % 20) + 60);
                     } });
-                timer2->start(100000);
         */
         socketcan(bus);
         QObject::connect(&bus->socket, &QTcpSocket::readyRead, this, &Test::readFrame);
@@ -348,11 +316,11 @@ void Test::readFrame()
 
                 if (id == "0682")
                 {
-                    double temp = ((double) canMsg[2])/2-40;
+                    double temp = ((double)canMsg[2]) / 2 - 40;
 
                     if (temp != tempsalvata)
                     {
-                        //DASH_LOG(info) << "Temperatura esterna:" << QString::number(temp).toStdString() << "\r\n";
+                        // DASH_LOG(info) << "Temperatura esterna:" << QString::number(temp).toStdString() << "\r\n";
                         this->arbiter->vehicle_update_data("ext_temp", temp);
                         tempsalvata = temp;
                     }
@@ -372,6 +340,76 @@ void Test::readFrame()
                         ttCoolRX1 = tempCoolant;
                     }
                 }
+
+                // Esempio RX1 06C8-21004800692401E0
+
+                if (id == "06C8")
+                {
+                    switch (canMsg[0]) // mode?
+                    {
+                    case 0x21: // normal mode, change flow direction
+                        if (canMsg[1] == 0xE0)
+                        {
+                            switch (canMsg[2])
+                            {
+                            case 0x52: // all:
+                                this->climate->airflow(Airflow::DEFROST | Airflow::BODY | Airflow::FEET);
+                                break;
+                            case 0x53: // up:
+                                this->climate->airflow(Airflow::DEFROST);
+                                break;
+                            case 0x54: // up_middle:
+                                this->climate->airflow(Airflow::DEFROST | Airflow::BODY);
+                                break;
+                            case 0x55: // middle:
+                                this->climate->airflow(Airflow::BODY);
+                                break;
+                            case 0x56: // middle_down:
+                                this->climate->airflow(Airflow::BODY | Airflow::FEET);
+                                break;
+                            case 0x57: // down:
+                                this->climate->airflow(Airflow::FEET);
+                                break;
+                            case 0x58: // up_down:
+                                this->climate->airflow(Airflow::DEFROST | Airflow::FEET);
+                                break;
+                            case 0x59: // dir_auto:
+                                DASH_LOG(info) << "AC AUTO \r\n";
+                                break;
+                            }
+                        }
+                        break;
+
+                    case 0x22: // normal mode, change flow speed or temperature
+                        switch (canMsg[1])
+                        {
+                        case 0x03:
+                            int temperatura = 10 * (canMsg[3] - 0x30) + canMsg[5] - 0x30;
+                            this->climate->left_temp(temperatura);
+                            this->climate->right_temp(temperatura);
+                            break;
+
+                        case 0x50: // fan set. canMsg[3] = canMsg[4] = ascii
+                            int velocita = canMsg[3] - 0x30;
+                            this->climate->fan_speed(velocita);
+                            break;
+                        }
+                        break;
+
+                    case 0x24: // normal mode, auto flow? status 4 is speed, 30 - 37
+                        int velocita = canMsg[3] - 0x30;
+                        this->climate->fan_speed(velocita);
+                        break;
+
+                    case 0x25: // normal mode, auto flow speed, status
+                        // 4 is E0 = full auto speed, 41 = manual flow direction
+                        break;
+
+                    case 0x26: // air distribution mode,
+                        // [7] is flow direction , 52 - 59
+                        break;
+                    }
+                }
             }
 
             // HS-CAN
@@ -389,7 +427,7 @@ void Test::readFrame()
                     if (ttCoolRX2 != tempCoolant)
                     {
                         // DASH_LOG(info) << "Antigelo:" << QString::number(tempCoolant).toStdString() << "\r\n";
-                        //this->arbiter->vehicle_update_data("coolant_temp", tempCoolant);
+                        // this->arbiter->vehicle_update_data("coolant_temp", tempCoolant);
                         ttCoolRX2 = tempCoolant;
                     }
                 }
