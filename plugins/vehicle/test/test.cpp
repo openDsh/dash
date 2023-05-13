@@ -352,6 +352,7 @@ void Test::readFrame()
 
                     if (temp != tempsalvata)
                     {
+                        DASH_LOG(info) << "Temperatura esterna:" << QString::number(temp).toStdString() << "\r\n";
                         this->arbiter->vehicle_update_data("ext_temp", temp);
                         tempsalvata = temp;
                     }
