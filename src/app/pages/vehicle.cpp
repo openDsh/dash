@@ -269,9 +269,6 @@ QWidget *DataTab::mileage_data_widget()
     QWidget *widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(widget);
 
-    Gauge *mileage = new Gauge();
-    layout->addWidget(mileage);
-    this->gauges.push_back(mileage);
 
     return widget;
 }
