@@ -38,6 +38,7 @@ private:
     int rpmsalvati = 0;
     int velsalvata = 0;
     double tempsalvata = 0;
+    bool premuto = false;
     SocketCANBus *bus = nullptr;
 
 signals:

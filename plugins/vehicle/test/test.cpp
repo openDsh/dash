@@ -172,60 +172,66 @@ void Test::readFrame()
 
                 if (id == "0206")
                 {
-                    if (canMsg[0] == 0x00)
+
+                    if (canMsg[0] == 0x01 && canMsg[2] > 4 && premuto == false)
                     {
-                        if (canMsg[2] > 4)
+                        switch (canMsg[1])
                         {
-                            switch (canMsg[1])
-                            {
-                            case 0x81:
-                                this->arbiter->set_curr_page(0);
-                                // DASH_LOG(info) << "PREMUTO pulsante in alto a sinistra\r\n";
-                                break;
-                            case 0x82:
-                                this->arbiter->set_curr_page(3);
-                                // DASH_LOG(info) << "PREMUTO Pulsante giù a sinistra\r\n";
-                                break;
-                            case 0x84:
-                                // non usare temp
-                                DASH_LOG(info) << "PREMUTO Pulsante manopola sinistra\r\n";
-                                break;
-                            case 0x91:
-                                this->arbiter->android_auto().handler->injectButtonPressHelper(aasdk::proto::enums::ButtonCode::MICROPHONE_1, Action::ActionState::Triggered);
-                                // DASH_LOG(info) << "PREMUTO Pulsante destro in alto (successivo)\r\n";
-                                break;
-                            case 0x92:
-                                this->arbiter->android_auto().handler->injectButtonPressHelper(aasdk::proto::enums::ButtonCode::TOGGLE_PLAY, Action::ActionState::Triggered);
-                                // DASH_LOG(info) << "PREMUTO Pulsante in basso a destra\r\n";
-                                break;
-                            }
+                        case 0x81:
+                            this->arbiter->set_curr_page(0);
+                            // DASH_LOG(info) << "PREMUTO pulsante in alto a sinistra\r\n";
+                            break;
+                        case 0x82:
+                            this->arbiter->set_curr_page(3);
+                            // DASH_LOG(info) << "PREMUTO Pulsante giù a sinistra\r\n";
+                            break;
+                        case 0x84:
+                            // non usare temp
+                            DASH_LOG(info) << "PREMUTO Pulsante manopola sinistra\r\n";
+                            break;
+                        case 0x91:
+                            this->arbiter->android_auto().handler->injectButtonPressHelper(aasdk::proto::enums::ButtonCode::MICROPHONE_1, Action::ActionState::Triggered);
+                            // DASH_LOG(info) << "PREMUTO Pulsante destro in alto (successivo)\r\n";
+                            break;
+                        case 0x92:
+                            this->arbiter->android_auto().handler->injectButtonPressHelper(aasdk::proto::enums::ButtonCode::TOGGLE_PLAY, Action::ActionState::Triggered);
+                            // DASH_LOG(info) << "PREMUTO Pulsante in basso a destra\r\n";
+                            break;
                         }
-                        else
+                        premuto = true;
+                    }
+
+                    if (canMsg[0] == 0x00 && premuto == false)
+                    {
+                        switch (canMsg[1])
                         {
-                            switch (canMsg[1])
-                            {
-                            case 0x81:
-                                // DASH_LOG(info) << "pulsante in alto a sinistra\r\n";
-                                this->arbiter->android_auto().handler->injectButtonPressHelper(aasdk::proto::enums::ButtonCode::ENTER, Action::ActionState::Triggered);
-                                break;
-                            case 0x82: // DASH_LOG(info) << "Pulsante giù a sinistra\r\n";
-                                this->arbiter->set_curr_page(this->arbiter->layout().next_enabled_page(this->arbiter->layout().curr_page));
-                                break;
-                            case 0x84:
-                                // non usare temp
-                                DASH_LOG(info) << "Pulsante manopola sinistra\r\n";
-                                break;
-                            case 0x91:
-                                this->arbiter->android_auto().handler->injectButtonPressHelper(aasdk::proto::enums::ButtonCode::NEXT, Action::ActionState::Triggered);
-                                // DASH_LOG(info) << "Pulsante destro in alto (successivo)\r\n";
-                                break;
-                            case 0x92:
-                                this->arbiter->android_auto().handler->injectButtonPressHelper(aasdk::proto::enums::ButtonCode::PREV, Action::ActionState::Triggered);
-                                // DASH_LOG(info) << "Pulsante in basso a destra\r\n";
-                                break;
-                            }
+                        case 0x81:
+                            // DASH_LOG(info) << "pulsante in alto a sinistra\r\n";
+                            this->arbiter->android_auto().handler->injectButtonPressHelper(aasdk::proto::enums::ButtonCode::ENTER, Action::ActionState::Triggered);
+                            break;
+                        case 0x82: // DASH_LOG(info) << "Pulsante giù a sinistra\r\n";
+                            this->arbiter->set_curr_page(this->arbiter->layout().next_enabled_page(this->arbiter->layout().curr_page));
+                            break;
+                        case 0x84:
+                            // non usare temp
+                            DASH_LOG(info) << "Pulsante manopola sinistra\r\n";
+                            break;
+                        case 0x91:
+                            this->arbiter->android_auto().handler->injectButtonPressHelper(aasdk::proto::enums::ButtonCode::NEXT, Action::ActionState::Triggered);
+                            // DASH_LOG(info) << "Pulsante destro in alto (successivo)\r\n";
+                            break;
+                        case 0x92:
+                            this->arbiter->android_auto().handler->injectButtonPressHelper(aasdk::proto::enums::ButtonCode::PREV, Action::ActionState::Triggered);
+                            // DASH_LOG(info) << "Pulsante in basso a destra\r\n";
+                            break;
                         }
                     }
+                    else
+                    {
+                        if (premuto)
+                            premuto = false;
+                    }
+                    
                     if (canMsg[0] == 0x08)
                     {
                         if (canMsg[1] == 0x83)
