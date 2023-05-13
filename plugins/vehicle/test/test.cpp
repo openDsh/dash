@@ -348,12 +348,27 @@ void Test::readFrame()
 
                 if (id == "0682")
                 {
-                    int temp = ((int) canMsg[2])/2-40;
+                    double temp = ((double) canMsg[2])/2-40;
 
                     if (temp != tempsalvata)
                     {
                         this->arbiter->vehicle_update_data("ext_temp", temp);
                         tempsalvata = temp;
+                    }
+                }
+
+                // Esempio RX1 04EC-46075A2C00
+
+                if (id == "04EC")
+                {
+
+                    double tempCoolant = ((double)canMsg[2]) - 40;
+
+                    if (ttCoolRX1 != tempCoolant)
+                    {
+                        // DASH_LOG(info) << "Antigelo:" << QString::number(tempCoolant).toStdString() << "\r\n";
+                        this->arbiter->vehicle_update_data("coolant_temp", tempCoolant);
+                        ttCoolRX1 = tempCoolant;
                     }
                 }
             }
@@ -368,13 +383,13 @@ void Test::readFrame()
                 if (id == "0510")
                 {
 
-                    int tempCoolant = (int)(canMsg[1]) - 40;
+                    double tempCoolant = ((double)canMsg[1]) - 40;
 
-                    if (ttCool != tempCoolant)
+                    if (ttCoolRX2 != tempCoolant)
                     {
                         // DASH_LOG(info) << "Antigelo:" << QString::number(tempCoolant).toStdString() << "\r\n";
-                        this->arbiter->vehicle_update_data("coolant_temp", tempCoolant);
-                        ttCool = tempCoolant;
+                        //this->arbiter->vehicle_update_data("coolant_temp", tempCoolant);
+                        ttCoolRX2 = tempCoolant;
                     }
                 }
             }
