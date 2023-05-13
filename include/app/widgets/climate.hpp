@@ -13,7 +13,9 @@ enum Airflow : uint8_t
     OFF = 0,
     DEFROST = (1 << 0),
     BODY = (1 << 1),
-    FEET = (1 << 2)
+    FEET = (1 << 2),
+    RECIRCULATE = (1 << 3),
+    AC = (1 << 4)
 };
 
 class ClimateSnackBar : public SnackBar {
