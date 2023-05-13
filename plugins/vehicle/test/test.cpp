@@ -175,6 +175,8 @@ void Test::readFrame()
 
                     if (canMsg[0] == 0x01 && canMsg[2] > 4 && premuto == false)
                     {
+                        premuto = true;
+
                         switch (canMsg[1])
                         {
                         case 0x81:
@@ -198,7 +200,6 @@ void Test::readFrame()
                             // DASH_LOG(info) << "PREMUTO Pulsante in basso a destra\r\n";
                             break;
                         }
-                        premuto = true;
                     }
 
                     if (canMsg[0] == 0x00 && premuto == false)
@@ -231,7 +232,7 @@ void Test::readFrame()
                         if (premuto)
                             premuto = false;
                     }
-                    
+
                     if (canMsg[0] == 0x08)
                     {
                         if (canMsg[1] == 0x83)
