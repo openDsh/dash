@@ -68,7 +68,7 @@ Gauge::Gauge(GaugeConfig cfg, QFont value_font, QFont unit_font, Gauge::Orientat
     layout->addStretch(4);
 }
 
-void Gauge::set_value(int value){
+void Gauge::set_value(double value){
     DASH_LOG(debug)<<"[Gauges] set_value: "<<std::to_string(value);
     value_label->setText(this->format_value(this->converter(value, this->si)));
 }

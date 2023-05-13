@@ -50,7 +50,7 @@ class Gauge : public QWidget {
     Gauge(GaugeConfig cfg, QFont value_font, QFont unit_font, Orientation orientation, QWidget *parent = nullptr);
 
     inline QString get_id() { return this->id; };
-    void set_value(int value);
+    void set_value(double value);
 
    private:
     QString format_value(double value);
