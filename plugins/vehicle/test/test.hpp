@@ -5,6 +5,7 @@
 #include "plugins/vehicle_plugin.hpp"
 #include "app/widgets/climate.hpp"
 #include "app/widgets/vehicle.hpp"
+#include "app/widgets/obd.hpp"
 #include "canbus/socketcanbus.hpp"
 #include "app/arbiter.hpp"
 
