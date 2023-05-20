@@ -21,7 +21,7 @@ QList<QWidget *> Test::widgets()
     if (this->vehicle)
         tabs.append(this->vehicle);
     //if (this->obd)
-        //tabs.append(this->obd);
+        tabs.append(this->obd);
     return tabs;
 }
 
