@@ -30,6 +30,7 @@ public:
 private:
     Climate *climate;
     Vehicle *vehicle;
+    Obd *obd;
     int lumws = 0;
     int tempAC = 0;
     int fanAC = 0;
