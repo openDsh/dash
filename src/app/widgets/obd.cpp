@@ -8,8 +8,8 @@ Obd::Obd(Arbiter &arbiter, QWidget *parent) : QWidget(parent)
 {
     this->setObjectName("OBD");
 
-    auto *layout = new QHBoxLayout(this);
-    layout->setContentsMargins(0, 0, 0, 0);
+    //auto *layout = new QHBoxLayout(this);
+    //layout->setContentsMargins(0, 0, 0, 0);
     //layout->addWidget(this->Obd, 0, Qt::AlignHCenter);
 
 }

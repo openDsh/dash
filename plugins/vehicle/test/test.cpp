@@ -11,8 +11,8 @@ Test::~Test()
         delete this->climate;
     if (this->vehicle)
         delete this->vehicle;
-    if (this->obd)
-        delete this->obd;
+    //if (this->obd)
+      //  delete this->obd;
 }
 
 QList<QWidget *> Test::widgets()
