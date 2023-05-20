@@ -12,7 +12,7 @@ Test::~Test()
     if (this->vehicle)
         delete this->vehicle;
     //if (this->obd)
-      //  delete this->obd;
+        //delete this->obd;
 }
 
 QList<QWidget *> Test::widgets()
@@ -20,8 +20,8 @@ QList<QWidget *> Test::widgets()
     QList<QWidget *> tabs;
     if (this->vehicle)
         tabs.append(this->vehicle);
-    if (this->obd)
-        tabs.append(this->obd);
+    //if (this->obd)
+        //tabs.append(this->obd);
     return tabs;
 }
 
