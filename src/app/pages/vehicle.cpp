@@ -100,7 +100,7 @@ VehiclePage::VehiclePage(Arbiter &arbiter, QWidget *parent)
 
 void VehiclePage::init()
 {
-    this->addTab(new DataTab(this->arbiter, this), "Data");
+    this->addTab(new DataTab(this->arbiter, this), "Da&wta");
     this->config = Config::get_instance();
 
     for (auto device : QCanBus::instance()->availableDevices("socketcan"))
