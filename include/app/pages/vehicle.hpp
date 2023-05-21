@@ -97,6 +97,7 @@ class DataTab : public QWidget {
 
    public:
     DataTab(Arbiter &arbiter, QWidget *parent = nullptr);
+    QWidget *obd;
 
    private:
     Arbiter &arbiter;

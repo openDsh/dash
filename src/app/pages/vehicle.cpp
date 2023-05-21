@@ -100,7 +100,8 @@ VehiclePage::VehiclePage(Arbiter &arbiter, QWidget *parent)
 
 void VehiclePage::init()
 {
-    this->addTab(new DataTab(this->arbiter, this), "Da&wta");
+    this->addTab(new DataTab(this->arbiter, this), "Data");
+    this->addTab(obd, "OBD");
     this->config = Config::get_instance();
 
     for (auto device : QCanBus::instance()->availableDevices("socketcan"))
@@ -228,6 +229,7 @@ DataTab::DataTab(Arbiter &arbiter, QWidget *parent)
     , arbiter(arbiter)
 {
     QHBoxLayout *layout = new QHBoxLayout(this);
+    QHBoxLayout *layout_obd = new QHBoxLayout(obd);
 
     QWidget *driving_data = this->speedo_tach_widget();
     layout->addWidget(driving_data);
