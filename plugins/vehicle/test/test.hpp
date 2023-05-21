@@ -5,7 +5,6 @@
 #include "plugins/vehicle_plugin.hpp"
 #include "app/widgets/climate.hpp"
 #include "app/widgets/vehicle.hpp"
-#include "app/widgets/obd.hpp"
 #include "canbus/socketcanbus.hpp"
 #include "app/arbiter.hpp"
 
@@ -30,7 +29,6 @@ public:
 private:
     Climate *climate;
     Vehicle *vehicle;
-    Obd *obd;
     int lumws = 0;
     int tempAC = 0;
     int fanAC = 0;
