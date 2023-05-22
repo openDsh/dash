@@ -13,7 +13,6 @@
 #include "app/pages/page.hpp"
 
 class Arbiter;
-QWidget *obd;
 
 typedef QPair<QString, QString> units_t;
 struct font_size_t {
@@ -74,6 +73,7 @@ class VehiclePage : public QTabWidget, public Page {
 
    public:
     VehiclePage(Arbiter &arbiter, QWidget *parent = nullptr);
+    QWidget *obd;
 
     void init() override;
 

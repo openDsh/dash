@@ -293,6 +293,27 @@ QWidget *DataTab::engine_data_widget()
     return widget;
 }
 
+QWidget *DataTab::obd_data_widget()
+{
+    QVBoxLayout *layout = new QVBoxLayout(obd);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setSpacing(0);
+
+    layout->addStretch();
+    layout->addWidget(this->vehicle_data_widget(gauges_cfg.COOLANT_TEMP));
+    layout->addStretch();
+    layout->addWidget(Session::Forge::br());
+    layout->addStretch();
+    layout->addWidget(this->vehicle_data_widget(gauges_cfg.AUTONOMIA));
+    layout->addStretch();
+    layout->addWidget(Session::Forge::br());
+    layout->addStretch();
+    layout->addWidget(this->vehicle_data_widget(gauges_cfg.EXT_TEMP));
+    layout->addStretch();
+
+    return widget;
+}
+
 QWidget *DataTab::vehicle_data_widget(GaugeConfig cfg)
 {
     QWidget *widget = new QWidget(this);
