@@ -107,3 +107,13 @@ class DataTab : public QWidget {
 
     std::vector<Gauge *> gauges;
 };
+
+class ObdTab : public QWidget {
+    Q_OBJECT
+
+   public:
+    ObdTab(Arbiter &arbiter, QWidget *parent = nullptr);
+
+   private:
+    Arbiter &arbiter;
+};

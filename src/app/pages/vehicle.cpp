@@ -28,6 +28,16 @@ GaugesConfig gauges_cfg =
   }
 };
 
+ObdTab::ObdTab(Arbiter &arbiter, QWidget *parent)
+    : QWidget(parent)
+    , arbiter(arbiter)
+{
+    QVBoxLayout *layout = new QVBoxLayout(this);
+
+    //layout->addWidget(this->track_widget());
+    //layout->addWidget(this->controls_widget());
+}
+
 Gauge::Gauge(GaugeConfig cfg, QFont value_font, QFont unit_font, Gauge::Orientation orientation, QWidget *parent)
 : QWidget(parent)
 {
@@ -101,7 +111,7 @@ VehiclePage::VehiclePage(Arbiter &arbiter, QWidget *parent)
 void VehiclePage::init()
 {
     this->addTab(new DataTab(this->arbiter, this), "Data");
-    this->addTab(obd, "OBD");
+    this->addTab(new ObdTab(this->arbiter, this), "OBD");
     this->config = Config::get_instance();
 
     for (auto device : QCanBus::instance()->availableDevices("socketcan"))
@@ -229,7 +239,6 @@ DataTab::DataTab(Arbiter &arbiter, QWidget *parent)
     , arbiter(arbiter)
 {
     QHBoxLayout *layout = new QHBoxLayout(this);
-    QHBoxLayout *layout_obd = new QHBoxLayout(obd);
 
     QWidget *driving_data = this->speedo_tach_widget();
     layout->addWidget(driving_data);
