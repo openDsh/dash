@@ -38,16 +38,16 @@ ObdTab::ObdTab(Arbiter &arbiter, QWidget *parent)
 
     QHBoxLayout *layout = new QHBoxLayout(this);
 
-    QWidget *driving_data = this->speedo_tach_widget();
-    layout->addWidget(driving_data);
-    layout->addWidget(Session::Forge::br(true));
+    //QWidget *driving_data = this->speedo_tach_widget();
+    //layout->addWidget(driving_data);
+    //layout->addWidget(Session::Forge::br(true));
 
     QWidget *obd_data = this->obd_data_widget();
     layout->addWidget(obd_data);
 
-    QSizePolicy sp_left(QSizePolicy::Preferred, QSizePolicy::Preferred);
-    sp_left.setHorizontalStretch(5);
-    driving_data->setSizePolicy(sp_left);
+    //QSizePolicy sp_left(QSizePolicy::Preferred, QSizePolicy::Preferred);
+    //sp_left.setHorizontalStretch(5);
+    //driving_data->setSizePolicy(sp_left);
     QSizePolicy sp_right(QSizePolicy::Preferred, QSizePolicy::Preferred);
     sp_right.setHorizontalStretch(2);
     obd_data->setSizePolicy(sp_right);
@@ -317,14 +317,14 @@ QWidget *DataTab::engine_data_widget()
     return widget;
 }
 
-QWidget *DataTab::obd_data_widget()
+QWidget *ObdTab::obd_data_widget()
 {
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
 
     layout->addStretch();
-    layout->addWidget(this->vehicle_data_widget(gauges_cfg.EXT_TEMP));
+    layout->addWidget(DataTab->vehicle_data_widget(gauges_cfg.EXT_TEMP));
     layout->addStretch();
     //layout->addWidget(Session::Forge::br());
 

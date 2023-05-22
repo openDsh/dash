@@ -116,4 +116,5 @@ class ObdTab : public QWidget {
 
    private:
     Arbiter &arbiter;
+    QWidget *obd_data_widget();
 };
