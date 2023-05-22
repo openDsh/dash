@@ -32,10 +32,6 @@ ObdTab::ObdTab(Arbiter &arbiter, QWidget *parent)
     : QWidget(parent)
     , arbiter(arbiter)
 {
-    //QVBoxLayout *layout = new QVBoxLayout(this);
-    //layout->addWidget(this->track_widget());
-    //layout->addWidget(this->controls_widget());
-
     QHBoxLayout *layout = new QHBoxLayout(this);
 
     //QWidget *driving_data = this->speedo_tach_widget();
@@ -51,6 +47,16 @@ ObdTab::ObdTab(Arbiter &arbiter, QWidget *parent)
     QSizePolicy sp_right(QSizePolicy::Preferred, QSizePolicy::Preferred);
     sp_right.setHorizontalStretch(2);
     obd_data->setSizePolicy(sp_right);
+
+    connect(&this->arbiter, &Arbiter::vehicle_update_data, [this](QString gauge_id, double value){
+        // DASH_LOG(info)<<"[Gauges] arbiter update: "<<qPrintable(gauge_id)<<" to "<< std::to_string(value);
+        for (auto &gauge : this->gauges) {
+            if(gauge->get_id() == gauge_id){
+                // DASH_LOG(info)<<"[Gauges] Found: "<<gauge->get_id();
+                gauge->set_value(value);
+            }
+        }
+    });
 }
 
 Gauge::Gauge(GaugeConfig cfg, QFont value_font, QFont unit_font, Gauge::Orientation orientation, QWidget *parent)
