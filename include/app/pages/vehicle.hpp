@@ -117,4 +117,8 @@ class ObdTab : public QWidget {
    private:
     Arbiter &arbiter;
     QWidget *obd_data_widget();
+    QWidget *vehicle_data_widget(GaugeConfig cfg);
+
+    std::vector<Gauge *> gauges;
+
 };

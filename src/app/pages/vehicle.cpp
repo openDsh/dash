@@ -319,12 +319,13 @@ QWidget *DataTab::engine_data_widget()
 
 QWidget *ObdTab::obd_data_widget()
 {
-    QVBoxLayout *layout = new QVBoxLayout(this);
+    QWidget *widget = new QWidget(this);
+    QVBoxLayout *layout = new QVBoxLayout(widget);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
 
     layout->addStretch();
-    layout->addWidget(DataTab->vehicle_data_widget(gauges_cfg.EXT_TEMP));
+    layout->addWidget(this->vehicle_data_widget(gauges_cfg.EXT_TEMP));
     layout->addStretch();
     //layout->addWidget(Session::Forge::br());
 
@@ -332,6 +333,37 @@ QWidget *ObdTab::obd_data_widget()
 }
 
 QWidget *DataTab::vehicle_data_widget(GaugeConfig cfg)
+{
+    QWidget *widget = new QWidget(this);
+    QVBoxLayout *layout = new QVBoxLayout(widget);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setSpacing(0);
+
+    QFont value_font(this->arbiter.forge().font(cfg.font_size.value, true));
+
+    QFont unit_font(this->arbiter.forge().font(cfg.font_size.unit));
+    unit_font.setWeight(QFont::Light);
+    unit_font.setItalic(true);
+
+    Gauge *gauge = new Gauge(cfg,
+        value_font, unit_font, Gauge::RIGHT, widget);
+    layout->addWidget(gauge);
+    this->gauges.push_back(gauge);
+
+    if (cfg.font_size.label > 0) {
+        QFont label_font(this->arbiter.forge().font(cfg.font_size.label));
+        label_font.setWeight(QFont::Light);
+
+        QLabel *gauge_label = new QLabel(cfg.description, widget);
+        gauge_label->setFont(label_font);
+        gauge_label->setAlignment(Qt::AlignHCenter);
+        layout->addWidget(gauge_label);
+    }
+
+    return widget;
+}
+
+QWidget *ObdTab::vehicle_data_widget(GaugeConfig cfg)
 {
     QWidget *widget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
