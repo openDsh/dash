@@ -39,6 +39,23 @@ struct GaugesConfig {
     GaugeConfig SPEED;
     GaugeConfig INTAKE_TEMP;
     GaugeConfig EXT_TEMP;
+    GaugeConfig VOLT;
+    GaugeConfig MAF;
+    GaugeConfig MAP;
+    GaugeConfig APP;
+    GaugeConfig TPAPWM;
+    GaugeConfig INJ;
+    GaugeConfig TVENT;
+    GaugeConfig TANK;
+    GaugeConfig IGNANGLE;
+    GaugeConfig BATT;
+    GaugeConfig RITCYL1;
+    GaugeConfig RITCYL2;
+    GaugeConfig RITCYL3;
+    GaugeConfig RITCYL4;
+    GaugeConfig SFT;
+    GaugeConfig LMB1;
+    GaugeConfig LMB2;
 };
 
 class Gauge : public QWidget {
