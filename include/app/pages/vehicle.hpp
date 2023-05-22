@@ -15,14 +15,16 @@
 class Arbiter;
 
 typedef QPair<QString, QString> units_t;
-struct font_size_t {
+struct font_size_t
+{
     int label;
     int value;
     int unit;
 };
 typedef std::function<double(double, bool)> unit_converter_t;
 
-struct GaugeConfig {
+struct GaugeConfig
+{
     QString id;
     QString description;
     units_t units;
@@ -32,7 +34,8 @@ struct GaugeConfig {
 };
 
 // typedef QList<Gauge> Gauges;
-struct GaugesConfig {
+struct GaugesConfig
+{
     GaugeConfig AUTONOMIA;
     GaugeConfig COOLANT_TEMP;
     GaugeConfig RPM;
@@ -58,18 +61,23 @@ struct GaugesConfig {
     GaugeConfig LMB2;
 };
 
-class Gauge : public QWidget {
+class Gauge : public QWidget
+{
     Q_OBJECT
 
-   public:
-    enum Orientation { BOTTOM, RIGHT };
+public:
+    enum Orientation
+    {
+        BOTTOM,
+        RIGHT
+    };
 
     Gauge(GaugeConfig cfg, QFont value_font, QFont unit_font, Orientation orientation, QWidget *parent = nullptr);
 
     inline QString get_id() { return this->id; };
     void set_value(double value);
 
-   private:
+private:
     QString format_value(double value);
     QString null_value();
     QLabel *value_label;
@@ -81,20 +89,21 @@ class Gauge : public QWidget {
     int precision;
     units_t units;
 
-   signals:
+signals:
     void toggle_unit(bool si);
 };
 
-class VehiclePage : public QTabWidget, public Page {
+class VehiclePage : public QTabWidget, public Page
+{
     Q_OBJECT
 
-   public:
+public:
     VehiclePage(Arbiter &arbiter, QWidget *parent = nullptr);
     QWidget *obd;
 
     void init() override;
 
-   private:
+private:
     void get_plugins();
     void load_plugin();
     QWidget *dialog_body();
@@ -110,13 +119,14 @@ class VehiclePage : public QTabWidget, public Page {
     Config *config;
 };
 
-class DataTab : public QWidget {
+class DataTab : public QWidget
+{
     Q_OBJECT
 
-   public:
+public:
     DataTab(Arbiter &arbiter, QWidget *parent = nullptr);
 
-   private:
+private:
     Arbiter &arbiter;
     QWidget *speedo_tach_widget();
     QWidget *engine_data_widget();
@@ -125,32 +135,32 @@ class DataTab : public QWidget {
     std::vector<Gauge *> gauges;
 };
 
-class ObdTab : public QWidget {
+class ObdTab : public QWidget
+{
     Q_OBJECT
 
-   public:
+public:
     ObdTab(Arbiter &arbiter, QWidget *parent = nullptr);
 
-   private:
+private:
     Arbiter &arbiter;
-    QWidget *obd_data_widget();
+    QWidget *obd_data_widget(int colonna);
     QWidget *vehicle_data_widget(GaugeConfig cfg);
 
     std::vector<Gauge *> gauges;
-
 };
 
-class LSTab : public QWidget {
+class LSTab : public QWidget
+{
     Q_OBJECT
 
-   public:
+public:
     LSTab(Arbiter &arbiter, QWidget *parent = nullptr);
 
-   private:
+private:
     Arbiter &arbiter;
     QWidget *ls_data_widget();
     QWidget *vehicle_data_widget(GaugeConfig cfg);
 
     std::vector<Gauge *> gauges;
-
 };

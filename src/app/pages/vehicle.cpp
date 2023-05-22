@@ -6,143 +6,132 @@
 #include "app/window.hpp"
 #include "plugins/vehicle_plugin.hpp"
 
-GaugesConfig gauges_cfg = 
-{
-  {"autonomia", "Autonomia", {"Miles", "Km"}, 
-    {10, 16, 12}, 0, [](double x, bool _) { return x; }
-  },
-  {"coolant_temp", "Temperatura Refrigerante Motore", {"°F", "°C"}, 
-    {10, 16, 12}, 0, [](double x, bool si) { return si ? x : Conversion::c_to_f(x); }
-  },
-  {"rpm", "Giri al Minuto (RPM)", {"rpm", "rpm"}, 
-    {0, 24, 12}, 0, [](double x, bool _) { return x; }
-  },
-  {"speed", "Velocità", {"mph", "km/h"}, 
-    {0, 36, 16}, 0, [](double x, bool si) { return si ? x : Conversion::kph_to_mph(x); }
-  },
-  {"intake_temp", "Temperatura Aspirazione", {"°F", "°C"}, 
-    {10, 16, 12}, 1, [](double x, bool si) { return si ? x : Conversion::c_to_f(x); }
-  },
-  {"ext_temp", "Temperatura Esterna", {"°F", "°C"},  
-    {10, 16, 12}, 1, [](double x, bool si) { return si ? x : Conversion::c_to_f(x); }
-  },
-  {"volt", "Tensione Batteria", {"V", "V"},  
-    {10, 16, 12}, 1, [](double x, bool si) { return x; }
-  },
-  {"maf", "Debimetro (MAF)", {"g/s", "g/s"},  
-    {10, 16, 12}, 1, [](double x, bool si) { return x; }
-  },
-  {"map", "Pressione Aspirazione (MAP)", {"kPa", "kPa"},  
-    {10, 16, 12}, 1, [](double x, bool si) { return x; }
-  },
-  {"app", "Acceleratore", {"%", "%"},  
-    {10, 16, 12}, 1, [](double x, bool si) { return x; }
-  },
-  {"tpapwm", "Corpo Farfallato", {"%", "%"},  
-    {10, 16, 12}, 1, [](double x, bool si) { return x; }
-  },
-  {"inj", "Iniezione", {"ms", "ms"},  
-    {10, 16, 12}, 1, [](double x, bool si) { return x; }
-  },
-  {"tvent", "Pompa Benzina", {"%", "%"},  
-    {10, 16, 12}, 1, [](double x, bool si) { return x; }
-  },
-  {"tank", "Serbatoio Benzina", {"L", "L"},  
-    {10, 16, 12}, 1, [](double x, bool si) { return x; }
-  },
-  {"ignangle", "Anticipo d'Accensione", {"°CA", "°CA"},  
-    {10, 16, 12}, 1, [](double x, bool si) { return x; }
-  },
-  {"batt", "Sensore di Detonazione", {"V", "V"},  
-    {10, 16, 12}, 1, [](double x, bool si) { return x; }
-  },
-  {"ritcyl1", "Ritardo di Scoppio C1", {"°CA", "°CA"},  
-    {10, 16, 12}, 1, [](double x, bool si) { return x; }
-  },
-  {"ritcyl2", "Ritardo di Scoppio C2", {"°CA", "°CA"},  
-    {10, 16, 12}, 1, [](double x, bool si) { return x; }
-  },
-  {"ritcyl3", "Ritardo di Scoppio C3", {"°CA", "°CA"},  
-    {10, 16, 12}, 1, [](double x, bool si) { return x; }
-  },
-  {"ritcyl4", "Ritardo di Scoppio C4", {"°CA", "°CA"},  
-    {10, 16, 12}, 1, [](double x, bool si) { return x; }
-  },
-  {"sft", "Correzione Istantanea Carburazione (Benzina)", {"%", "%"},  
-    {10, 16, 12}, 1, [](double x, bool si) { return x; }
-  },
-  {"lmb1", "Sonda Lambda 1", {"V", "V"},  
-    {10, 16, 12}, 1, [](double x, bool si) { return x; }
-  },
-  {"lmb2", "Sonda Lambda 2", {"V", "V"},  
-    {10, 16, 12}, 1, [](double x, bool si) { return x; }
-  }
-};
+GaugesConfig gauges_cfg =
+    {
+        {"autonomia", "Autonomia", {"Miles", "Km"}, {10, 16, 12}, 0, [](double x, bool _)
+         { return x; }},
+        {"coolant_temp", "Temperatura Refrigerante Motore", {"°F", "°C"}, {10, 16, 12}, 0, [](double x, bool si)
+         { return si ? x : Conversion::c_to_f(x); }},
+        {"rpm", "Giri al Minuto (RPM)", {"rpm", "rpm"}, {0, 24, 12}, 0, [](double x, bool _)
+         { return x; }},
+        {"speed", "Velocità", {"mph", "km/h"}, {0, 36, 16}, 0, [](double x, bool si)
+         { return si ? x : Conversion::kph_to_mph(x); }},
+        {"intake_temp", "Temperatura Aspirazione", {"°F", "°C"}, {10, 16, 12}, 1, [](double x, bool si)
+         { return si ? x : Conversion::c_to_f(x); }},
+        {"ext_temp", "Temperatura Esterna", {"°F", "°C"}, {10, 16, 12}, 1, [](double x, bool si)
+         { return si ? x : Conversion::c_to_f(x); }},
+        {"volt", "Tensione Batteria", {"V", "V"}, {10, 16, 12}, 1, [](double x, bool si)
+         { return x; }},
+        {"maf", "Debimetro (MAF)", {"g/s", "g/s"}, {10, 16, 12}, 1, [](double x, bool si)
+         { return x; }},
+        {"map", "Pressione Aspirazione (MAP)", {"kPa", "kPa"}, {10, 16, 12}, 1, [](double x, bool si)
+         { return x; }},
+        {"app", "Acceleratore", {"%", "%"}, {10, 16, 12}, 1, [](double x, bool si)
+         { return x; }},
+        {"tpapwm", "Corpo Farfallato", {"%", "%"}, {10, 16, 12}, 1, [](double x, bool si)
+         { return x; }},
+        {"inj", "Iniezione", {"ms", "ms"}, {10, 16, 12}, 1, [](double x, bool si)
+         { return x; }},
+        {"tvent", "Pompa Benzina", {"%", "%"}, {10, 16, 12}, 1, [](double x, bool si)
+         { return x; }},
+        {"tank", "Serbatoio Benzina", {"L", "L"}, {10, 16, 12}, 1, [](double x, bool si)
+         { return x; }},
+        {"ignangle", "Anticipo d'Accensione", {"°CA", "°CA"}, {10, 16, 12}, 1, [](double x, bool si)
+         { return x; }},
+        {"batt", "Sensore di Detonazione", {"V", "V"}, {10, 16, 12}, 1, [](double x, bool si)
+         { return x; }},
+        {"ritcyl1", "Ritardo di Scoppio C1", {"°CA", "°CA"}, {10, 16, 12}, 1, [](double x, bool si)
+         { return x; }},
+        {"ritcyl2", "Ritardo di Scoppio C2", {"°CA", "°CA"}, {10, 16, 12}, 1, [](double x, bool si)
+         { return x; }},
+        {"ritcyl3", "Ritardo di Scoppio C3", {"°CA", "°CA"}, {10, 16, 12}, 1, [](double x, bool si)
+         { return x; }},
+        {"ritcyl4", "Ritardo di Scoppio C4", {"°CA", "°CA"}, {10, 16, 12}, 1, [](double x, bool si)
+         { return x; }},
+        {"sft", "Correzione Istantanea Carburazione (Benzina)", {"%", "%"}, {10, 16, 12}, 1, [](double x, bool si)
+         { return x; }},
+        {"lmb1", "Sonda Lambda 1", {"V", "V"}, {10, 16, 12}, 1, [](double x, bool si)
+         { return x; }},
+        {"lmb2", "Sonda Lambda 2", {"V", "V"}, {10, 16, 12}, 1, [](double x, bool si)
+         { return x; }}};
 
 ObdTab::ObdTab(Arbiter &arbiter, QWidget *parent)
-    : QWidget(parent)
-    , arbiter(arbiter)
+    : QWidget(parent), arbiter(arbiter)
 {
     QHBoxLayout *layout = new QHBoxLayout(this);
 
-    //QWidget *driving_data = this->speedo_tach_widget();
-    //layout->addWidget(driving_data);
-    //layout->addWidget(Session::Forge::br(true));
+    // QWidget *driving_data = this->speedo_tach_widget();
+    // layout->addWidget(driving_data);
+    // layout->addWidget(Session::Forge::br(true));
 
-    QWidget *obd_data = this->obd_data_widget();
-    layout->addWidget(obd_data);
+    QWidget *obd_data1 = this->obd_data_widget(1);
+    layout->addWidget(obd_data1);
+    layout->addWidget(Session::Forge::br(true));
+    QWidget *obd_data2 = this->obd_data_widget(2);
+    layout->addWidget(obd_data2);
+    layout->addWidget(Session::Forge::br(true));
+    QWidget *obd_data3 = this->obd_data_widget(3);
+    layout->addWidget(obd_data3);
+    layout->addWidget(Session::Forge::br(true));
+    QWidget *obd_data4 = this->obd_data_widget(4);
+    layout->addWidget(obd_data4);
+    layout->addWidget(Session::Forge::br(true));
+    QWidget *obd_data5 = this->obd_data_widget(5);
+    layout->addWidget(obd_data5);
+    layout->addWidget(Session::Forge::br(true));
+    QWidget *obd_data6 = this->obd_data_widget(6);
+    layout->addWidget(obd_data6);
 
-    //QSizePolicy sp_left(QSizePolicy::Preferred, QSizePolicy::Preferred);
-    //sp_left.setHorizontalStretch(5);
-    //driving_data->setSizePolicy(sp_left);
+    // QSizePolicy sp_left(QSizePolicy::Preferred, QSizePolicy::Preferred);
+    // sp_left.setHorizontalStretch(5);
+    // driving_data->setSizePolicy(sp_left);
     QSizePolicy sp_right(QSizePolicy::Preferred, QSizePolicy::Preferred);
     sp_right.setHorizontalStretch(2);
     obd_data->setSizePolicy(sp_right);
 
-    connect(&this->arbiter, &Arbiter::vehicle_update_data, [this](QString gauge_id, double value){
+    connect(&this->arbiter, &Arbiter::vehicle_update_data, [this](QString gauge_id, double value)
+            {
         // DASH_LOG(info)<<"[Gauges] arbiter update: "<<qPrintable(gauge_id)<<" to "<< std::to_string(value);
         for (auto &gauge : this->gauges) {
             if(gauge->get_id() == gauge_id){
                 // DASH_LOG(info)<<"[Gauges] Found: "<<gauge->get_id();
                 gauge->set_value(value);
             }
-        }
-    });
+        } });
 }
 
 LSTab::LSTab(Arbiter &arbiter, QWidget *parent)
-    : QWidget(parent)
-    , arbiter(arbiter)
+    : QWidget(parent), arbiter(arbiter)
 {
     QHBoxLayout *layout = new QHBoxLayout(this);
 
-    //QWidget *driving_data = this->speedo_tach_widget();
-    //layout->addWidget(driving_data);
-    //layout->addWidget(Session::Forge::br(true));
+    // QWidget *driving_data = this->speedo_tach_widget();
+    // layout->addWidget(driving_data);
+    // layout->addWidget(Session::Forge::br(true));
 
     QWidget *ls_data = this->ls_data_widget();
     layout->addWidget(ls_data);
 
-    //QSizePolicy sp_left(QSizePolicy::Preferred, QSizePolicy::Preferred);
-    //sp_left.setHorizontalStretch(5);
-    //driving_data->setSizePolicy(sp_left);
+    // QSizePolicy sp_left(QSizePolicy::Preferred, QSizePolicy::Preferred);
+    // sp_left.setHorizontalStretch(5);
+    // driving_data->setSizePolicy(sp_left);
     QSizePolicy sp_right(QSizePolicy::Preferred, QSizePolicy::Preferred);
     sp_right.setHorizontalStretch(2);
     ls_data->setSizePolicy(sp_right);
 
-    connect(&this->arbiter, &Arbiter::vehicle_update_data, [this](QString gauge_id, double value){
+    connect(&this->arbiter, &Arbiter::vehicle_update_data, [this](QString gauge_id, double value)
+            {
         // DASH_LOG(info)<<"[Gauges] arbiter update: "<<qPrintable(gauge_id)<<" to "<< std::to_string(value);
         for (auto &gauge : this->gauges) {
             if(gauge->get_id() == gauge_id){
                 // DASH_LOG(info)<<"[Gauges] Found: "<<gauge->get_id();
                 gauge->set_value(value);
             }
-        }
-    });
+        } });
 }
 
 Gauge::Gauge(GaugeConfig cfg, QFont value_font, QFont unit_font, Gauge::Orientation orientation, QWidget *parent)
-: QWidget(parent)
+    : QWidget(parent)
 {
     Config *config = Config::get_instance();
 
@@ -168,11 +157,11 @@ Gauge::Gauge(GaugeConfig cfg, QFont value_font, QFont unit_font, Gauge::Orientat
     unit_label->setFont(unit_font);
     unit_label->setAlignment(Qt::AlignCenter);
 
-    connect(config, &Config::si_units_changed, [this, unit_label](bool si) {
+    connect(config, &Config::si_units_changed, [this, unit_label](bool si)
+            {
         this->si = si;
         unit_label->setText(this->si ? this->units.second : this->units.first);
-        value_label->setText(this->null_value());
-    });
+        value_label->setText(this->null_value()); });
 
     layout->addStretch(6);
     layout->addWidget(value_label);
@@ -181,8 +170,9 @@ Gauge::Gauge(GaugeConfig cfg, QFont value_font, QFont unit_font, Gauge::Orientat
     layout->addStretch(4);
 }
 
-void Gauge::set_value(double value){
-    DASH_LOG(debug)<<"[Gauges] set_value: "<<std::to_string(value);
+void Gauge::set_value(double value)
+{
+    DASH_LOG(debug) << "[Gauges] set_value: " << std::to_string(value);
     value_label->setText(this->format_value(this->converter(value, this->si)));
 }
 
@@ -206,8 +196,7 @@ QString Gauge::null_value()
 }
 
 VehiclePage::VehiclePage(Arbiter &arbiter, QWidget *parent)
-    : QTabWidget(parent)
-    , Page(arbiter, "Vehicle", "directions_car", true, this)
+    : QTabWidget(parent), Page(arbiter, "Vehicle", "directions_car", true, this)
 {
 }
 
@@ -229,13 +218,15 @@ void VehiclePage::init()
     Dialog *dialog = new Dialog(this->arbiter, true, this->window());
     dialog->set_body(this->dialog_body());
     QPushButton *load_button = new QPushButton("load");
-    connect(load_button, &QPushButton::clicked, [this]() { this->load_plugin(); });
+    connect(load_button, &QPushButton::clicked, [this]()
+            { this->load_plugin(); });
     dialog->set_button(load_button);
 
     QPushButton *settings_button = new QPushButton(this);
     settings_button->setFlat(true);
     this->arbiter.forge().iconize("settings", settings_button, 24);
-    connect(settings_button, &QPushButton::clicked, [dialog]() { dialog->open(); });
+    connect(settings_button, &QPushButton::clicked, [dialog]()
+            { dialog->open(); });
     this->setCornerWidget(settings_button);
 
     this->load_plugin();
@@ -256,12 +247,10 @@ QWidget *VehiclePage::dialog_body()
     QStringList devices = this->config->get_vehicle_can_bus() ? this->can_devices : this->serial_devices;
     Selector *interface_selector = new Selector(devices, this->config->get_vehicle_interface(), this->arbiter.forge().font(14), this->arbiter, widget, "disabled");
     interface_selector->setVisible((this->can_devices.size() > 0) || (this->serial_devices.size() > 0));
-    connect(interface_selector, &Selector::item_changed, [config = this->config](QString item){
-        config->set_vehicle_interface(item);
-    });
-    connect(this->config, &Config::vehicle_can_bus_changed, [this, interface_selector](bool state){
-        interface_selector->set_options(state ? this->can_devices : this->serial_devices);
-    });
+    connect(interface_selector, &Selector::item_changed, [config = this->config](QString item)
+            { config->set_vehicle_interface(item); });
+    connect(this->config, &Config::vehicle_can_bus_changed, [this, interface_selector](bool state)
+            { interface_selector->set_options(state ? this->can_devices : this->serial_devices); });
     layout->addWidget(interface_selector, 1);
 
     layout->addWidget(Session::Forge::br(), 1);
@@ -284,9 +273,8 @@ QWidget *VehiclePage::can_bus_toggle_row()
     QRadioButton *socketcan_button = new QRadioButton("SocketCAN", group);
     socketcan_button->setChecked(this->config->get_vehicle_can_bus());
     socketcan_button->setEnabled(this->can_devices.size() > 0);
-    connect(socketcan_button, &QRadioButton::clicked, [config = this->config]{
-        config->set_vehicle_can_bus(true);
-    });
+    connect(socketcan_button, &QRadioButton::clicked, [config = this->config]
+            { config->set_vehicle_can_bus(true); });
     group_layout->addWidget(socketcan_button);
 
     layout->addWidget(group, 1, Qt::AlignHCenter);
@@ -305,7 +293,8 @@ QWidget *VehiclePage::si_units_row_widget()
     Switch *toggle = new Switch(widget);
     toggle->scale(this->arbiter.layout().scale);
     toggle->setChecked(this->config->get_si_units());
-    connect(toggle, &Switch::stateChanged, [config = this->config](bool state) { config->set_si_units(state); });
+    connect(toggle, &Switch::stateChanged, [config = this->config](bool state)
+            { config->set_si_units(state); });
     layout->addWidget(toggle, 1, Qt::AlignHCenter);
 
     return widget;
@@ -313,7 +302,8 @@ QWidget *VehiclePage::si_units_row_widget()
 
 void VehiclePage::get_plugins()
 {
-    for (const QFileInfo &plugin : Session::plugin_dir("vehicle").entryInfoList(QDir::Files)) {
+    for (const QFileInfo &plugin : Session::plugin_dir("vehicle").entryInfoList(QDir::Files))
+    {
         if (QLibrary::isLibrary(plugin.absoluteFilePath()))
             this->plugins[Session::fmt_plugin(plugin.baseName())] = plugin;
     }
@@ -325,10 +315,12 @@ void VehiclePage::load_plugin()
         this->active_plugin->unload();
 
     QString key = this->plugin_selector->get_current();
-    if (!key.isNull()) {
+    if (!key.isNull())
+    {
         this->active_plugin->setFileName(this->plugins[key].absoluteFilePath());
 
-        if (VehiclePlugin *plugin = qobject_cast<VehiclePlugin *>(this->active_plugin->instance())) {
+        if (VehiclePlugin *plugin = qobject_cast<VehiclePlugin *>(this->active_plugin->instance()))
+        {
             plugin->dashize(&this->arbiter);
             plugin->init(((SocketCANBus *)SocketCANBus::get_instance()));
             for (QWidget *tab : plugin->widgets())
@@ -339,8 +331,7 @@ void VehiclePage::load_plugin()
 }
 
 DataTab::DataTab(Arbiter &arbiter, QWidget *parent)
-    : QWidget(parent)
-    , arbiter(arbiter)
+    : QWidget(parent), arbiter(arbiter)
 {
     QHBoxLayout *layout = new QHBoxLayout(this);
 
@@ -358,15 +349,15 @@ DataTab::DataTab(Arbiter &arbiter, QWidget *parent)
     sp_right.setHorizontalStretch(2);
     engine_data->setSizePolicy(sp_right);
 
-    connect(&this->arbiter, &Arbiter::vehicle_update_data, [this](QString gauge_id, double value){
+    connect(&this->arbiter, &Arbiter::vehicle_update_data, [this](QString gauge_id, double value)
+            {
         // DASH_LOG(info)<<"[Gauges] arbiter update: "<<qPrintable(gauge_id)<<" to "<< std::to_string(value);
         for (auto &gauge : this->gauges) {
             if(gauge->get_id() == gauge_id){
                 // DASH_LOG(info)<<"[Gauges] Found: "<<gauge->get_id();
                 gauge->set_value(value);
             }
-        }
-    });
+        } });
 }
 
 QWidget *DataTab::speedo_tach_widget()
@@ -406,84 +397,93 @@ QWidget *DataTab::engine_data_widget()
     return widget;
 }
 
-QWidget *ObdTab::obd_data_widget()
+QWidget *ObdTab::obd_data_widget(int colonna)
 {
     QWidget *widget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
 
-    layout->addStretch();
-    layout->addWidget(this->vehicle_data_widget(gauges_cfg.INTAKE_TEMP));
-    layout->addStretch();
-    layout->addWidget(Session::Forge::br());
-    layout->addStretch();
-    layout->addWidget(this->vehicle_data_widget(gauges_cfg.VOLT));
-    layout->addStretch();
-    layout->addWidget(Session::Forge::br());
-    layout->addStretch();
-    layout->addWidget(this->vehicle_data_widget(gauges_cfg.MAF));
-    layout->addStretch();
-    layout->addWidget(Session::Forge::br());
-    layout->addStretch();
-    layout->addWidget(this->vehicle_data_widget(gauges_cfg.MAP));
-    layout->addStretch();
-    layout->addWidget(Session::Forge::br());
-    layout->addStretch();
-    layout->addWidget(this->vehicle_data_widget(gauges_cfg.APP));
-    layout->addStretch();
-    layout->addWidget(Session::Forge::br());
-    layout->addStretch();
-    layout->addWidget(this->vehicle_data_widget(gauges_cfg.TPAPWM));
-    layout->addStretch();
-    layout->addWidget(Session::Forge::br());
-    layout->addStretch();
-    layout->addWidget(this->vehicle_data_widget(gauges_cfg.INJ));
-    layout->addStretch();
-    layout->addWidget(Session::Forge::br());
-    layout->addStretch();
-    layout->addWidget(this->vehicle_data_widget(gauges_cfg.TVENT));
-    layout->addStretch();
-    layout->addWidget(Session::Forge::br());
-    layout->addStretch();
-    layout->addWidget(this->vehicle_data_widget(gauges_cfg.TANK));
-    layout->addStretch();
-    layout->addWidget(Session::Forge::br());
-    layout->addStretch();
-    layout->addWidget(this->vehicle_data_widget(gauges_cfg.IGNANGLE));
-    layout->addStretch();
-    layout->addWidget(Session::Forge::br());
-    layout->addStretch();
-    layout->addWidget(this->vehicle_data_widget(gauges_cfg.BATT));
-    layout->addStretch();
-    layout->addWidget(Session::Forge::br());
-    layout->addStretch();
-    layout->addWidget(this->vehicle_data_widget(gauges_cfg.RITCYL1));
-    layout->addStretch();
-    layout->addWidget(Session::Forge::br());
-    layout->addStretch();
-    layout->addWidget(this->vehicle_data_widget(gauges_cfg.RITCYL2));
-    layout->addStretch();
-    layout->addWidget(Session::Forge::br());
-    layout->addStretch();
-    layout->addWidget(this->vehicle_data_widget(gauges_cfg.RITCYL3));
-    layout->addStretch();
-    layout->addWidget(Session::Forge::br());
-    layout->addStretch();
-    layout->addWidget(this->vehicle_data_widget(gauges_cfg.RITCYL4));
-    layout->addStretch();
-    layout->addWidget(Session::Forge::br());
-    layout->addStretch();
-    layout->addWidget(this->vehicle_data_widget(gauges_cfg.SFT));
-    layout->addStretch();
-    layout->addWidget(Session::Forge::br());
-    layout->addStretch();
-    layout->addWidget(this->vehicle_data_widget(gauges_cfg.LMB1));
-    layout->addStretch();
-    layout->addWidget(Session::Forge::br());
-    layout->addStretch();
-    layout->addWidget(this->vehicle_data_widget(gauges_cfg.LMB2));
-    layout->addStretch();
+    switch (colonna)
+    {
+    case 1:
+        layout->addStretch();
+        layout->addWidget(this->vehicle_data_widget(gauges_cfg.INTAKE_TEMP));
+        layout->addStretch();
+        layout->addWidget(Session::Forge::br());
+        layout->addStretch();
+        layout->addWidget(this->vehicle_data_widget(gauges_cfg.VOLT));
+        layout->addStretch();
+        layout->addWidget(Session::Forge::br());
+        layout->addStretch();
+        layout->addWidget(this->vehicle_data_widget(gauges_cfg.MAF));
+        layout->addStretch();
+        break;
+    case 2:
+        layout->addStretch();
+        layout->addWidget(this->vehicle_data_widget(gauges_cfg.MAP));
+        layout->addStretch();
+        layout->addWidget(Session::Forge::br());
+        layout->addStretch();
+        layout->addWidget(this->vehicle_data_widget(gauges_cfg.APP));
+        layout->addStretch();
+        layout->addWidget(Session::Forge::br());
+        layout->addStretch();
+        layout->addWidget(this->vehicle_data_widget(gauges_cfg.TPAPWM));
+        layout->addStretch();
+        break;
+    case 3:
+        layout->addStretch();
+        layout->addWidget(this->vehicle_data_widget(gauges_cfg.INJ));
+        layout->addStretch();
+        layout->addWidget(Session::Forge::br());
+        layout->addStretch();
+        layout->addWidget(this->vehicle_data_widget(gauges_cfg.TVENT));
+        layout->addStretch();
+        layout->addWidget(Session::Forge::br());
+        layout->addStretch();
+        layout->addWidget(this->vehicle_data_widget(gauges_cfg.TANK));
+        layout->addStretch();
+        break;
+    case 4:
+        layout->addStretch();
+        layout->addWidget(this->vehicle_data_widget(gauges_cfg.IGNANGLE));
+        layout->addStretch();
+        layout->addWidget(Session::Forge::br());
+        layout->addStretch();
+        layout->addWidget(this->vehicle_data_widget(gauges_cfg.BATT));
+        layout->addStretch();
+        layout->addWidget(Session::Forge::br());
+        layout->addStretch();
+        layout->addWidget(this->vehicle_data_widget(gauges_cfg.RITCYL1));
+        layout->addStretch();
+    case 5:
+        layout->addStretch();
+        layout->addWidget(this->vehicle_data_widget(gauges_cfg.RITCYL2));
+        layout->addStretch();
+        layout->addWidget(Session::Forge::br());
+        layout->addStretch();
+        layout->addWidget(this->vehicle_data_widget(gauges_cfg.RITCYL3));
+        layout->addStretch();
+        layout->addWidget(Session::Forge::br());
+        layout->addStretch();
+        layout->addWidget(this->vehicle_data_widget(gauges_cfg.RITCYL4));
+        layout->addStretch();
+        break;
+    case 6:
+        layout->addStretch();
+        layout->addWidget(this->vehicle_data_widget(gauges_cfg.SFT));
+        layout->addStretch();
+        layout->addWidget(Session::Forge::br());
+        layout->addStretch();
+        layout->addWidget(this->vehicle_data_widget(gauges_cfg.LMB1));
+        layout->addStretch();
+        layout->addWidget(Session::Forge::br());
+        layout->addStretch();
+        layout->addWidget(this->vehicle_data_widget(gauges_cfg.LMB2));
+        layout->addStretch();
+        break;
+    }
 
     return widget;
 }
@@ -498,7 +498,7 @@ QWidget *LSTab::ls_data_widget()
     layout->addStretch();
     layout->addWidget(this->vehicle_data_widget(gauges_cfg.INTAKE_TEMP));
     layout->addStretch();
-    //layout->addWidget(Session::Forge::br());
+    // layout->addWidget(Session::Forge::br());
 
     return widget;
 }
@@ -517,11 +517,12 @@ QWidget *DataTab::vehicle_data_widget(GaugeConfig cfg)
     unit_font.setItalic(true);
 
     Gauge *gauge = new Gauge(cfg,
-        value_font, unit_font, Gauge::RIGHT, widget);
+                             value_font, unit_font, Gauge::RIGHT, widget);
     layout->addWidget(gauge);
     this->gauges.push_back(gauge);
 
-    if (cfg.font_size.label > 0) {
+    if (cfg.font_size.label > 0)
+    {
         QFont label_font(this->arbiter.forge().font(cfg.font_size.label));
         label_font.setWeight(QFont::Light);
 
@@ -548,11 +549,12 @@ QWidget *ObdTab::vehicle_data_widget(GaugeConfig cfg)
     unit_font.setItalic(true);
 
     Gauge *gauge = new Gauge(cfg,
-        value_font, unit_font, Gauge::RIGHT, widget);
+                             value_font, unit_font, Gauge::RIGHT, widget);
     layout->addWidget(gauge);
     this->gauges.push_back(gauge);
 
-    if (cfg.font_size.label > 0) {
+    if (cfg.font_size.label > 0)
+    {
         QFont label_font(this->arbiter.forge().font(cfg.font_size.label));
         label_font.setWeight(QFont::Light);
 
@@ -579,11 +581,12 @@ QWidget *LSTab::vehicle_data_widget(GaugeConfig cfg)
     unit_font.setItalic(true);
 
     Gauge *gauge = new Gauge(cfg,
-        value_font, unit_font, Gauge::RIGHT, widget);
+                             value_font, unit_font, Gauge::RIGHT, widget);
     layout->addWidget(gauge);
     this->gauges.push_back(gauge);
 
-    if (cfg.font_size.label > 0) {
+    if (cfg.font_size.label > 0)
+    {
         QFont label_font(this->arbiter.forge().font(cfg.font_size.label));
         label_font.setWeight(QFont::Light);
 
