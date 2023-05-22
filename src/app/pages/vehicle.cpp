@@ -462,6 +462,7 @@ QWidget *ObdTab::obd_data_widget(int colonna)
         layout->addStretch();
         layout->addWidget(this->vehicle_data_widget(gauges_cfg.RITCYL1));
         layout->addStretch();
+        break;
     case 5:
         layout->addStretch();
         layout->addWidget(this->vehicle_data_widget(gauges_cfg.RITCYL2));
