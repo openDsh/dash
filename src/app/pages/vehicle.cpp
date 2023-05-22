@@ -16,43 +16,43 @@ GaugesConfig gauges_cfg =
          { return x; }},
         {"speed", "Velocità", {"mph", "km/h"}, {0, 36, 16}, 0, [](double x, bool si)
          { return si ? x : Conversion::kph_to_mph(x); }},
-        {"intake_temp", "Temperatura Aspirazione", {"°F", "°C"}, {10, 16, 12}, 1, [](double x, bool si)
+        {"intake_temp", "Aspirazione", {"°F", "°C"}, {8, 18, 10}, 1, [](double x, bool si)
          { return si ? x : Conversion::c_to_f(x); }},
         {"ext_temp", "Temperatura Esterna", {"°F", "°C"}, {10, 16, 12}, 1, [](double x, bool si)
          { return si ? x : Conversion::c_to_f(x); }},
-        {"volt", "Tensione Batteria", {"V", "V"}, {10, 16, 12}, 1, [](double x, bool si)
+        {"volt", "Batteria", {"V", "V"}, {8, 18, 10}, 1, [](double x, bool si)
          { return x; }},
-        {"maf", "Debimetro (MAF)", {"g/s", "g/s"}, {10, 16, 12}, 1, [](double x, bool si)
+        {"maf", "Debimetro", {"g/s", "g/s"}, {8, 18, 10}, 1, [](double x, bool si)
          { return x; }},
-        {"map", "Pressione Aspirazione (MAP)", {"kPa", "kPa"}, {10, 16, 12}, 1, [](double x, bool si)
+        {"map", "Pressione Aspirazione (MAP)", {"kPa", "kPa"}, {8, 18, 10}, 1, [](double x, bool si)
          { return x; }},
-        {"app", "Acceleratore", {"%", "%"}, {10, 16, 12}, 1, [](double x, bool si)
+        {"app", "Acceleratore", {"%", "%"}, {8, 18, 10}, 1, [](double x, bool si)
          { return x; }},
-        {"tpapwm", "Corpo Farfallato", {"%", "%"}, {10, 16, 12}, 1, [](double x, bool si)
+        {"tpapwm", "Corpo Farfallato", {"%", "%"}, {8, 18, 10}, 1, [](double x, bool si)
          { return x; }},
-        {"inj", "Iniezione", {"ms", "ms"}, {10, 16, 12}, 1, [](double x, bool si)
+        {"inj", "Iniezione", {"ms", "ms"}, {8, 18, 10}, 1, [](double x, bool si)
          { return x; }},
-        {"tvent", "Pompa Benzina", {"%", "%"}, {10, 16, 12}, 1, [](double x, bool si)
+        {"tvent", "Pompa Benzina", {"%", "%"}, {8, 18, 10}, 1, [](double x, bool si)
          { return x; }},
-        {"tank", "Serbatoio Benzina", {"L", "L"}, {10, 16, 12}, 1, [](double x, bool si)
+        {"tank", "Serbatoio Benzina", {"L", "L"}, {8, 18, 10}, 1, [](double x, bool si)
          { return x; }},
-        {"ignangle", "Anticipo d'Accensione", {"°CA", "°CA"}, {10, 16, 12}, 1, [](double x, bool si)
+        {"ignangle", "A. Accensione", {"°CA", "°CA"}, {8, 18, 10}, 1, [](double x, bool si)
          { return x; }},
-        {"batt", "Sensore di Detonazione", {"V", "V"}, {10, 16, 12}, 1, [](double x, bool si)
+        {"batt", "Sensore di Detonazione", {"V", "V"}, {8, 18, 10}, 1, [](double x, bool si)
          { return x; }},
-        {"ritcyl1", "Ritardo di Scoppio C1", {"°CA", "°CA"}, {10, 16, 12}, 1, [](double x, bool si)
+        {"ritcyl1", "R. Scoppio C1", {"°CA", "°CA"}, {8, 18, 10}, 1, [](double x, bool si)
          { return x; }},
-        {"ritcyl2", "Ritardo di Scoppio C2", {"°CA", "°CA"}, {10, 16, 12}, 1, [](double x, bool si)
+        {"ritcyl2", "R. Scoppio C2", {"°CA", "°CA"}, {8, 18, 10}, 1, [](double x, bool si)
          { return x; }},
-        {"ritcyl3", "Ritardo di Scoppio C3", {"°CA", "°CA"}, {10, 16, 12}, 1, [](double x, bool si)
+        {"ritcyl3", "R. Scoppio C3", {"°CA", "°CA"}, {8, 18, 10}, 1, [](double x, bool si)
          { return x; }},
-        {"ritcyl4", "Ritardo di Scoppio C4", {"°CA", "°CA"}, {10, 16, 12}, 1, [](double x, bool si)
+        {"ritcyl4", "R. Scoppio C4", {"°CA", "°CA"}, {8, 18, 10}, 1, [](double x, bool si)
          { return x; }},
-        {"sft", "Correzione Istantanea Carburazione (Benzina)", {"%", "%"}, {10, 16, 12}, 1, [](double x, bool si)
+        {"sft", "Taglio Benzina (Carburazione)", {"%", "%"}, {8, 18, 10}, 1, [](double x, bool si)
          { return x; }},
-        {"lmb1", "Sonda Lambda 1", {"V", "V"}, {10, 16, 12}, 1, [](double x, bool si)
+        {"lmb1", "Sonda Lambda 1", {"V", "V"}, {8, 18, 10}, 1, [](double x, bool si)
          { return x; }},
-        {"lmb2", "Sonda Lambda 2", {"V", "V"}, {10, 16, 12}, 1, [](double x, bool si)
+        {"lmb2", "Sonda Lambda 2", {"V", "V"}, {8, 18, 10}, 1, [](double x, bool si)
          { return x; }}};
 
 ObdTab::ObdTab(Arbiter &arbiter, QWidget *parent)
