@@ -50,7 +50,7 @@ ObdTab::ObdTab(Arbiter &arbiter, QWidget *parent)
     driving_data->setSizePolicy(sp_left);
     QSizePolicy sp_right(QSizePolicy::Preferred, QSizePolicy::Preferred);
     sp_right.setHorizontalStretch(2);
-    engine_data->setSizePolicy(sp_right);
+    obd_data->setSizePolicy(sp_right);
 }
 
 Gauge::Gauge(GaugeConfig cfg, QFont value_font, QFont unit_font, Gauge::Orientation orientation, QWidget *parent)
