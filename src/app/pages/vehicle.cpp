@@ -325,7 +325,7 @@ QWidget *ObdTab::obd_data_widget()
     layout->setSpacing(0);
 
     layout->addStretch();
-    layout->addWidget(this->vehicle_data_widget(gauges_cfg.EXT_TEMP));
+    layout->addWidget(this->vehicle_data_widget(gauges_cfg.INTAKE_TEMP));
     layout->addStretch();
     //layout->addWidget(Session::Forge::br());
 
