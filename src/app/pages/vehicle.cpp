@@ -59,6 +59,37 @@ ObdTab::ObdTab(Arbiter &arbiter, QWidget *parent)
     });
 }
 
+LSTab::LSTab(Arbiter &arbiter, QWidget *parent)
+    : QWidget(parent)
+    , arbiter(arbiter)
+{
+    QHBoxLayout *layout = new QHBoxLayout(this);
+
+    //QWidget *driving_data = this->speedo_tach_widget();
+    //layout->addWidget(driving_data);
+    //layout->addWidget(Session::Forge::br(true));
+
+    QWidget *ls_data = this->ls_data_widget();
+    layout->addWidget(ls_data);
+
+    //QSizePolicy sp_left(QSizePolicy::Preferred, QSizePolicy::Preferred);
+    //sp_left.setHorizontalStretch(5);
+    //driving_data->setSizePolicy(sp_left);
+    QSizePolicy sp_right(QSizePolicy::Preferred, QSizePolicy::Preferred);
+    sp_right.setHorizontalStretch(2);
+    ls_data->setSizePolicy(sp_right);
+
+    connect(&this->arbiter, &Arbiter::vehicle_update_data, [this](QString gauge_id, double value){
+        // DASH_LOG(info)<<"[Gauges] arbiter update: "<<qPrintable(gauge_id)<<" to "<< std::to_string(value);
+        for (auto &gauge : this->gauges) {
+            if(gauge->get_id() == gauge_id){
+                // DASH_LOG(info)<<"[Gauges] Found: "<<gauge->get_id();
+                gauge->set_value(value);
+            }
+        }
+    });
+}
+
 Gauge::Gauge(GaugeConfig cfg, QFont value_font, QFont unit_font, Gauge::Orientation orientation, QWidget *parent)
 : QWidget(parent)
 {
@@ -133,6 +164,7 @@ void VehiclePage::init()
 {
     this->addTab(new DataTab(this->arbiter, this), "Data");
     this->addTab(new ObdTab(this->arbiter, this), "Obd");
+    this->addTab(new LSTab(this->arbiter, this), "LS");
     this->config = Config::get_instance();
 
     for (auto device : QCanBus::instance()->availableDevices("socketcan"))
@@ -338,6 +370,21 @@ QWidget *ObdTab::obd_data_widget()
     return widget;
 }
 
+QWidget *LSTab::obd_data_widget()
+{
+    QWidget *widget = new QWidget(this);
+    QVBoxLayout *layout = new QVBoxLayout(widget);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setSpacing(0);
+
+    layout->addStretch();
+    layout->addWidget(this->vehicle_data_widget(gauges_cfg.INTAKE_TEMP));
+    layout->addStretch();
+    //layout->addWidget(Session::Forge::br());
+
+    return widget;
+}
+
 QWidget *DataTab::vehicle_data_widget(GaugeConfig cfg)
 {
     QWidget *widget = new QWidget(this);
@@ -370,6 +417,37 @@ QWidget *DataTab::vehicle_data_widget(GaugeConfig cfg)
 }
 
 QWidget *ObdTab::vehicle_data_widget(GaugeConfig cfg)
+{
+    QWidget *widget = new QWidget(this);
+    QVBoxLayout *layout = new QVBoxLayout(widget);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setSpacing(0);
+
+    QFont value_font(this->arbiter.forge().font(cfg.font_size.value, true));
+
+    QFont unit_font(this->arbiter.forge().font(cfg.font_size.unit));
+    unit_font.setWeight(QFont::Light);
+    unit_font.setItalic(true);
+
+    Gauge *gauge = new Gauge(cfg,
+        value_font, unit_font, Gauge::RIGHT, widget);
+    layout->addWidget(gauge);
+    this->gauges.push_back(gauge);
+
+    if (cfg.font_size.label > 0) {
+        QFont label_font(this->arbiter.forge().font(cfg.font_size.label));
+        label_font.setWeight(QFont::Light);
+
+        QLabel *gauge_label = new QLabel(cfg.description, widget);
+        gauge_label->setFont(label_font);
+        gauge_label->setAlignment(Qt::AlignHCenter);
+        layout->addWidget(gauge_label);
+    }
+
+    return widget;
+}
+
+QWidget *LSTab::vehicle_data_widget(GaugeConfig cfg)
 {
     QWidget *widget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);

@@ -122,3 +122,18 @@ class ObdTab : public QWidget {
     std::vector<Gauge *> gauges;
 
 };
+
+class LSTab : public QWidget {
+    Q_OBJECT
+
+   public:
+    LSTab(Arbiter &arbiter, QWidget *parent = nullptr);
+
+   private:
+    Arbiter &arbiter;
+    QWidget *ls_data_widget();
+    QWidget *vehicle_data_widget(GaugeConfig cfg);
+
+    std::vector<Gauge *> gauges;
+
+};
