@@ -370,7 +370,7 @@ QWidget *ObdTab::obd_data_widget()
     return widget;
 }
 
-QWidget *LSTab::obd_data_widget()
+QWidget *LSTab::ls_data_widget()
 {
     QWidget *widget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
