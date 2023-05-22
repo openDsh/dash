@@ -293,6 +293,8 @@ QWidget *DataTab::engine_data_widget()
     return widget;
 }
 
+/*
+
 QWidget *DataTab::obd_data_widget()
 {
     QVBoxLayout *layout = new QVBoxLayout(obd);
@@ -313,6 +315,8 @@ QWidget *DataTab::obd_data_widget()
 
     return widget;
 }
+
+*/
 
 QWidget *DataTab::vehicle_data_widget(GaugeConfig cfg)
 {
