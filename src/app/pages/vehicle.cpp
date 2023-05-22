@@ -32,10 +32,25 @@ ObdTab::ObdTab(Arbiter &arbiter, QWidget *parent)
     : QWidget(parent)
     , arbiter(arbiter)
 {
-    QVBoxLayout *layout = new QVBoxLayout(this);
-
+    //QVBoxLayout *layout = new QVBoxLayout(this);
     //layout->addWidget(this->track_widget());
     //layout->addWidget(this->controls_widget());
+
+    QHBoxLayout *layout = new QHBoxLayout(this);
+
+    QWidget *driving_data = this->speedo_tach_widget();
+    layout->addWidget(driving_data);
+    layout->addWidget(Session::Forge::br(true));
+
+    QWidget *obd_data = this->obd_data_widget();
+    layout->addWidget(obd_data);
+
+    QSizePolicy sp_left(QSizePolicy::Preferred, QSizePolicy::Preferred);
+    sp_left.setHorizontalStretch(5);
+    driving_data->setSizePolicy(sp_left);
+    QSizePolicy sp_right(QSizePolicy::Preferred, QSizePolicy::Preferred);
+    sp_right.setHorizontalStretch(2);
+    engine_data->setSizePolicy(sp_right);
 }
 
 Gauge::Gauge(GaugeConfig cfg, QFont value_font, QFont unit_font, Gauge::Orientation orientation, QWidget *parent)
@@ -111,7 +126,7 @@ VehiclePage::VehiclePage(Arbiter &arbiter, QWidget *parent)
 void VehiclePage::init()
 {
     this->addTab(new DataTab(this->arbiter, this), "Data");
-    this->addTab(new ObdTab(this->arbiter, this), "OBD");
+    this->addTab(new ObdTab(this->arbiter, this), "Obd");
     this->config = Config::get_instance();
 
     for (auto device : QCanBus::instance()->availableDevices("socketcan"))
@@ -302,30 +317,19 @@ QWidget *DataTab::engine_data_widget()
     return widget;
 }
 
-/*
-
 QWidget *DataTab::obd_data_widget()
 {
-    QVBoxLayout *layout = new QVBoxLayout(obd);
+    QVBoxLayout *layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
 
     layout->addStretch();
-    layout->addWidget(this->vehicle_data_widget(gauges_cfg.COOLANT_TEMP));
-    layout->addStretch();
-    layout->addWidget(Session::Forge::br());
-    layout->addStretch();
-    layout->addWidget(this->vehicle_data_widget(gauges_cfg.AUTONOMIA));
-    layout->addStretch();
-    layout->addWidget(Session::Forge::br());
-    layout->addStretch();
     layout->addWidget(this->vehicle_data_widget(gauges_cfg.EXT_TEMP));
     layout->addStretch();
+    //layout->addWidget(Session::Forge::br());
 
     return widget;
 }
-
-*/
 
 QWidget *DataTab::vehicle_data_widget(GaugeConfig cfg)
 {
