@@ -44,7 +44,6 @@ class Arbiter : public QObject {
     void increase_volume(uint8_t val);
     void set_cursor(bool enabled);
     void set_action(Action *action, QString key);
-    void send_openauto_button_press(aasdk::proto::enums::ButtonCode::Enum buttonCode, openauto::projection::WheelDirection wheelDirection = openauto::projection::WheelDirection::NONE);
 
     QMainWindow *window();
     QSettings &settings() { return this->session_.settings_; }
