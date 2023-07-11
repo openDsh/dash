@@ -98,6 +98,7 @@ Session::Layout::ControlBar::ControlBar(QSettings &settings, Arbiter &arbiter)
 Session::Layout::Fullscreen::Fullscreen(QSettings &settings, Arbiter &arbiter)
     : enabled(false)
     , curr_toggler(nullptr)
+    , on_start(settings.value("Layout/Fullscreen/on_start", false).toBool())
 {
     this->togglers_ = {
         new NullFullscreenToggler(arbiter),

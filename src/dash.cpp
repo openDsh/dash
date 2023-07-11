@@ -13,27 +13,31 @@ int main(int argc, char *argv[])
     dash.setApplicationName("dash");
     dash.installEventFilter(ActionEventFilter::get_instance());
 
-    QStringList args = dash.arguments();
-    bool use_fixed_size = (args.size() > 2);
-
+    QSettings settings;
     QSize size = dash.primaryScreen()->size();
-    if (use_fixed_size)
-        size = QSize(args.at(1).toInt(), args.at(2).toInt());
+    QPoint pos = dash.primaryScreen()->geometry().topLeft();
+    settings.beginGroup("Window");
+    bool fixed = settings.contains("size");
+    if (fixed) {
+        size = settings.value("size").toSize();
+        if (settings.contains("pos"))
+            pos = settings.value("pos").toPoint();
+    }
+    DASH_LOG(info) << "loaded config: " << settings.fileName().toStdString();
 
-    QPixmap pixmap(QPixmap(":/splash.png").scaledToHeight(size.height()/2));
+    QPixmap pixmap(QPixmap(":/splash.png").scaledToHeight(size.height() / 2));
     QSplashScreen splash(pixmap);
     splash.setMask(pixmap.mask());
+    splash.move(pos.x() + ((size.width() / 2) - (splash.width() / 2)), pos.y() + ((size.height() / 2) - (splash.height() / 2)));
     splash.show();
     dash.processEvents();
 
-    MainWindow window;
+    MainWindow window(QRect(pos, size));
     window.setWindowIcon(QIcon(":/logo.png"));
     window.setWindowFlags(Qt::FramelessWindowHint);
-    if (!use_fixed_size)
+    if (!fixed)
         window.setWindowState(Qt::WindowFullScreen);
 
-    // force to either screen or custom size
-    window.setFixedSize(size);
     window.show();
     splash.finish(&window);
 
