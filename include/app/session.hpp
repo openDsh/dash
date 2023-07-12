@@ -78,6 +78,7 @@ class Session {
         struct Fullscreen {
             bool enabled;
             FullscreenToggler *curr_toggler;
+            bool on_start;
 
             Fullscreen(QSettings &settings, Arbiter &arbiter);
 

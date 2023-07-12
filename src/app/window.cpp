@@ -203,9 +203,9 @@ QWidget *Dash::power_control() const
     return widget;
 }
 
-MainWindow::MainWindow()
+MainWindow::MainWindow(QRect geometry)
     : QMainWindow()
-    , arbiter(this)
+    , arbiter(this->init(geometry))
     , stack(new QStackedWidget())
 {
     this->setAttribute(Qt::WA_TranslucentBackground, true);
@@ -225,6 +225,17 @@ MainWindow::MainWindow()
     dash->init();
 
     this->arbiter.system().brightness.set();
+
+    if (this->arbiter.layout().fullscreen.on_start)
+        this->arbiter.set_fullscreen(true);
+}
+
+MainWindow *MainWindow::init(QRect geometry)
+{
+    // force to either screen or custom size
+    this->setGeometry(geometry);
+
+    return this;
 }
 
 void MainWindow::showEvent(QShowEvent *event)

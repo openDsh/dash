@@ -163,6 +163,14 @@ void Arbiter::set_curr_fullscreen_toggler(int id)
     this->set_curr_fullscreen_toggler(this->layout().fullscreen.toggler(id));
 }
 
+void Arbiter::set_fullscreen_on_start(bool enabled)
+{
+    this->layout().fullscreen.on_start = enabled;
+    this->settings().setValue("Layout/Fullscreen/on_start", enabled);
+
+    emit fullscreen_on_start_changed(enabled);
+}
+
 void Arbiter::set_brightness_plugin(QString plugin)
 {
     if (!(this->system().brightness.plugins().contains(plugin) || (plugin == Session::System::Brightness::AUTO_PLUGIN)))
