@@ -4,6 +4,24 @@
 
 #include "app/pages/page.hpp"
 
+PageContainer::PageContainer(QWidget *widget)
+    : QFrame(nullptr)
+    , widget(widget)
+{
+    (new QStackedLayout(this))->addWidget(this->widget);
+}
+
+QWidget *PageContainer::take()
+{
+    this->layout()->removeWidget(this->widget);
+    return this->widget;
+}
+
+void PageContainer::reset()
+{
+    this->layout()->addWidget(this->widget);
+}
+
 Page::Settings::Settings() : QWidget()
 {
     this->layout_ = new QVBoxLayout(this);
@@ -29,7 +47,7 @@ Page::Page(Arbiter &arbiter, QString name, QString icon_name, bool toggleable, Q
     , name_(name)
     , icon_name_(icon_name)
     , toggleable_(toggleable)
-    , widget_(widget)
+    , container_(new PageContainer(widget))
     , button_(new QPushButton())
     , enabled_(true)
 {
@@ -64,7 +82,7 @@ QLayout *Page::settings_layout()
 
 Dialog *Page::dialog()
 {
-    auto dialog = new Dialog(this->arbiter, true, this->widget_);
+    auto dialog = new Dialog(this->arbiter, true, this->container_);
     dialog->set_body(this->settings_body());
     auto save_button = new QPushButton("save");
     QObject::connect(save_button, &QPushButton::clicked, [this]{ this->on_settings_save(); });

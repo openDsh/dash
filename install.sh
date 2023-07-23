@@ -193,10 +193,10 @@ if [ $pulseaudio = false ]
   else
     echo Preparing to compile and install pulseaudio
     echo Grabbing pulseaudio deps
-    sed -i 's/#deb-src/deb-src/g' /etc/apt/sources.list
+    sudo sed -i 's/#deb-src/deb-src/g' /etc/apt/sources.list
     sudo apt-get update -y
     git clone git://anongit.freedesktop.org/pulseaudio/pulseaudio
-    apt-get install -y autopoint
+    sudo apt-get install -y autopoint
     cd pulseaudio
     git checkout tags/v12.99.3
     echo Applying imtu patch
@@ -226,8 +226,8 @@ if [ $ofono = false ]
         echo Package failed to install with error code $?, quitting check logs above
         exit 1
     fi
-    sed -i 's/load-module module-bluetooth-discover/load-module module-bluetooth-discover headset=ofono/g' /usr/local/etc/pulse/default.pa
-    cat <<EOT >> /usr/local/etc/pulse/default.pa
+    sudo sed -i 's/load-module module-bluetooth-discover/load-module module-bluetooth-discover headset=ofono/g' /usr/local/etc/pulse/default.pa
+    sudo cat <<EOT >> /usr/local/etc/pulse/default.pa
     ### Echo cancel and noise reduction
     .ifexists module-echo-cancel.so
     load-module module-echo-cancel aec_method=webrtc source_name=ec_out sink_name=ec_ref

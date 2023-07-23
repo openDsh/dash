@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QFrame>
 #include <QPushButton>
 #include <QString>
 #include <QVBoxLayout>
@@ -9,6 +10,18 @@
 
 class Arbiter;
 
+class PageContainer : public QFrame {
+    Q_OBJECT
+
+   public:
+    PageContainer(QWidget *widget);
+    QWidget *take();
+    void reset();
+
+   private:
+    QWidget *widget;
+};
+
 class Page {
    public:
     Page(Arbiter &arbiter, QString name, QString icon_name, bool toggleable, QWidget *widget);
@@ -17,7 +30,7 @@ class Page {
     const QString &name() { return this->name_; }
     const QString &icon_name() { return this->icon_name_; }
     const bool &toggleale() { return this->toggleable_; }
-    QWidget *widget() { return this->widget_; }
+    PageContainer *container() { return this->container_; }
     QPushButton *button() { return this->button_; }
     const bool &enabled() { return this->enabled_; }
 
@@ -46,7 +59,7 @@ class Page {
     const QString name_;
     const QString icon_name_;
     const bool toggleable_;
-    QWidget *widget_;
+    PageContainer *container_;
     QPushButton *button_;
     bool enabled_;
 
