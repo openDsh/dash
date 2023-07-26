@@ -6,18 +6,14 @@
 #include <QObject>
 #include <QShowEvent>
 #include <QStackedLayout>
-#include <QElapsedTimer>
 #include <QVBoxLayout>
 #include <QWidget>
-#include <QStackedWidget>
 
 #include "app/config.hpp"
 #include "app/pages/openauto.hpp"
 #include "app/pages/page.hpp"
 
 #include "app/arbiter.hpp"
-
-class FullscreenToggle;
 
 class Dash : public QWidget {
     Q_OBJECT
@@ -29,7 +25,6 @@ class Dash : public QWidget {
    private:
     struct NavRail {
         QButtonGroup group;
-        QElapsedTimer timer;
         QVBoxLayout *layout;
 
         NavRail();
@@ -54,19 +49,17 @@ class Dash : public QWidget {
     QWidget *power_control() const;
 };
 
-class MainWindow : public QMainWindow {
+class Window : public QMainWindow {
     Q_OBJECT
 
    public:
-    MainWindow(QRect geometry);
-    void set_fullscreen(Page *page);
+    Window();
 
    protected:
-    void showEvent(QShowEvent *event) override;
+    void showEvent(QShowEvent *event);
+    // void keyPressEvent(QKeyEvent *event);
+    // void keyReleaseEvent(QKeyEvent *event);
 
    private:
     Arbiter arbiter;
-    QStackedWidget *stack;
-
-    MainWindow *init(QRect geometry);
 };

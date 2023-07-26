@@ -68,6 +68,12 @@ OpenAutoFrame::OpenAutoFrame(QWidget *parent) : QWidget(parent)
     this->setAttribute(Qt::WA_AcceptTouchEvents);
 }
 
+void OpenAutoFrame::mouseDoubleClickEvent(QMouseEvent *)
+{
+    this->toggle_fullscreen();
+    emit double_clicked(this->fullscreen);
+}
+
 OpenAutoPage::Settings::Settings(Arbiter &arbiter, QWidget *parent)
     : QWidget(parent)
     , arbiter(arbiter)
@@ -423,6 +429,10 @@ void OpenAutoPage::init()
     this->worker = new OpenAutoWorker(callback, this->arbiter.theme().mode == Session::Theme::Dark, frame, this->arbiter);
 
     connect(this->frame, &OpenAutoFrame::toggle, [this](bool enable){
+        if (!enable && this->frame->is_fullscreen()) {
+            this->addWidget(frame);
+            this->frame->toggle_fullscreen();
+        }
         this->setCurrentIndex(enable ? 1 : 0);
 
         if (Config::get_instance()->get_show_aa_connected()) {
@@ -434,14 +444,33 @@ void OpenAutoPage::init()
             this->button()->setIcon(icon);
         }
     });
+    connect(this->frame, &OpenAutoFrame::double_clicked, [this](bool fullscreen) {
+        this->set_full_screen(fullscreen);
+    });
     
     AAHandler *aa_handler = this->arbiter.android_auto().handler;
     connect(&this->arbiter, &Arbiter::mode_changed, [this, aa_handler](Session::Theme::Mode mode){
         aa_handler->setNightMode(mode == Session::Theme::Dark);
     });
 
+    connect(&this->arbiter, &Arbiter::openauto_full_screen, [this](bool fullscreen) {
+        this->set_full_screen(fullscreen);
+    });
+
     this->addWidget(this->connect_msg());
     this->addWidget(this->frame);
+}
+
+void OpenAutoPage::set_full_screen(bool fullscreen)
+{
+    if (fullscreen) {
+        emit toggle_fullscreen(this->frame);
+    }
+    else {
+        this->addWidget(frame);
+        this->setCurrentWidget(frame);
+    }
+    this->worker->update_size();
 }
 
 void OpenAutoPage::resizeEvent(QResizeEvent *event)

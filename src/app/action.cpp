@@ -129,11 +129,14 @@ Action::Action(QString name, std::function<void(ActionState)> action, QWidget *p
 
 bool ActionEventFilter::eventFilter(QObject* obj, QEvent* event)
 {
-    if (this->disabled || (this->eventFilterMap.count() == 0))
+    std::lock_guard<decltype(mutex_)> lock(mutex_);
+    if(disabled) return false;
+    if(eventFilterMap.count()==0){
         return false;
-
+    }
     Action::ActionState state = Action::ActionState::Triggered;
-    switch (event->type()) {
+    switch(event->type())
+    {
         case(QEvent::KeyPress):
             state = Action::ActionState::Activated;
             break;
@@ -144,13 +147,16 @@ bool ActionEventFilter::eventFilter(QObject* obj, QEvent* event)
             return false;
     }
     QKeyEvent* key = static_cast<QKeyEvent*>(event);
-    if (!key->isAutoRepeat())
+    if(!key->isAutoRepeat())
     {
-        auto it = this->eventFilterMap.find(key->key());
-        if (it != this->eventFilterMap.end())
-        {
-            std::lock_guard<decltype(mutex_)> lock(mutex_);
-            (*it)->func_(state);
+        QMap<int, Action*>::const_iterator i = eventFilterMap.find(key->key());
+        int count = 0;
+        while (i != eventFilterMap.end() && i.key() == key->key()) {
+            i.value()->func_(state);
+            ++i;
+            ++count;
+        }
+        if(count > 0){
             return true;
         }
     }

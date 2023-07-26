@@ -107,11 +107,6 @@ QPushButton:!flat:disabled {
     background-color: rgb(33, 33, 33);
 }
 
-QPushButton#FullscreenBar {
-    border-radius: 2px;
-    margin: 2px;
-}
-
 QFrame[frameShape="4"][frameShadow="16"],
 QFrame[frameShape="5"][frameShadow="16"] {
     color: rgba(255, 255, 255, 66);

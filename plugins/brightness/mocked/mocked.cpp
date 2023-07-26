@@ -24,6 +24,6 @@ uint8_t Mocked::priority()
 
 void Mocked::set(int brightness)
 {
-    for (auto widget : QApplication::topLevelWidgets())
-        widget->setWindowOpacity(brightness / 255.0);
+    if (this->window != nullptr)
+        this->window->setWindowOpacity(brightness / 255.0);
 }

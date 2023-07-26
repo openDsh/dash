@@ -1,9 +1,8 @@
 #include "app/session.hpp"
-#include "app/window.hpp"
 
 #include "app/arbiter.hpp"
 
-Arbiter::Arbiter(MainWindow *window)
+Arbiter::Arbiter(QMainWindow *window)
     : QObject()
     , window_(window)
     , session_(*this)
@@ -85,14 +84,8 @@ void Arbiter::set_curr_page(Page *page)
 {
     if (this->layout().page_id(page) < 0 || !page->enabled())
         return;
-
-    if (this->layout().fullscreen.enabled)
-        this->layout().curr_page->container()->reset();
-
+    
     this->layout().curr_page = page;
-
-    if (this->layout().fullscreen.enabled)
-        this->window_->set_fullscreen(page);
 
     emit curr_page_changed(page);
 }
@@ -116,59 +109,6 @@ void Arbiter::set_page(Page *page, bool enabled)
     this->settings().endGroup();
 
     emit page_changed(page, enabled);
-}
-
-void Arbiter::set_fullscreen(bool fullscreen)
-{
-    this->layout().fullscreen.enabled = fullscreen;
-
-    auto page = this->layout().curr_page;
-
-    if (fullscreen) {
-        this->window_->set_fullscreen(page);
-        this->layout().fullscreen.curr_toggler->enable();
-    }
-    else {
-        this->layout().fullscreen.curr_toggler->disable();
-        page->container()->reset(); // reinserts widget into container, removing it from window stack
-    }
-
-    emit fullscreen_changed(fullscreen);
-}
-
-void Arbiter::toggle_fullscreen()
-{
-    this->set_fullscreen(!this->layout().fullscreen.enabled);
-}
-
-void Arbiter::set_curr_fullscreen_toggler(FullscreenToggler *toggler)
-{
-    auto id = this->layout().fullscreen.toggler_id(toggler);
-    if (id < 0)
-        return;
-
-    this->layout().fullscreen.curr_toggler->disable();
-
-    this->layout().fullscreen.curr_toggler = toggler;
-    this->settings().setValue("Layout/Fullscreen/toggler", id);
-
-    if (this->layout().fullscreen.enabled)
-        this->layout().fullscreen.curr_toggler->enable();
-
-    emit curr_fullscreen_toggler_changed(toggler);
-}
-
-void Arbiter::set_curr_fullscreen_toggler(int id)
-{
-    this->set_curr_fullscreen_toggler(this->layout().fullscreen.toggler(id));
-}
-
-void Arbiter::set_fullscreen_on_start(bool enabled)
-{
-    this->layout().fullscreen.on_start = enabled;
-    this->settings().setValue("Layout/Fullscreen/on_start", enabled);
-
-    emit fullscreen_on_start_changed(enabled);
 }
 
 void Arbiter::set_brightness_plugin(QString plugin)
@@ -255,9 +195,10 @@ void Arbiter::set_action(Action *action, QString key)
     emit action_changed(action, key);
 }
 
-QMainWindow *Arbiter::window()
+
+void Arbiter::send_openauto_full_screen(bool fullscreen)
 {
-    return this->window_;
+    emit openauto_full_screen(fullscreen);
 }
 
 void Arbiter::send_vehicle_data(QString gauge_id, double value)

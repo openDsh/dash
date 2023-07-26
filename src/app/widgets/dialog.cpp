@@ -154,14 +154,15 @@ void Dialog::showEvent(QShowEvent *event)
     this->set_position();
 }
 
-void Dialog::closeEvent(QCloseEvent *)
+void Dialog::closeEvent(QCloseEvent *event)
 {
     // On Raspberry Pi's, sometimes LXPanel will grab focus after a dialog closes
     // Focus should be returned to main dash window instead, so that shortcuts work
     // and that dash remains fullscreen
     //
     // Tells the main window to grab focus
-    this->arbiter.window()->activateWindow();
+    arbiter.window()->activateWindow();
+    
 }
 
 bool Dialog::eventFilter(QObject *object, QEvent *event)

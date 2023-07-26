@@ -272,9 +272,6 @@ QWidget *LayoutSettingsTab::settings_widget()
 
     layout->addWidget(this->pages_widget());
     layout->addWidget(Session::Forge::br(), 1);
-    layout->addWidget(this->fullscreen_widget(), 1);
-    layout->addWidget(this->fullscreen_on_start_widget(), 1);
-    layout->addWidget(Session::Forge::br(), 1);
     layout->addWidget(this->status_bar_widget(), 1);
     layout->addWidget(Session::Forge::br(), 1);
     layout->addWidget(this->control_bar_widget(), 1);
@@ -325,43 +322,6 @@ QWidget *LayoutSettingsTab::pages_widget()
     });
 
     layout->addWidget(group, 1, Qt::AlignHCenter);
-
-    return widget;
-}
-
-QWidget *LayoutSettingsTab::fullscreen_widget()
-{
-    QWidget *widget = new QWidget(this);
-    QHBoxLayout *layout = new QHBoxLayout(widget);
-
-    QLabel *label = new QLabel("Fullscreen Toggler", widget);
-    layout->addWidget(label, 1);
-
-    QStringList togglers;
-    for (auto toggler : this->arbiter.layout().fullscreen.togglers())
-        togglers.append(toggler->name());
-    Selector *selector = new Selector(togglers, this->arbiter.layout().fullscreen.curr_toggler->name(), this->arbiter.forge().font(14), this->arbiter, widget);
-    connect(selector, &Selector::idx_changed, [this](int idx){
-        this->arbiter.set_curr_fullscreen_toggler(idx);
-    });
-    layout->addWidget(selector, 1);
-
-    return widget;
-}
-
-QWidget *LayoutSettingsTab::fullscreen_on_start_widget()
-{
-    QWidget *widget = new QWidget(this);
-    QHBoxLayout *layout = new QHBoxLayout(widget);
-
-    QLabel *label = new QLabel("Fullscreen on Start", widget);
-    layout->addWidget(label, 1);
-
-    Switch *toggle = new Switch(widget);
-    toggle->scale(this->arbiter.layout().scale);
-    toggle->setChecked(this->arbiter.layout().fullscreen.on_start);
-    connect(toggle, &Switch::stateChanged, [this](bool state){ this->arbiter.set_fullscreen_on_start(state); });
-    layout->addWidget(toggle, 1, Qt::AlignHCenter);
 
     return widget;
 }
