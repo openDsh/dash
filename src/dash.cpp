@@ -35,8 +35,8 @@ int main(int argc, char *argv[])
     MainWindow window(QRect(pos, size));
     window.setWindowIcon(QIcon(":/logo.png"));
     window.setWindowFlags(Qt::FramelessWindowHint);
-    if (!fixed)
-        window.setWindowState(Qt::WindowFullScreen);
+    //if (!fixed)
+      //  window.setWindowState(Qt::WindowFullScreen);
 
     window.show();
     splash.finish(&window);
