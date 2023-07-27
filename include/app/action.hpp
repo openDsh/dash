@@ -90,7 +90,6 @@ class Action : public QObject {
 
     QString name_;
     QString key_;
-    
 };
 
 class ActionEventFilter : public QObject

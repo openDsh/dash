@@ -3,8 +3,6 @@
 #include "openauto/Service/IAndroidAutoInterface.hpp"
 #include "app/action.hpp"
 
-
-
 class AAHandler : public QObject, public openauto::service::IAndroidAutoInterface {
     Q_OBJECT
 
@@ -18,10 +16,7 @@ class AAHandler : public QObject, public openauto::service::IAndroidAutoInterfac
     void navigationDistanceEvent(const aasdk::proto::messages::NavigationDistanceEvent& distanceEvent) override;
     void injectButtonPressHelper(aasdk::proto::enums::ButtonCode::Enum buttonCode, Action::ActionState actionState);
 
-   
-
    private:
-    
 
    signals:
     void aa_media_metadata_update(const aasdk::proto::messages::MediaInfoChannelMetadataData& metadata);
@@ -29,5 +24,4 @@ class AAHandler : public QObject, public openauto::service::IAndroidAutoInterfac
     void aa_navigation_status_update(const aasdk::proto::messages::NavigationStatus& navStatus);
     void aa_navigation_turn_event(const aasdk::proto::messages::NavigationTurnEvent& turnEvent);
     void aa_navigation_distance_event(const aasdk::proto::messages::NavigationDistanceEvent& distanceEvent);
-
 };

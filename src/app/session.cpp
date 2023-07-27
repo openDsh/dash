@@ -399,9 +399,9 @@ Session::Core::Core(QSettings &settings, Arbiter &arbiter)
     };
 
     for (auto page : arbiter.layout().pages()) {
-        auto callback = [&arbiter, page](Action::ActionState actionState){ 
-            if(actionState == Action::ActionState::Triggered || actionState == Action::ActionState::Activated) {
-                QMetaObject::invokeMethod(&arbiter, [&arbiter, page](){
+        auto callback = [&arbiter, page](Action::ActionState actionState){
+            if (actionState == Action::ActionState::Triggered || actionState == Action::ActionState::Activated) {
+                QMetaObject::invokeMethod(&arbiter, [&arbiter, page]{
                     arbiter.set_curr_page(page);
                 }, Qt::QueuedConnection);
             }
@@ -410,9 +410,9 @@ Session::Core::Core(QSettings &settings, Arbiter &arbiter)
     }
 
     {
-        auto callback = [&arbiter](Action::ActionState actionState){ 
-            if(actionState == Action::ActionState::Triggered || actionState == Action::ActionState::Activated){
-                QMetaObject::invokeMethod(&arbiter, [&arbiter](){
+        auto callback = [&arbiter](Action::ActionState actionState){
+            if (actionState == Action::ActionState::Triggered || actionState == Action::ActionState::Activated) {
+                QMetaObject::invokeMethod(&arbiter, [&arbiter]{
                     arbiter.set_curr_page(arbiter.layout().next_enabled_page(arbiter.layout().curr_page));
                 }, Qt::QueuedConnection);
             }
