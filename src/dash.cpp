@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
         if (settings.contains("pos"))
             pos = settings.value("pos").toPoint();
     }
-    DASH_LOG(info) << "loaded config: " << settings.fileName().toStdString();
+    DASH_LOG(info) << "loaded config: " << settings.fileName().toStdString() << ";size: " << size.toStdString() << ";pos: " << pos.toStdString();
 
     QPixmap pixmap(QPixmap(":/splash.png").scaledToHeight(size.height() / 2));
     QSplashScreen splash(pixmap);
@@ -35,8 +35,8 @@ int main(int argc, char *argv[])
     MainWindow window(QRect(pos, size));
     window.setWindowIcon(QIcon(":/logo.png"));
     window.setWindowFlags(Qt::FramelessWindowHint);
-    //if (!fixed)
-      //  window.setWindowState(Qt::WindowFullScreen);
+    if (!fixed)
+        window.setWindowState(Qt::WindowFullScreen);
 
     window.show();
     splash.finish(&window);
