@@ -95,23 +95,19 @@ class Action : public QObject {
 class ActionEventFilter : public QObject
 {
     Q_OBJECT
+
     public:
         ActionEventFilter(){};
         bool eventFilter(QObject* obj, QEvent* event);
         static ActionEventFilter *get_instance();
         QMap<int, Action*> eventFilterMap;
-        void disable()
-        {
-            disabled = true;
-        }
-        void enable()
-        {
-            disabled = false;
-        }
+
+        void enable() { this->disabled = false; }
+        void disable() { this->disabled = true; }
+
     private:
         std::mutex mutex_;
         bool disabled = false;
-
 };
 
 

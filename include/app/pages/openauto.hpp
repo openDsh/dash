@@ -55,8 +55,6 @@ class OpenAutoWorker : public QObject {
     std::shared_ptr<aasdk::usb::ConnectedAccessoriesEnumerator> connected_accessories_enumerator;
     std::shared_ptr<openauto::App> app;
     std::vector<std::thread> thread_pool;
-
-
 };
 
 class OpenAutoFrame : public QWidget {

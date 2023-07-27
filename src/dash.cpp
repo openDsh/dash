@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
     if (use_fixed_size)
         size = QSize(args.at(1).toInt(), args.at(2).toInt());
 
-    QPixmap pixmap(QPixmap(":/splash.png").scaledToHeight(size.height()/2));
+    QPixmap pixmap(QPixmap(":/splash.png").scaledToHeight(size.height() / 2));
     QSplashScreen splash(pixmap);
     splash.setMask(pixmap.mask());
     splash.show();

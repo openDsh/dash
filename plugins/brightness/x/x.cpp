@@ -24,7 +24,7 @@ void X::set(int brightness)
 {
     if (this->screen != nullptr) {
         QProcess process(this);
-        process.start(QString("/home/gioele/RPi-USB-Brightness/64/lite/Raspi_USB_Backlight_nogui -b %1").arg((int)(brightness / 25.5)));
+        process.start(QString("/home/gioele/lum.sh %1").arg(brightness));
         process.waitForFinished();
     }
 }
