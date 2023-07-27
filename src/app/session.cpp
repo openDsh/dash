@@ -95,12 +95,27 @@ Session::Layout::ControlBar::ControlBar(QSettings &settings, Arbiter &arbiter)
     this->curr_quick_view = this->quick_views_.value(settings.value("Layout/ControlBar/quick_view", 0).toInt());
 }
 
+Session::Layout::Fullscreen::Fullscreen(QSettings &settings, Arbiter &arbiter)
+    : enabled(false)
+    , curr_toggler(nullptr)
+    , on_start(settings.value("Layout/Fullscreen/on_start", false).toBool())
+{
+    this->togglers_ = {
+        new NullFullscreenToggler(arbiter),
+        new BarFullscreenToggler(arbiter),
+        new ButtonFullscreenToggler(arbiter)
+    };
+
+    this->curr_toggler = this->togglers_.value(settings.value("Layout/Fullscreen/toggler", 0).toInt());
+}
+
 Session::Layout::Layout(QSettings &settings, Arbiter &arbiter)
     : scale(settings.value("Layout/scale", 1.0).toDouble())
     , status_bar(settings.value("Layout/status_bar", false).toBool())
     , control_bar(settings, arbiter)
     , openauto_page(new OpenAutoPage(arbiter))
     , curr_page(nullptr)
+    , fullscreen(settings, arbiter)
 {
     this->pages_ = {
         this->openauto_page,
