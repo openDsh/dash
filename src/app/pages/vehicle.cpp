@@ -72,15 +72,6 @@ Obd1Tab::Obd1Tab(Arbiter &arbiter, QWidget *parent)
     layout->addWidget(Session::Forge::br(true));
     QWidget *obd_data3 = this->obd_data_widget(3);
     layout->addWidget(obd_data3);
-    layout->addWidget(Session::Forge::br(true));
-    QWidget *obd_data4 = this->obd_data_widget(4);
-    layout->addWidget(obd_data4);
-    layout->addWidget(Session::Forge::br(true));
-    QWidget *obd_data5 = this->obd_data_widget(5);
-    layout->addWidget(obd_data5);
-    layout->addWidget(Session::Forge::br(true));
-    QWidget *obd_data6 = this->obd_data_widget(6);
-    layout->addWidget(obd_data6);
 
     // QSizePolicy sp_left(QSizePolicy::Preferred, QSizePolicy::Preferred);
     // sp_left.setHorizontalStretch(5);
