@@ -5,7 +5,7 @@
 #include "app/pages/vehicle.hpp"
 #include "app/window.hpp"
 #include "plugins/vehicle_plugin.hpp"
-
+/*
 GaugesConfig gauges_cfg =
     {
         {"autonomia", "Autonomia", {"Miles", "Km"}, {10, 16, 12}, 0, [](double x, bool _)
@@ -603,4 +603,4 @@ QWidget *LSTab::vehicle_data_widget(GaugeConfig cfg)
     }
 
     return widget;
-}
+}*/
