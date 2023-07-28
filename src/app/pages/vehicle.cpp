@@ -408,7 +408,7 @@ QWidget *ObdTab::obd_data_widget(int colonna)
     QVBoxLayout *layout = new QVBoxLayout(widget);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
-
+/*
     switch (colonna)
     {
     case 1:
@@ -489,7 +489,7 @@ QWidget *ObdTab::obd_data_widget(int colonna)
         layout->addWidget(this->vehicle_data_widget(gauges_cfg.LMB2));
         layout->addStretch();
         break;
-    }
+    }*/
 
     return widget;
 }
