@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
         if (settings.contains("pos"))
             pos = settings.value("pos").toPoint();
     }
-    DASH_LOG(info) << "loaded config: " << settings.fileName().toStdString() << ";size: " << size << ";pos: " << pos;
+    DASH_LOG(info) << "loaded config: " << settings.fileName().toStdString() << ";width: " << size.width() << ";height: " << size.height() << ";x: " << pos.x() << ";y: " << pos.y();
 
     QPixmap pixmap(QPixmap(":/splash.png").scaledToHeight(size.height() / 2));
     QSplashScreen splash(pixmap);
