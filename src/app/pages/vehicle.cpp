@@ -5,7 +5,7 @@
 #include "app/pages/vehicle.hpp"
 #include "app/window.hpp"
 #include "plugins/vehicle_plugin.hpp"
-/*
+
 GaugesConfig gauges_cfg =
     {
         {"autonomia", "Autonomia", {"Miles", "Km"}, {10, 16, 12}, 0, [](double x, bool _)
@@ -208,8 +208,8 @@ VehiclePage::VehiclePage(Arbiter &arbiter, QWidget *parent)
 void VehiclePage::init()
 {
     this->addTab(new DataTab(this->arbiter, this), "Data");
-    this->addTab(new ObdTab(this->arbiter, this), "Obd");
-    this->addTab(new LSTab(this->arbiter, this), "LS");
+    //this->addTab(new ObdTab(this->arbiter, this), "Obd");
+    //this->addTab(new LSTab(this->arbiter, this), "LS");
     this->config = Config::get_instance();
 
     for (auto device : QCanBus::instance()->availableDevices("socketcan"))
@@ -603,4 +603,4 @@ QWidget *LSTab::vehicle_data_widget(GaugeConfig cfg)
     }
 
     return widget;
-}*/
+}
