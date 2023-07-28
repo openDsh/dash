@@ -423,7 +423,7 @@ QWidget *ObdTab::obd_data_widget(int colonna)
         layout->addStretch();
         layout->addWidget(this->vehicle_data_widget(gauges_cfg.MAF));
         layout->addStretch();
-        break;/*
+        break;
     case 2:
         layout->addStretch();
         layout->addWidget(this->vehicle_data_widget(gauges_cfg.MAP));
@@ -449,7 +449,7 @@ QWidget *ObdTab::obd_data_widget(int colonna)
         layout->addStretch();
         layout->addWidget(this->vehicle_data_widget(gauges_cfg.TANK));
         layout->addStretch();
-        break;
+        break;/*
     case 4:
         layout->addStretch();
         layout->addWidget(this->vehicle_data_widget(gauges_cfg.IGNANGLE));
