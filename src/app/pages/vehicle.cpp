@@ -209,7 +209,7 @@ void VehiclePage::init()
 {
     this->addTab(new DataTab(this->arbiter, this), "Data");
     //this->addTab(new ObdTab(this->arbiter, this), "Obd");
-    //this->addTab(new LSTab(this->arbiter, this), "LS");
+    this->addTab(new LSTab(this->arbiter, this), "LS");
     this->config = Config::get_instance();
 
     for (auto device : QCanBus::instance()->availableDevices("socketcan"))
