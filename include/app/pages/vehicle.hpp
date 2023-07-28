@@ -135,12 +135,27 @@ private:
     std::vector<Gauge *> gauges;
 };
 
-class ObdTab : public QWidget
+class Obd1Tab : public QWidget
 {
     Q_OBJECT
 
 public:
-    ObdTab(Arbiter &arbiter, QWidget *parent = nullptr);
+    Obd1Tab(Arbiter &arbiter, QWidget *parent = nullptr);
+
+private:
+    Arbiter &arbiter;
+    QWidget *obd_data_widget(int colonna);
+    QWidget *vehicle_data_widget(GaugeConfig cfg);
+
+    std::vector<Gauge *> gauges;
+};
+
+class Obd2Tab : public QWidget
+{
+    Q_OBJECT
+
+public:
+    Obd2Tab(Arbiter &arbiter, QWidget *parent = nullptr);
 
 private:
     Arbiter &arbiter;
