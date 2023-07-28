@@ -81,9 +81,6 @@ Obd1Tab::Obd1Tab(Arbiter &arbiter, QWidget *parent)
     obd_data1->setSizePolicy(sp_right);
     obd_data2->setSizePolicy(sp_right);
     obd_data3->setSizePolicy(sp_right);
-    obd_data4->setSizePolicy(sp_right);
-    obd_data5->setSizePolicy(sp_right);
-    obd_data6->setSizePolicy(sp_right);
 
     connect(&this->arbiter, &Arbiter::vehicle_update_data, [this](QString gauge_id, double value)
             {
