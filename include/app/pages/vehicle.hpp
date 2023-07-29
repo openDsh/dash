@@ -59,7 +59,6 @@ struct GaugesConfig
     GaugeConfig SFT;
     GaugeConfig LMB1;
     GaugeConfig LMB2;
-    GaugeConfig LSCOOLANT;
     GaugeConfig LSOIL;
     GaugeConfig LSLVLCOOLANT;
     GaugeConfig LSTEMPEXT;

@@ -54,8 +54,6 @@ GaugesConfig gauges_cfg =
          { return x; }},
         {"lmb2", "Sonda Lambda 2", {"V", "V"}, {8, 18, 10}, 1, [](double x, bool si)
          { return x; }},
-        {"lscoolant", "Antigelo", {"°C", "°C"}, {8, 18, 10}, 1, [](double x, bool si)
-         { return x; }},
         {"lsoil", "Olio motore", {"lvl", "lvl"}, {8, 18, 10}, 0, [](double x, bool si)
          { return x; }},
         {"lslvlcoolant", "Livello Antigelo", {"lvl", "lvl"}, {8, 18, 10}, 0, [](double x, bool si)
@@ -573,7 +571,7 @@ QWidget *LSTab::ls_data_widget(int colonna)
     {
     case 1:
         layout->addStretch();
-        layout->addWidget(this->vehicle_data_widget(gauges_cfg.LSCOOLANT));
+        layout->addWidget(this->vehicle_data_widget(gauges_cfg.COOLANT_TEMP));
         layout->addStretch();
         layout->addWidget(Session::Forge::br());
         layout->addStretch();

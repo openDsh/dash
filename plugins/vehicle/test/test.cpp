@@ -420,7 +420,19 @@ void Test::readFrame()
                     if (ttCoolRX2 != tempCoolant)
                     {
                         // DASH_LOG(info) << "Antigelo:" << QString::number(tempCoolant).toStdString() << "\r\n";
-                        // this->arbiter->vehicle_update_data("coolant_temp", tempCoolant);
+                        this->arbiter->vehicle_update_data("coolant_temp", tempCoolant);
+                        ttCoolRX2 = tempCoolant;
+                    }
+                }
+
+                if(id == "0145")
+                {
+                    int tempCoolant = ((int)canMsg[3]) - 40;
+
+                    if (ttCoolRX2 != tempCoolant)
+                    {
+                        // DASH_LOG(info) << "Antigelo:" << QString::number(tempCoolant).toStdString() << "\r\n";
+                        this->arbiter->vehicle_update_data("coolant_temp", tempCoolant);
                         ttCoolRX2 = tempCoolant;
                     }
                 }
