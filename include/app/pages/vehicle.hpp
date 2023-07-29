@@ -59,6 +59,15 @@ struct GaugesConfig
     GaugeConfig SFT;
     GaugeConfig LMB1;
     GaugeConfig LMB2;
+    GaugeConfig LSCOOLANT;
+    GaugeConfig LSOIL;
+    GaugeConfig LSLVLCOOLANT;
+    GaugeConfig LSTEMPEXT;
+    GaugeConfig LSBENZ;
+    GaugeConfig LSVOLT;
+    GaugeConfig LSINIEZS;
+    GaugeConfig LSINIEZH;
+    GaugeConfig LSINIEZKM;
 };
 
 class Gauge : public QWidget
@@ -174,7 +183,7 @@ public:
 
 private:
     Arbiter &arbiter;
-    QWidget *ls_data_widget();
+    QWidget *ls_data_widget(int colonna);
     QWidget *vehicle_data_widget(GaugeConfig cfg);
 
     std::vector<Gauge *> gauges;

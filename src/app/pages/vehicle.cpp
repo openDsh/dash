@@ -53,7 +53,26 @@ GaugesConfig gauges_cfg =
         {"lmb1", "Sonda Lambda 1", {"V", "V"}, {8, 18, 10}, 1, [](double x, bool si)
          { return x; }},
         {"lmb2", "Sonda Lambda 2", {"V", "V"}, {8, 18, 10}, 1, [](double x, bool si)
-         { return x; }}};
+         { return x; }},
+        {"lscoolant", "Antigelo", {"°C", "°C"}, {8, 18, 10}, 1, [](double x, bool si)
+         { return x; }},
+        {"lsoil", "Olio motore", {"lvl", "lvl"}, {8, 18, 10}, 0, [](double x, bool si)
+         { return x; }},
+        {"lslvlcoolant", "Livello Antigelo", {"lvl", "lvl"}, {8, 18, 10}, 0, [](double x, bool si)
+         { return x; }},
+        {"lstempext", "Temperatura Esterna", {"°C", "°C"}, {8, 18, 10}, 1, [](double x, bool si)
+         { return x; }},
+        {"lsbenz", "Benzina", {"L", "L"}, {8, 18, 10}, 1, [](double x, bool si)
+         { return x; }},
+        {"lsvolt", "Tensione Batteria", {"V", "V"}, {8, 18, 10}, 1, [](double x, bool si)
+         { return x; }},
+        {"lsiniezs", "Cons. inst.", {"ml/s", "ml/s"}, {8, 18, 10}, 1, [](double x, bool si)
+         { return x; }},
+        {"lsiniezh", "Cons. orari", {"L", "L"}, {8, 18, 10}, 1, [](double x, bool si)
+         { return x; }},
+        {"lsiniezkm", "Cons. ogni 100km", {"L", "L"}, {8, 18, 10}, 1, [](double x, bool si)
+         { return x; }}
+         };
 
 Obd1Tab::Obd1Tab(Arbiter &arbiter, QWidget *parent)
     : QWidget(parent), arbiter(arbiter)
@@ -140,15 +159,23 @@ LSTab::LSTab(Arbiter &arbiter, QWidget *parent)
     // layout->addWidget(driving_data);
     // layout->addWidget(Session::Forge::br(true));
 
-    QWidget *ls_data = this->ls_data_widget();
-    layout->addWidget(ls_data);
+    QWidget *ls_data1 = this->ls_data_widget(1);
+    layout->addWidget(ls_data1);
+    layout->addWidget(Session::Forge::br(true));
+    QWidget *ls_data2 = this->ls_data_widget(2);
+    layout->addWidget(ls_data2);
+    layout->addWidget(Session::Forge::br(true));
+    QWidget *ls_data3 = this->ls_data_widget(3);
+    layout->addWidget(ls_data3);
 
     // QSizePolicy sp_left(QSizePolicy::Preferred, QSizePolicy::Preferred);
     // sp_left.setHorizontalStretch(5);
     // driving_data->setSizePolicy(sp_left);
     QSizePolicy sp_right(QSizePolicy::Preferred, QSizePolicy::Preferred);
     sp_right.setHorizontalStretch(2);
-    ls_data->setSizePolicy(sp_right);
+    ls_data1->setSizePolicy(sp_right);
+    ls_data2->setSizePolicy(sp_right);
+    ls_data3->setSizePolicy(sp_right);
 
     connect(&this->arbiter, &Arbiter::vehicle_update_data, [this](QString gauge_id, double value)
             {
@@ -535,17 +562,55 @@ QWidget *Obd2Tab::obd_data_widget(int colonna)
     return widget;
 }
 
-QWidget *LSTab::ls_data_widget()
+QWidget *LSTab::ls_data_widget(int colonna)
 {
     QWidget *widget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
 
-    layout->addStretch();
-    layout->addWidget(this->vehicle_data_widget(gauges_cfg.INTAKE_TEMP));
-    layout->addStretch();
-    // layout->addWidget(Session::Forge::br());
+    switch (colonna)
+    {
+    case 1:
+        layout->addStretch();
+        layout->addWidget(this->vehicle_data_widget(gauges_cfg.LSCOOLANT));
+        layout->addStretch();
+        layout->addWidget(Session::Forge::br());
+        layout->addStretch();
+        layout->addWidget(this->vehicle_data_widget(gauges_cfg.LSOIL));
+        layout->addStretch();
+        layout->addWidget(Session::Forge::br());
+        layout->addStretch();
+        layout->addWidget(this->vehicle_data_widget(gauges_cfg.LSLVLCOOLANT));
+        layout->addStretch();
+        break;
+    case 2:
+        layout->addStretch();
+        layout->addWidget(this->vehicle_data_widget(gauges_cfg.LSTEMPEXT));
+        layout->addStretch();
+        layout->addWidget(Session::Forge::br());
+        layout->addStretch();
+        layout->addWidget(this->vehicle_data_widget(gauges_cfg.LSBENZ));
+        layout->addStretch();
+        layout->addWidget(Session::Forge::br());
+        layout->addStretch();
+        layout->addWidget(this->vehicle_data_widget(gauges_cfg.LSVOLT));
+        layout->addStretch();
+        break;
+    case 3:
+        layout->addStretch();
+        layout->addWidget(this->vehicle_data_widget(gauges_cfg.LSINIEZS));
+        layout->addStretch();
+        layout->addWidget(Session::Forge::br());
+        layout->addStretch();
+        layout->addWidget(this->vehicle_data_widget(gauges_cfg.LSINIEZH));
+        layout->addStretch();
+        layout->addWidget(Session::Forge::br());
+        layout->addStretch();
+        layout->addWidget(this->vehicle_data_widget(gauges_cfg.LSINIEZKM));
+        layout->addStretch();
+        break;
+    }
 
     return widget;
 }
