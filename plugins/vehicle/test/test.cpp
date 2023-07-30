@@ -325,11 +325,11 @@ void Test::readFrame()
 
                     int tempCoolant = ((int)canMsg[2]) - 40;
 
-                    if (ttCoolRX1 != tempCoolant)
+                    if (ttCool != tempCoolant)
                     {
                         // DASH_LOG(info) << "Antigelo:" << QString::number(tempCoolant).toStdString() << "\r\n";
                         this->arbiter->vehicle_update_data("coolant_temp", tempCoolant);
-                        ttCoolRX1 = tempCoolant;
+                        ttCool = tempCoolant;
                     }
                 }
 
@@ -417,23 +417,93 @@ void Test::readFrame()
 
                     int tempCoolant = ((int)canMsg[1]) - 40;
 
-                    if (ttCoolRX2 != tempCoolant)
+                    if (ttCool != tempCoolant)
                     {
                         // DASH_LOG(info) << "Antigelo:" << QString::number(tempCoolant).toStdString() << "\r\n";
                         this->arbiter->vehicle_update_data("coolant_temp", tempCoolant);
-                        ttCoolRX2 = tempCoolant;
+                        ttCool = tempCoolant;
                     }
                 }
+
+                //LSCAN
 
                 if(id == "0145")
                 {
                     int tempCoolant = ((int)canMsg[3]) - 40;
 
-                    if (ttCoolRX2 != tempCoolant)
+                    if (ttCool != tempCoolant)
                     {
                         // DASH_LOG(info) << "Antigelo:" << QString::number(tempCoolant).toStdString() << "\r\n";
                         this->arbiter->vehicle_update_data("coolant_temp", tempCoolant);
-                        ttCoolRX2 = tempCoolant;
+                        ttCool = tempCoolant;
+                    }
+
+                    int tempOil = ((int)canMsg[2]);
+
+                    if (ttOil != tempOil)
+                    {
+                        this->arbiter->vehicle_update_data("lsoil", tempOil);
+                        ttOil = tempOil;
+                    }
+                }
+
+                if(id=="0350")
+                {
+                    int templvlCoolant = (int)(canMsg[1] & 8); //se 0b....1... allora and con 8 = 8 e coolant basso, altrimenti coolant alto
+
+                    if (ttlvlCool != templvlCoolant)
+                    {
+                        this->arbiter->vehicle_update_data("lslvlcoolant", templvlCoolant);
+                        ttlvlCool = templvlCoolant;
+                    }
+
+                    double temp = ((((canMsg[1] & 0x03) << 8) + canMsg[2])/ 8.0) - 40.0;
+
+                    if (temp != tempsalvata)
+                    {
+                        // DASH_LOG(info) << "Temperatura esterna:" << QString::number(temp).toStdString() << "\r\n";
+                        this->arbiter->vehicle_update_data("ext_temp", temp);
+                        tempsalvata = temp;
+                    }
+                }
+
+                if (id == "0375")
+                {
+                    //double tempBenz = 94 - (canMsg[1]/2);
+                    //double tempBenz = (((int)(canMsg[1] & 255) | (canMsg[0] << 8)) * (-0.6d)) + 100.0d;
+
+                    double tempBenz = codBenz[((int)canMsg[1])-80];
+
+                    if (ttBenz != tempBenz)
+                    {
+                        this->arbiter->vehicle_update_data("lsbenz", tempBenz);
+                        ttBenz = tempBenz;
+                    }
+                }
+
+                if (id == "0500")
+                {
+
+                    //double tempVolt = (((canMsg[0] << 8) + canMsg[1])-28.0)/10.0;
+                    double tempVolt = 2.8+canMsg[1]*0.1;
+
+                    if (ttVolt != tempVolt)
+                    {
+                        this->arbiter->vehicle_update_data("lsvolt", tempVolt);
+                        ttVolt = tempVolt;
+                    }
+                }
+
+                if (id == "0130")
+                {
+
+                    //double tempVolt = (((canMsg[0] << 8) + canMsg[1])-28.0)/10.0;
+                    double tempVolt = 2.8+canMsg[1]*0.1;
+
+                    if (ttVolt != tempVolt)
+                    {
+                        this->arbiter->vehicle_update_data("lsvolt", tempVolt);
+                        ttVolt = tempVolt;
                     }
                 }
             }

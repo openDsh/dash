@@ -61,7 +61,6 @@ struct GaugesConfig
     GaugeConfig LMB2;
     GaugeConfig LSOIL;
     GaugeConfig LSLVLCOOLANT;
-    GaugeConfig LSTEMPEXT;
     GaugeConfig LSBENZ;
     GaugeConfig LSVOLT;
     GaugeConfig LSINIEZS;
