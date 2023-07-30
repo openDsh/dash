@@ -38,6 +38,8 @@ private:
     int rpmsalvati = 0;
     int velsalvata = 0;
     double tempsalvata = 0;
+    double lastcons = 0;
+    double ttlastcons = 0;
     int ttOil = 0;
     double ttVolt = 0;
     double ttBenz = 0;

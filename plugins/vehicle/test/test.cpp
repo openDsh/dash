@@ -496,14 +496,18 @@ void Test::readFrame()
 
                 if (id == "0130")
                 {
+                    double cons = ((canMsg[1]<<8)+canMsg[2])*0.03054;
+                    double tempcons;
 
-                    //double tempVolt = (((canMsg[0] << 8) + canMsg[1])-28.0)/10.0;
-                    double tempVolt = 2.8+canMsg[1]*0.1;
+                    if(cons != lastcons){
+                        tempcons = cons - lastcons;
+                        lastcons = cons;
+                    }
 
-                    if (ttVolt != tempVolt)
+                    if (ttlastcons != tempcons)
                     {
-                        this->arbiter->vehicle_update_data("lsvolt", tempVolt);
-                        ttVolt = tempVolt;
+                        this->arbiter->vehicle_update_data("lsiniezs", tempcons);
+                        ttlastcons = tempcons;
                     }
                 }
             }
