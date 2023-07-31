@@ -51,7 +51,7 @@ class Climate : public QWidget {
     void fan_speed(int fan_speed);
     uint8_t airflow() const { return this->airflow_; }
     void airflow(uint8_t airflow);
-    int left_temp() const { return this->left_temp_; }
+    QString left_temp() const { return this->left_temp_; }
     void left_temp(QString left_temp);
     int right_temp() const { return this->right_temp_; }
     void right_temp(int right_temp);
@@ -60,7 +60,7 @@ class Climate : public QWidget {
     int max_fan_speed_ = 0;
     int fan_speed_ = 0;
     uint8_t airflow_ = Airflow::OFF;
-    int left_temp_ = 0;
+    QString left_temp_;
     int right_temp_ = 0;
 
     ClimateSnackBar *snack_bar;
