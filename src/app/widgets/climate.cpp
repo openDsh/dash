@@ -51,9 +51,9 @@ QLayout *ClimateSnackBar::state()
     return layout;
 }
 
-void ClimateSnackBar::set_left_temp(int temp)
+void ClimateSnackBar::set_left_temp(QString temp)
 {
-    this->left_temp->setText(QString("%1°").arg(temp));
+    this->left_temp->setText(temp);
     this->open(3000);
 }
 
@@ -107,7 +107,7 @@ void Climate::airflow(uint8_t airflow)
     this->snack_bar->set_airflow(this->airflow_);
 }
 
-void Climate::left_temp(int left_temp)
+void Climate::left_temp(QString left_temp)
 {
     this->left_temp_ = left_temp;
     this->snack_bar->set_left_temp(this->left_temp_);

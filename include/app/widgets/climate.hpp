@@ -24,7 +24,7 @@ class ClimateSnackBar : public SnackBar {
    public:
     ClimateSnackBar(Arbiter &arbiter);
 
-    void set_left_temp(int temp);
+    void set_left_temp(QString temp);
     void set_right_temp(int temp);
     void set_airflow(uint8_t airflow);
     void set_max_fan_speed(int max_speed);
@@ -52,7 +52,7 @@ class Climate : public QWidget {
     uint8_t airflow() const { return this->airflow_; }
     void airflow(uint8_t airflow);
     int left_temp() const { return this->left_temp_; }
-    void left_temp(int left_temp);
+    void left_temp(QString left_temp);
     int right_temp() const { return this->right_temp_; }
     void right_temp(int right_temp);
 

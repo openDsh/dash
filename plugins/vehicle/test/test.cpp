@@ -26,7 +26,7 @@ bool Test::init(SocketCANBus *bus)
     if (this->arbiter)
     {
         this->vehicle = new Vehicle(*this->arbiter);
-        this->vehicle->pressure_init("psi", 35);
+        this->vehicle->pressure_init("km", 35);
         this->vehicle->disable_sensors();
         this->vehicle->rotate(270);
 
@@ -40,17 +40,11 @@ bool Test::init(SocketCANBus *bus)
                         case 0:
                             this->climate->airflow(Airflow::OFF);
                             break;
-                        case 9:
-                            this->vehicle->sensor(Position::FRONT_LEFT, rand() % 5);
-                            break;
                         case 10:
                             this->vehicle->sensor(Position::FRONT_MIDDLE_LEFT, rand() % 5);
                             break;
                         case 11:
                             this->vehicle->sensor(Position::FRONT_MIDDLE_RIGHT, rand() % 5);
-                            break;
-                        case 12:
-                            this->vehicle->sensor(Position::FRONT_RIGHT, rand() % 5);
                             break;
                         case 13:
                             this->vehicle->sensor(Position::BACK_LEFT, rand() % 5);
@@ -337,6 +331,37 @@ void Test::readFrame()
 
                 if (id == "06C8")
                 {
+                    switch (canMsg[4])
+                    {
+                    case 0x30:
+                        this->climate->fan_speed(0)
+                        break;
+                    case 0x31:
+                        this->climate->fan_speed(1)
+                        break;
+                    case 0x32:
+                        this->climate->fan_speed(2)
+                        break;
+                    case 0x33:
+                        this->climate->fan_speed(3)
+                        break;
+                    case 0x34:
+                        this->climate->fan_speed(4)
+                        break;
+                    case 0x35:
+                        this->climate->fan_speed(5)
+                        break;
+                    case 0x36:
+                        this->climate->fan_speed(6)
+                        break;
+                    case 0x37:
+                        this->climate->fan_speed(7)
+                        break;
+                    case 0x41:
+                        //fanSpeed = "AUTO";
+                        break;
+                    }
+
                     switch (canMsg[0]) // mode?
                     {
                     case 0x21: // normal mode, change flow direction
@@ -366,7 +391,7 @@ void Test::readFrame()
                                 this->climate->airflow(Airflow::DEFROST | Airflow::FEET);
                                 break;
                             case 0x59: // dir_auto:
-                                DASH_LOG(info) << "AC AUTO \r\n";
+                                //DASH_LOG(info) << "AC AUTO \r\n";
                                 break;
                             }
                         }
@@ -377,14 +402,38 @@ void Test::readFrame()
                         {
                         case 0x03:
                             tempAC = 10 * (canMsg[3] - 0x30) + (canMsg[5] - 0x30);
-                            this->climate->left_temp(tempAC);
-                            this->climate->right_temp(tempAC);
+                            this->climate->left_temp(QString("%1°").arg(tempAC));
+                            //this->climate->right_temp(tempAC);
                             break;
 
+                        case 0x4C:
+                            this->climate->left_temp(QString("LOW"));
+                            break;
+
+                        case 0x48:
+                            this->climate->left_temp(QString("HIGH"));
+                            break;
+                        case 0x36:
+                            this->climate->airflow(Airflow::DEFROST);
+                            break;
+                        /*
                         case 0x50: // fan set. canMsg[3] = canMsg[4] = ascii
                             fanAC = canMsg[3] - 0x30;
                             this->climate->fan_speed(fanAC);
                             break;
+                        */
+                        }
+                        if(canMsg[4] == 0x25){
+                            if(canMsg[5] == 0x01){
+                                this->climate->airflow(Airflow::AC); //ac on
+                            }
+                            if(canMsg[5] == 0x03){
+                                this->climate->airflow(Airflow::OFF); //ac off
+                            }
+                        }
+                        if(canMsg[2] == 0xE0){
+                            //fanauto
+                            //climauto
                         }
                         break;
 
@@ -426,6 +475,25 @@ void Test::readFrame()
                 }
 
                 //LSCAN
+
+                if(id == "0110"){
+                    double leftWheel = ((canMsg[1] << 8 | canMsg[2])*1.5748)*0.00001;
+                    double rightWheel = ((canMsg[3] << 8 | canMsg[4]) * 1.5748) * 0.00001;
+                    dist = (leftWheel + rightWheel) /2;
+
+                    if (ttrightWheel != rightWheel)
+                    {
+                        this->vehicle->sensor(Position::FRONT_RIGHT, rightWheel);
+                        ttrightWheel = rightWheel;
+                    }
+                                            
+                    if (ttlefttWheel != leftWheel)
+                    {
+                        this->vehicle->sensor(Position::FRONT_LEFT, leftWheel);
+                        ttleftWheel = leftWheel;
+                    }
+
+                }
 
                 if(id == "0145")
                 {
