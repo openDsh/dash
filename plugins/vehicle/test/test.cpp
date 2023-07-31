@@ -498,6 +498,7 @@ void Test::readFrame()
                 if(id == "0145")
                 {
                     int tempCoolant = ((int)canMsg[3]) - 40;
+                    ign = canMsg[1];
 
                     if (ttCool != tempCoolant)
                     {
@@ -561,10 +562,6 @@ void Test::readFrame()
                         this->arbiter->vehicle_update_data("lsvolt", tempVolt);
                         ttVolt = tempVolt;
                     }
-                }
-
-                if( id == "0145"){
-                    ign = canMsg[1];
                 }
 
                 if (id == "0130")
