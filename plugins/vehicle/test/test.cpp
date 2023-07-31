@@ -494,20 +494,45 @@ void Test::readFrame()
                     }
                 }
 
+                if( id == "0145"){
+                    ign = canMsg[1];
+                }
+
                 if (id == "0130")
                 {
-                    double cons = ((canMsg[1]<<8)+canMsg[2])*0.03054;
+                    double cons = (canMsg[1]<<8)+canMsg[2];
                     double tempcons;
+                    double hcons;
 
-                    if(cons != lastcons){
-                        tempcons = cons - lastcons;
-                        lastcons = cons;
-                    }
+                    if(ign!=0){
 
-                    if (ttlastcons != tempcons)
-                    {
-                        this->arbiter->vehicle_update_data("lsiniezs", tempcons);
-                        ttlastcons = tempcons;
+                        if(cons != lastcons){
+
+                            if(cons<lastcons){
+                                tempcons = (cons + 0xFFFF - lastcons) * 0.03054;
+                                hcons = (cons + 0xFFFF - lastcons) * 0.03054 * 36;
+                            }
+
+                            if(cons>lastcons){
+                                tempcons = (cons - lastcons) * 0.03054;
+                                hcons = (cons - lastcons) * 0.03054 * 36;
+                            }
+                        
+                            lastcons = cons;
+                        }
+
+                        if (ttlastconss != tempcons)
+                        {
+                            this->arbiter->vehicle_update_data("lsiniezs", tempcons);
+                            ttlastconss = tempcons;
+                        }
+
+                        if (ttlastconsh != hcons)
+                        {
+                            this->arbiter->vehicle_update_data("lsiniezh", hcons);
+                            ttlastconsh = hcons;
+                        }
+
                     }
                 }
             }
