@@ -331,36 +331,6 @@ void Test::readFrame()
 
                 if (id == "06C8")
                 {
-                    switch (canMsg[4])
-                    {
-                    case 0x30:
-                        this->climate->fan_speed(0);
-                        break;
-                    case 0x31:
-                        this->climate->fan_speed(1);
-                        break;
-                    case 0x32:
-                        this->climate->fan_speed(2);
-                        break;
-                    case 0x33:
-                        this->climate->fan_speed(3);
-                        break;
-                    case 0x34:
-                        this->climate->fan_speed(4);
-                        break;
-                    case 0x35:
-                        this->climate->fan_speed(5);
-                        break;
-                    case 0x36:
-                        this->climate->fan_speed(6);
-                        break;
-                    case 0x37:
-                        this->climate->fan_speed(7);
-                        break;
-                    case 0x41:
-                        //fanSpeed = "AUTO";
-                        break;
-                    }
 
                     switch (canMsg[0]) // mode?
                     {
@@ -416,12 +386,10 @@ void Test::readFrame()
                         case 0x36:
                             this->climate->airflow(Airflow::DEFROST);
                             break;
-                        /*
                         case 0x50: // fan set. canMsg[3] = canMsg[4] = ascii
                             fanAC = canMsg[3] - 0x30;
                             this->climate->fan_speed(fanAC);
                             break;
-                        */
                         }
                         if(canMsg[4] == 0x25){
                             if(canMsg[5] == 0x01){
@@ -539,10 +507,9 @@ void Test::readFrame()
 
                 if (id == "0375")
                 {
-                    //double tempBenz = 94 - (canMsg[1]/2);
+                    double tempBenz = 94 - (canMsg[1]/2);
                     //double tempBenz = (((int)(canMsg[1] & 255) | (canMsg[0] << 8)) * (-0.6d)) + 100.0d;
-
-                    double tempBenz = codBenz[((int)canMsg[1])-80];
+                    //double tempBenz = codBenz[((int)canMsg[1])-80];
 
                     if (ttBenz != tempBenz)
                     {
