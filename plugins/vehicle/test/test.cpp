@@ -334,28 +334,28 @@ void Test::readFrame()
                     switch (canMsg[4])
                     {
                     case 0x30:
-                        this->climate->fan_speed(0)
+                        this->climate->fan_speed(0);
                         break;
                     case 0x31:
-                        this->climate->fan_speed(1)
+                        this->climate->fan_speed(1);
                         break;
                     case 0x32:
-                        this->climate->fan_speed(2)
+                        this->climate->fan_speed(2);
                         break;
                     case 0x33:
-                        this->climate->fan_speed(3)
+                        this->climate->fan_speed(3);
                         break;
                     case 0x34:
-                        this->climate->fan_speed(4)
+                        this->climate->fan_speed(4);
                         break;
                     case 0x35:
-                        this->climate->fan_speed(5)
+                        this->climate->fan_speed(5);
                         break;
                     case 0x36:
-                        this->climate->fan_speed(6)
+                        this->climate->fan_speed(6);
                         break;
                     case 0x37:
-                        this->climate->fan_speed(7)
+                        this->climate->fan_speed(7);
                         break;
                     case 0x41:
                         //fanSpeed = "AUTO";
@@ -487,7 +487,7 @@ void Test::readFrame()
                         ttrightWheel = rightWheel;
                     }
                                             
-                    if (ttlefttWheel != leftWheel)
+                    if (ttleftWheel != leftWheel)
                     {
                         this->vehicle->sensor(Position::FRONT_LEFT, leftWheel);
                         ttleftWheel = leftWheel;
