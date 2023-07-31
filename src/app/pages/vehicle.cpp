@@ -54,19 +54,19 @@ GaugesConfig gauges_cfg =
          { return x; }},
         {"lmb2", "Sonda Lambda 2", {"V", "V"}, {8, 18, 10}, 1, [](double x, bool si)
          { return x; }},
-        {"lsoil", "Olio motore", {"lvl", "lvl"}, {8, 18, 10}, 0, [](double x, bool si)
+        {"lsoil", "Olio motore", {"lvl", "lvl"}, {10, 16, 12}, 0, [](double x, bool si)
          { return x; }},
-        {"lslvlcoolant", "Livello Antigelo", {"lvl", "lvl"}, {8, 18, 10}, 0, [](double x, bool si)
+        {"lslvlcoolant", "Livello Antigelo", {"lvl", "lvl"}, {10, 16, 12}, 0, [](double x, bool si)
          { return x; }},
-        {"lsbenz", "Benzina", {"L", "L"}, {8, 18, 10}, 1, [](double x, bool si)
+        {"lsbenz", "Benzina", {"L", "L"}, {10, 16, 12}, 1, [](double x, bool si)
          { return x; }},
-        {"lsvolt", "Tensione Batteria", {"V", "V"}, {8, 18, 10}, 1, [](double x, bool si)
+        {"lsvolt", "Tensione Batteria", {"V", "V"}, {10, 16, 12}, 1, [](double x, bool si)
          { return x; }},
-        {"lsiniezs", "Cons. inst.", {"ml/s", "ml/s"}, {8, 18, 10}, 1, [](double x, bool si)
+        {"lsiniezs", "Cons. inst.", {"ml/s", "ml/s"}, {10, 16, 12}, 1, [](double x, bool si)
          { return x; }},
-        {"lsiniezh", "Cons. orari", {"L", "L"}, {8, 18, 10}, 1, [](double x, bool si)
+        {"lsiniezh", "Cons. orari", {"L", "L"}, {10, 16, 12}, 1, [](double x, bool si)
          { return x; }},
-        {"lsiniezkm", "Cons. ogni 100km", {"L", "L"}, {8, 18, 10}, 1, [](double x, bool si)
+        {"lsiniezkm", "Cons. ogni 100km", {"L", "L"}, {10, 16, 12}, 1, [](double x, bool si)
          { return x; }}
          };
 

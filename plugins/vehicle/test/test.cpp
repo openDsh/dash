@@ -456,7 +456,7 @@ void Test::readFrame()
                         this->arbiter->vehicle_update_data("lslvlcoolant", templvlCoolant);
                         ttlvlCool = templvlCoolant;
                     }
-
+                /*
                     double temp = ((((canMsg[1] & 0x03) << 8) + canMsg[2])/ 8.0) - 40.0;
 
                     if (temp != tempsalvata)
@@ -465,6 +465,7 @@ void Test::readFrame()
                         this->arbiter->vehicle_update_data("ext_temp", temp);
                         tempsalvata = temp;
                     }
+                */
                 }
 
                 if (id == "0375")
