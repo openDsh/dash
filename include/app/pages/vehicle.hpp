@@ -196,5 +196,6 @@ public:
 
 private:
     Arbiter &arbiter;
-    QWidget *aq_widget();
+    QWidget *aq_row_widget();
+    QWidget *aq_selector_widget();
 };

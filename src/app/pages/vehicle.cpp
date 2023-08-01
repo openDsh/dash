@@ -187,11 +187,26 @@ LSTab::LSTab(Arbiter &arbiter, QWidget *parent)
 ACTab::ACTab(Arbiter &arbiter, QWidget *parent)
     : QWidget(parent), arbiter(arbiter)
 {
-    QHBoxLayout *layout = new QHBoxLayout(this);
-    layout->addWidget(this->aq_widget(), 1);
+    QVBoxLayout *layout = new QVBoxLayout(this);
+
+    layout->addWidget(this->aq_row_widget(), 1);
+    layout->addWidget(Session::Forge::br(), 1);
 }
 
-QWidget *ACTab::aq_widget()
+QWidget *ACTab::aq_row_widget()
+{
+    QWidget *widget = new QWidget(this);
+    QHBoxLayout *layout = new QHBoxLayout(widget);
+
+    QLabel *label = new QLabel("Ventilazione automatica", widget);
+    layout->addWidget(label, 1);
+
+    layout->addWidget(this->aq_selector_widget(), 1);
+
+    return widget;
+}
+
+QWidget *ACTab::aq_selector_widget()
 {
     QWidget *widget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
@@ -202,6 +217,14 @@ QWidget *ACTab::aq_widget()
     //connect(selector, &Selector::item_changed, [this](QString item){ this->arbiter.set_brightness_plugin(item); });
 
     layout->addWidget(selector);
+    
+    Switch *toggle = new Switch(widget);
+    toggle->scale(this->arbiter.layout().scale);
+    /*toggle->setChecked(this->arbiter.core().cursor);
+    connect(toggle, &Switch::stateChanged, [this](bool state){
+        this->arbiter.set_cursor(state);
+    });*/
+    layout->addWidget(toggle, 1, Qt::AlignHCenter);
 
     return widget;
 }
