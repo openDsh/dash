@@ -190,7 +190,7 @@ ACTab::ACTab(Arbiter &arbiter, QWidget *parent)
     QVBoxLayout *layout = new QVBoxLayout(this);
 
     layout->addWidget(this->aq_row_widget(), 1);
-    layout->addWidget(Session::Forge::br(true));
+    layout->addWidget(Session::Forge::br(), 1);
 }
 
 QWidget *ACTab::aq_row_widget()
@@ -216,7 +216,7 @@ QWidget *ACTab::aq_selector_widget()
     Selector *selector = new Selector(autoblower, "high", this->arbiter.forge().font(14), this->arbiter, widget, "high");
     //connect(selector, &Selector::item_changed, [this](QString item){ this->arbiter.set_brightness_plugin(item); });
 
-    layout->addWidget(selector);
+    layout->addWidget(selector, 1);
     
     Switch *toggle = new Switch(widget);
     toggle->scale(this->arbiter.layout().scale);
