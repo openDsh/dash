@@ -198,4 +198,6 @@ private:
     Arbiter &arbiter;
     QWidget *aq_row_widget();
     QWidget *aq_selector_widget();
+    QWidget *ac_row_widget();
+    QWidget *ac_switch_widget();
 };

@@ -191,6 +191,7 @@ ACTab::ACTab(Arbiter &arbiter, QWidget *parent)
 
     layout->addWidget(this->aq_row_widget(), 1);
     layout->addWidget(Session::Forge::br(), 1);
+    layout->addWidget(this->ac_row_widget(), 1);
 }
 
 QWidget *ACTab::aq_row_widget()
@@ -206,6 +207,19 @@ QWidget *ACTab::aq_row_widget()
     return widget;
 }
 
+QWidget *ACTab::ac_row_widget()
+{
+    QWidget *widget = new QWidget(this);
+    QHBoxLayout *layout = new QHBoxLayout(widget);
+
+    QLabel *label = new QLabel("Aria Condizionata", widget);
+    layout->addWidget(label, 1);
+
+    layout->addWidget(this->ac_switch_widget(), 1);
+
+    return widget;
+}
+
 QWidget *ACTab::aq_selector_widget()
 {
     QWidget *widget = new QWidget(this);
@@ -217,6 +231,22 @@ QWidget *ACTab::aq_selector_widget()
     //connect(selector, &Selector::item_changed, [this](QString item){ this->arbiter.set_brightness_plugin(item); });
 
     layout->addWidget(selector, 1);
+    
+    Switch *toggle = new Switch(widget);
+    toggle->scale(this->arbiter.layout().scale);
+    /*toggle->setChecked(this->arbiter.core().cursor);
+    connect(toggle, &Switch::stateChanged, [this](bool state){
+        this->arbiter.set_cursor(state);
+    });*/
+    layout->addWidget(toggle, 1, Qt::AlignHCenter);
+
+    return widget;
+}
+
+QWidget *ACTab::ac_switch_widget()
+{
+    QWidget *widget = new QWidget(this);
+    QVBoxLayout *layout = new QVBoxLayout(widget);
     
     Switch *toggle = new Switch(widget);
     toggle->scale(this->arbiter.layout().scale);
