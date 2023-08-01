@@ -186,3 +186,15 @@ private:
 
     std::vector<Gauge *> gauges;
 };
+
+class ACTab : public QWidget
+{
+    Q_OBJECT
+
+public:
+    ACTab(Arbiter &arbiter, QWidget *parent = nullptr);
+
+private:
+    Arbiter &arbiter;
+    QWidget *aq_widget();
+};

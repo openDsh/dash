@@ -62,7 +62,7 @@ GaugesConfig gauges_cfg =
          { return x; }},
         {"lsvolt", "Tensione Batteria", {"V", "V"}, {10, 16, 12}, 1, [](double x, bool si)
          { return x; }},
-        {"lsiniezs", "Cons. inst.", {"ml/s", "ml/s"}, {10, 16, 12}, 1, [](double x, bool si)
+        {"lsiniezs", "Cons. inst.", {"ml/s", "ml/s"}, {10, 16, 12}, 2, [](double x, bool si)
          { return x; }},
         {"lsiniezh", "Cons. orari", {"L", "L"}, {10, 16, 12}, 1, [](double x, bool si)
          { return x; }},
@@ -184,6 +184,28 @@ LSTab::LSTab(Arbiter &arbiter, QWidget *parent)
         } });
 }
 
+ACTab::ACTab(Arbiter &arbiter, QWidget *parent)
+    : QWidget(parent), arbiter(arbiter)
+{
+    QHBoxLayout *layout = new QHBoxLayout(this);
+    layout->addWidget(this->aq_widget(), 1);
+}
+
+QWidget *ACTab::aq_widget()
+{
+    QWidget *widget = new QWidget(this);
+    QVBoxLayout *layout = new QVBoxLayout(widget);
+
+    QList<QString> autoblower = {"low","med","high"};
+
+    Selector *selector = new Selector(autoblower, "high", this->arbiter.forge().font(14), this->arbiter, widget, "high");
+    //connect(selector, &Selector::item_changed, [this](QString item){ this->arbiter.set_brightness_plugin(item); });
+
+    layout->addWidget(selector);
+
+    return widget;
+}
+
 Gauge::Gauge(GaugeConfig cfg, QFont value_font, QFont unit_font, Gauge::Orientation orientation, QWidget *parent)
     : QWidget(parent)
 {
@@ -260,6 +282,7 @@ void VehiclePage::init()
     this->addTab(new LSTab(this->arbiter, this), "CAN2");
     this->addTab(new Obd1Tab(this->arbiter, this), "OBD1");
     this->addTab(new Obd2Tab(this->arbiter, this), "OBD2");
+    this->addTab(new ACTab(this->arbiter, this), "AC");
     this->config = Config::get_instance();
 
     for (auto device : QCanBus::instance()->availableDevices("socketcan"))

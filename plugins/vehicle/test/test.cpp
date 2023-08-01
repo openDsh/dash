@@ -362,6 +362,7 @@ void Test::readFrame()
                                 break;
                             case 0x59: // dir_auto:
                                 //DASH_LOG(info) << "AC AUTO \r\n";
+                                this->climate->right_temp("AUTO");
                                 break;
                             }
                         }
@@ -373,7 +374,6 @@ void Test::readFrame()
                         case 0x03:
                             tempAC = 10 * (canMsg[3] - 0x30) + (canMsg[5] - 0x30);
                             this->climate->left_temp(QString("%1°").arg(tempAC));
-                            //this->climate->right_temp(tempAC);
                             break;
 
                         case 0x4C:
@@ -394,14 +394,15 @@ void Test::readFrame()
                         if(canMsg[4] == 0x25){
                             if(canMsg[5] == 0x01){
                                 this->climate->airflow(Airflow::AC); //ac on
+                                this->climate->right_temp("AC ON");
                             }
                             if(canMsg[5] == 0x03){
                                 this->climate->airflow(Airflow::OFF); //ac off
+                                this->climate->right_temp("AC OFF");
                             }
                         }
                         if(canMsg[2] == 0xE0){
-                            //fanauto
-                            //climauto
+                            this->climate->right_temp("AUTO");//climauto flowauto
                         }
                         break;
 
@@ -412,7 +413,7 @@ void Test::readFrame()
                         break;
 
                     case 0x25: // normal mode, auto flow speed, status
-                        // 4 is E0 = full auto speed, 41 = manual flow direction
+                        // [4] is E0 = full auto speed, 41 = manual flow direction
                         break;
 
                     case 0x26: // air distribution mode,
@@ -543,12 +544,12 @@ void Test::readFrame()
 
                             if(cons<lastcons){
                                 tempcons = (cons + 0xFFFF - lastcons) * 0.03054;
-                                hcons = (cons + 0xFFFF - lastcons) * 0.03054 * 36;
+                                hcons = tempcons * 3.6;
                             }
 
                             if(cons>lastcons){
                                 tempcons = (cons - lastcons) * 0.03054;
-                                hcons = (cons - lastcons) * 0.03054 * 36;
+                                hcons = tempcons * 3.6;
                             }
                         
                             lastcons = cons;
