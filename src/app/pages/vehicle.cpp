@@ -190,7 +190,7 @@ ACTab::ACTab(Arbiter &arbiter, QWidget *parent)
     QVBoxLayout *layout = new QVBoxLayout(this);
 
     layout->addWidget(this->aq_row_widget(), 1);
-    layout->addWidget(Session::Forge::br(), 1);
+    layout->addWidget(Session::Forge::br(true));
 }
 
 QWidget *ACTab::aq_row_widget()
