@@ -406,7 +406,7 @@ void Test::readFrame()
                                 break;
                             case 0x59: // dir_auto:
                                 //DASH_LOG(info) << "AC AUTO \r\n";
-                                this->climate->right_temp("AUTO");
+                                this->climate->right_temp("AUTO1");
                                 break;
                             }
                         }
@@ -446,7 +446,7 @@ void Test::readFrame()
                             }
                         }
                         if(canMsg[2] == 0xE0){
-                            this->climate->right_temp("AUTO");//climauto flowauto
+                            this->climate->right_temp("AUTO2");//climauto flowauto
                         }
                         break;
 
