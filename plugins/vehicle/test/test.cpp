@@ -542,7 +542,7 @@ void Test::readFrame()
                 if (id == "0375")
                 {
                     double tempBenz = 94 - (((int)canMsg[1])/2);
-                    double tempBenz = (((int)((canMsg[1] & 255) | (canMsg[0] << 8))) * (-0.6)) + 100.0;
+                    //double tempBenz = (((int)((canMsg[1] & 255) | (canMsg[0] << 8))) * (-0.6)) + 100.0;
                     //double tempBenz = codBenz[((int)canMsg[1])-80];
 
                     if (ttBenz != tempBenz)
