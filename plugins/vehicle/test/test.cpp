@@ -272,25 +272,25 @@ void Test::readFrame()
                 if (id == "0208")
                 {
                     if((canMsg[0] == 0x01) && (canMsg[1] == 0x17) && (canMsg[2] == 0x00) && bloccato == false){
-                        msleep(200);
+                        usleep(200000);
                         bus->socket.write(QString("CAN USER TX CH1 0208 06081601").toUtf8()); //turn right
-                        msleep(200);
+                        usleep(200000);
                         bus->socket.write(QString("CAN USER TX CH1 0208 06011700").toUtf8()); //button press
-                        msleep(70);
+                        usleep(70000);
                         bus->socket.write(QString("CAN USER TX CH1 0208 06001700").toUtf8()); //button release
-                        msleep(200);
+                        usleep(200000);
                         bus->socket.write(QString("CAN USER TX CH1 0208 060816FF").toUtf8()); //turn left
-                        msleep(30);
+                        usleep(30000);
                         bus->socket.write(QString("CAN USER TX CH1 0208 060816FF").toUtf8()); //turn left
-                        msleep(200);
+                        usleep(200000);
                         bus->socket.write(QString("CAN USER TX CH1 0208 060816FF").toUtf8()); //turn left
-                        msleep(30);
+                        usleep(30000);
                         bus->socket.write(QString("CAN USER TX CH1 0208 060816FF").toUtf8()); //turn left
-                        msleep(200);
+                        usleep(200000);
                         bus->socket.write(QString("CAN USER TX CH1 0208 06011700").toUtf8()); //button press
-                        msleep(70);
+                        usleep(70000);
                         bus->socket.write(QString("CAN USER TX CH1 0208 06001700").toUtf8()); //button release
-                        msleep(200);
+                        usleep(200000);
                     }
                 }
 
@@ -542,7 +542,7 @@ void Test::readFrame()
                 if (id == "0375")
                 {
                     double tempBenz = 94 - (((int)canMsg[1])/2);
-                    //double tempBenz = (((int)(canMsg[1] & 255) | (canMsg[0] << 8)) * (-0.6d)) + 100.0d;
+                    double tempBenz = (((int)((canMsg[1] & 255) | (canMsg[0] << 8))) * (-0.6)) + 100.0;
                     //double tempBenz = codBenz[((int)canMsg[1])-80];
 
                     if (ttBenz != tempBenz)
