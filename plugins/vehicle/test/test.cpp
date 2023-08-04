@@ -446,7 +446,7 @@ void Test::readFrame()
                             }
                         }
                         if(canMsg[2] == 0xE0){
-                            this->climate->right_temp("AUTO2");//climauto flowauto
+                          
                         }
                         break;
 
