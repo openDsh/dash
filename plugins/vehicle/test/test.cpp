@@ -271,7 +271,7 @@ void Test::readFrame()
 
                 if (id == "0208")
                 {
-                    if((canMsg[0] == 0x01) && (canMsg[1] == 0x17) && (canMsg[2] == 0x00) && bloccato == false){
+                    if((canMsg[0] == 0x01) && (canMsg[1] == 0x17) && (canMsg[2] == 0x00)){
                         usleep(200000);
                         bus->socket.write(QString("CAN USER TX CH1 0208 06081601\r\n").toUtf8()); //turn right
                         bus->socket.flush();
