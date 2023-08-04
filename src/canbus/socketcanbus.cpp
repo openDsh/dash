@@ -98,14 +98,6 @@ SocketCANBus::~SocketCANBus()
     this->socket.close();
 }
 
-bool SocketCANBus::writeFrame(int ch, QString frame)
-{
-    if (this->socket.write(QString("CAN USER TX CH%1 %2").arg(ch).arg(frame).toUtf8()) < 0)
-        return false;
-        
-    return true;
-}
-
 SocketCANBus *SocketCANBus::get_instance()
 {
     static SocketCANBus bus(NULL, Config::get_instance()->get_vehicle_interface());

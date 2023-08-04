@@ -273,23 +273,23 @@ void Test::readFrame()
                 {
                     if((canMsg[0] == 0x01) && (canMsg[1] == 0x17) && (canMsg[2] == 0x00) && bloccato == false){
                         msleep(200);
-                        bus->socket.writeFrame(1, "0208 06081601"); //turn right
+                        bus->socket.write(QString("CAN USER TX CH1 0208 06081601").toUtf8()); //turn right
                         msleep(200);
-                        bus->socket.writeFrame(1, "0208 06011700"); //button press
+                        bus->socket.write(QString("CAN USER TX CH1 0208 06011700").toUtf8()); //button press
                         msleep(70);
-                        bus->socket.writeFrame(1, "0208 06001700"); //button release
+                        bus->socket.write(QString("CAN USER TX CH1 0208 06001700").toUtf8()); //button release
                         msleep(200);
-                        bus->socket.writeFrame(1, "0208 060816FF"); //turn left
+                        bus->socket.write(QString("CAN USER TX CH1 0208 060816FF").toUtf8()); //turn left
                         msleep(30);
-                        bus->socket.writeFrame(1, "0208 060816FF"); //turn left
+                        bus->socket.write(QString("CAN USER TX CH1 0208 060816FF").toUtf8()); //turn left
                         msleep(200);
-                        bus->socket.writeFrame(1, "0208 060816FF"); //turn left
+                        bus->socket.write(QString("CAN USER TX CH1 0208 060816FF").toUtf8()); //turn left
                         msleep(30);
-                        bus->socket.writeFrame(1, "0208 060816FF"); //turn left
+                        bus->socket.write(QString("CAN USER TX CH1 0208 060816FF").toUtf8()); //turn left
                         msleep(200);
-                        bus->socket.writeFrame(1, "0208 06011700"); //button press
+                        bus->socket.write(QString("CAN USER TX CH1 0208 06011700").toUtf8()); //button press
                         msleep(70);
-                        bus->socket.writeFrame(1, "0208 06001700"); //button release
+                        bus->socket.write(QString("CAN USER TX CH1 0208 06001700").toUtf8()); //button release
                         msleep(200);
                     }
                 }
@@ -541,7 +541,7 @@ void Test::readFrame()
 
                 if (id == "0375")
                 {
-                    double tempBenz = 94 - (canMsg[1]/2);
+                    double tempBenz = 94 - (((int)canMsg[1])/2);
                     //double tempBenz = (((int)(canMsg[1] & 255) | (canMsg[0] << 8)) * (-0.6d)) + 100.0d;
                     //double tempBenz = codBenz[((int)canMsg[1])-80];
 
