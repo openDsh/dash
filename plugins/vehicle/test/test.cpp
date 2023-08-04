@@ -273,31 +273,31 @@ void Test::readFrame()
                 {
                     if((canMsg[0] == 0x01) && (canMsg[1] == 0x17) && (canMsg[2] == 0x00) && bloccato == false){
                         usleep(200000);
-                        bus->socket.write(QString("CAN USER TX CH1 0208 06081601").toUtf8()); //turn right
+                        bus->socket.write(QString("CAN USER TX CH1 0208 06081601\r\n").toUtf8()); //turn right
                         bus->socket.flush();
                         usleep(200000);
-                        bus->socket.write(QString("CAN USER TX CH1 0208 06011700").toUtf8()); //button press
+                        bus->socket.write(QString("CAN USER TX CH1 0208 06011700\r\n").toUtf8()); //button press
                         bus->socket.flush();
                         usleep(70000);
-                        bus->socket.write(QString("CAN USER TX CH1 0208 06001700").toUtf8()); //button release
+                        bus->socket.write(QString("CAN USER TX CH1 0208 06001700\r\n").toUtf8()); //button release
                         bus->socket.flush();
                         usleep(200000);
-                        bus->socket.write(QString("CAN USER TX CH1 0208 060816FF").toUtf8()); //turn left
+                        bus->socket.write(QString("CAN USER TX CH1 0208 060816FF\r\n").toUtf8()); //turn left
                         bus->socket.flush();
                         usleep(30000);
-                        bus->socket.write(QString("CAN USER TX CH1 0208 060816FF").toUtf8()); //turn left
+                        bus->socket.write(QString("CAN USER TX CH1 0208 060816FF\r\n").toUtf8()); //turn left
                         bus->socket.flush();
                         usleep(200000);
-                        bus->socket.write(QString("CAN USER TX CH1 0208 060816FF").toUtf8()); //turn left
+                        bus->socket.write(QString("CAN USER TX CH1 0208 060816FF\r\n").toUtf8()); //turn left
                         bus->socket.flush();
                         usleep(30000);
-                        bus->socket.write(QString("CAN USER TX CH1 0208 060816FF").toUtf8()); //turn left
+                        bus->socket.write(QString("CAN USER TX CH1 0208 060816FF\r\n").toUtf8()); //turn left
                         bus->socket.flush();
                         usleep(200000);
-                        bus->socket.write(QString("CAN USER TX CH1 0208 06011700").toUtf8()); //button press
+                        bus->socket.write(QString("CAN USER TX CH1 0208 06011700\r\n").toUtf8()); //button press
                         bus->socket.flush();
                         usleep(70000);
-                        bus->socket.write(QString("CAN USER TX CH1 0208 06001700").toUtf8()); //button release
+                        bus->socket.write(QString("CAN USER TX CH1 0208 06001700\r\n").toUtf8()); //button release
                         bus->socket.flush();
                         usleep(200000);
                     }
