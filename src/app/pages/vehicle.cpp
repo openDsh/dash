@@ -225,9 +225,9 @@ QWidget *ACTab::aq_selector_widget()
     QWidget *widget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
 
-    QList<QString> autoblower = {"low","med","high"};
+    QList<QString> autoblower = {"bassa","media","alta"};
 
-    Selector *selector = new Selector(autoblower, "high", this->arbiter.forge().font(14), this->arbiter, widget, "high");
+    Selector *selector = new Selector(autoblower, "alta", this->arbiter.forge().font(14), this->arbiter, widget, "high");
     //connect(selector, &Selector::item_changed, [this](QString item){ this->arbiter.set_brightness_plugin(item); });
 
     layout->addWidget(selector, 1);
@@ -325,7 +325,7 @@ QString Gauge::null_value()
 }
 
 VehiclePage::VehiclePage(Arbiter &arbiter, QWidget *parent)
-    : QTabWidget(parent), Page(arbiter, "Vehicle", "directions_car", true, this)
+    : QTabWidget(parent), Page(arbiter, "AUTO", "directions_car", true, this)
 {
 }
 

@@ -1,6 +1,7 @@
 #include <QDebug>
 #include <QTimer>
 #include <QString>
+#include <QThread>
 #include <QStringList>
 
 #include "test.hpp"
@@ -261,6 +262,38 @@ void Test::readFrame()
                     }
                 }
 
+                if (id == "02B0")
+                {
+                    if(!((canMsg[0] == 0x46) && (canMsg[1] == 0x0C) && (canMsg[2] == 0x00) && (canMsg[3] == 0xC8))){
+                        bloccato = true;
+                    }
+                }
+
+                if (id == "0208")
+                {
+                    if((canMsg[0] == 0x01) && (canMsg[1] == 0x17) && (canMsg[2] == 0x00) && bloccato == false){
+                        msleep(200);
+                        bus->socket.writeFrame(1, "0208 06081601"); //turn right
+                        msleep(200);
+                        bus->socket.writeFrame(1, "0208 06011700"); //button press
+                        msleep(70);
+                        bus->socket.writeFrame(1, "0208 06001700"); //button release
+                        msleep(200);
+                        bus->socket.writeFrame(1, "0208 060816FF"); //turn left
+                        msleep(30);
+                        bus->socket.writeFrame(1, "0208 060816FF"); //turn left
+                        msleep(200);
+                        bus->socket.writeFrame(1, "0208 060816FF"); //turn left
+                        msleep(30);
+                        bus->socket.writeFrame(1, "0208 060816FF"); //turn left
+                        msleep(200);
+                        bus->socket.writeFrame(1, "0208 06011700"); //button press
+                        msleep(70);
+                        bus->socket.writeFrame(1, "0208 06001700"); //button release
+                        msleep(200);
+                    }
+                }
+
                 // Esempio RX1 0450-460706FF
 
                 if (id == "0450")
@@ -393,11 +426,11 @@ void Test::readFrame()
                         }
                         if(canMsg[4] == 0x25){
                             if(canMsg[5] == 0x01){
-                                this->climate->airflow(Airflow::AC); //ac on
+                                //this->climate->airflow(Airflow::AC); ac on
                                 this->climate->right_temp("AC ON");
                             }
                             if(canMsg[5] == 0x03){
-                                this->climate->airflow(Airflow::OFF); //ac off
+                                //this->climate->airflow(Airflow::OFF); ac off
                                 this->climate->right_temp("AC OFF");
                             }
                         }
