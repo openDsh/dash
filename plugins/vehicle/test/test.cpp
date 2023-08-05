@@ -437,16 +437,19 @@ void Test::readFrame()
                         }
                         if(canMsg[4] == 0x25){
                             if(canMsg[5] == 0x01){
-                                //this->climate->airflow(Airflow::AC); ac on
-                                this->climate->right_temp("AC ON");
+                                ac = true;
                             }
                             if(canMsg[5] == 0x03){
-                                //this->climate->airflow(Airflow::OFF); ac off
-                                this->climate->right_temp("AC OFF");
+                                ac = false;
+                            }
+
+                            if(acprev!=ac){
+                                this->climate->right_temp(QString("AC %1").arg(ac?"ON":"OFF"));
+                                acprev=ac;
                             }
                         }
                         if(canMsg[2] == 0xE0){
-                          
+                            //this->climate->right_temp("AUTO2");climauto flowauto
                         }
                         break;
 
