@@ -34,12 +34,6 @@ SocketCANBus::SocketCANBus(QObject *parent, QString canInterface) : QObject(pare
             //QString aperturaHS = "CAN USER OPEN CH2 500K\r\n";
             //this->socket.write(aperturaHS.toUtf8());
 
-            QString aperturaLS = "CAN USER OPEN CH2 33K3 GMLAN\r\n";
-            this->socket.write(aperturaLS.toUtf8());
-
-            this->socket.flush();
-            usleep(200000);
-
             QString mascheraMS = "CAN USER MASK CH1 0FFF\r\n";
             this->socket.write(mascheraMS.toUtf8());
 
@@ -102,6 +96,12 @@ SocketCANBus::SocketCANBus(QObject *parent, QString canInterface) : QObject(pare
 
             //QString filtroTempAntigeloRX2 = "CAN USER FILTER CH2 0 0510\r\n";
             //this->socket.write(filtroTempAntigeloRX2.toUtf8());
+
+            QString aperturaLS = "CAN USER OPEN CH2 33K3 GMLAN\r\n";
+            this->socket.write(aperturaLS.toUtf8());
+
+            this->socket.flush();
+            usleep(200000);
 
             QString mascheraHS = "CAN USER MASK CH2 0FFF\r\n";
             this->socket.write(mascheraHS.toUtf8());
