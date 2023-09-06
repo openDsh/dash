@@ -233,7 +233,8 @@ MainWindow::MainWindow(QRect geometry)
 MainWindow *MainWindow::init(QRect geometry)
 {
     // force to either screen or custom size
-    this->setGeometry(geometry);
+    this->setFixedSize(geometry.size());
+    this->move(geometry.topLeft());
 
     return this;
 }
