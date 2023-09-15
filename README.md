@@ -8,4 +8,4 @@ Main added features of astraDash include:
 *	Read CanBus frames from localhost
 *	Camera size fix and brightness control
 * Fix clima bar
-* Read SWC, Clima, Temps, Speed.
+* Read SWC, Clima, Temps, Speed, oil level, fuel level, and more.
