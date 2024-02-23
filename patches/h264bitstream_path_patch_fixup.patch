@@ -1,0 +1,36 @@
+We need the pkgconfig to point at the installed location, not somewhere
+in the build directory.
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 9419cb6..e738bff 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -68,9 +68,10 @@ if(UNIX)
+ 
+ 	configure_file("${CMAKE_CURRENT_SOURCE_DIR}/libh264bitstream.pc.in"
+ 		"${CMAKE_CURRENT_BINARY_DIR}/libh264bitstream.pc"
++		@ONLY
+ 	)
+ 
+ 	install(FILES "${CMAKE_CURRENT_BINARY_DIR}/libh264bitstream.pc"
+ 		DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/pkgconfig"
+ 	)
+-endif(UNIX)
+\ No newline at end of file
++endif(UNIX)
+diff --git a/libh264bitstream.pc.in b/libh264bitstream.pc.in
+index 3211162..7a9ccc3 100644
+--- a/libh264bitstream.pc.in
++++ b/libh264bitstream.pc.in
+@@ -1,7 +1,7 @@
+-prefix=@prefix@
+-exec_prefix=@exec_prefix@
+-libdir=@libdir@
+-includedir=@includedir@
++prefix=@CMAKE_INSTALL_PREFIX@
++exec_prefix=${prefix}
++libdir=@CMAKE_INSTALL_FULL_LIBDIR@
++includedir=@CMAKE_INSTALL_INCLUDEDIR@
+ 
+ Name: @PROJECT_NAME@
+ Description: @PROJECT_DESCRIPTION@
