@@ -313,7 +313,7 @@ QWidget *Session::Forge::brightness_slider(bool buttons) const
 
     auto slider = new QSlider(Qt::Orientation::Horizontal);
     slider->setTracking(false);
-    slider->setRange(76, 255);
+    slider->setRange(0, 255);
     slider->setValue(this->arbiter_.system().brightness.value);
     QObject::connect(slider, &QSlider::sliderReleased, [this, slider]{
         this->arbiter_.set_brightness(slider->sliderPosition());

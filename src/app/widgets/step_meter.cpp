@@ -38,7 +38,7 @@ void StepMeter::paintEvent(QPaintEvent *event)
 
         QPainterPath path;
         path.addPolygon(bar);
-        painter.fillPath(path, (this->bars >= i) ? QBrush(this->bar_color) : QBrush(this->base_color));
+        painter.fillPath(path, (this->bars > i) ? QBrush(this->bar_color) : QBrush(this->base_color));
     }
 }
 

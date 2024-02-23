@@ -85,7 +85,7 @@ void Arbiter::set_curr_page(Page *page)
 {
     if (this->layout().page_id(page) < 0 || !page->enabled())
         return;
-
+    
     if (this->layout().fullscreen.enabled)
         this->layout().curr_page->container()->reset();
 
@@ -198,12 +198,12 @@ void Arbiter::set_brightness(uint8_t brightness)
 
 void Arbiter::decrease_brightness(uint8_t val)
 {
-    this->set_brightness(std::min(std::max(76, this->system().brightness.value - val), 255));
+    this->set_brightness(std::min(std::max(0, this->system().brightness.value - val), 255));
 }
 
 void Arbiter::increase_brightness(uint8_t val)
 {
-    this->set_brightness(std::min(std::max(76, this->system().brightness.value + val), 255));
+    this->set_brightness(std::min(std::max(0, this->system().brightness.value + val), 255));
 }
 
 void Arbiter::set_volume(uint8_t volume)
@@ -258,4 +258,10 @@ void Arbiter::set_action(Action *action, QString key)
 QMainWindow *Arbiter::window()
 {
     return this->window_;
+}
+
+
+void Arbiter::send_vehicle_data(QString gauge_id, double value)
+{
+    emit vehicle_update_data(gauge_id, value);
 }
