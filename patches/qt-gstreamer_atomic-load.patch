@@ -1,0 +1,13 @@
+diff --git a/elements/gstqtvideosink/gstqtvideosinkplugin.h b/elements/gstqtvideosink/gstqtvideosinkplugin.h
+index dc04671..a72c572 100644
+--- a/elements/gstqtvideosink/gstqtvideosinkplugin.h
++++ b/elements/gstqtvideosink/gstqtvideosinkplugin.h
+@@ -27,7 +27,7 @@ GST_DEBUG_CATEGORY_EXTERN(gst_qt_video_sink_debug);
+ #define DEFINE_TYPE_FULL(cpp_type, type_name, parent_type, additional_initializations) \
+     GType cpp_type::get_type() \
+     { \
+-        static volatile gsize gonce_data = 0; \
++        static gsize gonce_data = 0; \
+         if (g_once_init_enter(&gonce_data)) { \
+             GType type = 0; \
+             GTypeInfo info; \

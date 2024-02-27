@@ -1,0 +1,72 @@
+See: https://github.com/NixOS/nixpkgs/issues/144170
+
+diff --git a/src/QGlib/QtGLib-2.0.pc.in b/src/QGlib/QtGLib-2.0.pc.in
+index 96dac7c..2724e7a 100644
+--- a/src/QGlib/QtGLib-2.0.pc.in
++++ b/src/QGlib/QtGLib-2.0.pc.in
+@@ -1,7 +1,7 @@
+ prefix=@CMAKE_INSTALL_PREFIX@
+ exec_prefix=${prefix}
+-libdir=${prefix}/@CMAKE_INSTALL_LIBDIR@
+-includedir=${prefix}/@QTGSTREAMER_INCLUDES_INSTALL_DIR@
++libdir=@CMAKE_INSTALL_FULL_LIBDIR@
++includedir=@QTGSTREAMER_INCLUDES_INSTALL_DIR@
+ 
+ Name: @QTGLIB_LIBRARY@-2.0
+ Description: Qt-style C++ bindings library for GLib & GObject
+diff --git a/src/QGst/QtGStreamer-1.0.pc.in b/src/QGst/QtGStreamer-1.0.pc.in
+index d6fabc6..9926379 100644
+--- a/src/QGst/QtGStreamer-1.0.pc.in
++++ b/src/QGst/QtGStreamer-1.0.pc.in
+@@ -1,7 +1,7 @@
+ prefix=@CMAKE_INSTALL_PREFIX@
+ exec_prefix=${prefix}
+-libdir=${prefix}/@CMAKE_INSTALL_LIBDIR@
+-includedir=${prefix}/@QTGSTREAMER_INCLUDES_INSTALL_DIR@
++libdir=@CMAKE_INSTALL_FULL_LIBDIR@
++includedir=@QTGSTREAMER_INCLUDES_INSTALL_DIR@
+ 
+ Name: @QTGSTREAMER_LIBRARY@-1.0
+ Description: Qt-style C++ bindings library for GStreamer
+diff --git a/src/QGst/QtGStreamerQuick-1.0.pc.in b/src/QGst/QtGStreamerQuick-1.0.pc.in
+index 21ca0ec..89d4ca4 100644
+--- a/src/QGst/QtGStreamerQuick-1.0.pc.in
++++ b/src/QGst/QtGStreamerQuick-1.0.pc.in
+@@ -1,7 +1,7 @@
+ prefix=@CMAKE_INSTALL_PREFIX@
+ exec_prefix=${prefix}
+-libdir=${prefix}/@CMAKE_INSTALL_LIBDIR@
+-includedir=${prefix}/@QTGSTREAMER_INCLUDES_INSTALL_DIR@
++libdir=@CMAKE_INSTALL_FULL_LIBDIR@
++includedir=@QTGSTREAMER_INCLUDES_INSTALL_DIR@
+ 
+ Name: @QTGSTREAMER_QUICK_LIBRARY@-1.0
+ Description: QtQuick GStreamer integration library
+diff --git a/src/QGst/QtGStreamerUi-1.0.pc.in b/src/QGst/QtGStreamerUi-1.0.pc.in
+index fb62189..831c70e 100644
+--- a/src/QGst/QtGStreamerUi-1.0.pc.in
++++ b/src/QGst/QtGStreamerUi-1.0.pc.in
+@@ -1,7 +1,7 @@
+ prefix=@CMAKE_INSTALL_PREFIX@
+ exec_prefix=${prefix}
+-libdir=${prefix}/@CMAKE_INSTALL_LIBDIR@
+-includedir=${prefix}/@QTGSTREAMER_INCLUDES_INSTALL_DIR@
++libdir=@CMAKE_INSTALL_FULL_LIBDIR@
++includedir=@QTGSTREAMER_INCLUDES_INSTALL_DIR@
+ 
+ Name: @QTGSTREAMER_UI_LIBRARY@-1.0
+ Description: QtGui/QtWidgets GStreamer integration library
+diff --git a/src/QGst/QtGStreamerUtils-1.0.pc.in b/src/QGst/QtGStreamerUtils-1.0.pc.in
+index 96965ee..26cbc16 100644
+--- a/src/QGst/QtGStreamerUtils-1.0.pc.in
++++ b/src/QGst/QtGStreamerUtils-1.0.pc.in
+@@ -1,7 +1,7 @@
+ prefix=@CMAKE_INSTALL_PREFIX@
+ exec_prefix=${prefix}
+-libdir=${prefix}/@CMAKE_INSTALL_LIBDIR@
+-includedir=${prefix}/@QTGSTREAMER_INCLUDES_INSTALL_DIR@
++libdir=@CMAKE_INSTALL_FULL_LIBDIR@
++includedir=@QTGSTREAMER_INCLUDES_INSTALL_DIR@
+ 
+ Name: @QTGSTREAMER_UTILS_LIBRARY@-1.0
+ Description: QtGStreamer's high level utility classes
