@@ -34,6 +34,7 @@
             h264bitstream
             openDsh_aasdk
             openDsh_dash
+            openDsh_dash_nonnixos
             openDsh_openauto
             qtGStreamer
             ;

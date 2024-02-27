@@ -1,10 +1,12 @@
 {
+
   boost,
   cmake,
   gst_all_1,
   lib,
   libsForQt5,
   libusb,
+  mesa,
   openDsh_aasdk,
   openDsh_openauto,
   openssl,
@@ -15,9 +17,10 @@
   rtaudio,
   stdenv,
   taglib,
+  writeScriptBin,
   date,
 }:
-{
+rec {
   openDsh_dash = stdenv.mkDerivation {
     pname = "openDsh_dash";
     version = "${date}";
@@ -87,4 +90,27 @@
       mainProgram = "dash";
     };
   };
+
+  openDsh_dash_nonnixos = writeScriptBin "dash" ''
+    # Wrapper for dash for starting dash on Non-NixOS systems, which lack
+    # GPU drivers existing at /run/opengl-driver.
+    #
+    # Dash requires OpenGL drivers or "White Screen" will occur.
+    # "qt.qpa.wayland: EGL not available"
+    #
+    # This solution is a hack, but is the best hack for the situation.  The
+    # alternative is to use nixGL, but that will incur a runtime pentalty as
+    # a nix evaluation must be done and may require hundreds of megabytes to
+    # be downloaded at launch time.
+    #
+    # Nvidia support is ignored, if that is needed, use nixGL without this wrapper.
+    #
+    # If subprocesses are launched and have an issue with the GPU drivers, the user
+    # should configure the system to create a symlink to the mesa.drivers output
+    # at /run/opengl-driver and stop using this wrapper.
+
+    export LIBGL_DRIVERS_PATH=${mesa.drivers}/lib/dri
+    export LD_LIBRARY_PATH=${mesa.drivers}/lib
+    exec ${openDsh_dash}/bin/dash "$@"
+  '';
 }

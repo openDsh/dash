@@ -12,6 +12,7 @@
         inherit (packages)
           openDsh_aasdk
           openDsh_dash
+          openDsh_dash_nonnixos
           openDsh_openauto
           h264bitstream
           qtGStreamer

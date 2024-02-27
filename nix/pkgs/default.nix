@@ -17,5 +17,5 @@ in
   inherit (pkgs.callPackage ./qtgstreamer { }) qtGStreamer;
   inherit (pkgs.callPackage ./aasdk { }) openDsh_aasdk;
   inherit (pkgs.callPackage ./openauto { }) openDsh_openauto;
-  inherit (pkgs.callPackage ./dash { date = (mkDate self.lastModifiedDate); }) openDsh_dash;
+  inherit (pkgs.callPackage ./dash { date = (mkDate self.lastModifiedDate); }) openDsh_dash openDsh_dash_nonnixos;
 }
