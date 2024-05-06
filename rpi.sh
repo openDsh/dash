@@ -1,10 +1,7 @@
 #!/bin/bash
 
-#location of OS details for linux
-OS_RELEASE_FILE="/etc/os-release"
-
 #check if Raspian OS is active, otherwise kill script
-if grep -q "Raspbian" ${OS_RELEASE_FILE};
+if [ -f /etc/rpi-issue ];
 then
  echo "Great this script works for RaspberryPI OS"
 else
