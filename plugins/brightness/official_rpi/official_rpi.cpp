@@ -4,7 +4,16 @@
 
 OfficialRPi::OfficialRPi() : brightness_attribute(this->PATH)
 {
-    this->brightness_attribute.open(QIODevice::WriteOnly);
+    QString fkms_path = "/sys/class/backlight/rpi_backlight/brightness";
+    QString kms_path = "/sys/class/backlight/10-0045/brightness";
+ 
+    if (QFileInfo(kms_path).exists()) {
+        PATH = kms_path;
+    } else {
+        PATH = fkms_path;
+    }
+    brightness_attribute.setFileName(PATH);
+    brightness_attribute.open(QIODevice::WriteOnly);
 }
 
 OfficialRPi::~OfficialRPi()
