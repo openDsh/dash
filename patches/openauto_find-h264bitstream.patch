@@ -1,0 +1,25 @@
+It is installed properly, use pkg-config to find it.  It will not have a
+static path on nix as it will reside in the nix store, and that path depends
+on the complete closure of its derivation.
+
+diff --git a/cmake_modules/Findh264.cmake b/cmake_modules/Findh264.cmake
+index 0f9bffd..fa2b537 100644
+--- a/cmake_modules/Findh264.cmake
++++ b/cmake_modules/Findh264.cmake
+@@ -1,5 +1,14 @@
+-set (H264_INCLUDE_DIR /usr/local/include/h264bitstream)
+-set (H264_LIB_DIR /usr/local/lib)
++find_path(H264_INCLUDE_DIR
++    h264_avcc.h
++    PATHS ${H264_DIR}
++    PATH_SUFFIXES include
++)
++
++find_path(H264_LIB_DIR
++    libh264bitstream.a
++    PATHS ${H264_DIR}
++    PATH_SUFFIXES lib
++)
+ 
+ set(H264_FOUND TRUE)
+   

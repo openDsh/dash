@@ -1,0 +1,45 @@
+I give up, I don't knwo why cmake is not fixing rpath on the libs during the
+install phase.  This makes nix very angry, because a reference to /build/...
+is not right.  Tell cmake to build with install RPATH as I can't work out why
+it's not fixing up correctly.  It works fine in a dev shell during install phase.
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index da2af6b..db6c36d 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -17,7 +17,8 @@ set(CMAKE_AUTOMOC ON)
+ set(CMAKE_AUTOUIC ON)
+ set(CMAKE_AUTORCC ON)
+ 
+-set(base_directory ${CMAKE_CURRENT_SOURCE_DIR})					   
++set( CMAKE_BUILD_WITH_INSTALL_RPATH TRUE )
++set(base_directory ${CMAKE_CURRENT_SOURCE_DIR})
+ set(CMAKE_INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/lib)
+ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib)
+ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib)
+diff --git a/autoapp/CMakeLists.txt b/autoapp/CMakeLists.txt
+index 67946c8..0050c52 100644
+--- a/autoapp/CMakeLists.txt
++++ b/autoapp/CMakeLists.txt
+@@ -26,7 +26,7 @@ if(RPI_BUILD AND NOT GST_BUILD)
+ endif()
+ 
+ set_target_properties(autoapp
+-        PROPERTIES INSTALL_RPATH_USE_LINK_PATH 1)
++        PROPERTIES INSTALL_RPATH_USE_LINK_PATH 0)
+ 
+ install(TARGETS autoapp
+         RUNTIME DESTINATION bin)
+diff --git a/openauto/CMakeLists.txt b/openauto/CMakeLists.txt
+index 8f2238a..b1dd2f7 100644
+--- a/openauto/CMakeLists.txt
++++ b/openauto/CMakeLists.txt
+@@ -127,7 +127,7 @@ install(TARGETS openauto
+         LIBRARY DESTINATION lib)
+ 
+ set_target_properties(openauto
+-        PROPERTIES INSTALL_RPATH_USE_LINK_PATH 1)
++        PROPERTIES INSTALL_RPATH_USE_LINK_PATH 0)
+ 
+ install(DIRECTORY ${CMAKE_SOURCE_DIR}/include/openauto DESTINATION include)
+ install(DIRECTORY ${CMAKE_SOURCE_DIR}/include/btservice DESTINATION include)

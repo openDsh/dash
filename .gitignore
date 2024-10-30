@@ -5,6 +5,7 @@
 /lib
 /nbproject
 /cmake-build-debug
+/result
 
 # Compiled source #
 ###################
