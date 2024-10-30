@@ -582,10 +582,12 @@ void CameraPage::connect_local_stream()
     qDebug() << "camera status: " << this->local_cam->status();
 
     QSize res = this->choose_video_resolution();
+    
+    qDebug() << "RES=" << res;
 
     DASH_LOG(info) << "[CameraPage] Creating GStreamer pipeline with " << this->config->get_cam_local_device().toStdString();
     std::string pipeline = "v4l2src device=" + this->config->get_cam_local_device().toStdString() +
-                           " ! capsfilter caps=\"video/x-raw,width=" + std::to_string(res.width()) + ",height=" + std::to_string(res.height()) + ";image/jpeg,width=" + std::to_string(res.width()) + ",height=" + std::to_string(res.height()) + "\"" +
+                           " ! capsfilter caps=\"video/x-raw,width=" + std::to_string(res.width()) + ",height=" + std::to_string(res.height()) + ",colorimetry=bt601;image/jpeg,width=" + std::to_string(res.width()) + ",height=" + std::to_string(res.height()) + "\"" +
                            " ! decodebin";
     init_gstreamer_pipeline(pipeline);
     //emit the connected signal before we resize anything, so that videoContainer has had time to resize to the proper dimensions
@@ -646,7 +648,8 @@ QSize CameraPage::choose_video_resolution()
     QSize window_size = this->size();
     QCameraImageCapture imageCapture(this->local_cam);
     int min_gap = 10000, xgap, ygap;
-    QSize max_fit;
+    QSize max_fit, min_fit;
+    bool first = true;
     qDebug() << "camera: " << this->local_cam;
 
     qDebug() << "resolutions: " << imageCapture.supportedResolutions();
@@ -657,13 +660,21 @@ QSize CameraPage::choose_video_resolution()
             min_gap = xgap + ygap;
             max_fit = resolution;
         }
+        else{
+            if(first){
+                first=false;
+                min_fit=resolution;
+            }
+        }
     }
     if (max_fit.isValid()) {
         qDebug() << "Local cam auto resolution" << max_fit << "to fit in" << window_size;
         this->local_cam_settings.setResolution(max_fit);
     }
     else {
-        qDebug() << "No suitable resolutions found to fit in" << window_size;
+        qDebug() << "No suitable resolutions found to fit in" << window_size << ". I'll try with the lowest one " << min_fit;
+        this->local_cam_settings.setResolution(min_fit);
+        max_fit=min_fit;
     }
 
     if (this->config->get_cam_local_format_override() > 0) {

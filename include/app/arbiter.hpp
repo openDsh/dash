@@ -45,6 +45,7 @@ class Arbiter : public QObject {
     void increase_volume(uint8_t val);
     void set_cursor(bool enabled);
     void set_action(Action *action, QString key);
+    void send_vehicle_data(QString gauge_id, double value);
 
     QMainWindow *window();
     QSettings &settings() { return this->session_.settings_; }
@@ -77,4 +78,5 @@ class Arbiter : public QObject {
     void volume_changed(uint8_t volume);
     void cursor_changed(bool enabled);
     void action_changed(Action *action, QString key);
+    void vehicle_update_data(QString gauge_id, double value);
 };

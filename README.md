@@ -1,42 +1,23 @@
-# OpenDash
+# astraDash
 
-OpenDash is a Qt-based infotainment center for your Linux OpenAuto installation!
-The OpenDash project includes OpenAuto, AASDK, and Dash.
+astraDash is a Qt-based infotainment center for my Opel Astra H GTC Linux setup!
+The astraDash project includes OpenAuto, AASDK, and OpenDash.
 
-Main features of Dash include:
+Main added features of astraDash include:
 
-*	Embedded OpenAuto `Windowed/Fullscreen`
-*	Wireless OpenAuto Capability
-*	On-screen Volume, Brightness, & Theme Control
-*	Responsive Scalable UI `Adjustable for screen size`
-*	Bluetooth Media Control
-*	Real-Time Vehicle OBD-II Data & SocketCAN Capabilities
-*	Theming `Dark/Light mode` `Customizable RGB Accent Color`
-*	True Raspberry Pi 7” Official Touchscreen Brightness Control
-*	App-Launcher built in
-*	Camera Access `Streaming/Local` `Backup` `Dash`
-*	Keyboard Shortcuts `GPIO Triggerable`
+*	Read CanBus frames from localhost
+*	Camera size fix and brightness control
+* Fix clima bar
+* Read SWC, Clima, Temps, Speed, oil level, fuel level, and more.
 
-![](docs/imgs/opendash-ui.gif)
 
-# Getting Started
 
-## Video walk through
-_steps may be slightly different such as ia (intelligent-auto) has been renamed to dash, the UI has changed, etc..._
+![VirtualBox_Raspberry_15_09_2023_17_28_48](https://github.com/Gioee/astraDash/assets/48024736/cc016721-bed5-4a62-a9d0-ec41741e3f75)
 
-https://youtu.be/CIdEN2JNAzw
+![VirtualBox_Raspberry_15_09_2023_17_29_05](https://github.com/Gioee/astraDash/assets/48024736/859c11ee-af64-4587-9a68-9535dddefcbb)
 
-## Install Script
+![VirtualBox_Raspberry_15_09_2023_17_29_18](https://github.com/Gioee/astraDash/assets/48024736/0e7b7945-c339-4613-9159-b08777a23825)
 
-Dash can be built automatically utilizing an included script.
+![VirtualBox_Raspberry_15_09_2023_17_29_27](https://github.com/Gioee/astraDash/assets/48024736/d01e0933-ddb3-4da1-bf81-2d1f71bbdc3f)
 
-The install script included in the dash repo will install all the required packages and compile all portions of the OpenDash project.
-
-### 1. Clone the repo, Run the install script
-```
-git clone https://github.com/openDsh/dash
-
-cd dash
-
-./install.sh
-```
+![VirtualBox_Raspberry_15_09_2023_17_29_36](https://github.com/Gioee/astraDash/assets/48024736/ab18e7df-929a-46ed-b63c-08c1ce8a1979)
