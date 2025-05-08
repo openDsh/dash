@@ -9,7 +9,6 @@ class RadioPlugin : public Plugin {
     virtual void play() = 0;
     virtual void stop() = 0;
     virtual void freq(int hz) = 0;
-    virtual QWidget* get_widget() = 0; // P17eb, Pa6cd
 };
 
 #define RadioPlugin_iid "openDsh.plugins.RadioPlugin"

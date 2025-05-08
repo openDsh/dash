@@ -29,13 +29,3 @@ void WelleIo::freq(int hz)
     if(this->socket.state() == QAbstractSocket::ConnectedState)
         this->socket.write(QJsonDocument(QJsonObject({{"method", "SetFrequency"}, {"params", QJsonArray({hz})}})).toJson());
 }
-
-QWidget* WelleIo::get_widget()
-{
-    QWidget *widget = new QWidget();
-    QLabel *label = new QLabel("Welle.io Radio", widget);
-    QVBoxLayout *layout = new QVBoxLayout(widget);
-    layout->addWidget(label);
-    widget->setLayout(layout);
-    return widget;
-}

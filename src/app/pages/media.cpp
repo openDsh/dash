@@ -178,7 +178,7 @@ RadioPlayerTab::RadioPlayerTab(Arbiter &arbiter, QWidget *parent)
 
     auto layout = new QVBoxLayout(this);
     layout->addStretch(1);
-    layout->addWidget(this->get_widget(), 1);
+    layout->addWidget(this->tuner_widget(), 1);
     layout->addWidget(this->controls_widget(), 3);
     layout->addStretch(1);
 
@@ -219,12 +219,44 @@ QWidget *RadioPlayerTab::dialog_body()
     return widget;
 }
 
-QWidget *RadioPlayerTab::get_widget()
+QWidget *RadioPlayerTab::tuner_widget()
 {
-    if (RadioPlugin *plugin = qobject_cast<RadioPlugin *>(this->loader.instance())) {
-        return plugin->get_widget();
-    }
-    return nullptr;
+    auto widget = new QWidget(this);
+    auto layout = new QHBoxLayout(widget);
+    layout->setSpacing(0);
+
+    auto dialog = new Dialog(this->arbiter, true, this->window());
+    dialog->set_body(this->dialog_body());
+
+    auto load_button = new QPushButton("load");
+    connect(load_button, &QPushButton::clicked, [this]{ this->load_plugin(); });
+    dialog->set_button(load_button);
+
+    auto settings_button = new QPushButton();
+    settings_button->setFlat(true);
+    this->arbiter.forge().iconize("settings", settings_button, 24);
+    connect(settings_button, &QPushButton::clicked, [dialog]{ dialog->open(); });
+
+    auto station = new QLabel(QString::number(this->tuner->sliderPosition() / 10.0, 'f', 1));
+    station->setFont(this->arbiter.forge().font(36, true));
+    connect(this->tuner, &Tuner::valueChanged, [this, station](int freq){
+        this->config->set_radio_station(freq);
+        station->setText(QString::number(freq / 10.0, 'f', 1));
+        if (RadioPlugin *plugin = qobject_cast<RadioPlugin *>(this->loader.instance()))
+            plugin->freq(freq * 100000);
+    });
+
+    // auto info = new QLabel("station info");
+    // info->setWordWrap(true);
+
+    layout->addStretch(2);
+    layout->addWidget(settings_button);
+    layout->addWidget(station, 2);
+    // layout->addWidget(info, 3);
+    layout->addWidget(this->play_button, 3);
+    layout->addStretch(2);
+
+    return widget;
 }
 
 QWidget *RadioPlayerTab::controls_widget()
