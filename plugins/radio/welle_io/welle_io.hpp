@@ -3,6 +3,9 @@
 #include <QObject>
 #include <QProcess>
 #include <QTcpSocket>
+#include <QWidget>
+#include <QLabel>
+#include <QVBoxLayout>
 
 #include "plugins/radio_plugin.hpp"
 
@@ -16,6 +19,7 @@ class WelleIo : public QObject, RadioPlugin {
     void play() override;
     void stop() override;
     void freq(int hz) override;
+    QWidget* get_widget() override;
 
    private:
     QProcess server;
