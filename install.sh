@@ -23,36 +23,6 @@ display_help() {
     echo
 }
 
-# Check Distro version
-if [ -f /etc/os-release ]; then
-  OS_DISTRO=$(source /etc/os-release; echo ${PRETTY_NAME%% *})
-  if [ $OS_DISTRO = "Debian" ]; then
-    isDebian=true
-    #determine if script is being run on bullseye or above
-    read -d . DEBIAN_VERSION < /etc/debian_version
-    if (( $DEBIAN_VERSION > 10 )); then
-      echo Detected Debian version of Bullseye or above
-      BULLSEYE=true
-    else
-      echo Older version of Debian detected
-      BULLSEYE=false
-    fi
-  elif [ $OS_DISTRO = "Ubuntu" ]; then
-    isUbuntu=true
-    UBUNTU_VERSION=$(source /etc/os-release; echo ${VERSION_ID%% *} | cut -c1-2)
-    if (( $UBUNTU_VERSION >= 22 )); then
-      echo Detcted Ubuntu version of Jammy or above
-      JAMMY=true
-    else
-      echo Older version of Ubuntu detected.
-      JAMMY=false
-    fi
-  else
-    echo "Unsupported OS detected. Recommended Debian 12 or Ubuntu 22.04"
-    exit 1
-  fi
-fi
-
 #check if /etc/rpi-issue exists, if not set the install Args to be false
 if [ -f /etc/rpi-issue ]
 then
