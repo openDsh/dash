@@ -68,3 +68,9 @@ openauto.ini
 plugins/vehicle/*
 !plugins/vehicle/test
 !plugins/vehicle/README.md
+
+bluez*/
+qtserialbus/
+aasdk/
+pulseaudio/
+qt-gstreamer/

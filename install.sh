@@ -3,9 +3,10 @@
 #repo addresses
 aasdkRepo="https://github.com/OpenDsh/aasdk"
 gstreamerRepo="https://github.com/GStreamer/qt-gstreamer"
-openautoRepo="https://github.com/openDsh/openauto"
+openautoRepo="https://github.com/CeSiumUA/openauto-kraftwagn.git"
 h264bitstreamRepo="https://github.com/aizvorski/h264bitstream"
 pulseaudioRepo="https://gitlab.freedesktop.org/pulseaudio/pulseaudio.git"
+qtserialbusRepo="https://github.com/qt/qtserialbus.git"
 
 #Help text
 display_help() {
@@ -14,6 +15,7 @@ display_help() {
     echo "   --aasdk          install and build aasdk"
     echo "   --openauto       install and build openauto "
     echo "   --gstreamer      install and build gstreamer "
+    echo "   --qtserialbus    install qtserialbus dependencies "
     echo "   --dash           install and build dash "
     echo "   --h264bitstream  install and build h264bitstream"
     echo "   --pulseaudio     install and build pulseaudio to fix raspberry pi bluetooth HFP"
@@ -97,6 +99,8 @@ if [ $# -gt 0 ]; then
                                     ;;
             --gstreamer )       gstreamer=true
                                     ;;
+            --qtserialbus )     qtserialbus=true
+                                    ;;
             --openauto )       openauto=true
                                     ;;
             --dash )           dash=true
@@ -162,7 +166,7 @@ dependencies=(
 "pulseaudio"
 "pulseaudio-module-bluetooth"
 "librtaudio-dev"
-"librtaudio6"
+# "librtaudio6"
 "libkf5bluezqt-dev"
 "libtag1-dev"
 "qml-module-qtquick2"
@@ -177,8 +181,13 @@ dependencies=(
 "libgstreamer-plugins-bad1.0-dev"
 "libunwind-dev"
 "qml-module-qtmultimedia"
-"libqt5serialbus5-dev"
-"libqt5serialbus5-plugins"
+# "libqt5serialbus5-dev"
+# "libqt5serialbus5-plugins"
+"libxml-parser-perl"
+"libsndfile1-dev"
+"qtbase5-dev"
+"qttools5-dev"
+"qttools5-dev-tools"
 "libqt5serialport5-dev"
 "libqt5websockets5-dev"
 "libqt5svg5-dev"
@@ -186,68 +195,67 @@ dependencies=(
 "libtool"
 "autoconf"
 "ffmpeg"
+"qtbase5-private-dev"
 )
 
 
 ###############################  dependencies  #########################
-if [ $deps = false ]
-  then
+if [ $deps = false ]; then
     echo -e skipping dependencies '\n'
+else
+  if [ $isDebian ] && [ $BULLSEYE = false ]; then
+    echo Adding qt5-default to dependencies
+    dependencies[${#dependencies[@]}]="qt5-default"
+  fi
+
+  echo installing dependencies
+  #loop through dependencies and install
+  echo Running apt update
+  sudo apt update
+
+  installString="sudo apt install -y "
+
+  #create apt install string
+  for i in ${dependencies[@]}; do
+    installString+=" $i"
+  done
+
+  #run install
+  ${installString}
+  if [[ $? -eq 0 ]]; then
+      echo -e All dependencies Installed ok '\n'
   else
-    if [ $isDebian ] && [ $BULLSEYE = false ]; then
-      echo Adding qt5-default to dependencies
-      dependencies[${#dependencies[@]}]="qt5-default"
-    fi
-
-    echo installing dependencies
-    #loop through dependencies and install
-    echo Running apt-get update
-    sudo apt-get update
-
-    installString="sudo apt-get install -y "
-
-    #create apt-get install string
-    for i in ${dependencies[@]}; do
-      installString+=" $i"
-    done
-
-    #run install
-    ${installString}
-    if [[ $? -eq 0 ]]; then
-        echo -e All dependencies Installed ok '\n'
-    else
-        echo Package failed to install with error code $?, quitting check logs above
-        exit 1
-    fi
+      echo Package failed to install with error code $?, quitting check logs above
+      exit 1
+  fi
 fi
 
 ############################### pulseaudio #########################
-if [ $pulseaudio = false ]
-  then
-    echo -e skipping pulseaudio '\n'
-  else
-    #change to project root
-    cd $script_path
-    
-    echo Preparing to compile and install pulseaudio
-    echo Grabbing pulseaudio deps
-    sudo sed -i 's/#deb-src/deb-src/g' /etc/apt/sources.list
-    sudo apt-get update -y
-    git clone $pulseaudioRepo
-    sudo apt-get install -y autopoint
-    cd pulseaudio
-    git checkout tags/v12.99.3
-    echo Applying imtu patch
-    sed -i 's/*imtu = 48;/*imtu = 60;/g' src/modules/bluetooth/backend-native.c
-    sed -i 's/*imtu = 48;/*imtu = 60;/g' src/modules/bluetooth/backend-ofono.c
-    sudo apt-get build-dep -y pulseaudio
-    ./bootstrap.sh
-    make -j4
-    sudo make install
-    sudo ldconfig
-    # copy configs and force an exit 0 just in case files are identical (we don't care but it will make pimod exit)
-    sudo cp /usr/share/pulseaudio/alsa-mixer/profile-sets/* /usr/local/share/pulseaudio/alsa-mixer/profile-sets/
-    cd ..
+if [ $pulseaudio = false ]; then
+  echo -e skipping pulseaudio '\n'
+else
+  #change to project root
+  cd $script_path
+  
+  echo Preparing to compile and install pulseaudio
+  echo Grabbing pulseaudio deps
+  sudo sed -i 's/#deb-src/deb-src/g' /etc/apt/sources.list
+  sudo apt update -y
+  git clone $pulseaudioRepo
+  sudo apt install -y autopoint
+  cd pulseaudio
+  git checkout tags/v12.99.3
+  echo Applying imtu patch
+  sed -i 's/*imtu = 48;/*imtu = 60;/g' src/modules/bluetooth/backend-native.c
+  sed -i 's/*imtu = 48;/*imtu = 60;/g' src/modules/bluetooth/backend-ofono.c
+  sudo apt build-dep -y pulseaudio
+  ./bootstrap.sh
+  make -j4
+  sudo make install
+  sudo ldconfig
+  # copy configs and force an exit 0 just in case files are identical (we don't care but it will make pimod exit)
+  sudo cp /usr/share/pulseaudio/alsa-mixer/profile-sets/* /usr/local/share/pulseaudio/alsa-mixer/profile-sets/
+  cd ..
 fi
 
 
@@ -257,7 +265,7 @@ if [ $ofono = false ]
     echo -e skipping ofono '\n'
   else
     echo Installing ofono
-    sudo apt-get install -y ofono
+    sudo apt install -y ofono
     if [[ $? -eq 0 ]]; then
         echo -e ofono Installed ok '\n'
     else
@@ -286,12 +294,12 @@ if [ $bluez = false ]
     cd $script_path
 
     echo Installing bluez
-    sudo apt-get install -y libdbus-1-dev libudev-dev libical-dev libreadline-dev libjson-c-dev
+    sudo apt install -y libdbus-1-dev libudev-dev libical-dev libreadline-dev libjson-c-dev
     wget www.kernel.org/pub/linux/bluetooth/bluez-5.63.tar.xz
     tar -xvf bluez-5.63.tar.xz bluez-5.63/
     rm bluez-5.63.tar.xz
     cd bluez-5.63
-    ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var --enable-library --disable-manpages --enable-deprecated
+    ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var --enable-library --disable-manpages --enable-deprecated --with-udevdir=/usr/lib/udev --with-systemdsystemunitdir=/usr/lib/systemd/system --with-systemduserunitdir=/usr/lib/systemd/user
     make
     sudo make install
     cd ..
@@ -537,7 +545,50 @@ else
 	echo -e Skipping Gstreamer'\n'
 fi
 
+if [ $qtserialbus = false ]; then
+  echo -e skipping qtserialbus dependencies '\n'
+else
+  echo Installing qtserialbus dependencies
 
+  #change to project root
+  cd $script_path
+
+  git clone --branch v5.15.2 $qtserialbusRepo
+
+  cd qtserialbus
+
+  mkdir build && cd build
+
+  echo Beginning qmake for qtserialbus
+  qmake ../
+
+  if [[ $? -eq 0 ]]; then
+    echo -e qtserialbus qmake OK'\n'
+  else
+    echo qtserialbus qmake failed with error code $?
+    exit 1
+  fi
+
+  echo Beginning make for qtserialbus
+  make
+  if [[ $? -eq 0 ]]; then
+    echo -e qtserialbus make OK'\n'
+  else
+    echo qtserialbus make failed with error code $?
+    exit 1
+  fi
+
+  echo Beginning make install for qtserialbus
+  sudo make install
+  if [[ $? -eq 0 ]]; then
+    echo -e qtserialbus installed ok'\n'
+  else
+    echo qtserialbus make install failed with error code $?
+    exit 1
+  fi
+
+  cd $script_path
+fi
 
 ###############################  openauto  #########################
 if [ $openauto = false ]; then
@@ -550,7 +601,7 @@ else
 
   #clone openauto
   echo -e cloning openauto'\n'
-  git clone $openautoRepo
+  git clone $openautoRepo openauto
   if [[ $? -eq 0 ]]; then
     echo -e cloned OK'\n'
   else
