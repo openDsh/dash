@@ -113,10 +113,50 @@
                 runtimeInputs = [
                   pkgs.coreutils
                   pkgs.findutils
+                  pkgs.jq
                   pkgs.nix
                 ];
                 text = ''
                   set -euo pipefail
+
+                  required_system="aarch64-linux"
+                  nix_config="$(nix config show --json)"
+                  host_system="$(printf '%s\n' "$nix_config" | jq -r '.system.value')"
+                  extra_platforms="$(printf '%s\n' "$nix_config" | jq -r '."extra-platforms".value | join(" ")')"
+
+                  nix_platform_ok="no"
+                  if [ "$host_system" = "$required_system" ]; then
+                    nix_platform_ok="yes"
+                  elif printf '%s\n' "$nix_config" | jq -e --arg system "$required_system" '."extra-platforms".value | index($system)' >/dev/null; then
+                    nix_platform_ok="yes"
+                  fi
+
+                  binfmt_ok="yes"
+                  if [ "$host_system" != "$required_system" ] && [ ! -r /proc/sys/fs/binfmt_misc/qemu-aarch64 ]; then
+                    binfmt_ok="no"
+                  fi
+
+                  if [ "$nix_platform_ok" != "yes" ] || [ "$binfmt_ok" != "yes" ]; then
+                    cat >&2 <<EOF
+                  Cannot build the Raspberry Pi image on this host yet.
+
+                  This image targets $required_system, but the local host is $host_system.
+
+                  Current host status:
+                    Nix extra-platforms: ''${extra_platforms:-<empty>}
+                    qemu-aarch64 binfmt: $binfmt_ok
+
+                  On a NixOS builder, add this to the host configuration:
+                    boot.binfmt.emulatedSystems = [ "$required_system" ];
+                    nix.settings.extra-platforms = [ "$required_system" ];
+
+                  On non-NixOS Linux, register qemu-aarch64 with binfmt_misc using the host's
+                  service manager or container tooling, then add this to nix.conf and restart
+                  the Nix daemon:
+                    extra-platforms = $required_system
+                  EOF
+                    exit 1
+                  fi
 
                   out_link="result-pi4-headunit-image"
                   nix build .#nixosConfigurations.pi4-headunit.config.system.build.sdImage \

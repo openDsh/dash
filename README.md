@@ -49,6 +49,42 @@ Compressed image artifacts are copied to:
 dist/images/*.img.zst
 ```
 
+The image target is `aarch64-linux`. On an `x86_64-linux` host, local image
+builds need host-level emulation before Nix can start the build. QEMU may come
+from Nix or from the host distribution, but `binfmt_misc` registration and Nix's
+accepted build platforms are configured on the builder machine.
+
+For a NixOS builder, add this to the host configuration and rebuild the host:
+
+```nix
+{
+  boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
+  nix.settings.extra-platforms = [ "aarch64-linux" ];
+}
+```
+
+For a non-NixOS Linux builder, register `qemu-aarch64` with `binfmt_misc` using
+the host's service manager or container tooling, then add this to `nix.conf` and
+restart the Nix daemon:
+
+```conf
+extra-platforms = aarch64-linux
+```
+
+The local preflight can be checked with:
+
+```sh
+nix config show | sed -n '/^extra-platforms =/p'
+test -r /proc/sys/fs/binfmt_misc/qemu-aarch64
+```
+
+Install QEMU ARM64 Handler (Fedora)
+
+```
+sudo dnf install -y qemu-user-static-aarch64
+sudo systemctl restart systemd-binfmt.service
+```
+
 ## Flake Outputs
 
 The initial Nix surface is intentionally small:
