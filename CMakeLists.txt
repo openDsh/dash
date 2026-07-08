@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.7.0)
 project(dash CXX)
 
+include(GNUInstallDirs)
+
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
@@ -11,9 +13,13 @@ set(include_directory ${base_directory}/include)
 set(plugins_directory ${base_directory}/plugins)
 include(${base_directory}/cmake_modules/functions.cmake)
 
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${base_directory}/lib)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${base_directory}/bin)
-set(EXECUTABLE_OUTPUT_PATH ${base_directory}/bin)
+option(GST_BUILD "Build with GStreamer support" ON)
+option(RPI_BUILD "Build Raspberry Pi-specific code paths" OFF)
+set(RPI_MODEL "" CACHE STRING "Raspberry Pi model hint, for example pi4")
+
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
 
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
@@ -40,15 +46,12 @@ find_package(Protobuf REQUIRED)
 find_package(OpenSSL REQUIRED)
 find_package(rtaudio REQUIRED)
 find_package(taglib REQUIRED)
+find_package(X11 REQUIRED)
 find_package(aasdk REQUIRED)
 find_package(openauto REQUIRED)
 
 if(RPI_BUILD AND NOT GST_BUILD)
-    add_definitions(-DUSE_OMX -DOMX_SKIP64BIT)
-    set(BCM_HOST_LIBRARIES "/opt/vc/lib/libbcm_host.so")
-    set(BCM_HOST_INCLUDE_DIRS "/opt/vc/include")
-    set(ILCLIENT_INCLUDE_DIRS "/opt/vc/src/hello_pi/libs/ilclient")
-    set(ILCLIENT_LIBRARIES "/opt/vc/src/hello_pi/libs/ilclient/libilclient.a;/opt/vc/lib/libvcos.so;/opt/vc/lib/libvcilcs.a;/opt/vc/lib/libvchiq_arm.so")
+    message(FATAL_ERROR "RPI_BUILD requires GST_BUILD in packaged builds")
 endif(RPI_BUILD AND NOT GST_BUILD)
 if(GST_BUILD)
     find_package(Qt5GStreamer)
@@ -61,22 +64,13 @@ if(GST_BUILD)
     add_definitions(-DUSE_GST)
     if(RPI_BUILD)
         add_definitions(-DRPI)
-        include(${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules/functions.cmake)
-        findRpiRevision( RPI_REVISION )
-        # https://www.raspberrypi.org/documentation/hardware/raspberrypi/revision-codes/README.md
-        # Decodes the 'Type' from revision code
-        math(EXPR RPI_MODEL "(0x${RPI_REVISION}>>4)&0xFF")
-        message( "-- Raspberry Pi Model: ${RPI_MODEL}" )
-        # Type 17 (0x11) is the RPI 4B
-        if(RPI_MODEL EQUAL 17)
-            message("Raspberry Pi 4 Found")
+        if(RPI_MODEL STREQUAL "pi4")
+            message("Raspberry Pi 4 build selected")
             add_definitions(-DPI4)
-        endif(RPI_MODEL EQUAL 17)
+        endif()
     endif(RPI_BUILD)
 endif(GST_BUILD)
 message(INFO "${GST_LIBRARIES}")
-
-link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
 
 file(GLOB_RECURSE source_files ${sources_directory}/*.cpp ${include_directory}/*.hpp ${resources_directory}/*.qrc)
 
@@ -151,4 +145,4 @@ target_link_libraries(dash
     ${TAGLIB_LIBRARIES}
     )
 
-install(TARGETS dash DESTINATION bin)
+install(TARGETS dash RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})

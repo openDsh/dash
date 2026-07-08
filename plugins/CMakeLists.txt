@@ -74,5 +74,6 @@ FOREACH(plugin_type ${plugin_types})
             ${TAGLIB_LIBRARIES}
             ${X11_LIBRARIES}
         )
+        install(TARGETS ${plugin} LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}/plugins/${plugin_type})
     ENDFOREACH()
 ENDFOREACH()

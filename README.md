@@ -19,24 +19,42 @@ Main features of Dash include:
 
 ![](docs/imgs/opendash-ui.gif)
 
-# Getting Started
+## Getting Started
 
-## Video walk through
-_steps may be slightly different such as ia (intelligent-auto) has been renamed to dash, the UI has changed, etc..._
+Dash is built with the repository flake. The supported entrypoints are:
 
-https://youtu.be/CIdEN2JNAzw
-
-## Install Script
-
-Dash can be built automatically utilizing an included script.
-
-The install script included in the dash repo will install all the required packages and compile all portions of the OpenDash project.
-
-### 1. Clone the repo, Run the install script
+```sh
+nix develop
+nix flake check --print-build-logs
+nix build .#dash --print-build-logs
 ```
-git clone https://github.com/openDsh/dash
 
-cd dash
+After a successful package build, the executable is available at:
 
-./install.sh
+```sh
+./result/bin/dash
 ```
+
+## Raspberry Pi Image
+
+The flake also defines a Raspberry Pi 4 NixOS image for a head-unit style deployment:
+
+```sh
+nix run .#make-images
+```
+
+Compressed image artifacts are copied to:
+
+```sh
+dist/images/*.img.zst
+```
+
+## Flake Outputs
+
+The initial Nix surface is intentionally small:
+
+- `devShells.default`
+- `packages.dash`
+- `checks.dash`
+- `apps.make-images`
+- `nixosConfigurations.pi4-headunit`

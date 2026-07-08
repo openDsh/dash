@@ -1,0 +1,113 @@
+{
+  "nodes": {
+    "aasdk": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1640548136,
+        "narHash": "sha256-Gqd+IHn3G3yU1/SSrp8B+isn1mhsGj2w41oMmSgkpQY=",
+        "owner": "OpenDsh",
+        "repo": "aasdk",
+        "rev": "1bc0fe69d5f5f505c978a0c6e32c860e820fa8f6",
+        "type": "github"
+      },
+      "original": {
+        "owner": "OpenDsh",
+        "repo": "aasdk",
+        "rev": "1bc0fe69d5f5f505c978a0c6e32c860e820fa8f6",
+        "type": "github"
+      }
+    },
+    "bluez-qt5": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1714822617,
+        "narHash": "sha256-F5vjaoHqwCQwCQENF6N3UBGsONGgZLm8hELV7vN/iKg=",
+        "type": "tarball",
+        "url": "https://download.kde.org/stable/frameworks/5.116/bluez-qt-5.116.0.tar.xz"
+      },
+      "original": {
+        "type": "tarball",
+        "url": "https://download.kde.org/stable/frameworks/5.116/bluez-qt-5.116.0.tar.xz"
+      }
+    },
+    "h264bitstream": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1718927416,
+        "narHash": "sha256-2LmprlZvtvPf0qlVT6WdoB4zyaLEjACE1Y46HAPzil0=",
+        "owner": "aizvorski",
+        "repo": "h264bitstream",
+        "rev": "70124d3051ba45e6b326264f0b25e6f48a7479e7",
+        "type": "github"
+      },
+      "original": {
+        "owner": "aizvorski",
+        "repo": "h264bitstream",
+        "rev": "70124d3051ba45e6b326264f0b25e6f48a7479e7",
+        "type": "github"
+      }
+    },
+    "nixpkgs": {
+      "locked": {
+        "lastModified": 1783389287,
+        "narHash": "sha256-0xIy4dVLqq47rA+mRy0hXDfjhQd4E5PoIns/RmB7nR4=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "0ad6f47ea4fe188f4bc8f0380f93ae8523337c6c",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixos-26.05",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "openauto": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1729650729,
+        "narHash": "sha256-3jCyJ+xXQfr4b62VoyBpzxlnurf4XpzV8uE8opvKfvE=",
+        "owner": "openDsh",
+        "repo": "openauto",
+        "rev": "e7caeb4d49186af867c1d4693c9f3bf9e9ef99e0",
+        "type": "github"
+      },
+      "original": {
+        "owner": "openDsh",
+        "repo": "openauto",
+        "rev": "e7caeb4d49186af867c1d4693c9f3bf9e9ef99e0",
+        "type": "github"
+      }
+    },
+    "qt-gstreamer": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1567842578,
+        "narHash": "sha256-4re3LDZS0NNeC2800J4TJ5SsI/b7MtdElwWcOPEYftU=",
+        "owner": "GStreamer",
+        "repo": "qt-gstreamer",
+        "rev": "6e4fb2f3fcfb453c5522c66457ac5ed8c3b1b05c",
+        "type": "github"
+      },
+      "original": {
+        "owner": "GStreamer",
+        "repo": "qt-gstreamer",
+        "rev": "6e4fb2f3fcfb453c5522c66457ac5ed8c3b1b05c",
+        "type": "github"
+      }
+    },
+    "root": {
+      "inputs": {
+        "aasdk": "aasdk",
+        "bluez-qt5": "bluez-qt5",
+        "h264bitstream": "h264bitstream",
+        "nixpkgs": "nixpkgs",
+        "openauto": "openauto",
+        "qt-gstreamer": "qt-gstreamer"
+      }
+    }
+  },
+  "root": "root",
+  "version": 7
+}

@@ -1,58 +1,25 @@
-# Heavily inspired (i.e. copy/paste) from https://gist.github.com/NickNaso/0d478f1481686d5bcc868cac06620a60
-name: Dash CMake Build Matrix
+name: Nix Build
 
-# Controls when the action will run. Triggers the workflow on push
-on: 
+on:
   push:
   pull_request:
-  release:
-    # tags:
-    # - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
   build:
-    # The type of runner that the job will run on
-    name: ${{ matrix.config.name }}
-    runs-on: ${{ matrix.config.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        config: 
-        - {
-            name: "Build Dash and dependencies",
-            os: ubuntu-latest,
-            build_type: "Release",
-            cc: "gcc",
-            cxx: "g++",
-            generators: "Ninja"
-          }
+    runs-on: ubuntu-latest
 
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3
+      - name: Check out repository
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
 
-      - name: Print env
-        run: |
-          echo github.event.action: ${{ github.event.action }}
-          echo github.event_name: ${{ github.event_name }}
+      - name: Install Nix
+        uses: cachix/install-nix-action@8aa03977d8d733052d78f4e008a241fd1dbf36b3
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
 
-      - name: Install dependencies on ubuntu
-        run: |
-          sudo apt-get update && sudo apt-get upgrade -y
-          # sudo apt-get install --no-install-recommends libxkbcommon-x11-0 libgl1-mesa-dev xserver-xorg-video-all xserver-xorg-input-all xserver-xorg-core xinit x11-xserver-utils
-          # cmake --version
-          # gcc --version
+      - name: Check flake
+        run: nix flake check --print-build-logs
 
-      - name: Build
-        shell: bash
-        run: ./install.sh
-
-      # - name: Run app and check logs
-      #   shell: bash
-      #   run: |
-      #     ./bin/dash > dash.log
-      #     grep 'Init complete!' dash.log
-      #     status=$?
-      #     [ $status -eq 0 ] && exit 0 || exit 1
+      - name: Build Dash
+        run: nix build .#dash --print-build-logs
