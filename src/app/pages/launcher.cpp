@@ -49,7 +49,13 @@ LauncherPlugins::LauncherPlugins(Arbiter &arbiter, QWidget *parent)
     connect(settings_button, &QPushButton::clicked, [this]() { this->dialog->open(); });
     this->setCornerWidget(settings_button);
 
-    for (auto launcher_plugin : this->config->get_launcher_plugins()) {
+    const auto configured_plugins = this->config->get_launcher_plugins();
+    for (const auto &launcher_plugin : configured_plugins) {
+        if (!this->plugins.contains(launcher_plugin)) {
+            this->config->set_launcher_plugin(launcher_plugin, true);
+            continue;
+        }
+
         auto plugin_loader = new QPluginLoader(this);
         plugin_loader->setFileName(this->plugins[launcher_plugin].absoluteFilePath());
 
