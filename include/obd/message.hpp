@@ -4,6 +4,7 @@
 #include <sstream>
 #include <string>
 #include <QByteArray>
+#include <algorithm>
 
 struct Message {
     unsigned char length;
@@ -28,6 +29,45 @@ struct Request : Message {
 };
 
 struct Response : Message {
+    bool success = false;
+    QByteArray data;
+    
+    explicit Response(const QByteArray &payload)
+    : Message{0, 0, 0}
+    {
+        if (payload.size() < 3)
+            return;
+        
+        this->length =
+        static_cast<unsigned char>(payload.at(0));
+        
+        if (this->length < 2)
+            return;
+        
+        this->mode =
+        static_cast<unsigned char>(payload.at(1)) - 0x40;
+        
+        this->PID =
+        static_cast<unsigned char>(payload.at(2));
+        
+        const int data_length =
+        std::min<int>(this->length - 2, payload.size() - 3);
+        
+        if (data_length > 0)
+            this->data = payload.mid(3, data_length);
+        
+        this->success = true;
+    }
+    
+    Response()
+    : Message{0, 0, 0}
+    , success(false)
+    {
+    }
+};
+
+/*
+struct Response : Message {
     bool success = true;
     QByteArray data;
 
@@ -42,3 +82,4 @@ struct Response : Message {
 
     Response() { this->success = false; }
 };
+*/

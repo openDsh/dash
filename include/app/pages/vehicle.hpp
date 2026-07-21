@@ -81,11 +81,13 @@ class DataTab : public QWidget {
 
    private:
     Arbiter &arbiter;
-    QWidget *speedo_tach_widget();
+    QWidget *speed_widget();
+    QWidget *rpm_widget();
     // QWidget *mileage_data_widget();
-    QWidget *engine_data_widget();
     QWidget *coolant_temp_widget();
     QWidget *engine_load_widget();
+    QWidget *intake_temp_widget();
+    QWidget *maf_widget();
 
     std::vector<Gauge *> gauges;
 };
